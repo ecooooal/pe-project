@@ -1,1 +1,33 @@
-{% extends 'components/base' %}
+{% from 'components/core/link-card' import link %}
+
+{% extends 'components/core/base' %}
+
+{% block content %}
+<div class="m-4 flex gap-5 justify-center" >
+    {{ link(name:'Exam Bank', number:5) }}
+    {{ link(name:'Question Bank', number:60) }}
+    {{ link(name:'Topic Bank', number:40) }}
+    {{ link(name:'Subject Bank', number:12) }}
+</div>
+
+<div class="m-4">
+    <div class="px-4 py-2 text-2xl font-bold">
+        <h1>Exams</h1>
+    </div>
+    
+   
+    <div class="flex gap-5 justify-center">
+        {% include 'components/core/exam-card' %}
+        {% include 'components/core/exam-card' %}
+        {% include 'components/core/exam-card' %}
+    </div>
+    
+    </div>
+
+<div class="m-4">
+    <div class="px-4 py-2 text-2xl font-bold">
+        <h1>Reports</h1>
+    </div>
+
+</div>
+{% endblock %}
