@@ -1,6 +1,5 @@
 {% macro sidebar_item(url, icon, label) %}
-{% set is_active = url == app.request.pathInfo  %}
-
+{% set is_active = url == '/' ~ app.request.pathInfo|split('/')[1]  %}
 <a href="{{ url }}" 
     class="flex items-center px-4 py-4 mt-1 rounded-lg
     {{ is_active ? 'text-white active bg-blue-900' : 'text-gray-600 transition-colors duration-300 transform hover:bg-gray-100 hover:text-gray-700'}}" >
