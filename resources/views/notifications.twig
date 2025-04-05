@@ -1,14 +1,31 @@
+{% from 'components/core/show-nav-item' import show_nav_item %}
 {% from 'components/core/breadcrumbs' import breadcrumb %}
+{% from 'components/core/show-header' import show_header %}
+{% from 'components/core/show-item' import show_item %}
+
 
 {% extends 'components/core/base' %}
 
 {% block content %}
 
 {{ breadcrumb() }}
-<div class="flex flex-1 flex-col">
-
-    <div class="flex max-w-full gap-x-4 overflow-x-auto mx-auto rounded-xl bg-white p-2 shadow-sm ring-1 ring-gray-950/5 ">
-        <h1 class="text-blue-900/80 font-bold text-2xl px-4 py-2">Notifications</h1>
+<div class="flex flex-1 flex-col gap-y-4">
+    <div class="flex max-w-full mx-16 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
+        <div class="flex flex-col p-4 flex-1">
+            {{ show_header('Notifications') }}
+            <div class="flex justify-between">
+                <div class="flex flex-col gap-y-4">
+                    {{ show_item('Notifications', 'Examination Name')}}
+                    {{ show_item('Notifications', '25')}}
+                    {{ show_item('Notifications', '50')}}
+                </div>
+                <div class="flex flex-col mr-16 gap-y-4">
+                    {{ show_item('Notifications', 'Incomplete', value_attributes:'text-red-600')}}
+                    {{ show_item('Notifications', 'ACS-CDE', value_attributes:'text-gray-400')}}
+                    {{ show_item('Notifications', 'Faculty Author')}}
+                </div>
+            </div>
+        </div>  
     </div>
-    </div>
+</div>
 {% endblock %}

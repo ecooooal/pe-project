@@ -1,5 +1,8 @@
 {% from 'components/core/show-nav-item' import show_nav_item %}
 {% from 'components/core/breadcrumbs' import breadcrumb %}
+{% from 'components/core/show-header' import show_header %}
+{% from 'components/core/show-item' import show_item %}
+
 
 {% extends 'components/core/base' %}
 
@@ -10,7 +13,7 @@
     <h1 class="font-bold text-4xl mx-4 p-2">Exam Show</h1>
 </div>
 
-<div class="flex flex-1 flex-col">
+<div class="flex flex-1 flex-col gap-y-4">
     <div class="flex max-w-full gap-x-4 overflow-x-auto mx-auto rounded-xl bg-white p-2 shadow-sm ring-1 ring-gray-950/5 ">
         {{ show_nav_item('/exams/show', 
                         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
@@ -28,6 +31,36 @@
                             <path d="M80 160c0-35.3 28.7-64 64-64l32 0c35.3 0 64 28.7 64 64l0 3.6c0 21.8-11.1 42.1-29.4 53.8l-42.2 27.1c-25.2 16.2-40.4 44.1-40.4 74l0 1.4c0 17.7 14.3 32 32 32s32-14.3 32-32l0-1.4c0-8.2 4.2-15.8 11-20.2l42.2-27.1c36.6-23.6 58.8-64.1 58.8-107.7l0-3.6c0-70.7-57.3-128-128-128l-32 0C73.3 32 16 89.3 16 160c0 17.7 14.3 32 32 32s32-14.3 32-32zm80 320a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"/>
                         </svg>',
                         'Manage Questions') }}
+    </div>
+
+    <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
+        <div class="flex flex-col p-4 flex-1">
+            {{ show_header('Details') }}
+            <div class="flex justify-between">
+                <div class="flex flex-col gap-y-4">
+                    {{ show_item('Name', 'Examination Name')}}
+                    {{ show_item('Current No. of Questions', '25')}}
+                    {{ show_item('Current No. of Points', '50')}}
+                </div>
+                <div class="flex flex-col mr-16 gap-y-4">
+                    {{ show_item('Status', 'Incomplete', value_attributes:'text-red-600')}}
+                    {{ show_item('Access Code', 'ACS-CDE', value_attributes:'text-gray-400')}}
+                    {{ show_item('Author', 'Faculty Author')}}
+                </div>
+            </div>
+        </div>  
+    </div>
+    <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
+        <div class="flex flex-col p-4 flex-1">
+            {{ show_header('Settings') }}
+            <div class="flex justify-between">
+                <div class="flex flex-col gap-y-4">
+                    {{ show_item('Examination Date', 'April 28 2025')}}
+                    {{ show_item('Exam Duration', '60 minutes')}}
+                    {{ show_item('Exam Retakes', 'Unlimited')}}
+                </div>
+            </div>
+        </div>  
     </div>
 </div>
 
