@@ -1,11 +1,13 @@
-{% macro table(headers, rows, header_attributes, row_attributes, url) %}
+{% macro table(headers, rows, header_attributes, row_attributes, url, actions = true, authorized = false) %}
     <table class="table-auto min-w-max w-full text-left bg-white border-t border-gray-300 rounded-t-2xl">
         <thead>
             <tr>
                 {% for header in headers %}
                     <th class="px-4 py-2 font-bold border-b border-gray-300 text-sm bg-gray-100 text-blue-900">{{ header }}</th>
                 {% endfor %}
-                <th class="px-4 py-2 font-bold border-b border-gray-300 text-sm bg-gray-100 text-blue-900">Actions</th>
+                {% if actions %}
+                    <th class="px-4 py-2 font-bold border-b border-gray-300 text-sm bg-gray-100 text-blue-900 ml-auto">Actions</th>
+                {% endif %}
 
             </tr>
         </thead>
@@ -17,11 +19,15 @@
                             <span class="block truncate">{{ cell }}</span>
                         </td>
                     {% endfor %}
+                    {% if actions %}
                         <td class="p-4 max-w-48  border-b border-gray-300">
                             <a href="/{{ url }}/show" class="text-blue-900 text-sm font-medium hover:underline">Open</a>
+                            {% if authorized %}
                             <a href="/{{ url }}/edit" class="pl-4 text-orange-400 text-sm font-medium hover:underline">Edit</a>
                             <a href="/{{ url }}/show" class="pl-4 text-red-600 text-sm font-medium hover:underline">Delete</a>
+                            {% endif %}
                         </td>
+                    {% endif %}
                 </tr>
             {% endfor %}
 

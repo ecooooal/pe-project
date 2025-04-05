@@ -18,6 +18,9 @@ Route::get('/exams/show', function(){
 Route::get('/exams/edit', function(){
     return view('exams/show');
 });
+Route::get('/exams/questions', function(){
+    return view('exams/questions');
+});
 
 
 Route::get('/questions', function(){
@@ -46,7 +49,9 @@ Route::get('/topics/show', function(){
 Route::get('/topics/edit', function(){
     return view('topics/show');
 });
-
+Route::get('/topics/questions', function(){
+    return view('topics/questions');
+});
 
 Route::get('/subjects', function(){
     return view('subjects/index');
@@ -59,6 +64,9 @@ Route::get('/subjects/show', function(){
 });
 Route::get('/subjects/edit', function(){
     return view('subjects/show');
+});
+Route::get('/subjects/questions', function(){
+    return view('subjects/questions');
 });
 
 Route::get('/exams/hello/time/set', function(){
