@@ -1,6 +1,15 @@
 {% from 'components/core/breadcrumbs' import breadcrumb %}
-
+{% from 'components/core/index-table' import table %}
 {% extends 'components/core/base' %}
+
+{% set headers = ['ID', 'Subject', 'Topic', 'Name', 'Type', 'Author', 'Date Created'] %}
+{% set rows = [
+    ['1', 'Computer Programming 1', 'Functions', 'What is the correct way to create a function in javaWhat is the correct way to create a function in javaWhat is the correct way to create a function in java?', 'Multiple Choice', 'Author_name', '04-19-2025'],
+    ['1', 'Computer Programming 1', 'Functions', 'What is the correct way to create a function in java?', 'Multiple Choice', 'Author_name', '04-19-2025'],
+    ['1', 'Computer Programming 1', 'Functions', 'What is the correct way to create a function in java?', 'Multiple Choice', 'Author_name', '04-19-2025'],
+    ['1', 'Computer Programming 1', 'Functions', 'What is the correct way to create a function in java?', 'Multiple Choice', 'Author_name', '04-19-2025'],
+
+] %}
 
 {% block content %}
 
@@ -10,50 +19,14 @@
     <a href="/questions/create" class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold">Create Question</a>
 </div>
 <div class="mx-4 p-4">
-    <div class="w-full h-16 p-8 bg-white border-x border-t border-gray-300 rounded-t-2xl">
+    <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-t border-gray-300 rounded-t-2xl">
+        <h1>Filter here</h1>
+    </div>
+    <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
+        {{ table(headers, rows, url:'questions') }}
 
     </div>
-
-
-
-    <table class="w-full p-8 bg-white border-x border-gray-300 border-collapse table-auto">
-        <tr class="bg-gray-50 text-black h-12 border border-gray-300">
-        <th><a href="/questions/show">Company</a></th>
-        <th>Contact</th>
-        <th>Country</th>
-        </tr>
-        <tr>
-        <td>Alfreds Futterkiste</td>
-        <td>Maria Anders</td>
-        <td>Germany</td>
-        </tr>
-        <tr>
-        <td>Centro comercial Moctezuma</td>
-        <td>Francisco Chang</td>
-        <td>Mexico</td>
-        </tr>
-        <tr>
-        <td>Ernst Handel</td>
-        <td>Roland Mendel</td>
-        <td>Austria</td>
-        </tr>
-        <tr>
-        <td>Island Trading</td>
-        <td>Helen Bennett</td>
-        <td>UK</td>
-        </tr>
-        <tr>
-        <td>Laughing Bacchus Winecellars</td>
-        <td>Yoshi Tannamuri</td>
-        <td>Canada</td>
-        </tr>
-        <tr>
-        <td>Magazzini Alimentari Riuniti</td>
-        <td>Giovanni Rovelli</td>
-        <td>Italy</td>
-        </tr>
-    </table>    
-    <div class="w-full h-16 p-4 bg-white border border-gray-300 rounded-b-2xl">
+    <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300 rounded-b-2xl">
         <h1>Pagination</h1>
     </div>
 </div>
