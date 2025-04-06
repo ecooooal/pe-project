@@ -16,7 +16,7 @@ Route::get('/exams/show', function(){
     return view('exams/show');
 });
 Route::get('/exams/edit', function(){
-    return view('exams/show');
+    return view('exams/edit');
 });
 Route::get('/exams/questions', function(){
     return view('exams/questions');
