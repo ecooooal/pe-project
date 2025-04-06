@@ -3,7 +3,11 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('home');
+    return view('landing-page');
+});
+
+Route::get('/faculty', function () {
+    return view('faculty-home');
 });
 
 Route::get('/exams', function(){
@@ -47,7 +51,7 @@ Route::get('/topics/show', function(){
     return view('topics/show');
 });
 Route::get('/topics/edit', function(){
-    return view('topics/show');
+    return view('topics/edit');
 });
 Route::get('/topics/questions', function(){
     return view('topics/questions');
@@ -63,7 +67,7 @@ Route::get('/subjects/show', function(){
     return view('subjects/show');
 });
 Route::get('/subjects/edit', function(){
-    return view('subjects/show');
+    return view('subjects/edit');
 });
 Route::get('/subjects/questions', function(){
     return view('subjects/questions');
