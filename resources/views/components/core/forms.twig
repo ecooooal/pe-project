@@ -1,0 +1,68 @@
+{% macro input(name, value, type, attributes) %}
+  <input name="{{ name }}" type="{{ type }}" value="{{ value }}"{% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %}{% if not attributes.id is defined %} id="{{ name }}"{% endif %}/>
+{% endmacro %}
+
+{% macro label(id, content, attributes) %}
+  <label for="{{ id }}"{% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %}>
+    {{ content|e }}
+  </label>
+{% endmacro %}
+
+{% macro text(name, value, attributes) %}
+  {% from _self import input %}
+  {{ input(name, value, "text", attributes) }}
+{% endmacro %}
+
+{% macro password(name, value, attributes) %}
+  {% from _self import input %}
+  {{ input(name, value, "password", attributes) }}
+{% endmacro %}
+
+{% macro email(name, value, attributes) %}
+  {% from _self import input %}
+  {{ input(name, value, "email", attributes) }}
+{% endmacro %}
+
+{% macro color(name, value, attributes) %}
+  {% from _self import input %}
+  {{ input(name, value, "color", attributes) }}
+{% endmacro %}
+
+{% macro date(name, value, attributes) %}
+  {% from _self import input %}
+  {{ input(name, value, "date", attributes) }}
+{% endmacro %}
+
+{% macro number(name, value, attributes) %}
+  {% from _self import input %}
+  {{ input(name, value, "number", attributes) }}
+{% endmacro %}
+
+{% macro time(name, value, attributes) %}
+  {% from _self import input %}
+  {{ input(name, value, "time", attributes) }}
+{% endmacro %}
+
+{% macro select(name, values, value, attributes) %}
+  <select name="{{ name }}"{% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %}{% if not attributes.id is defined %} id="{{ name }}"{% endif %}>
+    {% for key, name in values %}
+        <option value="{{ key }}"{% if value == key %} selected="selected"{% endif %}>{{ name }}</option>
+    {% endfor %}
+  </select>
+{% endmacro %}
+
+{% macro form_field(label, input, errors = 'None yet', isColumn = false) %}
+    {% if not isColumn %}
+        <div class="flex gap-x-4 pt-2 items-center">
+            {{ label }}
+            {{ input }}
+            <span class="text-red-500 text-sm whitespace-nowrap">{{ errors }}</span>    
+        </div>
+    {% else %}
+        <div class="flex flex-col gap-y-1 pt-2">
+            {{ label }}
+            {{ input }}
+            <span class="text-red-500 text-sm whitespace-nowrap">{{ errors }}</span>    
+        </div>
+    {% endif %}
+{% endmacro %}
