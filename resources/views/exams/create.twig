@@ -22,7 +22,7 @@
 
 <div class="flex flex-1 flex-col mx-16">
     <form action="/exams" class="flex flex-col gap-y-4">
-        <input type="hidden" name="_token" value="{{ csrf_token }}" autocomplete="off">
+        {{ csrf_field() }}
         <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
             <div class="flex flex-col p-4 flex-1">
                 {{ show_header('Details') }}
