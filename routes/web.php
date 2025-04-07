@@ -31,6 +31,9 @@ Route::get('/exams/questions', function(){
 Route::get('/questions', function(){
     return view('questions/index');
 });
+Route::post('/questions', function(Request $request){
+    dd($request->post());
+});
 Route::get('/questions/create', function(){
     return view('questions/create');
 });
@@ -71,7 +74,6 @@ Route::get('/questions/create/add-item', function () {
 
     return view('questions-types/new-text-item', ['counter' => $counter]);
 });
-
 
 Route::get('/topics', function(){
     return view('topics/index');
