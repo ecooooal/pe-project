@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -38,6 +39,37 @@ Route::get('/questions/show', function(){
 });
 Route::get('/questions/edit', function(){
     return view('questions/show');
+});
+Route::get('/questions/create/question-type', function (Request $request) {
+    $counter = session('counter', 4);
+    $type = $request->query('type'); 
+    switch ($type) {
+        case 'multiple_choice':
+            return view('questions-types/multiple-choice');
+        
+        case 'true_or_false':
+            return view('questions-types/true-false');
+        
+        case 'identification':
+            return view('questions-types/identification', compact('counter'));
+
+        case 'ranking_ordering_process':
+            return view('questions-types/rank-order-process');
+        
+        case 'coding':
+            return view('questions-types/coding');
+
+        default:
+            return '';
+        }
+});
+
+Route::get('/questions/create/add-item', function () {
+    $counter = session('counter', 4);
+    $counter++;
+    session()->flash('counter', $counter);
+
+    return view('questions-types/new-text-item', ['counter' => $counter]);
 });
 
 
