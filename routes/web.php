@@ -145,3 +145,5 @@ Route::get('/settings', function(){
 Route::get('/profile', function(){
     return view('profile');
 });
+
+//testing
