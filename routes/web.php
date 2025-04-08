@@ -107,6 +107,25 @@ Route::get('/subjects/questions', function(){
     return view('subjects/questions');
 });
 
+Route::get('/reviewers', function(){
+    return view('reviewers/index');
+});
+Route::get('/reviewers/create', function(){
+    return view('reviewers/create');
+});
+Route::post('/reviewers', function(Request $request){
+    dd($request->post());
+});
+Route::get('/reviewers/show', function(){
+    return view('reviewers/show');
+});
+Route::get('/reviewers/edit', function(){
+    return view('reviewers/edit');
+});
+Route::get('/reviewers/questions', function(){
+    return view('reviewers/questions');
+});
+
 Route::get('/exams/hello/time/set', function(){
     return view('exams/index');
 });
