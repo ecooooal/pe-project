@@ -142,8 +142,13 @@ Route::get('/settings', function(){
     return view('settings');
 });
 
-Route::get('/profile', function(){
-    return view('profile');
+Route::get('/profiles/show', function(){
+    return view('profiles/show');
 });
-
-//testing
+Route::get('/profiles/subjects', function(){
+    return view('profiles/subjects');
+});
+Route::get('/profiles/courses', function(){
+    return view('profiles/courses');
+});
+//testing hi i'm new branch
