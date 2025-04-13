@@ -34,6 +34,6 @@ class SessionController extends Controller
     
         $request->session()->regenerateToken();
     
-        return redirect('/test');
+        return redirect('/');
     }
 }

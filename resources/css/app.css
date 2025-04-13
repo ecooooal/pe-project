@@ -20,3 +20,13 @@
     --color-avocado-500: oklch(0.84 0.18 117.33);
     --color-avocado-600: oklch(0.53 0.12 118.34);
 }
+
+@layer utilities {
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  }

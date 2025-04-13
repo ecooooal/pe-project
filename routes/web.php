@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\SessionController;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -10,15 +11,41 @@ Route::get('/', function () {
 
 Route::get('/test', function () {
     return view('test-page');
-})->middleware('auth.basic');
+});
 
 Route::post('/login', [SessionController::class, 'authenticate']);
 Route::post('/logout', [SessionController::class, 'logout']);
 
+Route::group(['middleware' => ['role:faculty|admin']], function () { 
+    Route::get('/faculty', function () {
+        return view('faculty-home');
+    });
+ });
+Route::group(['middleware' => ['role:admin']], function () { 
+    Route::get('admins/access-control', function () {
+        return view('admins/access-control');
+    });
+    Route::get('admins/load-table', function () {
+        return view('admins/load-table');
+    });
+    Route::get('admins/roles', function () {
+        return view('admins/roles');
+    });
+    Route::get('admins/permissions', function () {
+        return view('admins/permissions');
+    });
+    Route::get('admins/users/{user}/show', function (User $user) {
+        return view('users.show', ['user' => $user]);
+    });
+    Route::get('admins/role-show', function(){
+        return view('roles/show');
+    });
+    Route::get('admins/permission-show', function(){
+        return view('permissions/show');
+    });
+ });
 
-Route::get('/faculty', function () {
-    return view('faculty-home');
-});
+
 
 Route::get('/exams', function(){
     return view('exams/index');

@@ -1,4 +1,4 @@
-{% macro table(headers, rows, header_attributes, row_attributes, url, actions = true, authorized = false) %}
+{% macro table(headers, rows, header_attributes, row_attributes, url, actions = true, authorized = false, forAdmin = false) %}
     <table class="table-auto min-w-max w-full text-left bg-white border-t border-gray-300 rounded-t-2xl">
         <thead>
             <tr>
@@ -15,13 +15,22 @@
             {% for row in rows %}
                 <tr class="hover:bg-gray-50">
                     {% for cell in row %}
+                    
                         <td class="p-4 border-b border-gray-300 max-w-xs text-sm {{ cell == 'Incomplete' ? 'text-red-600' : (cell == 'Complete' ? 'text-green-600' : '') }} ">
                             <span class="block truncate">{{ cell }}</span>
                         </td>
                     {% endfor %}
                     {% if actions %}
                         <td class="p-4 max-w-48  border-b border-gray-300">
-                            <a href="/{{ url }}/show" class="text-blue-900 text-sm font-medium hover:underline">Open</a>
+                            {% if not forAdmin %}
+                                <a href="/{{ url }}/show" class="text-blue-900 text-sm font-medium hover:underline">Open</a>
+                            {% else %}
+                            <button 
+                                class="text-blue-900 text-sm font-medium hover:underline"
+                                hx-get="/admins/{{ url }}/{{ row[0] }}/show"
+                                hx-swap="innerHTML transition:true" 
+                                hx-target="#access-control-content" >See</button>
+                            {% endif %}
                             {% if authorized %}
                             <a href="/{{ url }}/edit" class="pl-4 text-orange-400 text-sm font-medium hover:underline">Edit</a>
                             <a href="/{{ url }}/show" class="pl-4 text-red-600 text-sm font-medium hover:underline">Delete</a>
