@@ -27,7 +27,7 @@
                             {% else %}
                             <button 
                                 class="text-blue-900 text-sm font-medium hover:underline"
-                                hx-get="/admins/{{ url }}/{{ row[0] }}/show"
+                                hx-get="/admins/{{ url }}/{{ row.id }}/show"
                                 hx-swap="innerHTML transition:true" 
                                 hx-target="#access-control-content" >See</button>
                             {% endif %}

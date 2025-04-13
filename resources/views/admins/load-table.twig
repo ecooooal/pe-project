@@ -2,19 +2,12 @@
 {% from 'components/core/show-item' import show_item %}
 {% from 'components/core/index-table' import table %}
 
-{% set headers = ['ID', 'Name', 'Course', 'Questions', 'Date Created', 'Status'] %}
-{% set rows = [
-    ['1', 'Computer Science Proficiency Examination', 'BSCS', '48', '02-05-2025', 'Complete'],
-    ['2', 'Information Technology Proficiency Examination', 'BSIT', '48', '02-05-2025', 'Incomplete'],
-    ['3', 'Computer Engineer Proficiency Examination', 'BSCPE', '48', '02-05-2025', 'Incomplete'],
-    ['4', 'Multimedia Arts Proficiency Examination', 'BSMMA', '48', '02-05-2025', 'Incomplete']
-] %}
 <div class="mx-4 p-4" >
     <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-t border-gray-300 rounded-t-2xl">
         <h1>Filter here</h1>
     </div>
     <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
-        {{ table(headers, rows, url:'users', forAdmin:true) }}
+        {{ table(header, rows, url:url, forAdmin:true) }}
 
     </div>
     <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300 rounded-b-2xl">

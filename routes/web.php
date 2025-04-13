@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccessControlController;
 use App\Http\Controllers\SessionController;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -25,20 +26,16 @@ Route::group(['middleware' => ['role:admin']], function () {
     Route::get('admins/access-control', function () {
         return view('admins/access-control');
     });
-    Route::get('admins/load-table', function () {
-        return view('admins/load-table');
-    });
+    Route::get('admins/load-users', [AccessControlController::class, 'viewUsers']);
+    Route::get('admins/load-roles', [AccessControlController::class, 'viewRoles']);
+    Route::get('admins/load-permissions', [AccessControlController::class, 'viewPermissions']);
+    Route::get('admins/users/{user}/show', [AccessControlController::class, 'showUser']);
+    
     Route::get('admins/roles', function () {
         return view('admins/roles');
     });
     Route::get('admins/permissions', function () {
         return view('admins/permissions');
-    });
-    Route::get('admins/users/{user}/show', function (User $user) {
-        return view('users.show', ['user' => $user]);
-    });
-    Route::get('admins/role-show', function(){
-        return view('roles/show');
     });
     Route::get('admins/permission-show', function(){
         return view('permissions/show');
