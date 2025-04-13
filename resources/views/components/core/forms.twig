@@ -51,7 +51,7 @@
   </select>
 {% endmacro %}
 
-{% macro form_field(label, input, errors = 'None yet', isColumn = false) %}
+{% macro form_field(label, input, errors, isColumn = false) %}
     {% if not isColumn %}
         <div class="flex gap-x-4 pt-2 items-center">
             {{ label }}

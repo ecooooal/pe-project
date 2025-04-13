@@ -1,11 +1,20 @@
 <?php
 
+use App\Http\Controllers\SessionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('landing-page');
 });
+
+Route::get('/test', function () {
+    return view('test-page');
+})->middleware('auth.basic');
+
+Route::post('/login', [SessionController::class, 'authenticate']);
+Route::post('/logout', [SessionController::class, 'logout']);
+
 
 Route::get('/faculty', function () {
     return view('faculty-home');
