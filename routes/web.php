@@ -38,8 +38,10 @@ Route::group(['middleware' => ['role:admin']], function () {
 
 
     Route::get('admins/load-roles', [AccessControlController::class, 'viewRoles']);
-    Route::get('admins/roles/{role}/show', [AccessControlController::class, 'showRole']);
     Route::post('admins/roles/checkbox', [AccessControlController::class, 'showRoleCheckbox']);
+    Route::get('admins/roles/create', [AccessControlController::class, 'createRole']);
+    Route::get('admins/roles/{role}/show', [AccessControlController::class, 'showRole']);
+    Route::post('admins/roles', [AccessControlController::class, 'storeRole']);
 
 
 
@@ -53,9 +55,6 @@ Route::group(['middleware' => ['role:admin']], function () {
     });
     Route::get('admins/permissions', function () {
         return view('admins/permissions');
-    });
-    Route::get('admins/permission-show', function(){
-        return view('permissions/show');
     });
  });
 

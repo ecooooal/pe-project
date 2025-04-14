@@ -89,6 +89,25 @@ class AccessControlController extends Controller
         return view('roles/show', $data);
     }
 
+    public function createRole(){
+        $permissions = Permission::pluck('name', 'id');
+
+        $data = [
+            'permissions' => $permissions
+        ];
+
+        return view('roles/create', $data);
+    }
+
+    public function storeRole(){
+        $role_permissions = Permission::findMany(request('permissions'));
+        $role = Role::create(['name' => request('name')]);
+
+        $role->syncPermissions($role_permissions);
+
+        return redirect('/admins/load-roles');
+    }
+
     public function viewPermissions(){
         $permissions = Permission::all();
         $header = ['ID', 'Name', 'Date Created'];
