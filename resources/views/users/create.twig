@@ -21,7 +21,7 @@
     </button>
 </div>
 <div class="flex flex-1 flex-col mx-8">
-    <form method="POST" id="create-form" hx-post="/admins/users" class="flex flex-col gap-y-4" hx-target="#access-control-content">
+    <form method="POST" id="create-form" hx-post="/admins/users" hx-target="#access-control-content" class="flex flex-col gap-y-4" >
         {{ csrf_field() }}
         <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
             <div class="flex flex-col p-4 flex-1">
@@ -106,10 +106,10 @@
                             {% for id, course in courses %}
                             <div class="flex items-center hover:bg-gray-50 p-2 border-b border-gray-300 text-sm">
                                 <div class="w-1/5 max-w-xs">
-                                    {{ forms.checkbox(name:'courses[]', id:id, value:course) }}
+                                    {{ forms.checkbox(name:'courses[]', id:course, value:id) }}
                                 </div>
                                 <div class="w-4/5 max-w-xs">
-                                    {{ forms.label(id:id, content:course) }}
+                                    {{ forms.label(id:course, content:course) }}
                                 </div>
                             </div>         
                             {% endfor %}
@@ -124,16 +124,8 @@
             <div>
                 {{ show_header('User Roles and Permissions') }}
             </div>
-            <div class="flex gap-x-4 p-4 max-w-full ">
-                <div class="flex flex-col gap-y-4 p-4 bg-gray-100 rounded-lg">
-                    <div class="flex text-center my-2">
-                        <h3 class="text-lg font-medium">
-                            Search Roles
-                            <span class="htmx-indicator ml-4 text-sm text-gray-500">
-                                Searching...
-                            </span>
-                        </h3>
-                    </div>
+            <div class="flex gap-x-4 p-4 max-w-full max-h-96">
+                <div class="flex flex-col gap-y-2 p-4 bg-gray-100 rounded-lg">
                     <input class="border-1 border-gray-500 rounded-md p-2" type="search"
                         name="search" placeholder="Search Roles..."
                         hx-post="/admins/roles/checkbox"
@@ -141,25 +133,30 @@
                         hx-target="#search-results"
                         hx-indicator=".htmx-indicator"
                         hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'>
-    
-                    <table class="table-auto overflow-y-auto text-left">
-                        <thead>
-                            <tr>
-                                <th class="px-4 py-2 font-bold border-b border-gray-300 text-sm bg-gray-100 text-blue-900 ml-auto">Select</th>
-                                <th class="px-4 py-2 font-bold border-b border-gray-300 text-sm bg-gray-100 text-blue-900 ml-auto">Roles</th>
-                            </tr>
-                        </thead>
-                        <tbody  id="search-results"                  
-                                hx-post="/search"
-                                hx-trigger="load"
-                                hx-target="this"
-                                hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'>
-                        </tbody>
-                    </table>
+                        <span class="htmx-indicator ml-4 text-xs text-gray-500">
+                            Searching...
+                        </span>
+                    <div class="max-h-48 overflow-y-auto overscroll-x-none no-scrollbar">
+                        <table class="table-auto w-full text-left">
+                            <thead>
+                                <tr class="sticky top-0 w-full">
+                                    <th class="px-2 py-1 font-bold border-b border-gray-300 text-md bg-gray-100 text-blue-900 ml-auto">Select</th>
+                                    <th class="px-2 py-1 font-bold border-b border-gray-300 text-md bg-gray-100 text-blue-900 ml-auto">Roles</th>
+                                </tr>
+                            </thead>
+                            <tbody  id="search-results"                  
+                                    hx-post="/search"
+                                    hx-trigger="load"
+                                    hx-target="this"
+                                    hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'>
+                            </tbody>
+                        </table>
+                    </div>
+                    
                 </div>
-                <div class="flex flex-1 flex-col bg-blue-950 rounded-lg">
-                    <h1 class="text-gray-50 text-lg font-medium p-4">My Permissions</h1>
-                    <div id="user-permissions" class="sortable p-4 max-h-48 overflow-y-auto overscroll-x-none no-scrollbar" hx-trigger="end">
+                <div class="flex flex-1 flex-col bg-blue-950 rounded-lg ">
+                    <h1 class="sticky top-0 text-gray-50 text-lg font-medium p-4">My Permissions</h1>
+                    <div id="user-permissions" class="sortable p-4  overflow-y-auto overscroll-x-none no-scrollbar" hx-trigger="end">
                         <div></div>
                         {% for key, permission in user_permissions%}
                             <div class="text-gray-50 text-md border-b-1 border-gray-50">
@@ -169,8 +166,8 @@
                     </div>
                 </div>
                 <div class="flex flex-1 flex-col bg-blue-950/95 rounded-lg">
-                    <h1 class="text-gray-50 text-lg font-medium p-4">Permissions</h1>
-                    <div id="permissions" class="sortable p-4 max-h-48 overflow-y-auto overscroll-x-none no-scrollbar" hx-trigger="end">
+                    <h1 class="sticky top-0 text-gray-50 text-lg font-medium p-4">Permissions</h1>
+                    <div id="permissions" class="sortable p-4 overflow-y-auto overscroll-x-none no-scrollbar" hx-trigger="end">
                         <div></div>
                         {% for key, permission in permissions %}
                             <div class="text-gray-50 text-md border-b-1 border-gray-50">

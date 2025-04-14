@@ -29,9 +29,7 @@ Route::group(['middleware' => ['role:faculty|admin']], function () {
     });
  });
 Route::group(['middleware' => ['role:admin']], function () { 
-    Route::get('admins/access-control', function () {
-        return view('admins/access-control');
-    });
+    Route::get('admins/access-control', [AccessControlController::class, 'index']);
     Route::get('admins/load-users', [AccessControlController::class, 'viewUsers']);
     Route::get('admins/users/{user}/show', [AccessControlController::class, 'showUser']);
     Route::get('admins/users/create', [RegisteredUserController::class, 'create']);
@@ -46,7 +44,8 @@ Route::group(['middleware' => ['role:admin']], function () {
 
 
     Route::get('admins/load-permissions', [AccessControlController::class, 'viewPermissions']);
-    Route::get('admins/permissions/{permission}/show', [AccessControlController::class, 'showPermission']);
+    Route::get('admins/permissions/create', [AccessControlController::class, 'createPermission']);
+    Route::post('admins/permissions', [AccessControlController::class, 'storePermission']);
 
 
     Route::get('admins/roles', function () {

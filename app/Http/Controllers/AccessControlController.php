@@ -10,6 +10,10 @@ use Spatie\Permission\Models\Role;
 
 class AccessControlController extends Controller
 {
+
+    public function index(){
+        return view('admins/access-control');
+    }
     public function viewUsers(){
         $currentUser = request()->user();
         $users = User::all();
@@ -106,8 +110,14 @@ class AccessControlController extends Controller
         return view('admins/load-table', $data);
     }
 
-    public function showPermissions($id){
-        dd('none yet');
+    public function createPermission(){
+        return view('permissions/create');
+    }
+
+    public function storePermission(){
+        Permission::create(['name' => request('name')]);
+
+        return redirect('/admins/load-permissions');
     }
 
     public function showRoleCheckbox(){
