@@ -71,6 +71,20 @@ class AccessControlController extends Controller
         return view('admins/load-table', $data);
     }
 
+    public function showRole($id){
+        $role = Role::findOrFail($id);
+        $rolePermissions = $role->permissions;
+        $permissions = Permission::all()->diff($rolePermissions);
+
+        $data = [
+            'role' => $role,
+            'permissions' => $permissions,
+            'role_permissions' => $rolePermissions
+        ];
+
+        return view('roles/show', $data);
+    }
+
     public function viewPermissions(){
         $permissions = Permission::all();
         $header = ['ID', 'Name', 'Date Created'];
@@ -90,6 +104,10 @@ class AccessControlController extends Controller
         ];
 
         return view('admins/load-table', $data);
+    }
+
+    public function showPermissions($id){
+        dd('none yet');
     }
 
 }

@@ -56,13 +56,17 @@
         <div class="flex gap-x-4 pt-2 items-center">
             {{ label }}
             {{ input }}
-            <span class="text-red-500 text-sm font-semibold whitespace-nowrap">{{ errors }}</span>    
+            {% for error in errors %}
+            <span class="text-red-500 text-sm font-semibold whitespace-nowrap">{{ error }}</span>    
+            {% endfor %}  
         </div>
     {% else %}
         <div class="flex flex-col gap-y-1 pt-2">
             {{ label }}
             {{ input }}
-            <span class="text-red-500 text-sm font-semibold whitespace-nowrap">{{ errors }}</span>    
+            {% for error in errors %}
+            <span class="text-red-500 text-sm font-semibold whitespace-nowrap">{{ error }}</span>    
+            {% endfor %}
         </div>
     {% endif %}
 {% endmacro %}

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccessControlController;
+use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -27,10 +28,20 @@ Route::group(['middleware' => ['role:admin']], function () {
         return view('admins/access-control');
     });
     Route::get('admins/load-users', [AccessControlController::class, 'viewUsers']);
-    Route::get('admins/load-roles', [AccessControlController::class, 'viewRoles']);
-    Route::get('admins/load-permissions', [AccessControlController::class, 'viewPermissions']);
     Route::get('admins/users/{user}/show', [AccessControlController::class, 'showUser']);
-    
+    Route::get('admins/users/create', [RegisteredUserController::class, 'create']);
+    Route::post('admins/users', [RegisteredUserController::class, 'store']);
+
+
+
+    Route::get('admins/load-roles', [AccessControlController::class, 'viewRoles']);
+    Route::get('admins/roles/{role}/show', [AccessControlController::class, 'showRole']);
+
+
+    Route::get('admins/load-permissions', [AccessControlController::class, 'viewPermissions']);
+    Route::get('admins/permissions/{permission}/show', [AccessControlController::class, 'showPermission']);
+
+
     Route::get('admins/roles', function () {
         return view('admins/roles');
     });
