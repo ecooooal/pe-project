@@ -110,4 +110,10 @@ class AccessControlController extends Controller
         dd('none yet');
     }
 
+    public function showRoleCheckbox(){
+        $search = request()->input('search');
+        $roles = Role::where('name', 'like',  ['%' . strtolower($search) . '%'])->pluck('name', 'id');
+        
+        return view('/roles/checkbox', ['roles' => $roles]);
+    }
 }

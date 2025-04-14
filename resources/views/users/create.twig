@@ -103,25 +103,37 @@
                             isColumn:true 
                         )}}
                     </div>
-                    <div class="flex flex-1/2 flex-col gap-y-4 w-full">
-                        {{ forms.form_field(
-                            label:forms.label(
-                                id:'roles', 
-                                content:'Roles', 
-                                attributes:{
-                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
-                            ),
-                            input:forms.select(
-                                name:'roles', 
-                                values:roles, 
-                                attributes:{
-                                    'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                    'placeholder':'Select Roles',
-                                    'required':true,
-                                    'multiple':true}
-                            ),
-                            isColumn:true 
-                        )}}
+                    <div class="flex flex-1/2 flex-col gap-y-4 w-full p-4 bg-gray-100 rounded-lg">
+                        <div class="flex text-center my-2">
+                            <h3 class="text-lg font-medium">
+                                Search Roles
+                                <span class="htmx-indicator ml-4 text-sm text-gray-500">
+                                    Searching...
+                                </span>
+                            </h3>
+                        </div>
+                        <input class="border-1 border-gray-500 rounded-md p-2" type="search"
+                            name="search" placeholder="Search Roles..."
+                            hx-post="/admins/roles/checkbox"
+                            hx-trigger="input changed delay:500ms, keyup[key=='Enter'], load"
+                            hx-target="#search-results"
+                            hx-indicator=".htmx-indicator"
+                            hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'>
+        
+                        <table class="table-auto max-h-8 overflow-y-auto text-left">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-2 font-bold border-b border-gray-300 text-sm bg-gray-100 text-blue-900 ml-auto">Select</th>
+                                    <th class="px-4 py-2 font-bold border-b border-gray-300 text-sm bg-gray-100 text-blue-900 ml-auto">Roles</th>
+                                </tr>
+                            </thead>
+                            <tbody  id="search-results"                  
+                                    hx-post="/search"
+                                    hx-trigger="load"
+                                    hx-target="this"
+                                    hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>  

@@ -6,6 +6,7 @@ use App\Http\Controllers\SessionController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Spatie\Permission\Models\Role;
 
 Route::get('/', function () {
     return view('landing-page');
@@ -13,6 +14,10 @@ Route::get('/', function () {
 
 Route::get('/test', function () {
     return view('test-page');
+});
+
+Route::post('/search', function () {
+
 });
 
 Route::post('/login', [SessionController::class, 'authenticate']);
@@ -36,6 +41,8 @@ Route::group(['middleware' => ['role:admin']], function () {
 
     Route::get('admins/load-roles', [AccessControlController::class, 'viewRoles']);
     Route::get('admins/roles/{role}/show', [AccessControlController::class, 'showRole']);
+    Route::post('admins/roles/checkbox', [AccessControlController::class, 'showRoleCheckbox']);
+
 
 
     Route::get('admins/load-permissions', [AccessControlController::class, 'viewPermissions']);

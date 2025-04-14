@@ -51,6 +51,11 @@
   </select>
 {% endmacro %}
 
+{% macro checkbox(name, value, id, isOwn = false, attributes) %}
+  <input type="checkbox" name="{{ name }}" id="{{ id|default(name) }}" class="{{ class }}" value="{{ value }}" {% if isOwn %} checked="checked"{% endif %}{% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %} />
+{% endmacro %}
+
+
 {% macro form_field(label, input, errors, isColumn = false) %}
     {% if not isColumn %}
         <div class="flex gap-x-4 pt-2 items-center">

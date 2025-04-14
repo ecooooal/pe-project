@@ -29,7 +29,7 @@ class RegisteredUserController extends Controller
         $user_roles = Role::findMany(request('roles'));
         $user_permissions = Permission::findMany(request('permissions'));
         $user_author = request()->user();
-
+        
         $validator = Validator::make(request()->all(), [
             'name' => ['required'],
             'email' => ['required', 'email'],
@@ -41,12 +41,14 @@ class RegisteredUserController extends Controller
                 ->withErrors($validator)
                 ->withInput();
         }
+
+
         $data = $validator->validated();
 
         $user = User::create([
             'name'     => $data['name'],
             'email'    => $data['email'],
-            'password' => bcrypt($data['password']), // don't forget to hash
+            'password' => bcrypt($data['password']), 
         ]);
 
         $user->syncPermissions($user_permissions);

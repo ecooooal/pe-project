@@ -1,0 +1,13 @@
+{% import 'components/core/forms' as forms %}
+
+{% for id, role in roles %}
+<tr class="hover:bg-gray-50">
+
+    <td class="p-4 border-b border-gray-300 max-w-xs text-sm">
+        {{ forms.checkbox(name:'roles[]', id:id, value:id)}}
+    </td>
+    <td class="p-4 border-b border-gray-300 max-w-xs text-sm">
+        {{ forms.label(id:id, content:role|capitalize ) }}
+    </td>
+</tr>
+{% endfor %}
