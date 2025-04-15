@@ -38,22 +38,6 @@ class AccessControlController extends Controller
         return view('admins/load-table', $data);
     }
 
-    public function showUser($id){
-        $user = User::findOrFail($id);
-        $userPermissions = $user->permissions;
-        $userRoles = $user->getRoleNames();
-        $permissions = Permission::all()->diff($userPermissions);
-
-        $data = [
-            'user' => $user,
-            'permissions' => $permissions,
-            'user_roles' => $userRoles,
-            'user_permissions' => $userPermissions
-        ];
-
-        return view('users/show', $data);
-    }
-
     public function viewRoles(){
         $roles = Role::all();
         $header = ['ID', 'Name', 'Date Created'];
@@ -139,10 +123,20 @@ class AccessControlController extends Controller
         return redirect('/admins/load-permissions');
     }
 
-    public function showRoleCheckbox(){
+    public function loadRoleCheckbox(){
+        // \Log::info('HTMX payload:', request()->all());
+        $user_roles = request()->input('user_id') 
+        ? User::findOrFail(request()->input('user_id'))->getRoleNames()
+        : null;
+    
         $search = request()->input('search');
         $roles = Role::where('name', 'like',  ['%' . strtolower($search) . '%'])->pluck('name', 'id');
         
-        return view('/roles/checkbox', ['roles' => $roles]);
+        $data = [
+            'roles' => $roles,
+            'user_roles' => $user_roles
+        ];
+
+        return view('/roles/checkbox', $data);
     }
 }

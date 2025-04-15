@@ -37,7 +37,7 @@
                             ),
                             input:forms.text(
                                 name:'name', 
-                                value: old('name'),
+                                value: user.name,
                                 attributes:{
                                     'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'required':true}
@@ -53,7 +53,7 @@
                                     ),
                             input:forms.text(
                                 name:'email', 
-                                value:old('email'),
+                                value: user.email,
                                 attributes:{
                                     'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'placeholder':'',
@@ -62,37 +62,7 @@
                             errors:errors.get('email'),
                             isColumn:true 
                         )}}
-                        {{ forms.form_field(
-                            label:forms.label(
-                                id:'password', 
-                                content:'Password', 
-                                attributes:{
-                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
-                                    ),
-                            input:forms.password(
-                                name:'password',
-                                attributes:{
-                                    'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                    'required':true}
-                            ),
-                            errors:errors.get('password'),
-                            isColumn:true 
-                        )}}
-                        {{ forms.form_field(
-                            label:forms.label(
-                                id:'password-confirmation', 
-                                content:'Password Confirmation', 
-                                attributes:{
-                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
-                                    ),
-                            input:forms.password(
-                                name:'password_confirmation', 
-                                attributes:{
-                                    'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                    'required':true}
-                            ),
-                            isColumn:true 
-                        )}}
+                        <div>Reset Password</div>
                 </div>
 
                     <div class="flex flex-1/2 flex-col gap-y-4">
@@ -106,7 +76,7 @@
                             {% for id, course in courses %}
                             <div class="flex items-center hover:bg-gray-50 p-2 border-b border-gray-300 text-sm">
                                 <div class="w-1/5 max-w-xs">
-                                    {{ forms.checkbox(name:'courses[]', id:course, value:id) }}
+                                    {{ forms.checkbox(name:'courses[]', id:course, value:id, isOwn:true) }}
                                 </div>
                                 <div class="w-4/5 max-w-xs">
                                     {{ forms.label(id:course, content:course) }}
@@ -132,7 +102,8 @@
                         hx-trigger="input changed delay:500ms, keyup[key=='Enter'], load"
                         hx-target="#search-results"
                         hx-indicator=".htmx-indicator"
-                        hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'>
+                        hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
+                        hx-vals='{"user_id" : "{{ user.id }}" }'>
                         <span class="htmx-indicator ml-4 text-xs text-gray-500">
                             Searching...
                         </span>
@@ -175,9 +146,8 @@
             </div>
         </div>  
 
-        <div class="flex gap-x-2">
-            <button type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm">Create User</button>
-            <button type="button" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-gray-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm">Create User & create another</button>
+        <div class="flex gap-x-2 justify-end">
+            <button type="submit" class="cursor-pointer bg-orange-600 text-gray-200 hover:bg-orange-500 hover:text-white duration-300 rounded-lg p-2 font-semibold text-sm">Update</button>
             <a href="{{ request.META.HTTP_REFERER }}" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
         </div>
     </form>

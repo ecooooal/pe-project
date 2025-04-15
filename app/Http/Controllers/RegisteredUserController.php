@@ -13,6 +13,22 @@ use Illuminate\Support\Facades\Validator;
 class RegisteredUserController extends Controller
 {
 
+    public function show(User $user){
+        $userPermissions = $user->permissions()->pluck('name');
+        $userRoles = $user->getRoleNames();
+        $permissions = Permission::all()->pluck('name')->diff($userPermissions);
+
+        $data = [
+            'user' => $user,
+            'permissions' => $permissions,
+            'user_roles' => $userRoles,
+            'user_permissions' => $userPermissions
+        ];
+
+        return view('users/show', $data);
+    }
+
+
     public function create(){
         $roles = Role::pluck('name', 'id');
         $permissions = Permission::pluck('name', 'id');
@@ -55,5 +71,26 @@ class RegisteredUserController extends Controller
         $user->syncRoles($user_roles);
 
         return redirect('/admins/load-users');
+    }
+
+    public function edit(User $user){
+        $userPermissions = $user->permissions()->pluck('name');
+        $roles = Role::pluck('name', 'id');
+        $userRoles = $user->getRoleNames();
+        $permissions = Permission::all()->pluck('name')->diff($userPermissions);
+
+        $data = [
+            'user' => $user,
+            'roles' => $roles,
+            'permissions' => $permissions,
+            'user_roles' => $userRoles,
+            'user_permissions' => $userPermissions
+        ];
+
+        return view('users/edit', $data);
+    }
+
+    public function update() {
+
     }
 }
