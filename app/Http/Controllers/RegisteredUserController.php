@@ -74,10 +74,10 @@ class RegisteredUserController extends Controller
     }
 
     public function edit(User $user){
-        $userPermissions = $user->permissions()->pluck('name');
+        $userPermissions = $user->permissions()->pluck('name', 'id');
         $roles = Role::pluck('name', 'id');
         $userRoles = $user->getRoleNames();
-        $permissions = Permission::all()->pluck('name')->diff($userPermissions);
+        $permissions = Permission::all()->pluck('name', 'id')->diff($userPermissions);
 
         $data = [
             'user' => $user,
@@ -90,7 +90,32 @@ class RegisteredUserController extends Controller
         return view('users/edit', $data);
     }
 
-    public function update() {
+    public function update(User $user) {
+        $user_roles = Role::findMany(request('roles'));
+        $user_permissions = Permission::findMany(request('permissions'));
 
-    }
+        $validator = Validator::make(request()->all(), [
+            'name' => ['required'],
+            'email' => ['required', 'email'],
+        ]);
+    
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+    
+        $data = $validator->validated();
+    
+        $updateData = [
+            'name'  => $data['name'],
+            'email' => $data['email'],
+        ];
+    
+        $user->update($updateData);
+        $user->syncPermissions($user_permissions);
+        $user->syncRoles($user_roles);
+
+        return redirect()->route('admin.users.show', $user)
+        ->with('success', 'User updated successfully.');    }
 }

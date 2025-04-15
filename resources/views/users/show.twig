@@ -26,6 +26,7 @@
                 {{ show_header('User\'s Details') }}
                 <div class="flex gap-x-32 justify-between w-full">
                     <div class="flex p-1 w-full flex-col gap-y-4">
+                        {{ show_item('ID', user.id)}}
                         {{ show_item('Name', user.name)}}
                         {{ show_item('Email', user.email)}}
                     </div>

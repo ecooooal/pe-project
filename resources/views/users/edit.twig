@@ -21,8 +21,9 @@
     </button>
 </div>
 <div class="flex flex-1 flex-col mx-8">
-    <form method="POST" id="create-form" hx-post="/admins/users" hx-target="#access-control-content" class="flex flex-col gap-y-4" >
+    <form method="POST" id="create-form" hx-post="/admins/users/{{ user.id }}" hx-target="#access-control-content" class="flex flex-col gap-y-4" >
         {{ csrf_field() }}
+        {{ method_field('PATCH') }}
         <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
             <div class="flex flex-col p-4 flex-1">
                 {{ show_header('Details') }}
@@ -103,7 +104,7 @@
                         hx-target="#search-results"
                         hx-indicator=".htmx-indicator"
                         hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
-                        hx-vals='{"user_id" : "{{ user.id }}" }'>
+                        hx-vals='{"user_id" : "{{ user.id }}", "_method": "POST" }'>
                         <span class="htmx-indicator ml-4 text-xs text-gray-500">
                             Searching...
                         </span>
@@ -127,7 +128,7 @@
                         <div></div>
                         {% for key, permission in user_permissions%}
                             <div class="text-gray-50 text-md border-b-1 border-gray-50">
-                                <input type='hidden' name='permissions[]' value={{ key }}>{{ permission }}
+                                <input type='hidden' name='permissions[]' value="{{ key }}">{{ permission }}
                             </div>                        
                         {% endfor %}
                     </div>
@@ -138,7 +139,7 @@
                         <div></div>
                         {% for key, permission in permissions %}
                             <div class="text-gray-50 text-md border-b-1 border-gray-50">
-                                <input type='hidden' name='permissions[]' value={{ key }}>{{ permission }}
+                                <input type='hidden' name='permissions[]' value="{{ key }}">{{ permission }}
                             </div>
                         {% endfor %}
                     </div>
@@ -163,19 +164,17 @@
                 animation: 150,
             });
 
-            document.getElementById('create-form').addEventListener('submit', function (e) {
-                const otherSortable = document.querySelector('#permissions'); 
-                const inputs = otherSortable.querySelectorAll('input[type="hidden"]');
-                inputs.forEach(input => {
-                    input.disabled = true;
-                });
-            });
-
             // Re-enable sorting on the `htmx:afterSwap` event
             sortable.addEventListener("htmx:afterSwap", function() {
                 sortableInstance.option("disabled", false);
             });
         }
     });
-
+    document.getElementById('create-form').addEventListener('submit', function (e) {
+                const otherSortable = document.querySelector('#permissions'); 
+                const inputs = otherSortable.querySelectorAll('input[type="hidden"]');
+                inputs.forEach(input => {
+                    input.disabled = true;
+                });
+            });
 </script>

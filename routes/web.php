@@ -33,14 +33,14 @@ Route::group(['middleware' => ['role:admin']], function () {
     Route::get('/admins/load-users', [AccessControlController::class, 'viewUsers']);
     Route::get('/admins/users/create', [RegisteredUserController::class, 'create']);
     Route::get('/admins/users/{user}/edit', [RegisteredUserController::class, 'edit']);
-    Route::get('/admins/users/{user}', [RegisteredUserController::class, 'show']);
+    Route::get('/admins/users/{user}', [RegisteredUserController::class, 'show'])->name('admin.users.show');
+    Route::patch('/admins/users/{user}', [RegisteredUserController::class, 'update']);
     Route::post('/admins/users', [RegisteredUserController::class, 'store']);
 
 
 
     Route::get('/admins/load-roles', [AccessControlController::class, 'viewRoles']);
     Route::post('/admins/roles/load-role-checkbox', [AccessControlController::class, 'loadRoleCheckbox']);
-    Route::get('/admins/roles/load-role-checkbox', [AccessControlController::class, 'loadRoleCheckbox']);
     Route::get('/admins/roles/create', [AccessControlController::class, 'createRole']);
     Route::post('/admins/roles', [AccessControlController::class, 'storeRole']);
     Route::get('/admins/roles/{role}', [AccessControlController::class, 'showRole'])->whereNumber('role');;

@@ -125,6 +125,7 @@ class AccessControlController extends Controller
 
     public function loadRoleCheckbox(){
         // \Log::info('HTMX payload:', request()->all());
+        
         $user_roles = request()->input('user_id') 
         ? User::findOrFail(request()->input('user_id'))->getRoleNames()
         : null;

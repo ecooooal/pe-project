@@ -193,19 +193,17 @@
                 animation: 150,
             });
 
-            document.getElementById('create-form').addEventListener('submit', function (e) {
-                const otherSortable = document.querySelector('#permissions'); 
-                const inputs = otherSortable.querySelectorAll('input[type="hidden"]');
-                inputs.forEach(input => {
-                    input.disabled = true;
-                });
-            });
-
             // Re-enable sorting on the `htmx:afterSwap` event
             sortable.addEventListener("htmx:afterSwap", function() {
                 sortableInstance.option("disabled", false);
             });
         }
     });
-
+    document.getElementById('create-form').addEventListener('submit', function (e) {
+                const otherSortable = document.querySelector('#permissions'); 
+                const inputs = otherSortable.querySelectorAll('input[type="hidden"]');
+                inputs.forEach(input => {
+                    input.disabled = true;
+                });
+            });
 </script>
