@@ -29,6 +29,7 @@
                         {{ show_item('ID', user.id)}}
                         {{ show_item('Name', user.name)}}
                         {{ show_item('Email', user.email)}}
+                        {{ show_item('Date Created', user.created_at|date("m/d/Y")) }}
                     </div>
                     <div class="flex flex-1/4 flex-col gap-y-4">
                         <div class="flex flex-1 flex-col gap-y-4 w-full p-4 bg-gray-100 rounded-lg">
