@@ -44,8 +44,10 @@ Route::group(['middleware' => ['role:admin']], function () {
     Route::post('/admins/roles/load-role-checkbox', [AccessControlController::class, 'loadRoleCheckbox']);
     Route::get('/admins/roles/create', [AccessControlController::class, 'createRole']);
     Route::post('/admins/roles', [AccessControlController::class, 'storeRole']);
-    Route::get('/admins/roles/{role}', [AccessControlController::class, 'showRole'])->whereNumber('role');;
-
+    Route::get('/admins/roles/{role}', [AccessControlController::class, 'showRole'])->name('admin.roles.show');;
+    Route::get('/admins/roles/{role}/edit', [AccessControlController::class, 'editRole']);
+    Route::patch('/admins/roles/{role}', [AccessControlController::class, 'updateRole']);
+    Route::delete('/admins/roles/{role}', [AccessControlController::class, 'destroyRole']);
 
 
     Route::get('/admins/load-permissions', [AccessControlController::class, 'viewPermissions']);

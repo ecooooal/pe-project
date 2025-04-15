@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Validator;
 
 class AccessControlController extends Controller
 {
@@ -35,7 +36,7 @@ class AccessControlController extends Controller
             'url' => 'users'
         ];
 
-        return view('admins/load-table', $data);
+        return view('/admins/load-table', $data);
     }
 
     public function viewRoles(){
@@ -56,21 +57,19 @@ class AccessControlController extends Controller
             'url' => 'roles'
         ];
 
-        return view('admins/load-table', $data);
+        return view('/admins/load-table', $data);
     }
 
-    public function showRole($id){
-        $role = Role::findOrFail($id);
+    public function showRole(Role $role){
         $rolePermissions = $role->permissions;
         $permissions = Permission::all()->diff($rolePermissions);
-
         $data = [
             'role' => $role,
             'permissions' => $permissions,
             'role_permissions' => $rolePermissions
         ];
 
-        return view('roles/show', $data);
+        return view('/roles/show', $data);
     }
 
     public function createRole(){
@@ -80,7 +79,7 @@ class AccessControlController extends Controller
             'permissions' => $permissions
         ];
 
-        return view('roles/create', $data);
+        return view('/roles/create', $data);
     }
 
     public function storeRole(){
@@ -90,6 +89,53 @@ class AccessControlController extends Controller
         $role->syncPermissions($role_permissions);
 
         return redirect('/admins/load-roles');
+    }
+
+    public function editRole(Role $role){
+        $role_permissions = $role->permissions()->pluck('name', 'id');
+        $permissions = Permission::all()->pluck('name', 'id')->diff($role_permissions);
+
+        $data = [
+            'role' => $role,
+            'role_permissions' => $role_permissions,
+            'permissions' => $permissions,
+        ];
+
+        return view('roles/edit', $data);
+    }
+
+    public function updateRole(Role $role) {
+        $validator = Validator::make(request()->all(), [
+            'name' => ['required'],
+        ]);
+    
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+    
+        $data = $validator->validated();
+    
+        $role->update([
+            'name' => $data['name'],
+        ]);
+
+        $role_permissions = Permission::findMany(request('permissions'));
+
+        $role->syncPermissions($role_permissions);
+
+        return redirect()->route('admin.roles.show', $role)
+        ->with('success', 'User updated successfully.');    
+    }
+
+    public function destroyRole(Role $role){
+        // authorize
+
+        $role->delete();
+
+        return redirect('/admins/load-roles');
+
     }
 
     public function viewPermissions(){
