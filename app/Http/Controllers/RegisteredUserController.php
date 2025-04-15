@@ -117,5 +117,16 @@ class RegisteredUserController extends Controller
         $user->syncRoles($user_roles);
 
         return redirect()->route('admin.users.show', $user)
-        ->with('success', 'User updated successfully.');    }
+        ->with('success', 'User updated successfully.');    
+    }
+
+    public function destroy(User $user){
+
+        $this->authorize('delete', $user);
+
+        $user->delete();
+
+        return redirect('/admins/access-control');
+
+    }
 }

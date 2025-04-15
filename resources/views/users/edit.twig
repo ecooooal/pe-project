@@ -149,12 +149,44 @@
 
         <div class="flex gap-x-2 justify-end">
             <button type="submit" class="cursor-pointer bg-orange-600 text-gray-200 hover:bg-orange-500 hover:text-white duration-300 rounded-lg p-2 font-semibold text-sm">Update</button>
+            <button form="none" class="cursor-pointer bg-red-600 text-gray-200 hover:bg-red-500 hover:text-white duration-300 rounded-lg p-2 font-semibold text-sm"
+                    popovertarget="delete-popover">
+                        Delete
+            </button>
             <a href="{{ request.META.HTTP_REFERER }}" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
         </div>
     </form>
 </div>
 
-    <script>
+<div popover="manual" class="backdrop:bg-gray-900/15 backdrop:backdrop-blur-[1px] transition-discrete duration-300 m-auto p-16 ease-in-out transition-opacity rounded-xl" id="delete-popover">
+    <div class="flex flex-col gap-y-4">
+        {{ show_header('Delete User') }}
+        <div class="flex flex-1 flex-col">
+            <div class="flex flex-col gap-y-4">
+                {{ csrf_field() }}
+                        <div class="flex gap-x-32 justify-between w-full">
+                            <h1>Are you sure to delete this user?</h1>
+                        </div>
+                <div class="flex gap-x-2">
+                    <button form="delete-form" type="submit" class="mx-auto px-32 cursor-pointer bg-red-600 text-gray-200 hover:bg-red-500 hover:text-white duration-300 rounded-lg py-2 font-semibold text-sm">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <button popovertarget="delete-popover" popovertargetaction="hide" class="absolute cursor-pointer right-0 top-0 pt-4 pr-4">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>          
+    </button>
+  </div>
+
+<form method="POST" action="/admins/users/{{ user.id }}" class="hidden" id="delete-form">
+    {{ csrf_field() }}
+    {{ method_field('DELETE') }}
+</form>
+
+<script>
     htmx.onLoad(function(content) {
         var sortables = content.querySelectorAll(".sortable");
         for (let i = 0; i < sortables.length; i++) {

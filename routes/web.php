@@ -31,11 +31,12 @@ Route::group(['middleware' => ['role:faculty|admin']], function () {
 Route::group(['middleware' => ['role:admin']], function () { 
     Route::get('/admins/access-control', [AccessControlController::class, 'index']);
     Route::get('/admins/load-users', [AccessControlController::class, 'viewUsers']);
-    Route::get('/admins/users/create', [RegisteredUserController::class, 'create']);
+    Route::get('/admins/users/create', [RegisteredUserController::class, 'create']);    
+    Route::post('/admins/users', [RegisteredUserController::class, 'store']);
     Route::get('/admins/users/{user}/edit', [RegisteredUserController::class, 'edit']);
     Route::get('/admins/users/{user}', [RegisteredUserController::class, 'show'])->name('admin.users.show');
     Route::patch('/admins/users/{user}', [RegisteredUserController::class, 'update']);
-    Route::post('/admins/users', [RegisteredUserController::class, 'store']);
+    Route::delete('/admins/users/{user}', [RegisteredUserController::class, 'destroy']);
 
 
 
