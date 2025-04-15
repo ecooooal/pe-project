@@ -169,6 +169,45 @@ class AccessControlController extends Controller
         return redirect('/admins/load-permissions');
     }
 
+    public function showPermission(Permission $permission){
+        return view('/permissions/show', ['permission' => $permission]);
+    }
+
+    public function editPermission(Permission $permission){
+        return view('permissions/edit', ['permission' => $permission]);
+    }
+
+    public function updatePermission(Permission $permission) {
+        // Still need to authorize if the permission is within the CORE of the system (e.g., permission belongs to Model)
+        $validator = Validator::make(request()->all(), [
+            'name' => ['required'],
+        ]);
+    
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+    
+        $data = $validator->validated();
+    
+        $permission->update([
+            'name' => $data['name'],
+        ]);
+
+        return redirect()->route('admin.permissions.show', $permission)
+        ->with('success', 'Permission updated successfully.');    
+    }
+
+    public function destroyPermission(Permission $permission){
+        // authorize
+
+        $permission->delete();
+
+        return redirect('/admins/load-permissions');
+
+    }
+
     public function loadRoleCheckbox(){
         // \Log::info('HTMX payload:', request()->all());
         

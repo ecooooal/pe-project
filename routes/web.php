@@ -30,7 +30,7 @@ Route::group(['middleware' => ['role:faculty|admin']], function () {
  });
 Route::group(['middleware' => ['role:admin']], function () { 
     Route::get('/admins/access-control', [AccessControlController::class, 'index']);
-    
+
     Route::get('/admins/load-users', [AccessControlController::class, 'viewUsers']);
     Route::get('/admins/users/create', [RegisteredUserController::class, 'create']);    
     Route::post('/admins/users', [RegisteredUserController::class, 'store']);
@@ -54,6 +54,10 @@ Route::group(['middleware' => ['role:admin']], function () {
     Route::get('/admins/load-permissions', [AccessControlController::class, 'viewPermissions']);
     Route::get('/admins/permissions/create', [AccessControlController::class, 'createPermission']);
     Route::post('/admins/permissions', [AccessControlController::class, 'storePermission']);
+    Route::get('/admins/permissions/{permission}', [AccessControlController::class, 'showPermission'])->name('admin.permissions.show');;
+    Route::get('/admins/permissions/{permission}/edit', [AccessControlController::class, 'editPermission']);
+    Route::patch('/admins/permissions/{permission}', [AccessControlController::class, 'updatePermission']);
+    Route::delete('/admins/permissions/{permission}', [AccessControlController::class, 'destroyPermission']);
 
 
     Route::get('/admins/roles', function () {
