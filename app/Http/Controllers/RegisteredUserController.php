@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use App\Models\User;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -14,6 +15,7 @@ class RegisteredUserController extends Controller
 {
 
     public function show(User $user){
+        $user_courses = $user->courses()->get()->pluck('abbreviation', 'id');
         $userPermissions = $user->permissions()->pluck('name');
         $userRoles = $user->getRoleNames();
         $permissions = Permission::all()->pluck('name')->diff($userPermissions);
@@ -21,6 +23,7 @@ class RegisteredUserController extends Controller
         $data = [
             'user' => $user,
             'permissions' => $permissions,
+            'user_courses' => $user_courses,
             'user_roles' => $userRoles,
             'user_permissions' => $userPermissions
         ];
@@ -30,26 +33,31 @@ class RegisteredUserController extends Controller
 
 
     public function create(){
+        $courses = Course::pluck('abbreviation', 'id');
         $roles = Role::pluck('name', 'id');
         $permissions = Permission::pluck('name', 'id');
 
         $data = [
             'roles' => $roles,
-            'permissions' => $permissions
+            'permissions' => $permissions,
+            'courses' => $courses
         ];
 
         return view('users/create', $data);
     }
 
     public function store(){
+        $user_courses = Course::findMany(request('courses'))->pluck('id');
         $user_roles = Role::findMany(request('roles'));
         $user_permissions = Permission::findMany(request('permissions'));
-        $user_author = request()->user();
-        
+
         $validator = Validator::make(request()->all(), [
-            'name' => ['required'],
+            'first_name' => ['required'],
+            'last_name' => ['required'],
             'email' => ['required', 'email'],
             'password' => ['required', Password::min(6), 'confirmed'],
+            'courses' => ['required'],
+            'roles' =>['required']
         ]);
 
         if ($validator->fails()) {
@@ -62,11 +70,13 @@ class RegisteredUserController extends Controller
         $data = $validator->validated();
 
         $user = User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => bcrypt($data['password']), 
+            'first_name' => $data['first_name'],
+            'last_name'  => $data['last_name'],
+            'email'      => $data['email'],
+            'password'   => bcrypt($data['password']), 
         ]);
 
+        $user->courses()->sync($user_courses);
         $user->syncPermissions($user_permissions);
         $user->syncRoles($user_roles);
 
@@ -74,15 +84,19 @@ class RegisteredUserController extends Controller
     }
 
     public function edit(User $user){
-        $userPermissions = $user->permissions()->pluck('name', 'id');
+        $courses = Course::pluck('abbreviation', 'id');
+        $user_courses = $user->courses()->get()->pluck('abbreviation', 'id');
         $roles = Role::pluck('name', 'id');
         $userRoles = $user->getRoleNames();
+        $userPermissions = $user->permissions()->pluck('name', 'id');
         $permissions = Permission::all()->pluck('name', 'id')->diff($userPermissions);
 
         $data = [
             'user' => $user,
             'roles' => $roles,
             'permissions' => $permissions,
+            'courses' => $courses,
+            'user_courses' => $user_courses,
             'user_roles' => $userRoles,
             'user_permissions' => $userPermissions
         ];
@@ -91,16 +105,20 @@ class RegisteredUserController extends Controller
     }
 
     public function update(User $user) {
+        $user_courses = Course::findMany(request('courses'))->pluck('id');
         $user_roles = Role::findMany(request('roles'));
         $user_permissions = Permission::findMany(request('permissions'));
 
         $validator = Validator::make(request()->all(), [
-            'name' => ['required'],
+            'first_name' => ['required'],
+            'last_name' => ['required'],
             'email' => ['required', 'email'],
+            'courses' => ['required'],
+            'roles' =>['required']
         ]);
     
         if ($validator->fails()) {
-            return redirect()->back()
+            return redirect()->route('admin.users.edit', $user)
                 ->withErrors($validator)
                 ->withInput();
         }
@@ -108,16 +126,17 @@ class RegisteredUserController extends Controller
         $data = $validator->validated();
     
         $updateData = [
-            'name'  => $data['name'],
+            'first_name' => $data['first_name'],
+            'last_name'  => $data['last_name'],
             'email' => $data['email'],
         ];
     
         $user->update($updateData);
+        $user->courses()->sync($user_courses);
         $user->syncPermissions($user_permissions);
         $user->syncRoles($user_roles);
 
-        return redirect()->route('admin.users.show', $user)
-        ->with('success', 'User updated successfully.');    
+        return redirect()->route('admin.users.show', $user);
     }
 
     public function destroy(User $user){

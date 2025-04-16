@@ -13,7 +13,7 @@ use App\TracksUserActivity;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, SoftDeletes, TracksUserActivity;
+    use SoftDeletes, HasFactory, Notifiable, HasRoles, TracksUserActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -49,10 +49,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
-    public function createdBy()
+    public function getFullName()
     {
-        return $this->belongsTo(User::class, 'created_by')->withTrashed();
+        return "{$this->first_name} {$this->last_name}";
     }
 
     public function updatedBy()

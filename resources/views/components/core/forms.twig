@@ -88,7 +88,7 @@
 
 {% macro radio(name, values, value, attributes) %}
   {% for key, label in values %}
-  <label{% if value == key %} class="selected"{% endif %} ><input type="radio" name="{{ name }}" value="{{ key }}"{% if value == key %} checked="checked"{% endif %}{% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %}{% if not attributes.id is defined %} id="{{ name }}"{% endif %}> {{ label }}</label>
+  <label {% if value == key %} class="selected"{% endif %} ><input type="radio" name="{{ name }}" value="{{ key }}"{% if value == key %} checked="checked"{% endif %}{% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %}{% if not attributes.id is defined %} id="{{ name }}"{% endif %}> {{ label }}</label>
   {% endfor %}
 {% endmacro %}
 

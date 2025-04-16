@@ -10,7 +10,7 @@ use App\TracksUserActivity;
 
 class Course extends Model
 {
-    use HasFactory, Notifiable, SoftDeletes, TracksUserActivity;
+    use HasFactory, Notifiable, TracksUserActivity;
 
     protected $fillable = [
         'name',

@@ -22,7 +22,7 @@ class AccessControlController extends Controller
         $rows = $users->map(function ($user) {
             return [
                 'id' => $user->id,
-                'name' => $user->name,
+                'name' => $user->getFullName(),
                 'email' => $user->email,
                 'Date Created' => Carbon::parse($user->created_at)->format('m/d/Y')
             ];

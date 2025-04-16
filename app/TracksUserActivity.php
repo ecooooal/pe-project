@@ -20,12 +20,5 @@ trait TracksUserActivity
                 $model->updated_by = Auth::id();
             }
         });
-        
-        static::deleting(function ($model) {
-            if (Auth::check() && $model->usesSoftDeletes()) {
-                $model->deleted_by = Auth::id();
-                $model->save();
-            }
-        });
     }
 }

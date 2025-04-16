@@ -4,13 +4,6 @@
 {% from 'components/core/show-header' import show_header %}
 {% from 'components/core/show-item' import show_item %}
 
-{% set courses = {
-    1 : 'BSCS', 
-    2 : 'BSMMA', 
-    3 : 'BSIT', 
-    4 : 'BSCPE'
-}%} 
-
 <div class="flex mx-8">
     <button class="ml-auto p-2 text-md text-blue-900 text-sm font-medium hover:underline cursor-pointer" 
             hx-get="/admins/load-users" 
@@ -30,14 +23,30 @@
                     <div class="flex flex-col gap-y-4 w-full">
                         {{ forms.form_field(
                             label:forms.label(
-                                id:'name', 
-                                content:'Name', 
+                                id:'first_name', 
+                                content:'First Name', 
                                 attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
                             ),
                             input:forms.text(
-                                name:'name', 
-                                value: old('name'),
+                                name:'first_name', 
+                                value: old('first_name'),
+                                attributes:{
+                                    'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                    'required':true}
+                            ),
+                            isColumn:true 
+                        )}}
+                        {{ forms.form_field(
+                            label:forms.label(
+                                id:'last_name', 
+                                content:'Last Name', 
+                                attributes:{
+                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
+                            ),
+                            input:forms.text(
+                                name:'last_name', 
+                                value: old('last_name'),
                                 attributes:{
                                     'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'required':true}
@@ -95,10 +104,10 @@
                         )}}
                 </div>
 
-                    <div class="flex flex-1/2 flex-col gap-y-4">
+                    <div class="flex flex-1/4 flex-col gap-y-4">
                         <div class="flex flex-1 flex-col gap-y-4 w-full p-4 bg-gray-100 rounded-lg">
                             <div class="flex text-center my-2">
-                                <h3 class="text-lg font-medium">
+                                <h3 class="mx-auto text-lg font-medium">
                                     Courses
                                 </h3>
                             </div>
@@ -113,6 +122,10 @@
                                 </div>
                             </div>         
                             {% endfor %}
+
+                            {% for error in errors.get('courses') %}
+                            <span class="text-red-500 text-sm font-semibold whitespace-nowrap">{{ error }}</span>    
+                            {% endfor %}  
                             
                         </div>
                     </div>
@@ -148,7 +161,9 @@
                             </tbody>
                         </table>
                     </div>
-                    
+                    {% for error in errors.get('roles') %}
+                    <span class="text-red-500 text-sm font-semibold whitespace-nowrap">{{ error }}</span>    
+                    {% endfor %}  
                 </div>
                 <div class="flex flex-1 flex-col bg-blue-950 rounded-lg ">
                     <h1 class="sticky top-0 text-gray-50 text-lg font-medium p-4">My Permissions</h1>
@@ -156,7 +171,7 @@
                         <div></div>
                         {% for key, permission in user_permissions%}
                             <div class="text-gray-50 text-md border-b-1 border-gray-50">
-                                <input type='hidden' name='permissions[]' value={{ key }}>{{ permission }}
+                                <input type='hidden' name='permissions[]' value="{{ key }}">{{ permission }}
                             </div>                        
                         {% endfor %}
                     </div>
@@ -167,7 +182,7 @@
                         <div></div>
                         {% for key, permission in permissions %}
                             <div class="text-gray-50 text-md border-b-1 border-gray-50">
-                                <input type='hidden' name='permissions[]' value={{ key }}>{{ permission }}
+                                <input type='hidden' name='permissions[]' value="{{ key }}">{{ permission }}
                             </div>
                         {% endfor %}
                     </div>

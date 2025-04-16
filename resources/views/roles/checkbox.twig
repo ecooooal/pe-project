@@ -1,7 +1,7 @@
 {% import 'components/core/forms' as forms %}
 
 {% for id, role in roles %}    
-    {% if role != "Super-Admin" %}
+    {% if role != "super_admin" %}
         <tr class="hover:bg-gray-50">
                 <td class="p-2 border-b border-gray-300 text-sm">
                     {{ forms.checkbox(
@@ -11,7 +11,7 @@
                                 )}}
                 </td>
                 <td class="p-2 border-b border-gray-300 text-sm">
-                    {{ forms.label(id:id, content:role|capitalize ) }}
+                    {{ forms.label(id:id, content:role|replace({'_': ' '})|title) }}
                 </td>
         </tr>
     {% endif %}
