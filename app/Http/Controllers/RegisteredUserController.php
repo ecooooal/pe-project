@@ -126,7 +126,7 @@ class RegisteredUserController extends Controller
 
         $user->delete();
 
-        return redirect('/admins/access-control');
+        return redirect('/admins/load-users');
 
     }
 }
