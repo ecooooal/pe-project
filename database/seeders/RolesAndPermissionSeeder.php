@@ -55,6 +55,11 @@ class RolesAndPermissionSeeder extends Seeder
         Permission::create(['name' => 'update questions']);
         Permission::create(['name' => 'destroy questions']);
 
+        Permission::create(['name' => 'create exams']);
+        Permission::create(['name' => 'view exams']);
+        Permission::create(['name' => 'update exams']);
+        Permission::create(['name' => 'destroy exams']);
+
         Permission::create(['name' => 'create reviewers']);
         Permission::create(['name' => 'view reviewers']);
         Permission::create(['name' => 'update reviewers']);
@@ -62,8 +67,6 @@ class RolesAndPermissionSeeder extends Seeder
 
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
         
-
-
         $faculty_default_permissions = [
             'view users',
             'view faculty',
@@ -74,7 +77,8 @@ class RolesAndPermissionSeeder extends Seeder
         ];
 
         $head_default_permissions = array_merge($faculty_default_permissions, [
-            'create courses','view courses', 'create courses', 'update courses', 'destroy courses',
+            'create exams','view exams', 'update exams', 'destroy exams',
+            'create courses','view courses', 'update courses', 'destroy courses',
             'create subjects', 'update subjects', 'destroy subjects',
         ]);
 
@@ -90,6 +94,8 @@ class RolesAndPermissionSeeder extends Seeder
         Role::create(['name' => 'head_secretary'])->givePermissionTo($admin_default_permissions);
         Role::create(['name' => 'college_dean'])->givePermissionTo($admin_default_permissions);
         Role::create(['name' => 'super_admin'])->givePermissionTo(Permission::all());
+        Role::create(['name' => 'student']);
+
 
     }
 }
