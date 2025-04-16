@@ -22,20 +22,20 @@ class DatabaseSeeder extends Seeder
             'last_name' => 'One',
             'email' => 'faculty@email.com',
             'password' => bcrypt('testing1234'),
-        ])->assignRole('faculty');
+        ])->assignRole('faculty')->courses()->attach(1);
 
         User::create([
             'first_name' => 'Department',
             'last_name' => 'Head',
             'email' => 'deparmentHead@email.com',
             'password' => bcrypt('testing1234'),
-        ])->assignRole('department_head');
+        ])->assignRole('department_head')->courses()->attach(1);
 
         User::create([
             'first_name' => 'College',
             'last_name' => 'Dean',
             'email' => 'collegeDean@email.com',
             'password' => bcrypt('testing1234'),
-        ])->assignRole('college_dean');
+        ])->assignRole('college_dean')->courses()->attach(1);
     }
 }

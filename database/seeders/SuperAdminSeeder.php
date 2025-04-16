@@ -20,7 +20,7 @@ class SuperAdminSeeder extends Seeder
             'last_name' => 'Admin',
             'email' => 'superAdmin@email.com',
             'password' => bcrypt('admin'),
-        ])->assignRole('super_admin');
+        ])->assignRole('super_admin')->courses()->attach(1);
 
     }
 }

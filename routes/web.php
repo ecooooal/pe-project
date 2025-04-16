@@ -9,12 +9,13 @@ use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Role;
 
 Route::get('/', function () {
+
     $user = Auth::user();
 
-    if ($user->can('view faculty')) {
+    if ($user && $user->can('view faculty')) {
         return redirect('/faculty');
     }
-
+    
     // yet to implement
     // if ($user->can('access faculty')) {
     //     return redirect('/students');
