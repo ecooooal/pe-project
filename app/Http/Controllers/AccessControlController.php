@@ -15,6 +15,11 @@ class AccessControlController extends Controller
     public function index(){
         return view('admins/access-control');
     }
+
+    public function redirect(){
+        return redirect('/admins/access-control');
+    }
+
     public function viewUsers(){
         $currentUser = request()->user();
         $users = User::all();

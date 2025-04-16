@@ -3,13 +3,15 @@
 {% from 'components/core/index-table' import table %}
 
 <div class="flex flex-1 mr-8">
-    <button 
-            class=" ml-auto bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold"
-            hx-get="/admins/{{ url }}/create"
-            hx-swap="innerHTML transition:true" 
-            hx-target="#access-control-content">
-            Add {{ url|capitalize }}
-    </button>
+    {% if can('create ' ~ url) %}
+        <button 
+                class=" ml-auto bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold"
+                hx-get="/admins/{{ url }}/create"
+                hx-swap="innerHTML transition:true" 
+                hx-target="#access-control-content">
+                Add {{ url|capitalize }}
+        </button>
+    {% endif %}
 </div>
 
 <div class="mx-4 p-4" >
