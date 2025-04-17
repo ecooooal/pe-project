@@ -21,7 +21,10 @@ class Course extends Model
     }
 
     public function subjects(){
-        return $this->hasMany(Subject::class)->withTimestamps();
+        return $this->hasMany(Subject::class);
     }
+
+
+
 
 }

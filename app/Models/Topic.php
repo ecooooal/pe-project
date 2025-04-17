@@ -16,10 +16,10 @@ class Topic extends Model
     ];
 
     public function subjects(){
-        return $this->belongsToMany(Subject::class)->withTimestamps();
+        return $this->belongsTo(Subject::class);
     }
 
     public function questions(){
-        return $this->hasMany(Question::class)->withTimestamps();
+        return $this->hasMany(Question::class);
     }
 }

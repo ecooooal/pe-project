@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccessControlController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\SubjectController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -164,21 +165,13 @@ Route::get('/topics/questions', function(){
     return view('topics/questions');
 });
 
-Route::get('/subjects', function(){
-    return view('subjects/index');
-});
-Route::get('/subjects/create', function(){
-    return view('subjects/create');
-});
-Route::get('/subjects/show', function(){
-    return view('subjects/show');
-});
-Route::get('/subjects/edit', function(){
-    return view('subjects/edit');
-});
-Route::get('/subjects/questions', function(){
-    return view('subjects/questions');
-});
+Route::get('/subjects', [SubjectController::class, 'index']);
+Route::get('/subjects/create', [SubjectController::class, 'create']);
+Route::post('/subjects', [SubjectController::class, 'store']);
+Route::get('/subjects/{subject}', [SubjectController::class, 'show']);
+Route::get('/subjects/{subject}/edit', [SubjectController::class, 'edit']);
+Route::patch('/subjects/{subject}', [SubjectController::class, 'update']);
+Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy']);
 
 Route::get('/reviewers', function(){
     return view('reviewers/index');

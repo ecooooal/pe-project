@@ -16,11 +16,19 @@ class Subject extends Model
         'year_level'
     ];
 
-    public function courses(){
-        return $this->belongsToMany(Course::class)->withTimestamps();
+    public function course(){
+        return $this->belongsTo(Course::class);
     }
 
     public function topics(){
-        return $this->hasMany(Topic::class)->withTimestamps();
+        return $this->hasMany(Topic::class, 'subject_id');
+    }
+
+    public function createdBy(){
+    return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updatedBy(){
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }

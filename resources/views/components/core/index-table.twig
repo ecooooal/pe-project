@@ -23,7 +23,7 @@
                     {% if actions %}
                         <td class="p-4 max-w-48  border-b border-gray-300">
                             {% if not forAdmin %}
-                                <a href="/{{ url }}/show" class="text-blue-900 text-sm font-medium hover:underline">Open</a>
+                                <a href="/{{ url }}/{{ row.id }}" class="text-blue-900 text-sm font-medium hover:underline">Open</a>
                             {% else %}
                             <button 
                                 class="text-blue-900 text-sm font-medium hover:underline"
