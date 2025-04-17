@@ -15,11 +15,15 @@ class Topic extends Model
         'name',
     ];
 
-    public function subjects(){
+    public function subject(){
         return $this->belongsTo(Subject::class);
     }
 
     public function questions(){
         return $this->hasMany(Question::class);
     }
+    
+    public function createdBy(){
+        return $this->belongsTo(User::class, 'created_by');
+        }
 }

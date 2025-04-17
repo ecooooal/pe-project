@@ -4,6 +4,7 @@ use App\Http\Controllers\AccessControlController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\TopicController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -149,21 +150,14 @@ Route::get('/questions/create/add-item', function () {
     return view('questions-types/new-text-item', ['counter' => $counter]);
 });
 
-Route::get('/topics', function(){
-    return view('topics/index');
-});
-Route::get('/topics/create', function(){
-    return view('topics/create');
-});
-Route::get('/topics/show', function(){
-    return view('topics/show');
-});
-Route::get('/topics/edit', function(){
-    return view('topics/edit');
-});
-Route::get('/topics/questions', function(){
-    return view('topics/questions');
-});
+Route::get('/topics', [TopicController::class, 'index']);
+Route::get('/topics/create', [TopicController::class, 'create']);
+Route::post('/topics', [TopicController::class, 'store']);
+Route::get('/topics/{topic}', [TopicController::class, 'show']);
+Route::get('/topics/{topic}/edit', [TopicController::class, 'edit']);
+Route::patch('/topics/{topic}', [TopicController::class, 'update']);
+Route::delete('/topics/{topic}', [TopicController::class, 'destroy']);
+
 
 Route::get('/subjects', [SubjectController::class, 'index']);
 Route::get('/subjects/create', [SubjectController::class, 'create']);

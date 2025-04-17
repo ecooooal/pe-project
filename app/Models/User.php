@@ -60,4 +60,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Course::class)->withTimestamps();
     }
 
+    public function getCourseIds()
+    {
+        return $this->courses()->pluck('courses.id')->toArray();
+    }
+
 }
