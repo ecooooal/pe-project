@@ -82,7 +82,7 @@ class RolesAndPermissionSeeder extends Seeder
             'create subjects', 'update subjects', 'destroy subjects',
         ]);
 
-        $admin_default_permissions = array_merge($faculty_default_permissions, [
+        $admin_default_permissions = array_merge($head_default_permissions, [
             'view access control',
             'create users','view users', 'update users', 'destroy users',
             'create roles','view roles', 'update roles', 'destroy roles',

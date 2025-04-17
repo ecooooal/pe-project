@@ -6,7 +6,7 @@
 
     <div class="flex flex-col items-center mt-2 -mx-2">
 
-        <h4 class="mx-2 mt-2 font-medium text-gray-800">{{ auth_user().name }}</h4>
+        <h4 class="mx-2 mt-2 font-medium text-gray-800">{{ auth_user().first_name ~ ' ' ~ auth_user().last_name }}</h4>
         <p class="mx-2 mt-1 text-sm font-medium text-gray-600">{{ auth_user().email }}</p>
     </div>
 
