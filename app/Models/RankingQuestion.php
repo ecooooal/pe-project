@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Topics extends Model
+class RankingQuestion extends Model
 {
     //
 }

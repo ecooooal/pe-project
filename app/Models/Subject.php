@@ -7,21 +7,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use App\TracksUserActivity;
 
-class Course extends Model
+class Subject extends Model
 {
     use HasFactory, Notifiable, TracksUserActivity;
 
     protected $fillable = [
         'name',
-        'abbreviation'
+        'year_level'
     ];
 
-    public function users(){
-        return $this->belongsToMany(User::class)->withTimestamps();
+    public function courses(){
+        return $this->belongsToMany(Course::class)->withTimestamps();
     }
 
-    public function subjects(){
-        return $this->hasMany(Subject::class)->withTimestamps();
+    public function topics(){
+        return $this->hasMany(Topic::class)->withTimestamps();
     }
-
 }

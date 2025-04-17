@@ -28,6 +28,10 @@
   {{ input(name, value, "color", attributes) }}
 {% endmacro %}
 
+{% macro textarea(name, value, attributes) %}
+  <textarea name="{{ name }}"{% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %}{% if not attributes.id is defined %} id="{{ name }}"{% endif %}>{{ value|e }}</textarea>
+{% endmacro %}
+
 {% macro date(name, value, attributes) %}
   {% from _self import input %}
   {{ input(name, value, "date", attributes) }}

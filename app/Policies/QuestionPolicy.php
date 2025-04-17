@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Topics;
+use App\Models\Question;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class TopicsPolicy
+class QuestionPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,7 +19,7 @@ class TopicsPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Topics $topics): bool
+    public function view(User $user, Question $questions): bool
     {
         return false;
     }
@@ -35,7 +35,7 @@ class TopicsPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Topics $topics): bool
+    public function update(User $user, Question $questions): bool
     {
         return false;
     }
@@ -43,7 +43,7 @@ class TopicsPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Topics $topics): bool
+    public function delete(User $user, Question $questions): bool
     {
         return false;
     }
@@ -51,7 +51,7 @@ class TopicsPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Topics $topics): bool
+    public function restore(User $user, Question $questions): bool
     {
         return false;
     }
@@ -59,7 +59,7 @@ class TopicsPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Topics $topics): bool
+    public function forceDelete(User $user, Question $questions): bool
     {
         return false;
     }

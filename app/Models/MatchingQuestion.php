@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Subjects extends Model
+class MatchingQuestion extends Model
 {
     //
 }
