@@ -22,8 +22,9 @@
         </svg>
         <h1 class="font-bold text-4xl">Exam Bank</h1>
     </div>
-
-    <a href="/exams/create" class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold">Create Exam</a>
+    {% if can('create exams') %}
+        <a href="/exams/create" class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold">Create Exam</a>
+    {% endif %}
 </div>
 <div class="mx-4 p-4">
     <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-t border-gray-300 rounded-t-2xl">

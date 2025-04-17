@@ -1,0 +1,55 @@
+{% from 'components/core/show-header' import show_header %}
+{% import 'components/core/forms' as forms %}
+{% from 'components/core/breadcrumbs' import breadcrumb %}
+{% from 'components/core/index-table' import table %}
+
+{% set headers = ['ID', 'Name', 'Course', 'Questions', 'Date Created', 'Status'] %}
+{% set rows = [
+    ['1', 'Computer Science Proficiency Examination', 'BSCS', '48', '02-05-2025', 'Complete'],
+    ['2', 'Information Technology Proficiency Examination', 'BSIT', '48', '02-05-2025', 'Incomplete'],
+    ['3', 'Computer Engineer Proficiency Examination', 'BSCPE', '48', '02-05-2025', 'Incomplete'],
+    ['4', 'Multimedia Arts Proficiency Examination', 'BSMMA', '48', '02-05-2025', 'Incomplete']
+] %}
+{% extends 'components/core/base' %}
+
+{% block layout %}
+    <div class="flex flex-col w-screen overflow-auto pb-8">
+        {% include 'components/core/header' %}
+
+        {% block content %}
+            <div class="flex flex-col m-16 p-4 bg-gray-100 rounded-lg max-w-64">
+                <div class="flex text-center my-2">
+                    <h3 class="text-lg font-medium">
+                        Search Roles
+                        <span class="htmx-indicator ml-4 text-sm text-gray-500">
+                            Searching...
+                        </span>
+                    </h3>
+                </div>
+                <input class="border-1 border-gray-500 rounded-md p-2" type="search"
+                    name="search" placeholder="Search Roles..."
+                    hx-post="/search"
+                    hx-trigger="input changed delay:500ms, keyup[key=='Enter'], load"
+                    hx-target="#search-results"
+                    hx-indicator=".htmx-indicator"
+                    hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'>
+
+                <table class="table-auto max-h-8 overflow-y-auto text-left">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-2 font-bold border-b border-gray-300 text-sm bg-gray-100 text-blue-900 ml-auto">Select</th>
+                            <th class="px-4 py-2 font-bold border-b border-gray-300 text-sm bg-gray-100 text-blue-900 ml-auto">Roles</th>
+                        </tr>
+                    </thead>
+                    <tbody 
+                            id="search-results"                  
+                            hx-post="/search"
+                            hx-trigger="load"
+                            hx-target="this"
+                            hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'>
+                    </tbody>
+                </table>
+            </div>
+        {% endblock %}
+    </div>
+{% endblock %}

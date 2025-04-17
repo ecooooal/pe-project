@@ -1,15 +1,88 @@
 <?php
 
+use App\Http\Controllers\AccessControlController;
+use App\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\SessionController;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Spatie\Permission\Models\Role;
 
 Route::get('/', function () {
+
+    $user = Auth::user();
+
+    if ($user && $user->can('view faculty')) {
+        return redirect('/faculty');
+    }
+    
+    // yet to implement
+    // if ($user->can('access faculty')) {
+    //     return redirect('/students');
+    // }
+
+
     return view('landing-page');
 });
 
-Route::get('/faculty', function () {
-    return view('faculty-home');
+Route::get('/test', function () {
+    return view('test-page');
 });
+
+Route::post('/search', function () {
+
+});
+
+Route::post('/login', [SessionController::class, 'authenticate']);
+Route::post('/logout', [SessionController::class, 'logout'])->middleware(['auth']);;
+
+Route::group(['middleware' => ['can:view faculty']], function () { 
+    Route::get('/faculty', function () {
+        return view('faculty-home');
+    });
+ });
+Route::group(['middleware' => ['can:view access control']], function () { 
+    Route::get('/admins', [AccessControlController::class, 'redirect']);
+    Route::get('/admins/access-control', [AccessControlController::class, 'index']);
+
+    Route::get('/admins/load-users', [AccessControlController::class, 'viewUsers']);
+    Route::get('/admins/users/create', [RegisteredUserController::class, 'create']);    
+    Route::post('/admins/users', [RegisteredUserController::class, 'store']);
+    Route::get('/admins/users/{user}/edit', [RegisteredUserController::class, 'edit'])->name('admin.users.edit');
+    Route::get('/admins/users/{user}', [RegisteredUserController::class, 'show'])->name('admin.users.show');
+    Route::patch('/admins/users/{user}', [RegisteredUserController::class, 'update']);
+    Route::delete('/admins/users/{user}', [RegisteredUserController::class, 'destroy']);
+
+
+
+    Route::get('/admins/load-roles', [AccessControlController::class, 'viewRoles']);
+    Route::post('/admins/roles/load-role-checkbox', [AccessControlController::class, 'loadRoleCheckbox']);
+    Route::get('/admins/roles/create', [AccessControlController::class, 'createRole']);
+    Route::post('/admins/roles', [AccessControlController::class, 'storeRole']);
+    Route::get('/admins/roles/{role}', [AccessControlController::class, 'showRole'])->name('admin.roles.show');
+    Route::get('/admins/roles/{role}/edit', [AccessControlController::class, 'editRole']);
+    Route::patch('/admins/roles/{role}', [AccessControlController::class, 'updateRole']);
+    Route::delete('/admins/roles/{role}', [AccessControlController::class, 'destroyRole']);
+
+
+    Route::get('/admins/load-permissions', [AccessControlController::class, 'viewPermissions']);
+    Route::get('/admins/permissions/create', [AccessControlController::class, 'createPermission']);
+    Route::post('/admins/permissions', [AccessControlController::class, 'storePermission']);
+    Route::get('/admins/permissions/{permission}', [AccessControlController::class, 'showPermission'])->name('admin.permissions.show');
+    Route::get('/admins/permissions/{permission}/edit', [AccessControlController::class, 'editPermission']);
+    Route::patch('/admins/permissions/{permission}', [AccessControlController::class, 'updatePermission']);
+    Route::delete('/admins/permissions/{permission}', [AccessControlController::class, 'destroyPermission']);
+
+
+    Route::get('/admins/roles', function () {
+        return view('admins/roles');
+    });
+    Route::get('/admins/permissions', function () {
+        return view('admins/permissions');
+    });
+ });
+
+
 
 Route::get('/exams', function(){
     return view('exams/index');

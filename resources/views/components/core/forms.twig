@@ -51,18 +51,27 @@
   </select>
 {% endmacro %}
 
-{% macro form_field(label, input, errors = 'None yet', isColumn = false) %}
+{% macro checkbox(name, value, id, isOwn = false, attributes) %}
+  <input type="checkbox" name="{{ name }}" id="{{ id|default(name) }}" class="{{ class }}" value="{{ value }}" {% if isOwn %} checked="checked"{% endif %}{% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %} />
+{% endmacro %}
+
+
+{% macro form_field(label, input, errors, isColumn = false) %}
     {% if not isColumn %}
         <div class="flex gap-x-4 pt-2 items-center">
             {{ label }}
             {{ input }}
-            <span class="text-red-500 text-sm font-semibold whitespace-nowrap">{{ errors }}</span>    
+            {% for error in errors %}
+            <span class="text-red-500 text-sm font-semibold whitespace-nowrap">{{ error }}</span>    
+            {% endfor %}  
         </div>
     {% else %}
         <div class="flex flex-col gap-y-1 pt-2">
             {{ label }}
             {{ input }}
-            <span class="text-red-500 text-sm font-semibold whitespace-nowrap">{{ errors }}</span>    
+            {% for error in errors %}
+            <span class="text-red-500 text-sm font-semibold whitespace-nowrap">{{ error }}</span>    
+            {% endfor %}
         </div>
     {% endif %}
 {% endmacro %}
@@ -79,7 +88,7 @@
 
 {% macro radio(name, values, value, attributes) %}
   {% for key, label in values %}
-  <label{% if value == key %} class="selected"{% endif %} ><input type="radio" name="{{ name }}" value="{{ key }}"{% if value == key %} checked="checked"{% endif %}{% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %}{% if not attributes.id is defined %} id="{{ name }}"{% endif %}> {{ label }}</label>
+  <label {% if value == key %} class="selected"{% endif %} ><input type="radio" name="{{ name }}" value="{{ key }}"{% if value == key %} checked="checked"{% endif %}{% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %}{% if not attributes.id is defined %} id="{{ name }}"{% endif %}> {{ label }}</label>
   {% endfor %}
 {% endmacro %}
 
