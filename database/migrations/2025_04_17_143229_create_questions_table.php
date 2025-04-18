@@ -16,7 +16,13 @@ return new class extends Migration
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Topic::class, 'topic_id')->constrained();
-            $table->string('question_type');
+            $table->enum('question_type', [
+                'multiple_choice',
+                'true_or_false',
+                'identification',
+                'ranking',
+                'matching'
+            ]);           
             $table->string('name');
             $table->unsignedTinyInteger('points');
             $table->timestamps();

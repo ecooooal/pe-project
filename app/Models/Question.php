@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\QuestionType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
@@ -15,6 +16,10 @@ class Question extends Model
         'question_type',
         'name',
         'points'
+    ];
+
+    protected $casts = [
+        'question_type' => QuestionType::class,
     ];
 
     public function topics(){
@@ -36,4 +41,16 @@ class Question extends Model
     public function matching_questions(){
         return $this->hasMany(MatchingQuestion::class)->withTimestamps();
     }
+
+    public function getTypeModel()
+{
+    return match ($this->question_type) {
+        QuestionType::MultipleChoice => $this->multiple_choice_questions,
+        QuestionType::TrueOrFalse => $this->true_or_false_questions,
+        QuestionType::Identification => $this->identification_questions,
+        QuestionType::Ranking => $this->ranking_questions,
+        QuestionType::Matching => $this->matching_questions,
+    };
+}
+
 }
