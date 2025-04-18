@@ -13,7 +13,10 @@
 <div class="flex flex-col mx-4 pl-4">
     <div class="flex justify-between">
     <h1 class="font-bold text-4xl">{{ subject.name }}</h1>
-    <button form="delete-form" type="submit" class="cursor-pointer bg-red-600 text-gray-200 hover:bg-red-500 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm">Delete Subject</button>
+    <div class="flex flex-col gap-y-1">
+        <button form="delete-form" type="submit" class="cursor-pointer bg-red-600 text-gray-200 hover:bg-red-500 hover:text-white duration-300 rounded-lg p-3 font-semibold text-sm">Delete Subject</button>
+        {% if session('error') %} <p class="text-xs font-semibold text-red-500 italic">{{ session('error') }}</p> {% endif %}
+    </div>
     </div>
     <div class="flex flex-col pt-1 gap-y-0.5">
         <span class="pl-2 text-xs text-gray-400 font-semi">ID : {{ subject.id }}</span>
@@ -44,8 +47,9 @@
     </div>
 
     <div class="flex flex-1 flex-col mx-16">
-        <form action="/subjects" class="flex flex-col gap-y-4">
+        <form action="/subjects/{{ subject.id }}" method="POST" class="flex flex-col gap-y-4">
             {{ csrf_field() }}
+            {{ method_field('PATCH') }}
             <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
                 <div class="flex flex-col p-4 flex-1">
                     {{ show_header('Details') }}
@@ -79,11 +83,32 @@
                                     values: courses,
                                     value:subject.course.id, 
                                     attributes:{
-                                        'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                        'class':'block w-full cursor-not-allowed rounded-md bg-gray-100 px-3 py-1.5 outline-1 -outline-offset-1 outline-gray-300 text-gray-400  sm:text-sm/6',
                                         'placeholder':'Select a Course',
-                                        'required':true}
+                                        'disabled':true}
                                 ),
                                 isColumn:true 
+                            )}}
+                            <span class="text-gray-500 font-semibold text-xs italic">For Data Integrity Purposes, Course cannot be changed.</span>
+                            {{ forms.form_field(
+                                label:forms.label(
+                                    id:'year_level', 
+                                    content:'Year Level', 
+                                    attributes:{
+                                        'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
+                                    ),
+                                input:forms.number(
+                                    name:'year_level',
+                                    value: subject.year_level,
+                                    attributes:{
+                                        'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                        'required':true,
+                                        'min':1,
+                                        'max':4,
+                                        'placeholder':'1 - 4 Year Level'
+                                    }),
+                                    errors: errors.get('year_level'),
+                                    isColumn: true
                             )}}
                             {{ forms.form_field(
                                 label:forms.label(
@@ -107,15 +132,17 @@
             </div>
     
             <div class="flex gap-x-2">
-                <button type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm">Update Subject</button>
+                <button type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm">
+                    Update Subject
+                </button>
                 <a href="/subjects" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
     
             </div>
         </form>
 
-        <form method="" action="/faculty" class="hidden" id="delete-form">
-            <input type="hidden" name="_token" value="{{ csrf_token }}" autocomplete="off">
-            <input type="hidden" name="_method" value="DELETE">
+        <form method="POST" action="/subjects/{{ subject.id }}" class="hidden" id="delete-form">
+            {{ csrf_field() }}
+            {{ method_field('DELETE') }}
         </form>
     </div>
 </div>

@@ -45,7 +45,7 @@ class SubjectPolicy
      */
     public function delete(User $user, Subject $subjects): bool
     {
-        return false;
+        return $user->hasPermissionTo('destroy subjects');
     }
 
     /**

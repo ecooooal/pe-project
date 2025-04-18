@@ -52,7 +52,19 @@ class SubjectController extends Controller
     }
 
     public function store(){
-        dd(request()->post());
+        request()->validate([
+            'name'    => ['required'],
+            'course'     => ['required', 'integer'],
+            'year_level' => ['required', 'integer', 'min:1', 'max:4']
+        ]);
+
+        Subject::create([
+            'name' => request('name'),
+            'course_id' => request('course'),
+            'year_level' => request('year_level'),
+        ]);
+
+        return redirect('/subjects');
     }
 
     public function edit(Subject $subject){
@@ -64,5 +76,31 @@ class SubjectController extends Controller
         ];
     
         return view('subjects/edit', $data);
+    }
+
+    public function update(Subject $subject){
+        request()->validate([
+            'name'    => ['required'],
+            'year_level' => ['required', 'integer', 'min:1', 'max:4']
+        ]); 
+        $subject->update([
+            'name' => request('name'),
+            'year_level' => request('year_level'),
+        ]);
+
+        return redirect()->route('subjects.show', $subject);
+    }
+    public function destroy(Subject $subject){
+
+        $this->authorize('delete', $subject);
+
+        if ($subject->topics()->exists()) {
+            return back()->with('error', 'You cannot delete a subject that has topics.');
+        }
+
+        $subject->delete();
+
+        return redirect('/subjects');
+
     }
 }

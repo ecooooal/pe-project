@@ -162,7 +162,7 @@ Route::delete('/topics/{topic}', [TopicController::class, 'destroy']);
 Route::get('/subjects', [SubjectController::class, 'index']);
 Route::get('/subjects/create', [SubjectController::class, 'create']);
 Route::post('/subjects', [SubjectController::class, 'store']);
-Route::get('/subjects/{subject}', [SubjectController::class, 'show']);
+Route::get('/subjects/{subject}', [SubjectController::class, 'show'])->name('subjects.show');;
 Route::get('/subjects/{subject}/edit', [SubjectController::class, 'edit']);
 Route::patch('/subjects/{subject}', [SubjectController::class, 'update']);
 Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy']);

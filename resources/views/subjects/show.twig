@@ -44,7 +44,8 @@
             {{ show_header('Details') }}
             <div class="flex justify-between">
                 <div class="flex flex-col gap-y-4">
-                    {{ show_item('Course', subject.course.name)}}
+                    {{ show_item('Course', subject.course.name) }}
+                    {{ show_item('Year Level', subject.year_level) }}
                     {{ show_item('Current No. of Topics', subject.topics.count() )}}
                 </div>
                 <div class="flex flex-col mr-16 gap-y-4">

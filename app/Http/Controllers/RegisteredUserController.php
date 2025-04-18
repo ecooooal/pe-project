@@ -66,7 +66,6 @@ class RegisteredUserController extends Controller
                 ->withInput();
         }
 
-
         $data = $validator->validated();
 
         $user = User::create([
