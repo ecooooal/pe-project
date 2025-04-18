@@ -50,7 +50,17 @@ class TopicController extends Controller
     }
 
     public function store(){
-        dd(request()->post());
+        request()->validate([
+            'name'    => ['required'],
+            'subject'     => ['required', 'integer'],
+        ]);
+
+        Topic::create([
+            'name' => request('name'),
+            'subject_id' => request('subject'),
+        ]);
+
+        return redirect('/topics');
     }
     public function edit(Topic $topic){
         $subjects = Subject::whereIn('course_id', $topic->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
@@ -61,5 +71,31 @@ class TopicController extends Controller
         ];
     
         return view('topics/edit', $data);
+    }
+
+    public function update(Topic $topic){
+        $this->authorize('update', $topic);
+
+
+        request()->validate([
+            'name'    => ['required'],
+            'subject'     => ['required', 'integer'],
+        ]);
+
+        $topic->update([
+            'name' => request('name'),
+            'subject_id' => request('subject'),
+        ]);
+
+        return redirect()->route('topics.show', $topic);
+    }
+    public function destroy(Topic $topic){
+
+        $this->authorize('delete', $topic);
+
+        $topic->delete();
+
+        return redirect('/topics');
+
     }
 }

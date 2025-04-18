@@ -21,12 +21,12 @@ class SubjectController extends Controller
     }
     public function index(){
         $subject_courses = $this->getSubjectsForUser();
-        $header = ['ID', 'Course', 'Name', 'Year Level', 'Date Created'];
+        $header = ['ID', 'Name', 'Course',  'Year Level', 'Date Created'];
         $rows = $subject_courses->map(function ($subject) {
             return [
                 'id' => $subject->id,
-                'course' => $subject->course->name,
                 'name' => $subject->name,
+                'course' => $subject->course->name,
                 'year_level' => $subject->year_level,
                 'Date Created' => Carbon::parse($subject->created_at)->format('m/d/Y')
             ];

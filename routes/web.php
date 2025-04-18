@@ -153,7 +153,7 @@ Route::get('/questions/create/add-item', function () {
 Route::get('/topics', [TopicController::class, 'index']);
 Route::get('/topics/create', [TopicController::class, 'create']);
 Route::post('/topics', [TopicController::class, 'store']);
-Route::get('/topics/{topic}', [TopicController::class, 'show']);
+Route::get('/topics/{topic}', [TopicController::class, 'show'])->name(name: 'topics.show');
 Route::get('/topics/{topic}/edit', [TopicController::class, 'edit']);
 Route::patch('/topics/{topic}', [TopicController::class, 'update']);
 Route::delete('/topics/{topic}', [TopicController::class, 'destroy']);
@@ -162,7 +162,7 @@ Route::delete('/topics/{topic}', [TopicController::class, 'destroy']);
 Route::get('/subjects', [SubjectController::class, 'index']);
 Route::get('/subjects/create', [SubjectController::class, 'create']);
 Route::post('/subjects', [SubjectController::class, 'store']);
-Route::get('/subjects/{subject}', [SubjectController::class, 'show'])->name('subjects.show');;
+Route::get('/subjects/{subject}', [SubjectController::class, 'show'])->name('subjects.show');
 Route::get('/subjects/{subject}/edit', [SubjectController::class, 'edit']);
 Route::patch('/subjects/{subject}', [SubjectController::class, 'update']);
 Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy']);

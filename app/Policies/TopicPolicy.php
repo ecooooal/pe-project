@@ -37,7 +37,7 @@ class TopicPolicy
      */
     public function update(User $user, Topic $topics): bool
     {
-        return false;
+        return $user->hasPermissionTo('update topics');
     }
 
     /**
@@ -45,7 +45,7 @@ class TopicPolicy
      */
     public function delete(User $user, Topic $topics): bool
     {
-        return false;
+        return $user->hasPermissionTo('destroy topics');
     }
 
     /**

@@ -37,7 +37,7 @@ class SubjectPolicy
      */
     public function update(User $user, Subject $subjects): bool
     {
-        return false;
+        return $user->hasPermissionTo('update subjects');
     }
 
     /**
