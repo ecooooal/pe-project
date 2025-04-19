@@ -55,7 +55,7 @@ class QuestionController extends Controller
             'true_or_false'=> 'True or False',
             'identification' => 'Identification',
             'ranking_ordering_process' => 'Ranking/Ordering/Process',
-            'matching' => 'Matching Items',
+            'matching_items' => 'Matching Items',
             'coding' => 'Coding'
         ];
 
@@ -68,22 +68,11 @@ class QuestionController extends Controller
     }
 
     public function store(){
-        $first_validator = Validator::make(request()->all(), [
+        $alidator = Validator::make(request()->all(), [
             'topic' => ['required'],
             'type' => ['required'],
             'name' => ['required', 'string'],
             'points' => ['required', 'integer', 'min:1'],
-        ]);
-
-        if ($first_validator->fails()) {
-            session()->flash('first_validation', true);
-            return redirect()->route('questions.create')
-                ->withErrors($first_validator)
-                ->withInput();
-        }
-
-        $second_validator = Validator::make(request()->all(), [
-            'items' => ['required', 'array', 'min:2'],
             'items.*' => ['required', 'string', 'min:1'],
             'solution' => ['required', 'string'], 
         ], [
@@ -91,10 +80,10 @@ class QuestionController extends Controller
         ]);
 
         $question_type = request('type');
-
-        if ($second_validator->fails()) {
-            return redirect()->route('question.types', ['type' => $question_type])
-                ->withErrors($second_validator)
+        $item_count = count(request()->input('items', []));
+        if ($alidator->fails()) {
+            return redirect()->route('question.types', ['type' => $question_type, 'item_count' => $item_count])
+                ->withErrors($alidator)
                 ->withInput();
         }
 

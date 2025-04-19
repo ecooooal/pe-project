@@ -112,7 +112,7 @@ Route::patch('/questions/{question}', [QuestionController::class, 'update']);
 Route::delete('/questions/{question}', [QuestionController::class, 'destroy']);
 
 Route::get('/questions/create/question-type', function (Request $request) {
-    $counter = session('counter', 4);
+    $item_count = (int) $request->input('item_count', 4);
     $type = $request->query('type'); 
     switch ($type) {
         case 'multiple_choice':
@@ -122,11 +122,14 @@ Route::get('/questions/create/question-type', function (Request $request) {
             return view('questions-types/true-false');
         
         case 'identification':
-            return view('questions-types/identification', compact('counter'));
+            return view('questions-types/identification');
 
         case 'ranking_ordering_process':
-            return view('questions-types/rank-order-process');
+            return view('questions-types/rank-order-process', compact('item_count'));
         
+        case 'matching_items':
+            return view('questions-types/matching-items');
+
         case 'coding':
             return view('questions-types/coding');
 
@@ -136,12 +139,14 @@ Route::get('/questions/create/question-type', function (Request $request) {
     })->name('question.types');
 
     Route::get('/questions/create/add-item', function () {
-        $counter = session('counter', 4);
-        $counter++;
-        session()->flash('counter', $counter);
+        $counter = request('item_count', 4);
+        $item_count = session('counter', $counter);
+        $item_count++;
 
-        return view('questions-types/new-text-item', ['counter' => $counter]);
-    });
+        session()->flash('counter', $item_count);
+
+        return view('questions-types/new-text-item', ['counter' => $item_count]);
+     });
 
     Route::get('/topics', [TopicController::class, 'index']);
     Route::get('/topics/create', [TopicController::class, 'create']);

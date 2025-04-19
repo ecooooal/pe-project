@@ -6,21 +6,13 @@
 
 {% block content %}
 
-{{ dump(errors, session('first_validation')) }}
-
 {{ breadcrumb() }}
 <div class="flex flex-col mx-4 pl-4 pb-8">
     <h1 class="font-bold text-4xl">Create Question</h1>
 </div>
 
 <div class="flex flex-1 flex-col mx-16">
-    {% if session('first_validation') %}
-    <form method="POST" hx-post="/questions" hx-target="#question-type-content" class="flex flex-col gap-y-4">
-
-    {% else %}
-    <form method="POST" action="/questions" class="flex flex-col gap-y-4">
-
-    {% endif %}
+    <form method="POST" hx-post="/questions" hx-target="#question-type-content" hx-select-oob="#question-name-form" class="flex flex-col gap-y-4">
     {{ csrf_field() }}
         <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
             <div class="flex flex-col p-4 flex-1">
@@ -47,21 +39,23 @@
                             ),
                             isColumn:true 
                         )}}
-                        {{ forms.form_field(
-                            label:forms.label(
-                                id:'name', 
-                                content:'Name', 
-                                attributes:{
-                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
-                            ),
-                            input:forms.textarea(
-                                name:'name', 
-                                attributes:{
-                                    'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                    }
-                            ),
-                            isColumn:true 
-                        )}}
+                        <div id="question-name-form">
+                            {{ forms.form_field(
+                                label:forms.label(
+                                    id:'name', 
+                                    content:'Name', 
+                                    attributes:{
+                                        'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
+                                ),
+                                input:forms.textarea(
+                                    name:'name', 
+                                    attributes:{
+                                        'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                        }
+                                ),
+                                isColumn:true 
+                            )}}
+                    </div>
                     </div>
                     <div class="flex flex-1/2 flex-col gap-y-4 w-full">
                         {{ forms.form_field(
@@ -116,7 +110,6 @@
                                 ),
                             input:forms.number(
                                 name:'points', 
-                                values:values, 
                                 attributes:{
                                     'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'required':true,

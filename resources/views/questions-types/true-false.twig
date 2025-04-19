@@ -1,6 +1,8 @@
 {% from 'components/core/show-header' import show_header %}
 {% import 'components/core/forms' as forms %}
 
+{% include 'components/core/create-question-name-form' %}
+
 <div class="flex flex-col p-4 flex-1">
     {{ show_header('True or False') }}
     <div class="flex gap-x-32 justify-between w-full">
@@ -10,18 +12,18 @@
                     id:'solution', 
                     content:'Solution', 
                     attributes:{
-                        'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
+                        'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900',}
                     ),
                 input:forms.select(
                     name:'solution', 
-                    values:{'':'Select a Solution','true':'True', 'false':'False'}, 
+                    value: old('solution'),
+                    values:{'':'Select a Solution', 'true':'True', 'false':'False'}, 
                     attributes:{
                         'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                    })
+                        'required':true}),
+                errors: errors.get('solution'),
+                isColumn:true
             )}}
-        </div>
-        <div class="flex flex-col gap-y-4 w-full">
-
         </div>
     </div>
 </div>  
