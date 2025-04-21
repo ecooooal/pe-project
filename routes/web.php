@@ -124,10 +124,10 @@ Route::get('/questions/create/question-type', function (Request $request) {
         case 'identification':
             return view('questions-types/identification');
 
-        case 'ranking_ordering_process':
+        case 'ranking':
             return view('questions-types/rank-order-process', compact('item_count'));
         
-        case 'matching_items':
+        case 'matching':
             return view('questions-types/matching-items');
 
         case 'coding':

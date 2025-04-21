@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('multiple_choice_questions', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Question::class, 'question_id')->constrained()->cascadeOnDelete();
+            $table->char('choice_key');
             $table->string('item');
             $table->boolean('is_correct');
             $table->timestamps();

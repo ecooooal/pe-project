@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Factories\QuestionFactory;
 use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Topic;
@@ -54,8 +55,8 @@ class QuestionController extends Controller
             'multiple_choice' => 'Multiple Choice',
             'true_or_false'=> 'True or False',
             'identification' => 'Identification',
-            'ranking_ordering_process' => 'Ranking/Ordering/Process',
-            'matching_items' => 'Matching Items',
+            'ranking' => 'Ranking/Ordering/Process',
+            'matching' => 'Matching Items',
             'coding' => 'Coding'
         ];
 
@@ -68,7 +69,7 @@ class QuestionController extends Controller
     }
 
     public function store(){
-        $alidator = Validator::make(request()->all(), [
+        $validator = Validator::make(request()->all(), [
             'topic' => ['required'],
             'type' => ['required'],
             'name' => ['required', 'string'],
@@ -81,19 +82,19 @@ class QuestionController extends Controller
 
         $question_type = request('type');
         $item_count = count(request()->input('items', []));
-        if ($alidator->fails()) {
+        if ($validator->fails()) {
             return redirect()->route('question.types', ['type' => $question_type, 'item_count' => $item_count])
-                ->withErrors($alidator)
+                ->withErrors($validator)
                 ->withInput();
         }
 
-        \Log::info('data post', request()->post());
-        dd('error');
-        Question::create([
-            'name' => request('name'),
-            'subject_id' => request('subject'),
-        ]);
+        $data = $validator->validated();
 
+        \Log::info('data can be stored', $data);
+        QuestionFactory::create($data);
+        \Log::info('Question Creation Successful');
+
+        dd();
         return redirect('/questions');
     }
     public function edit(Question $question){

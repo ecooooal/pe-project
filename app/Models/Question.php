@@ -14,6 +14,7 @@ class Question extends Model
 
     protected $fillable = [
         'question_type',
+        'topic_id',
         'name',
         'points'
     ];
@@ -23,23 +24,23 @@ class Question extends Model
     ];
 
     public function topics(){
-        return $this->belongsToMany(Subject::class)->withTimestamps();
+        return $this->belongsTo(Topic::class);
     }
 
     public function multiple_choice_questions(){
-        return $this->hasMany(MultipleChoiceQuestion::class)->withTimestamps();
+        return $this->hasMany(MultipleChoiceQuestion::class);
     }
     public function true_or_false_questions(){
-        return $this->hasMany(TrueOrFalseQuestion::class)->withTimestamps();
+        return $this->hasMany(TrueOrFalseQuestion::class);
     }
     public function identification_questions(){
-        return $this->hasMany(IdentificationQuestion::class)->withTimestamps();
+        return $this->hasMany(IdentificationQuestion::class);
     }
     public function ranking_questions(){
-        return $this->hasMany(RankingQuestion::class)->withTimestamps();
+        return $this->hasMany(RankingQuestion::class);
     }
     public function matching_questions(){
-        return $this->hasMany(MatchingQuestion::class)->withTimestamps();
+        return $this->hasMany(MatchingQuestion::class);
     }
 
     public function getTypeModel()
