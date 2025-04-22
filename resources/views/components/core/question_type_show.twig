@@ -1,0 +1,86 @@
+{% macro question_type_show(question_type, question_type_model) %}
+    {% from 'components/core/show-header' import show_header %}
+    {% from _self import multiple_choice %}
+    {% from _self import true_or_false %}
+    {% from _self import identification %}
+    {% from _self import ranking %}
+    {% from _self import matching %}
+
+
+    <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
+        <div class="flex flex-col p-4 flex-1">
+            {{ show_header(question_type.getName()) }}
+            <div class="flex justify-between">
+                <div class="flex flex-col gap-y-4 w-full">
+                    {% if question_type.value == 'multiple_choice' %}
+                        {{ multiple_choice(question_type_model) }}
+                    {% elseif question_type.value == 'true_or_false' %}
+                        {{ true_or_false(question_type_model) }}
+                    {% elseif question_type.value == 'identification' %}
+                        {{ identification(question_type_model) }}
+                    {% elseif question_type.value == 'ranking' %}
+                        {{ ranking(question_type_model) }}
+                    {% elseif question_type.value == 'matching' %}
+                        <p>get matching</p>
+                    {% else %}
+                        <p>Unknown question type.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>  
+    </div>
+{% endmacro %}
+
+{% macro multiple_choice(question_type) %}
+{% from 'components/core/show-item' import show_item %}
+    <div class="flex justify-between">
+        <div class="flex flex-col gap-y-4">
+            {% for choice in question_type %}
+            {{ show_item(choice.choice_key|capitalize, choice.item  )}}
+            {% endfor %}
+        </div>
+        <div class="flex flex-col mr-16 gap-y-4">
+            {% for choice in question_type %}
+                {% if choice.is_correct == 'true' %} 
+                    {{ show_item('Solution', choice.choice_key|capitalize  )}}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro true_or_false(question_type) %}
+{% from 'components/core/show-item' import show_item %}
+    <div class="flex justify-between">
+        <div class="flex flex-col gap-y-4">
+            {{ show_item('Solution', question_type.solution|capitalize  )}}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro identification(question_type) %}
+{% from 'components/core/show-item' import show_item %}
+    <div class="flex justify-between">
+        <div class="flex flex-col gap-y-4">
+            {{ show_item('Solution', question_type.solution  )}}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro ranking(question_type) %}
+{% from 'components/core/show-item' import show_item %}
+    <div class="flex justify-between">
+        <div class="flex flex-col gap-y-4">
+            {% for choice in question_type %}
+            {{ show_item(choice.order, choice.item)}}
+            {% endfor %}
+        </div>
+        <div class="flex flex-col mr-16 gap-y-4">
+            {% for choice in question_type %}
+                {% if choice.is_correct == 'true' %} 
+                    {{ show_item('Solution', choice.choice_key|capitalize  )}}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endmacro %}

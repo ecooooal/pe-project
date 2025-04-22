@@ -23,35 +23,40 @@ class Question extends Model
         'question_type' => QuestionType::class,
     ];
 
-    public function topics(){
+    public function topic(){
         return $this->belongsTo(Topic::class);
     }
 
-    public function multiple_choice_questions(){
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function multipleChoiceQuestions(){
         return $this->hasMany(MultipleChoiceQuestion::class);
     }
-    public function true_or_false_questions(){
-        return $this->hasMany(TrueOrFalseQuestion::class);
+    public function trueOrFalseQuestion(){
+        return $this->hasOne(TrueOrFalseQuestion::class);
     }
-    public function identification_questions(){
-        return $this->hasMany(IdentificationQuestion::class);
+    public function identificationQuestion(){
+        return $this->hasOne(IdentificationQuestion::class);
     }
-    public function ranking_questions(){
+    public function rankingQuestions(){
         return $this->hasMany(RankingQuestion::class);
     }
-    public function matching_questions(){
+    public function matchingQuestions(){
         return $this->hasMany(MatchingQuestion::class);
     }
 
     public function getTypeModel()
-{
-    return match ($this->question_type) {
-        QuestionType::MultipleChoice => $this->multiple_choice_questions,
-        QuestionType::TrueOrFalse => $this->true_or_false_questions,
-        QuestionType::Identification => $this->identification_questions,
-        QuestionType::Ranking => $this->ranking_questions,
-        QuestionType::Matching => $this->matching_questions,
-    };
-}
+    {
+        return match ($this->question_type) {
+            QuestionType::MultipleChoice => $this->multipleChoiceQuestions,
+            QuestionType::TrueOrFalse => $this->trueOrFalseQuestion,
+            QuestionType::Identification => $this->identificationQuestion,
+            QuestionType::Ranking => $this->rankingQuestions,
+            QuestionType::Matching => $this->matchingQuestions,
+        };
+    }
 
 }

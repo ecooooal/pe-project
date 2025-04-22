@@ -2,7 +2,7 @@
 {% from 'components/core/breadcrumbs' import breadcrumb %}
 {% from 'components/core/show-header' import show_header %}
 {% from 'components/core/show-item' import show_item %}
-
+{% from 'components/core/question_type_show' import question_type_show %}
 
 {% extends 'components/core/faculty-layout' %}
 
@@ -10,12 +10,11 @@
 
 {{ breadcrumb() }}
 <div class="flex flex-col mx-4 pl-4">
-    <h1 class="font-bold text-4xl">Question Show</h1>
+    <h1 class="font-bold text-4xl">{{ question.name }}</h1>
     <div class="flex flex-col gap-y-0.5">
-        <span class="pl-2 text-xs text-gray-400 font-semi">ID</span>
+        <span class="pl-2 text-xs text-gray-400 font-semi">ID : {{ question.id }}</span>
     </div>
 </div>
-
 <div class="flex flex-1 flex-col gap-y-4">
     <div class="flex max-w-full gap-x-4 overflow-x-auto mx-auto rounded-xl bg-white p-2 shadow-sm ring-1 ring-gray-950/5 ">
         {{ show_nav_item('/questions/show', 
@@ -41,12 +40,12 @@
             {{ show_header('Details') }}
             <div class="flex justify-between">
                 <div class="flex flex-col gap-y-4">
-                    {{ show_item('Name', 'Question Name')}}
-                    {{ show_item('Topic', 'Question Topic')}}
-                    {{ show_item('Type', 'Question Type')}}
+                    {{ show_item('Name',  question.name  )}}
+                    {{ show_item('Topic', question.topic.name )}}
+                    {{ show_item('Type',  question.question_type.value|replace({'_': ' '})|title )}}
                 </div>
                 <div class="flex flex-col mr-16 gap-y-4">
-                    {{ show_item('Author', 'Faculty Author')}}
+                    {{ show_item('Author', question.author.getFullName()  )}}
                 </div>
             </div>
         </div>  
@@ -56,21 +55,13 @@
             {{ show_header('Settings') }}
             <div class="flex justify-between">
                 <div class="flex flex-col gap-y-4">
-                    {{ show_item('Points', '5')}}
+                    {{ show_item('Points', question.points )}}
                     {{ show_item('Solution', 'A/True/Algorithm/etc')}}
                 </div>
             </div>
         </div>  
     </div>
-    <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
-        <div class="flex flex-col p-4 flex-1">
-            {{ show_header('Content Depends on The Question Type') }}
-            <div class="flex justify-between">
-                <div class="flex flex-col gap-y-4 h-96 w-full bg-gray-300">
-                </div>
-            </div>
-        </div>  
-    </div>
+    {{ question_type_show(question.question_type, question_type) }}
 </div>
 
 {% endblock %}

@@ -2,12 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Models\Question;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\MultipleChoiceQuestion>
  */
-class MultipleChoiceFactory extends Factory
+class MultipleChoiceQuestionFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,9 +18,9 @@ class MultipleChoiceFactory extends Factory
     public function definition(): array
     {
         return [
-            'choice_key' => $this->faker->randomElement(['A', 'B', 'C', 'D']),
-            'item' => $this->faker->word(), // Random word as the choice
-            'is_correct' => $this->faker->boolean(), // Randomly true or false
+            'choice_key' => 'A', 
+            'item' => $this->faker->word(),
+            'is_correct' => $this->faker->boolean(),
         ];
     }
 }

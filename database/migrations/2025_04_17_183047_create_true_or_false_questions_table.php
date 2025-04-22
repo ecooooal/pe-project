@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('true_or_false_questions', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Question::class, 'question_id')->constrained()->cascadeOnDelete();
-            $table->string('Solution');
+            $table->string('solution');
             $table->timestamps();
         });
     }

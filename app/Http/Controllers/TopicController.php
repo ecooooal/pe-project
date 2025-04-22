@@ -20,6 +20,7 @@ class TopicController extends Controller
 
     public function index(){
         $Topics = $this->getTopicsForUser();
+
         $header = ['ID', 'Subject', 'Name', 'Year Level', 'Date Created'];
         $rows = $Topics->map(function ($topic) {
             return [

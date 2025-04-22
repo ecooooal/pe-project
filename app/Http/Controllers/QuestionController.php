@@ -21,7 +21,7 @@ class QuestionController extends Controller
         $topicIds = Topic::whereIn('subject_id', $subjectIds)->get()->pluck('id');;
         return Question::wherein('topic_id', $topicIds)->get();
     }
-
+    
     public function index(){
         $questions = $this->getQuestionsForUser();
         $header = ['ID', 'Name', 'Subject', 'Topic', 'Type', 'Author', 'Date Created'];
@@ -29,10 +29,10 @@ class QuestionController extends Controller
             return [
                 'id' => $question->id,
                 'name' => $question->name,
+                'topic' => $question->topic->name,
                 'subject' => $question->topic->subject->name,
-                'topic' => $question->topic,
-                'type' => $question->question_type,
-                'author' => $question->created_by,
+                'type' => $question->question_type->value,
+                'author' => $question->author->getFullName(),
                 'Date Created' => Carbon::parse($question->created_at)->format('m/d/Y')
             ];
         });
@@ -46,7 +46,12 @@ class QuestionController extends Controller
     }
 
     public function show(Question $question){
-        return view('questions/show', ['question' => $question]);
+        $question_type = $question->getTypeModel();
+        $data = [
+            'question' => $question,
+            'question_type' => $question_type
+        ];
+        return view('questions/show', $data);
     }
     public function create(){
         $topics = Topic::all()->pluck('name', 'id');
@@ -93,8 +98,7 @@ class QuestionController extends Controller
         \Log::info('data can be stored', $data);
         QuestionFactory::create($data);
         \Log::info('Question Creation Successful');
-
-        dd();
+        
         return redirect('/questions');
     }
     public function edit(Question $question){

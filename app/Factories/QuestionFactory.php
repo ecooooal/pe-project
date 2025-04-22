@@ -38,8 +38,7 @@ class QuestionFactory
                     $choice_keys = ['a','b','c','d'];
                     $question_type_data['items'] = array_combine($choice_keys,  $question_type_data['items']);
                     foreach($question_type_data['items'] as $key => $item){
-                        MultipleChoiceQuestion::create([
-                            'question_id' => $question->id,
+                        $question->multipleChoiceQuestions()->create([
                             'choice_key' => $key,
                             'item' => $item,
                             'is_correct' => $key == $question_type_data['solution']
@@ -48,42 +47,47 @@ class QuestionFactory
                     DB::commit();
                     break;
                 case 'true_or_false':
-                    \Log::info('True or false solution', [ $question_type_data['solution']]);
-                    TrueOrFalseQuestion::create([
-                        'question_id' => $question->id,
-                        'solution' => $question_type_data['solution']
-                    ]);
+                    $question->trueOrFalseQuestion()->create(['solution' => $question_type_data['solution']]);
+                    DB::commit();
                     break;
                 case 'identification':
-                    \Log::info('Identification solution', [ $question_type_data['solution']]);
-                    IdentificationQuestion::create([
-                        'question_id' => $question->id,
-                        'solution' => $question_type_data['solution']
-                    ]);
+                    $question->identificationQuestion()->create(['solution' => $question_type_data['solution']]);
+                    DB::commit();
                     break;
 
                 case 'ranking':
                     switch ($question_type_data['solution']){
                         case 'ascending':
-                            foreach($question_type_data['items'] as $order => $item){
-                            $order += 1;
-                            \Log::info('Ranking ascending solution items', ['order' => $order, 'item' => $item]);
-                            }                   
+                            $ascending_solution = array_reverse($question_type_data['items']);
+
+                            $order = 1;
+                            foreach($ascending_solution as $item){
+                            $question->rankingQuestions()->create([
+                                'order' => $order, 
+                                'item' => $item]);
+                            $order++;
+
+                            }      
+                            DB::commit();
+
                             break;
 
                         case 'descending':
-                            $descending_solution = array_reverse($question_type_data['items']);
-                            foreach($descending_solution as $order => $item){
-                                $order += 1;
-                                \Log::info('Ranking ascending solution items', ['order' => $order, 'item' => $item]);
-                            } 
-                            break;
+                            $order = 1;
+                            foreach($question_type_data['items'] as $item){
+                                $question->rankingQuestions()->create([
+                                    'order' => $order, 
+                                    'item' => $item]);
+                                $order++;
+
+                                } 
+                                DB::commit();
+
+                                break;       
 
                         default:
                         throw new \Exception("Unknown ranking solution: {$question_type_data['solution']}");
-                        
                     }
-                    // RankingQuestion::create($data);
                     break;
 
                 case 'matching':
