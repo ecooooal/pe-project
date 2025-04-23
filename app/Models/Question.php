@@ -32,6 +32,10 @@ class Question extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function exams() {
+        return $this->belongsToMany(Exam::class)->withTimestamps();
+    }
+
     public function multipleChoiceQuestions(){
         return $this->hasMany(MultipleChoiceQuestion::class);
     }

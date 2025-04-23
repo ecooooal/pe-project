@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccessControlController;
+use App\Http\Controllers\ExamController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
@@ -86,58 +87,54 @@ Route::group(['middleware' => ['can:view access control']], function () {
 
 
 
+    Route::get('/exams', [ExamController::class, 'index']);
+    Route::get('/exams/create', [ExamController::class, 'create'])->name('exams.create');
+    Route::post('/exams', [ExamController::class, 'store']);
+    Route::get('/exams/{exam}', [ExamController::class, 'show'])->name(name: 'exams.show');
+    Route::get('/exams/{exam}/edit', [ExamController::class, 'edit']);
+    Route::patch('/exams/{exam}', [ExamController::class, 'update']);
+    Route::delete('/exams/{exam}', [ExamController::class, 'destroy']);
 
-Route::get('/exams', function(){
-    return view('exams/index');
-});
-Route::get('/exams/create', function(){
-    return view('exams/create');
-});
-Route::get('/exams/show', function(){
-    return view('exams/show');
-});
-Route::get('/exams/edit', function(){
-    return view('exams/edit');
-});
-Route::get('/exams/questions', function(){
-    return view('exams/questions');
-});
 
-Route::get('/questions', [QuestionController::class, 'index']);
-Route::get('/questions/create', [QuestionController::class, 'create'])->name('questions.create');
-Route::get('/questions/create/subjects', [QuestionController::class, 'getTopicsForSubjects']);
-Route::post('/questions', [QuestionController::class, 'store']);
-Route::get('/questions/{question}', [QuestionController::class, 'show'])->name(name: 'questions.show');
-Route::get('/questions/{question}/edit', [QuestionController::class, 'edit']);
-Route::patch('/questions/{question}', [QuestionController::class, 'update']);
-Route::delete('/questions/{question}', [QuestionController::class, 'destroy']);
+    Route::get('/exams/questions', function(){
+        return view('exams/questions');
+    });
 
-Route::get('/questions/create/question-type', function (Request $request) {
-    $item_count = (int) $request->input('item_count', 4);
-    $type = $request->query('type'); 
-    switch ($type) {
-        case 'multiple_choice':
-            return view('questions-types/multiple-choice');
-        
-        case 'true_or_false':
-            return view('questions-types/true-false');
-        
-        case 'identification':
-            return view('questions-types/identification');
+    Route::get('/questions', [QuestionController::class, 'index']);
+    Route::get('/questions/create', [QuestionController::class, 'create'])->name('questions.create');
+    Route::get('/questions/create/subjects', [QuestionController::class, 'getTopicsForSubjects']);
+    Route::post('/questions', [QuestionController::class, 'store']);
+    Route::get('/questions/{question}', [QuestionController::class, 'show'])->name(name: 'questions.show');
+    Route::get('/questions/{question}/edit', [QuestionController::class, 'edit']);
+    Route::patch('/questions/{question}', [QuestionController::class, 'update']);
+    Route::delete('/questions/{question}', [QuestionController::class, 'destroy']);
 
-        case 'ranking':
-            return view('questions-types/rank-order-process', compact('item_count'));
-        
-        case 'matching':
-            return view('questions-types/matching-items');
+    Route::get('/questions/create/question-type', function (Request $request) {
+        $item_count = (int) $request->input('item_count', 4);
+        $type = $request->query('type'); 
+        switch ($type) {
+            case 'multiple_choice':
+                return view('questions-types/multiple-choice');
+            
+            case 'true_or_false':
+                return view('questions-types/true-false');
+            
+            case 'identification':
+                return view('questions-types/identification');
 
-        case 'coding':
-            return view('questions-types/coding');
+            case 'ranking':
+                return view('questions-types/rank-order-process', compact('item_count'));
+            
+            case 'matching':
+                return view('questions-types/matching-items');
 
-        default:
-            return '';
-        }
-    })->name('question.types');
+            case 'coding':
+                return view('questions-types/coding');
+
+            default:
+                return '';
+            }
+        })->name('question.types');
 
     Route::get('/questions/create/add-item', function () {
         $counter = request('item_count', 4);
@@ -183,10 +180,6 @@ Route::get('/questions/create/question-type', function (Request $request) {
     });
     Route::get('/reviewers/questions', function(){
         return view('reviewers/questions');
-    });
-
-    Route::get('/exams/hello/time/set', function(){
-        return view('exams/index');
     });
 
     Route::get('/reports', function(){

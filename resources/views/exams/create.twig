@@ -2,25 +2,16 @@
 {% from 'components/core/show-header' import show_header %}
 {% import 'components/core/forms' as forms %}
 
-{% set values = {
-    'BSCS':'Computer Science',
-    'BSIT':'Information Technology',
-    'BSCPE':'Computer Engineer',
-    'BSMMA':'Multimedia Arts',
-
-} %}
-
 {% extends 'components/core/faculty-layout' %}
 
 {% block content %}
-
 {{ breadcrumb() }}
 <div class="flex flex-col mx-4 pl-4 pb-8">
     <h1 class="font-bold text-4xl">Create Exam</h1>
 </div>
 
 <div class="flex flex-1 flex-col mx-16">
-    <form action="/exams" class="flex flex-col gap-y-4">
+    <form action="/exams" method="POST" class="flex flex-col gap-y-4">
         {{ csrf_field() }}
         <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
             <div class="flex flex-col p-4 flex-1">
@@ -40,23 +31,26 @@
                                     'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'required':true}
                             ),
+                            errors:errors.get('name'),
                             isColumn:true 
                         )}}
                         {{ forms.form_field(
                             label:forms.label(
-                                id:'course', 
+                                id:'course_id', 
                                 content:'Course', 
                                 attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
                                     ),
                             input:forms.select(
-                                name:'course', 
-                                values: values, 
+                                name:'course_id', 
+                                value: 1,
+                                values: courses, 
                                 attributes:{
                                     'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'placeholder':'Select a Course',
                                     'required':true}
                             ),
+                            errors:errors.get('course_id'),
                             isColumn:true 
                         )}}
                     </div>
@@ -105,16 +99,17 @@
                     <div class="flex flex-col gap-y-4 w-full mr-96">
                         {{ forms.form_field(
                             label:forms.label(
-                                id:'score', 
+                                id:'max_score', 
                                 content:'Max Score', attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
                                 ),
                             input:forms.number(
-                                name:'score', 
+                                name:'max_score', 
                                 attributes:{
-                                    'class':'required:bg-red-500 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                    'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'min':0
-                                })
+                                }),
+                            errors:errors.get('max_score'),
                         )}}
                         {{ forms.form_field(
                             label:forms.label(
@@ -147,12 +142,13 @@
                         )}}
                         {{ forms.form_field(
                             label:forms.label(
-                                id:'date', 
-                                content:'Date', attributes:{
+                                id:'examination_date', 
+                                content:'Examination Date', 
+                                attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
                                 ),
                             input:forms.date(
-                                name:'date', 
+                                name:'examination_date', 
                                 attributes:{
                                     'class':'required:bg-red-500 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
                                 )
