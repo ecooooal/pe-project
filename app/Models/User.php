@@ -64,5 +64,4 @@ class User extends Authenticatable
     {
         return $this->courses()->pluck('courses.id')->toArray();
     }
-
 }

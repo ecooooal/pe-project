@@ -60,18 +60,39 @@
                     <div class="flex flex-1/2 flex-col gap-y-4 w-full">
                         {{ forms.form_field(
                             label:forms.label(
+                                id:'subject', 
+                                content:'Subject', 
+                                attributes:{
+                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
+                                    ),
+                            input:forms.select(
+                                name:'subject', 
+                                values:subjects, 
+                                attributes:{
+                                    'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                    'placeholder':'Select a Subject',
+                                    'required':true,
+                                    'hx-get' :'/questions/create/subjects',
+                                    'hx-target': '#topics',
+                                    'hx-swap':'outerHTML',
+                                    'hx-trigger':'load, change'}
+                            ),
+                            isColumn:true 
+                        )}}
+                        {{ forms.form_field(
+                            label:forms.label(
                                 id:'topic', 
                                 content:'Topic', 
                                 attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
                                     ),
                             input:forms.select(
-                                name:'topic', 
-                                values:topics, 
+                                name:'topic',
                                 attributes:{
                                     'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'placeholder':'Select a Topic',
-                                    'required':true}
+                                    'required':true,
+                                    'id': 'topics'}
                             ),
                             isColumn:true 
                         )}}

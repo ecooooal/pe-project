@@ -1,10 +1,13 @@
 <?php
-
 namespace App\Services;
 
-class QuestionService{
+use App\Models\Course;
+use App\Models\Subject;
+use App\Models\Topic;
+use App\Models\Question;
+use App\Models\User;
 
-    public function validateQuestionType($question_type, $data){
-
-    }
+class QuestionService
+{
+   
 }

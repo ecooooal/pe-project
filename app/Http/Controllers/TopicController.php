@@ -4,22 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Subject;
 use App\Models\Topic;
+use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class TopicController extends Controller
 {
-    public function getTopicsForUser()
-    {   
-        $user = auth()->user();
-        $user_courses = $user->getCourseIds();
-        $subjectIds = Subject::whereIn('course_id', $user_courses)->get()->pluck('id');
-        return Topic::whereIn('subject_id', $subjectIds)->get();
+    protected $userService;
 
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
     }
 
+
     public function index(){
-        $Topics = $this->getTopicsForUser();
+        $Topics = $this->userService->getTopicsForUser(auth()->user());
 
         $header = ['ID', 'Subject', 'Name', 'Year Level', 'Date Created'];
         $rows = $Topics->map(function ($topic) {
@@ -41,11 +41,12 @@ class TopicController extends Controller
     }
 
     public function show(Topic $topic){
-    
+        $topic->load( 'subject.course');
+
         return view('topics/show', ['topic' => $topic]);
     }
     public function create(){
-        $subjects = Subject::all()->pluck('name', 'id');
+        $subjects = $this->userService->getSubjectsForUser(auth()->user())->pluck('name', 'id');
 
         return view('topics/create', ['subjects' => $subjects]);
     }

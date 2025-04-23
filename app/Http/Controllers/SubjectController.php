@@ -5,11 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Subject;
 use App\Models\User;
+use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class SubjectController extends Controller
 {
+
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
     public function getSubjectsForUser()
     {   
         $user = auth()->user();
@@ -20,13 +29,13 @@ class SubjectController extends Controller
             ->get();
     }
     public function index(){
-        $subject_courses = $this->getSubjectsForUser();
-        $header = ['ID', 'Name', 'Course',  'Year Level', 'Date Created'];
+        $subject_courses = $this->userService->getSubjectsForUser(auth()->user());
+        $header = ['ID', 'Course', 'Name',  'Year Level', 'Date Created'];
         $rows = $subject_courses->map(function ($subject) {
             return [
                 'id' => $subject->id,
-                'name' => $subject->name,
                 'course' => $subject->course->name,
+                'name' => $subject->name,
                 'year_level' => $subject->year_level,
                 'Date Created' => Carbon::parse($subject->created_at)->format('m/d/Y')
             ];

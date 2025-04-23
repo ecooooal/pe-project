@@ -6,6 +6,8 @@ use App\Factories\QuestionFactory;
 use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Topic;
+use App\Services\QuestionService;
+use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -13,24 +15,22 @@ use Validator;
 
 class QuestionController extends Controller
 {
-    public function getQuestionsForUser()
-    {   
-        $user = auth()->user();
-        $user_courses = $user->getCourseIds();
-        $subjectIds = Subject::whereIn('course_id', $user_courses)->get()->pluck('id');
-        $topicIds = Topic::whereIn('subject_id', $subjectIds)->get()->pluck('id');;
-        return Question::wherein('topic_id', $topicIds)->get();
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
     }
-    
+
     public function index(){
-        $questions = $this->getQuestionsForUser();
+        $questions = $this->userService->getQuestionsForUser(auth()->user());
         $header = ['ID', 'Name', 'Subject', 'Topic', 'Type', 'Author', 'Date Created'];
         $rows = $questions->map(function ($question) {
             return [
                 'id' => $question->id,
                 'name' => $question->name,
-                'topic' => $question->topic->name,
                 'subject' => $question->topic->subject->name,
+                'topic' => $question->topic->name,
                 'type' => $question->question_type->value,
                 'author' => $question->author->getFullName(),
                 'Date Created' => Carbon::parse($question->created_at)->format('m/d/Y')
@@ -46,6 +46,8 @@ class QuestionController extends Controller
     }
 
     public function show(Question $question){
+        $question->load('topic.subject.course');
+
         $question_type = $question->getTypeModel();
         $data = [
             'question' => $question,
@@ -54,7 +56,8 @@ class QuestionController extends Controller
         return view('questions/show', $data);
     }
     public function create(){
-        $topics = Topic::all()->pluck('name', 'id');
+        $subjects = $this->userService->getSubjectsForUser(auth()->user());
+        $subjects = $subjects->pluck('name', 'id');
         $question_types = [
             '' => 'Select A Question Type',
             'multiple_choice' => 'Multiple Choice',
@@ -66,7 +69,7 @@ class QuestionController extends Controller
         ];
 
         $data =[
-            'topics' => $topics,
+            'subjects' => $subjects,
             'question_types' => $question_types
         ];
 
@@ -75,7 +78,7 @@ class QuestionController extends Controller
 
     public function store(){
         $validator = Validator::make(request()->all(), [
-            'topic' => ['required'],
+            'topic' => ['required', 'exists:topics,id'],
             'type' => ['required'],
             'name' => ['required', 'string'],
             'points' => ['required', 'integer', 'min:1'],
@@ -137,4 +140,12 @@ class QuestionController extends Controller
         return redirect('/questions');
 
     }
+
+    public function getTopicsForSubjects(Request $request){
+        $subjectId = $request->input('subject');
+        
+        $subject = $this->userService->getSubjectById($subjectId);
+        $topics = $subject->topics->pluck('name', 'id');
+
+        return view('/components/core/partial-topic', ['topics' => $topics]);    }
 }

@@ -1,0 +1,59 @@
+<?php
+
+namespace App\Services;
+use App\Models\Course;
+use App\Models\Subject;
+use App\Models\Topic;
+use App\Models\Question;
+use App\Models\User;
+class UserService
+{
+    /**
+     * Create a new class instance.
+     */
+    public function getCoursesForUser(User $user)
+    {
+        return $user->courses()
+            ->with('subjects.topics.questions')
+            ->get();
+    }
+
+    public function getSubjectsForUser(User $user)
+    {
+        return Subject::whereIn('course_id', $user->getCourseIds())->get();
+    }
+
+    public function getSubjectById($subjectId)
+    {
+        return Subject::with('topics.questions')
+                      ->findOrFail($subjectId);
+    }
+
+    public function getTopicsForUser(User $user)
+    {
+        $subjectIds = $this->getSubjectsForUser($user)->pluck('id');
+        return Topic::whereIn('subject_id', $subjectIds)->get();
+    }
+
+    public function getTopicById($topicId)
+    {
+        return Topic::with('questions') // eager load questions
+                    ->findOrFail($topicId);
+    }
+
+    public function getQuestionsForUser(User $user)
+    {
+        $topicIds = $this->getTopicsForUser($user)->pluck('id');
+        return Question::with('topic.subject.course')
+            ->whereIn('topic_id', $topicIds)
+            ->get();
+    }
+
+    public function getQuestionById($questionId)
+    {
+        return Question::with('topic.subject.course')
+                       ->findOrFail($questionId);
+    }
+
+    
+}

@@ -105,6 +105,7 @@ Route::get('/exams/questions', function(){
 
 Route::get('/questions', [QuestionController::class, 'index']);
 Route::get('/questions/create', [QuestionController::class, 'create'])->name('questions.create');
+Route::get('/questions/create/subjects', [QuestionController::class, 'getTopicsForSubjects']);
 Route::post('/questions', [QuestionController::class, 'store']);
 Route::get('/questions/{question}', [QuestionController::class, 'show'])->name(name: 'questions.show');
 Route::get('/questions/{question}/edit', [QuestionController::class, 'edit']);

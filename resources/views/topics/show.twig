@@ -12,8 +12,9 @@
 <div class="flex flex-col mx-4 pl-4">
     <h1 class="font-bold text-4xl">{{ topic.name }}</h1>
     <div class="flex flex-col pt-1 gap-y-0.5">
-        <span class="pl-2 text-xs text-gray-400 font-semibold">{{ topic.subject.name }}</span>
-        <span class="pl-2 text-xs text-gray-400 font-semi">ID : {{ topic.id }}</span>
+        <span class="pl-2 text-xs text-gray-400 font-semibold">Subject : {{ topic.subject.name }}</span>
+        <span class="pl-2 text-xs text-gray-400 font-semibold">Course : {{ topic.subject.course.abbreviation }}</span>
+        <span class="pl-2 text-xs text-gray-400 font-semibold">ID : {{ topic.id }}</span>
     </div>
 </div>
 
@@ -43,7 +44,7 @@
             <div class="flex justify-between">
                 <div class="flex flex-col gap-y-4">
                     {{ show_item('Name', topic.name)}}
-                    {{ show_item('Current No. of Questions', '25')}}
+                    {{ show_item('Current No. of Questions', topic.questions.count() )}}
                     {{ show_item('Author', topic.createdBy.getFullName())}}
                 </div>
             </div>
