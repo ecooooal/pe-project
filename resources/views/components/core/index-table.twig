@@ -41,8 +41,9 @@
                                     hx-post="/exams/{{ exam_id }}/builder/add-question/{{ row.id }}"
                                     hx-target="closest tr"
                                     hx-swap="delete transition:true"
-                                    class="text-blue-900 text-sm font-medium hover:underline"
                                     hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
+                                    hx-select-oob="#question-count-field, #subject-field, #topic-field, #type-field, #exam-question-field, #available-question-field"
+                                    class="text-blue-900 text-sm font-medium hover:underline"
                                     >
                                         Toggle Question
                                 </button>

@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('duration');
             $table->integer('retakes');
             $table->dateTime('examination_date')->nullable();
-            $table->enum('published', ['unpublished', 'published'])->default('unpublished');
+            $table->boolean('is_published',)->default(false);
             $table->softDeletes();
             $table->timestamps();
             $table->foreignIdFor(User::class, 'created_by')->nullable()->constrained()->nullOnDelete();

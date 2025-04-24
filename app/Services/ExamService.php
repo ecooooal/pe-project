@@ -32,9 +32,6 @@ class ExamService
 
         return $available_questions->whereNotIn('id', $exam_questions);
     }
-    public function getExamQuestions(Exam $exam){
-        return $exam->questions()->get();
-    }
 
     public function getTopicsForExam(Exam $exam){
         $exam_questions = $this->getQuestionsForExam($exam);
@@ -59,7 +56,12 @@ class ExamService
 
     public function transformQuestionRows(Collection $questions)
     {
-        return $questions->map(fn ($q) => ['id' => $q->id, 'name' => $q->name]);
+        return $questions->map(fn ($q) => [
+            'id' => $q->id, 
+            'name' => $q->name,
+            'subject' => $q->topic->subject->name,
+            'topic' => $q->topic->name
+        ]);
     }
 
 

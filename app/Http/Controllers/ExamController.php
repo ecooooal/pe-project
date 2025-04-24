@@ -26,7 +26,7 @@ class ExamController extends Controller
         $courseIds = $this->userService->getCoursesForUser(auth()->user())->pluck('id');
         $exams = Exam::whereIn('course_id', $courseIds)->get();
 
-        $header = ['ID', 'Name', 'Course', 'Questions', 'Status', 'is Published', 'Date Created'];
+        $header = ['ID', 'Name', 'Course', 'Questions', 'Status', 'is Published', 'Examination Date'];
         $rows = $exams->map(function ($exam) {
             return [
                 'id' => $exam->id,
@@ -106,7 +106,7 @@ class ExamController extends Controller
         $exam_question_types = $this->examService->getQuestionTypeCounts($exam);
 
         $available_questions = $this->examService->getAvailableQuestionsForExam($exam);
-        $questions_header = ['ID', 'Name'];
+        $questions_header = ['ID', 'Name', 'Subject', 'Topic'];
         $exam_questions_rows = $this->examService->transformQuestionRows($exam_questions);
         $available_questions_rows = $this->examService->transformQuestionRows($available_questions);
 
@@ -132,5 +132,28 @@ class ExamController extends Controller
         } else {
             $exam->questions()->attach($question->id);
         }
+        $exam_questions =  $this->examService->getQuestionsForExam($exam);
+        $exam_topics = $this->examService->getTopicsForExam($exam);
+        $exam_subjects = $this->examService->getSubjectsForExam($exam);
+        $exam_question_types = $this->examService->getQuestionTypeCounts($exam);
+
+        $available_questions = $this->examService->getAvailableQuestionsForExam($exam);
+        $questions_header = ['ID', 'Name', 'Subject', 'Topic'];
+        $exam_questions_rows = $this->examService->transformQuestionRows($exam_questions);
+        $available_questions_rows = $this->examService->transformQuestionRows($available_questions);
+
+        $data = [
+            'exam' => $exam,
+            'exam_subjects' => $exam_subjects,
+            'exam_topics' => $exam_topics,
+            'exam_available_questions' => $available_questions,
+            'exam_questions' => $exam_questions,
+            'exam_question_types' => $exam_question_types,
+            'questions_header' => $questions_header,
+            'available_questions_rows' => $available_questions_rows,
+            'exam_questions_rows' => $exam_questions_rows
+        ];
+
+        return view('components/core/partials-exam-builder', $data);
     }
 }
