@@ -29,4 +29,11 @@ class Exam extends Model
     public function questions() {
         return $this->belongsToMany(Question::class)->withTimestamps();
     }
+    public function createdBy(){
+        return $this->belongsTo(User::class, 'created_by');
+        }
+    
+        public function updatedBy(){
+            return $this->belongsTo(User::class, 'updated_by');
+        }
 }

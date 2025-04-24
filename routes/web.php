@@ -90,15 +90,15 @@ Route::group(['middleware' => ['can:view access control']], function () {
     Route::get('/exams', [ExamController::class, 'index']);
     Route::get('/exams/create', [ExamController::class, 'create'])->name('exams.create');
     Route::post('/exams', [ExamController::class, 'store']);
-    Route::get('/exams/{exam}', [ExamController::class, 'show'])->name(name: 'exams.show');
+    Route::get('/exams/{exam}', [ExamController::class, 'show'])->name('exams.show');
     Route::get('/exams/{exam}/edit', [ExamController::class, 'edit']);
     Route::patch('/exams/{exam}', [ExamController::class, 'update']);
     Route::delete('/exams/{exam}', [ExamController::class, 'destroy']);
+    Route::get('/exams/{exam}/builder', [ExamController::class, 'exam_builder_show']);
+    Route::post('/exams/{exam}/builder/add-question/{question}',[ExamController::class, 'toggle_question'])->name('exam.toggleQuestion');
 
 
-    Route::get('/exams/questions', function(){
-        return view('exams/questions');
-    });
+
 
     Route::get('/questions', [QuestionController::class, 'index']);
     Route::get('/questions/create', [QuestionController::class, 'create'])->name('questions.create');

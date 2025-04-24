@@ -8,9 +8,6 @@ use App\Models\Question;
 use App\Models\User;
 class UserService
 {
-    /**
-     * Create a new class instance.
-     */
     public function getCoursesForUser(User $user)
     {
         return $user->courses()

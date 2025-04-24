@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Exam;
+use App\Models\Question;
+use App\Services\ExamService;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -12,10 +14,12 @@ use Str;
 class ExamController extends Controller
 {
     protected $userService;
+    protected $examService;
 
-    public function __construct(UserService $userService)
+    public function __construct(UserService $userService, ExamService $examService)
     {
         $this->userService = $userService;
+        $this->examService = $examService;
     }
 
     public function index(){
@@ -44,9 +48,8 @@ class ExamController extends Controller
 
     }
 
-    public function show(){
-        return view('exams/show');
-
+    public function show(Exam $exam){
+        return view('exams/show', ['exam' => $exam]);
     }
 
     public function create(){
@@ -94,5 +97,40 @@ class ExamController extends Controller
     public function destroy(){
         
     }
-    
+
+    public function exam_builder_show(Exam $exam){
+        $exam_course = $this->examService->getCourseForExam($exam);
+        $exam_questions =  $this->examService->getQuestionsForExam($exam);
+        $exam_topics = $this->examService->getTopicsForExam($exam);
+        $exam_subjects = $this->examService->getSubjectsForExam($exam);
+        $exam_question_types = $this->examService->getQuestionTypeCounts($exam);
+
+        $available_questions = $this->examService->getAvailableQuestionsForExam($exam);
+        $questions_header = ['ID', 'Name'];
+        $exam_questions_rows = $this->examService->transformQuestionRows($exam_questions);
+        $available_questions_rows = $this->examService->transformQuestionRows($available_questions);
+
+        $data = [
+            'exam' => $exam,
+            'exam_course' => $exam_course,
+            'exam_subjects' => $exam_subjects,
+            'exam_topics' => $exam_topics,
+            'exam_available_questions' => $available_questions,
+            'exam_questions' => $exam_questions,
+            'exam_question_types' => $exam_question_types,
+            'questions_header' => $questions_header,
+            'available_questions_rows' => $available_questions_rows,
+            'exam_questions_rows' => $exam_questions_rows
+        ];
+
+        return view('exams/exam-builder', $data);
+    }
+
+    public function toggle_question(Exam $exam, Question $question){
+        if ($exam->questions->contains($question->id)) {
+            $exam->questions()->detach($question->id);
+        } else {
+            $exam->questions()->attach($question->id);
+        }
+    }
 }
