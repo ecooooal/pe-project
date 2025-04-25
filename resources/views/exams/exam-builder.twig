@@ -74,12 +74,13 @@
 
 
         <div class="flex max-w-full mx-8 justify-between gap-x-8">
-            <div class="flex flex-1 max-w-full p-4 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
+            <div class="flex flex-1 max-w-full py-4 px-6 rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5">
                 <div id="subject-field" class="flex flex-col p-4 flex-1">
                     {{ show_header('Subjects') }}
+                    <div class="flex flex-col gap-y-2 max-h-54 overflow-y-scroll no-scrollbar">
+
                     {% for subject in exam_subjects %}
                         {% set question_count = 0 %}
-
                         <div class="flex justify-between m-1">
                             <p class="text-xs text-gray-600 font-semibold">{{ subject.name }}</p>
                             {% for topic in subject.topics %}
@@ -87,37 +88,42 @@
                                     {% set question_count = question_count + topic.questions|length %}
                                 {% endif %}
                             {% endfor %}
-                            <p class="text-xs text-gray-500"> {{ question_count }}</p>
+                            <p class="text-xs text-gray-500 font-semibold"> {{ question_count }}</p>
                         </div>
                     {% endfor %}
-
+                    </div>
                 </div>  
             </div>
-            <div class="flex flex-1 max-w-full p-4 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
+            <div class="flex flex-1 max-w-full py-4 px-6 rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5">
                 <div id="topic-field" class="flex flex-col p-4 flex-1">
-                    {{ show_header('Topics') }}
-                    {% for topic in exam_topics %}
-                        <div class="flex justify-between m-1">
-                            <p class="text-xs text-gray-600 font-semibold">{{ topic.name }}</p> 
-                            <p class="text-xs text-gray-500">{{ topic.questions.count }}</p>
-                        </div>
-                    {% endfor %}
+                    {{ show_header('Topics', 'font-medium text-2xl ') }}
+                    <div class="flex flex-col gap-y-2 max-h-54 overflow-y-scroll no-scrollbar">
+                        {% for topic in exam_topics %}
+                            <div class="flex justify-between">
+                                <p class="text-xs text-gray-600 font-semibold mr-2">{{ topic.name }}</p> 
+                                <p class="text-xs text-gray-500 font-semibold">{{ topic.questions.count }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>  
             </div>
-            <div class="flex flex-1 max-w-full p-4 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
+            <div class="flex flex-1 max-w-full py-4 px-6 rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5">
                 <div id="type-field" class="flex flex-col p-4 flex-1">
                     {{ show_header('Types') }}
+                    <div class="flex flex-col gap-y-2 max-h-54 overflow-y-scroll no-scrollbar">
                         {% for name, count in exam_question_types %}
                             <div class="flex justify-between m-1">
                                 <p class="text-xs text-gray-600 font-semibold">{{ name|replace({'_': ' '})|title }}</p> 
                                 <p class="text-xs text-gray-500">{{ count }}</p>
                             </div>  
                         {% endfor %}
+                    </div>
                 </div>  
             </div>
         </div>
-        <div class="mx-8">
-            <span class="text-xs font-bold text-gray-500">* Total Questions per Categories</span>  
+        <div class="flex gap-x-2 mx-8">
+            <span class="text-xs font-bold italic text-gray-500">* Total Questions per Categories </span>  
+            <span class="text-xs font-bold italic text-gray-500">* Categories are scrollable </span>  
         </div>
 
 

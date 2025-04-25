@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Topic;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,12 +19,18 @@ class QuestionFactory extends Factory
     public function definition(): array
     {
         $questionType = $this->faker->randomElement(['multiple_choice', 'true_or_false', 'identification', 'ranking', 'matching']);
-    
+        $questionWords = ['What', 'How', 'Why', 'When', 'Where', 'Who'];
+
+        // Randomly choose a question word
+        $questionWord = $this->faker->randomElement($questionWords);
+
         return [
             'topic_id' => Topic::inRandomOrder()->first()->id,
             'question_type' => $questionType,
-            'name' => $this->faker->sentence(),
-            'points' => $this->faker->numberBetween(1, 10),
+            'name' => $questionWord . ' ' . fake()->realText(50) . '?',
+            'points' => $this->faker->numberBetween(1, 5),
+            'created_by' => User::find(1),
+            'updated_by' => User::find(1)
         ];
     }
 }

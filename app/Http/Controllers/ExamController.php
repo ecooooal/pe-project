@@ -34,7 +34,7 @@ class ExamController extends Controller
                 'course' => $exam->course->name,
                 'questions' => $exam->questions->count(),
                 'status' => $exam->questions()->sum('points') >= $exam->max_score ? 'Complete' : 'Incomplete',
-                'is_published' => $exam->published,
+                'is_published' => $exam->is_published ? 'Yes' : 'No',
                 'examination date' => Carbon::parse($exam->examination_date)->format('m/d/Y')
             ];
         });
@@ -159,7 +159,7 @@ class ExamController extends Controller
     }
 
     public function build_exam(Exam $exam){
-        sleep(5);
+        sleep(1);
         $q = $this->examService->assignScoreToQuestionsForExam($exam);
 
         $data = [
