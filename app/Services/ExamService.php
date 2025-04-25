@@ -56,15 +56,40 @@ class ExamService
 
     public function transformQuestionRows(Collection $questions)
     {
-        return $questions->map(fn ($q) => [
-            'id' => $q->id, 
-            'name' => $q->name,
-            'subject' => $q->topic->subject->name,
-            'topic' => $q->topic->name
+        return $questions->map(fn ($question) => [
+            'id' => $question->id, 
+            'name' => $question->name,
+            'subject' => $question->topic->subject->name,
+            'topic' => $question->topic->name,
+            'type' => $question->question_type->name
         ]);
     }
 
 
     // algorithm for fetching and building the exam
+    public function assignScoreToQuestionsForExam(Exam $exam)
+    {
+        // Get all questions related to the exam’s course
+        $course = $this->getCourseForExam($exam);
+        $questions = $course->subjects->flatMap(function ($subject) {
+            return $subject->topics->flatMap->questions;
+        });
+
+        // Count questions per subject
+        $questions_in_subjects = $questions->groupBy(fn($question) => $question->topic->subject->id)
+                                        ->map->count();
+
+        // Assign score to each question
+        $scored_questions = $questions->map(function ($question) use ($questions_in_subjects) {
+            $subject_id = $question->topic->subject->id;
+            $subject_total = $questions_in_subjects[$subject_id] ?? 1;
+            $question->subject_coverage_score = 1 / $subject_total;
+            return $question;
+        });
+
+        return $scored_questions;
+    }
+
+
     // algorithm for shuffling the question list
 }

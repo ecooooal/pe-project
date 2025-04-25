@@ -96,6 +96,7 @@ Route::group(['middleware' => ['can:view access control']], function () {
     Route::delete('/exams/{exam}', [ExamController::class, 'destroy']);
     Route::get('/exams/{exam}/builder', [ExamController::class, 'exam_builder_show']);
     Route::post('/exams/{exam}/builder/add-question/{question}',[ExamController::class, 'toggle_question'])->name('exam.toggleQuestion');
+    Route::get('/exams/{exam}/builder/build', [ExamController::class, 'build_exam']);
 
 
 

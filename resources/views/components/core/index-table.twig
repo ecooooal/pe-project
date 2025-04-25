@@ -1,4 +1,4 @@
-{% macro table(headers, rows, header_attributes, row_attributes, url, actions = true, openAction = true, authorized = false, forAdmin = false, forAdding = false, exam_id) %}
+{% macro table(headers, rows, header_attributes, row_attributes, url, actions = true, openAction = true, authorized = false, forAdmin = false, forAdding = false, forRemoving = false, exam_id) %}
     <table class="table-auto min-w-max w-full text-left bg-white border-t border-gray-300 rounded-t-2xl">
         <thead>
             <tr>
@@ -42,10 +42,14 @@
                                     hx-target="closest tr"
                                     hx-swap="delete transition:true"
                                     hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
-                                    hx-select-oob="#question-count-field, #subject-field, #topic-field, #type-field, #exam-question-field, #available-question-field"
+                                    hx-select-oob="#question-count-field, #subject-field, #topic-field, #type-field, #exam-question-field, #available-question-field, #score-count-field"
                                     class="text-blue-900 text-sm font-medium hover:underline"
                                     >
-                                        Toggle Question
+                                    {% if not forRemoving %}
+                                        Add
+                                    {% else %}
+                                        Remove
+                                    {% endif %}
                                 </button>
                             {% endif %}
                             {% if authorized %}

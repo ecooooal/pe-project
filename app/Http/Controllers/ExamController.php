@@ -106,10 +106,10 @@ class ExamController extends Controller
         $exam_question_types = $this->examService->getQuestionTypeCounts($exam);
 
         $available_questions = $this->examService->getAvailableQuestionsForExam($exam);
-        $questions_header = ['ID', 'Name', 'Subject', 'Topic'];
+        $questions_header = ['ID', 'Name', 'Subject', 'Topic', 'Type'];
         $exam_questions_rows = $this->examService->transformQuestionRows($exam_questions);
         $available_questions_rows = $this->examService->transformQuestionRows($available_questions);
-
+        $q = $this->examService->assignScoreToQuestionsForExam($exam);
         $data = [
             'exam' => $exam,
             'exam_course' => $exam_course,
@@ -120,7 +120,8 @@ class ExamController extends Controller
             'exam_question_types' => $exam_question_types,
             'questions_header' => $questions_header,
             'available_questions_rows' => $available_questions_rows,
-            'exam_questions_rows' => $exam_questions_rows
+            'exam_questions_rows' => $exam_questions_rows,
+            'assign_score' => $q
         ];
 
         return view('exams/exam-builder', $data);
@@ -138,7 +139,7 @@ class ExamController extends Controller
         $exam_question_types = $this->examService->getQuestionTypeCounts($exam);
 
         $available_questions = $this->examService->getAvailableQuestionsForExam($exam);
-        $questions_header = ['ID', 'Name', 'Subject', 'Topic'];
+        $questions_header = ['ID', 'Name', 'Subject', 'Topic', 'Type'];
         $exam_questions_rows = $this->examService->transformQuestionRows($exam_questions);
         $available_questions_rows = $this->examService->transformQuestionRows($available_questions);
 
@@ -155,5 +156,16 @@ class ExamController extends Controller
         ];
 
         return view('components/core/partials-exam-builder', $data);
+    }
+
+    public function build_exam(Exam $exam){
+        sleep(5);
+        $q = $this->examService->assignScoreToQuestionsForExam($exam);
+
+        $data = [
+            'questions_with_scores' => $q
+        ];
+
+        return view('components/core/partials-exam-builder-content', $data);
     }
 }
