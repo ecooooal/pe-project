@@ -14,6 +14,11 @@ class UserService
             ->with('subjects.topics.questions')
             ->get();
     }
+    public function getCourseById($courseId)
+    {
+        return Course::with('subjects')
+                      ->findOrFail($courseId);
+    }
 
     public function getSubjectsForUser(User $user)
     {

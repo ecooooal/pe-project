@@ -47,7 +47,13 @@ class QuestionController extends Controller
 
     public function show(Question $question){
         $question->load('topic.subject.course');
-
+        $question->load([
+            'multipleChoiceQuestions',
+            'trueOrFalseQuestion',
+            'identificationQuestion',
+            'rankingQuestions',
+            'matchingQuestions',
+        ]);
         $question_type = $question->getTypeModel();
         $data = [
             'question' => $question,
@@ -56,7 +62,9 @@ class QuestionController extends Controller
         return view('questions/show', $data);
     }
     public function create(){
+        $courses = $this->userService->getCoursesForUser(auth()->user());
         $subjects = $this->userService->getSubjectsForUser(auth()->user());
+        $courses = $courses->pluck('name', 'id');
         $subjects = $subjects->pluck('name', 'id');
         $question_types = [
             '' => 'Select A Question Type',
@@ -69,6 +77,7 @@ class QuestionController extends Controller
         ];
 
         $data =[
+            'courses' => $courses,
             'subjects' => $subjects,
             'question_types' => $question_types
         ];
@@ -80,10 +89,11 @@ class QuestionController extends Controller
         $validator = Validator::make(request()->all(), [
             'topic' => ['required', 'exists:topics,id'],
             'type' => ['required'],
-            'name' => ['required', 'string'],
+            'name' => ['required', 'string', 'unique:questions,name'],
             'points' => ['required', 'integer', 'min:1'],
             'items.*' => ['required', 'string', 'min:1'],
             'solution' => ['required', 'string'], 
+            'subject' => ['required'],
         ], [
             'items.*.required' => 'This field is required.',
         ]);
@@ -102,7 +112,7 @@ class QuestionController extends Controller
         QuestionFactory::create($data);
         \Log::info('Question Creation Successful');
         
-        return redirect('/questions');
+        return response('', 200)->header('HX-Redirect', url('/questions'));
     }
     public function edit(Question $question){
         $subjects = Subject::whereIn('course_id', $question->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
@@ -141,11 +151,37 @@ class QuestionController extends Controller
 
     }
 
+    public function getSubjectsForCourses(Request $request){
+        $courseId = $request->input('course');
+        
+        $course = $this->userService->getCourseById($courseId);
+        $subjects = $course->subjects->pluck('name', 'id');
+
+        if(empty($subjects)){
+            return view('/components/core/partials-subject', ['subjects' => []]);
+        }   
+
+        return view('/components/core/partials-subject', ['subjects' => $subjects]);    
+    }
     public function getTopicsForSubjects(Request $request){
         $subjectId = $request->input('subject');
-        
+
+        if(empty($subjectId)){
+            return view('/components/core/partial-topic', ['topics' => []]);    
+        }   
+
         $subject = $this->userService->getSubjectById($subjectId);
+
         $topics = $subject->topics->pluck('name', 'id');
 
-        return view('/components/core/partial-topic', ['topics' => $topics]);    }
+        if(empty($topics)){
+            return view('/components/core/partial-topic', ['topics' => []]);    
+        }   
+
+        return view('/components/core/partial-topic', ['topics' => $topics]);    
+    }
+
+    public function question_type_show(Question $question){
+        return view('questions-types/show', ['question' => $question]);
+    }
 }

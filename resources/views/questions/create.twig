@@ -12,7 +12,7 @@
 </div>
 
 <div class="flex flex-1 flex-col mx-16">
-    <form method="POST" hx-post="/questions" hx-target="#question-type-content" hx-select-oob="#question-name-form" class="flex flex-col gap-y-4">
+    <form method="POST" hx-post="/questions" HX-Redirect:/questions hx-target="#question-type-content" hx-select-oob="#question-name-form" class="flex flex-col gap-y-4">
     {{ csrf_field() }}
         <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
             <div class="flex flex-col p-4 flex-1">
@@ -60,6 +60,28 @@
                     <div class="flex flex-1/2 flex-col gap-y-4 w-full">
                         {{ forms.form_field(
                             label:forms.label(
+                                id:'course', 
+                                content:'Course', 
+                                attributes:{
+                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
+                                    ),
+                            input:forms.select(
+                                name:'course', 
+                                values:courses, 
+                                attributes:{
+                                    'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                    'placeholder':'Select a Course',
+                                    'required':true,
+                                    'hx-get' :'/questions/create/courses',
+                                    'hx-target': '#subjects',
+                                    'hx-select': '#subjects',
+                                    'hx-swap':'outerHTML',
+                                    'hx-trigger':'load, change'}
+                            ),
+                            isColumn:true 
+                        )}}
+                        {{ forms.form_field(
+                            label:forms.label(
                                 id:'subject', 
                                 content:'Subject', 
                                 attributes:{
@@ -74,8 +96,10 @@
                                     'required':true,
                                     'hx-get' :'/questions/create/subjects',
                                     'hx-target': '#topics',
+                                    'hx-select': '#topics',
                                     'hx-swap':'outerHTML',
-                                    'hx-trigger':'load, change'}
+                                    'hx-trigger':'load, change',
+                                    'id': 'subjects'}
                             ),
                             isColumn:true 
                         )}}

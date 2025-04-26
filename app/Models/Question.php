@@ -53,14 +53,30 @@ class Question extends Model
     }
 
     public function getTypeModel()
-    {
-        return match ($this->question_type) {
-            QuestionType::MultipleChoice => $this->multipleChoiceQuestions,
-            QuestionType::TrueOrFalse => $this->trueOrFalseQuestion,
-            QuestionType::Identification => $this->identificationQuestion,
-            QuestionType::Ranking => $this->rankingQuestions,
-            QuestionType::Matching => $this->matchingQuestions,
-        };
+    {                
+
+        switch ($this->question_type) {
+            case QuestionType::MultipleChoice:
+                $this->load('multipleChoiceQuestions');
+                return $this->multipleChoiceQuestions;
+                
+            case QuestionType::TrueOrFalse:
+                $this->load('trueOrFalseQuestion');
+                return $this->trueOrFalseQuestion;
+                
+            case QuestionType::Identification:
+                $this->load('identificationQuestion');
+                return $this->identificationQuestion;
+                
+            case QuestionType::Ranking:
+                $this->load('rankingQuestions');
+                return $this->rankingQuestions;
+                
+            case QuestionType::Matching:
+                $this->load('matchingQuestions');
+                return $this->matchingQuestions;
+        }
     }
+    
 
 }

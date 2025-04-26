@@ -103,8 +103,10 @@ Route::group(['middleware' => ['can:view access control']], function () {
 
     Route::get('/questions', [QuestionController::class, 'index']);
     Route::get('/questions/create', [QuestionController::class, 'create'])->name('questions.create');
+    Route::get('/questions/create/courses', [QuestionController::class, 'getSubjectsForCourses']);
     Route::get('/questions/create/subjects', [QuestionController::class, 'getTopicsForSubjects']);
     Route::post('/questions', [QuestionController::class, 'store']);
+    Route::get('/question_type.show/{question}', [QuestionController::class, 'question_type_show'])->name('question_type.show');
     Route::get('/questions/{question}', [QuestionController::class, 'show'])->name(name: 'questions.show');
     Route::get('/questions/{question}/edit', [QuestionController::class, 'edit']);
     Route::patch('/questions/{question}', [QuestionController::class, 'update']);

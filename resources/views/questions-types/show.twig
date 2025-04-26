@@ -1,15 +1,20 @@
-{% from 'components/core/show-header' import show_header %}
-{% macro question_type_show(question_type) %}
 
-<div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
-    <div class="flex flex-col p-4 flex-1">
-        {{ show_header(question_type|replace({'_': ' '})|title ) }}
-        <div class="flex justify-between">
-            <div class="flex flex-col gap-y-4 h-96 w-full bg-gray-300">
-
-            </div>
-        </div>
-    </div>  
+<div id="MultipleChoice-content">
+    MCQ
 </div>
 
-{% endmacro %}
+<div id="TrueOrFalse-content">
+    True/False
+</div>
+
+<div id="Identification-content">
+    Identification
+</div>
+
+<div id="Ranking-content">
+    Ranking
+</div>
+
+<div id="Matching-content">
+    Mathcing
+</div>

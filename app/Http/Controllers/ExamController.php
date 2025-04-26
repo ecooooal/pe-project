@@ -162,28 +162,5 @@ class ExamController extends Controller
         $questions_to_sync =  array_column($q['questions'], 'id');
         $exam->questions()->sync($questions_to_sync);
 
-        $exam_questions =  $this->examService->getQuestionsForExam($exam);
-        $exam_topics = $this->examService->getTopicsForExam($exam);
-        $exam_subjects = $this->examService->getSubjectsForExam($exam);
-        $exam_question_types = $this->examService->getQuestionTypeCounts($exam);
-
-        $available_questions = $this->examService->getAvailableQuestionsForExam($exam);
-        $questions_header = ['ID', 'Name', 'Subject', 'Topic', 'Type'];
-        $exam_questions_rows = $this->examService->transformQuestionRows($exam_questions);
-        $available_questions_rows = $this->examService->transformQuestionRows($available_questions);
-
-        $data = [
-            'exam' => $exam,
-            'exam_subjects' => $exam_subjects,
-            'exam_topics' => $exam_topics,
-            'exam_available_questions' => $available_questions,
-            'exam_questions' => $exam_questions,
-            'exam_question_types' => $exam_question_types,
-            'questions_header' => $questions_header,
-            'available_questions_rows' => $available_questions_rows,
-            'exam_questions_rows' => $exam_questions_rows
-        ];
-
-        return view('exams/exam-builder', $data);
-    }
+        return response('', 200)->header('HX-Refresh', 'true');    }
 }
