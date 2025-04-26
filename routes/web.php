@@ -154,6 +154,8 @@ Route::group(['middleware' => ['can:view access control']], function () {
     Route::get('/topics/{topic}/edit', [TopicController::class, 'edit']);
     Route::patch('/topics/{topic}', [TopicController::class, 'update']);
     Route::delete('/topics/{topic}', [TopicController::class, 'destroy']);
+    Route::get('/topics/{topic}/questions', [TopicController::class, 'showQuestions']);
+
 
 
     Route::get('/subjects', [SubjectController::class, 'index']);
@@ -163,6 +165,7 @@ Route::group(['middleware' => ['can:view access control']], function () {
     Route::get('/subjects/{subject}/edit', [SubjectController::class, 'edit']);
     Route::patch('/subjects/{subject}', [SubjectController::class, 'update']);
     Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy']);
+    Route::get('/subjects/{subject}/questions', [SubjectController::class, 'showQuestions']);
 
     Route::get('/reviewers', function(){
         return view('reviewers/index');

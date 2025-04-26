@@ -21,13 +21,13 @@ class TopicController extends Controller
     public function index(){
         $Topics = $this->userService->getTopicsForUser(auth()->user());
 
-        $header = ['ID', 'Subject', 'Name', 'Year Level', 'Date Created'];
+        $header = ['ID', 'Subject', 'Name', 'Question Count', 'Date Created'];
         $rows = $Topics->map(function ($topic) {
             return [
                 'id' => $topic->id,
                 'course' => $topic->subject->name,
                 'name' => $topic->name,
-                'year_level' => $topic->subject->year_level,
+                'year_level' => $topic->questions->count(),
                 'Date Created' => Carbon::parse($topic->created_at)->format('m/d/Y')
             ];
         });
@@ -99,5 +99,26 @@ class TopicController extends Controller
 
         return redirect('/topics');
 
+    }
+
+    public function showQuestions(Topic $topic){
+        $topic->load('questions');
+
+        $header = ['ID', 'Name', 'Type', 'Date Created'];
+        $rows = $topic->questions->map(function ($question) {
+            return [
+                'id' => $question->id,
+                'name' => $question->name,
+                'type' => $question->question_type->name,
+                'Date Created' => Carbon::parse($question->created_at)->format('m/d/Y')
+            ];
+        });
+
+        $data = [
+            'headers' => $header,
+            'rows' => $rows,
+            'topic'=>$topic
+        ];
+        return view('topics/questions', $data);
     }
 }

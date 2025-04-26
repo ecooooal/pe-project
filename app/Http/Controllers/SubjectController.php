@@ -112,4 +112,25 @@ class SubjectController extends Controller
         return redirect('/subjects');
 
     }
+
+    public function showQuestions(Subject $subject){
+        $subject->load('topics.questions');
+        $header = ['ID', 'Topic', 'Name', 'Type', 'Author', 'Date Created'];
+        $rows = $subject->topics->flatMap(function ($topics) {
+            return $topics->questions;
+        })->map(fn($question) => [
+            'id' => $question->id,
+            'topic' => $question->topic->name,
+            'name' => $question->name,
+            'type' => $question->question_type->name,
+            'author' => $question->author->getFullName(),
+            'Date Created' => Carbon::parse($question->created_at)->format('m/d/Y')
+        ]);
+        $data = [
+            'headers' => $header,
+            'rows' => $rows,
+            'subject'=>$subject
+        ];
+        return view('subjects/questions', $data);
+    }
 }
