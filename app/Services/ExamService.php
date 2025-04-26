@@ -35,21 +35,34 @@ class ExamService
 
     public function getTopicsForExam(Exam $exam){
         $exam_questions = $this->getQuestionsForExam($exam);
-        $exam_topics = $exam_questions->pluck('topic')->unique('id');
+        $exam_topics = $exam_questions
+            ->groupBy(fn($question) => $question->topic->id)
+            ->map(function($questions) {
+                $topic = $questions->first()->topic;
+                $topic->question_count = $questions->count();
+                return $topic;
+            });
+
         return $exam_topics;
     }
 
     public function getSubjectsForExam(Exam $exam){
         $exam_topics = $this->getTopicsForExam($exam);
-        $exam_subjects = $exam_topics->pluck('subject')->unique('id');
+        $exam_subjects = $exam_topics            
+            ->groupBy(fn($topic) => $topic->subject->id)
+            ->map(function($topics) {
+                $subject = $topics->first()->subject;
+                $subject->question_count = $topics->sum('question_count');
+                return $subject;
+            });
         return $exam_subjects;
     }
     public function getQuestionTypeCounts(Exam $exam): array
     {
         $questions = $this->getQuestionsForExam($exam); // already eager loaded
 
-        return $questions->groupBy('question_type')->map(function ($group) {
-            return $group->count();
+        return $questions->groupBy('question_type')->map(function ($type) {
+            return $type->count();
         })->toArray();
     }
 

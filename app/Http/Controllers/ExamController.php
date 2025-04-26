@@ -133,6 +133,7 @@ class ExamController extends Controller
         } else {
             $exam->questions()->attach($question->id);
         }
+        
         $exam_questions =  $this->examService->getQuestionsForExam($exam);
         $exam_topics = $this->examService->getTopicsForExam($exam);
         $exam_subjects = $this->examService->getSubjectsForExam($exam);

@@ -72,28 +72,21 @@
             </div>  
         </div>
 
-
         <div class="flex max-w-full mx-8 justify-between gap-x-8">
             <div class="flex flex-1 max-w-full py-4 px-6 rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5">
                 <div id="subject-field" class="flex flex-col p-4 flex-1">
                     {{ show_header('Subjects') }}
                     <div class="flex flex-col gap-y-2 max-h-54 overflow-y-scroll no-scrollbar">
-
                     {% for subject in exam_subjects %}
-                        {% set question_count = 0 %}
                         <div class="flex justify-between m-1">
                             <p class="text-xs text-gray-600 font-semibold">{{ subject.name }}</p>
-                            {% for topic in subject.topics %}
-                                {% if topic.id in exam_topic_ids %}
-                                    {% set question_count = question_count + topic.questions|length %}
-                                {% endif %}
-                            {% endfor %}
-                            <p class="text-xs text-gray-500 font-semibold"> {{ question_count }}</p>
+                            <p class="text-xs text-gray-500 font-semibold"> {{ subject.question_count }}</p>
                         </div>
                     {% endfor %}
                     </div>
                 </div>  
             </div>
+            
             <div class="flex flex-1 max-w-full py-4 px-6 rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5">
                 <div id="topic-field" class="flex flex-col p-4 flex-1">
                     {{ show_header('Topics', 'font-medium text-2xl ') }}
@@ -101,7 +94,7 @@
                         {% for topic in exam_topics %}
                             <div class="flex justify-between">
                                 <p class="text-xs text-gray-600 font-semibold mr-2">{{ topic.name }}</p> 
-                                <p class="text-xs text-gray-500 font-semibold">{{ topic.questions.count }}</p>
+                                <p class="text-xs text-gray-500 font-semibold">{{ topic.question_count }}</p>
                             </div>
                         {% endfor %}
                     </div>
