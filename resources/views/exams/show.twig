@@ -74,8 +74,6 @@
                         {{ show_item('Is Currently', 'Incomplete', value_attributes:'text-red-600')}}
                     {% endif %}                    
                     {{ show_item('Is Currently', exam.is_published ? 'Published' : 'Unpublished', value_attributes: exam.is_published ? 'text-green-600' : 'text-red-600')}}
-                    {{ show_item('Exam Max Score', exam.max_score)}}
-                    {{ show_item('Exam Retakes', exam.retakes)}}
                 </div>
             </div>
         </div>  

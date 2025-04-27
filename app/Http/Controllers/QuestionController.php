@@ -156,9 +156,10 @@ class QuestionController extends Controller
         
         $course = $this->userService->getCourseById($courseId);
         $subjects = $course->subjects->pluck('name', 'id');
+        $subjects = $subjects->isEmpty() ? null : $subjects;
 
         if(empty($subjects)){
-            return view('/components/core/partials-subject', ['subjects' => []]);
+            return view('/components/core/partials-subject', ['subjects' => [""=>"No Subjects Available"]]);
         }   
 
         return view('/components/core/partials-subject', ['subjects' => $subjects]);    
@@ -167,7 +168,7 @@ class QuestionController extends Controller
         $subjectId = $request->input('subject');
 
         if(empty($subjectId)){
-            return view('/components/core/partial-topic', ['topics' => []]);    
+            return view('/components/core/partial-topic', ['topics' => [""=>"No Topics Available"]]);    
         }   
 
         $subject = $this->userService->getSubjectById($subjectId);
@@ -175,7 +176,7 @@ class QuestionController extends Controller
         $topics = $subject->topics->pluck('name', 'id');
 
         if(empty($topics)){
-            return view('/components/core/partial-topic', ['topics' => []]);    
+            return view('/components/core/partial-topic', ['topics' => ["No Topics Available"]]);    
         }   
 
         return view('/components/core/partial-topic', ['topics' => $topics]);    
