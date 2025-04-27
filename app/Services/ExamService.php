@@ -82,6 +82,8 @@ class ExamService
     }
 
 
+
+
     // algorithm for fetching and building the exam
     public function assignValuesToQuestionsForKnapsack(Exam $exam)
     {

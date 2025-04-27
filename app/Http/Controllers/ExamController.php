@@ -85,17 +85,41 @@ class ExamController extends Controller
         return redirect('/exams');
     }
 
-    public function edit(){
-        return view('exams/edit');
+    public function edit(Exam $exam){
+        return view('exams/edit', ['exam'=>$exam]);
 
     }
 
-    public function update(){
-        
+    public function update(Exam $exam){
+        request()->validate([
+            'name' => 'required|string|max:255',
+            'max_score' => 'required|integer|gte:1',
+            'duration' => 'nullable|integer|min:1',
+            'retakes' => 'nullable|integer|min:1',
+            'examination_date' => 'nullable|date|after:now',
+        ], [
+            'max_score' => 'The max score field is required',
+            'examination_date' => 'The examination date field must be a date after now.'
+        ]);
+
+        $exam->update([
+            'name' => request('name'),
+            'max_score' => request('max_score'),
+            'duration' => request('duration') ?? null,
+            'retakes' => request('retakes') ?? null, 
+            'examination_date' => request('examination_date') ?? null,
+        ]);
+        return redirect()->route('exams.show', $exam);
+
     }
 
-    public function destroy(){
+    public function destroy(Exam $exam){
         
+        $this->authorize('delete', $exam);
+
+        $exam->delete();
+
+        return redirect('/exams');
     }
 
     public function exam_builder_show(Exam $exam){
@@ -162,5 +186,18 @@ class ExamController extends Controller
         $questions_to_sync =  array_column($q['questions'], 'id');
         $exam->questions()->sync($questions_to_sync);
 
-        return response('', 200)->header('HX-Refresh', 'true');    }
+        return response('', 200)->header('HX-Refresh', 'true');    
+    }
+
+    public function generateAccessCode(Exam $exam){
+        $accessCode = strtoupper(implode('-', str_split(Str::random(8), 4)));
+        $exam->update(['access_code' => $accessCode]);
+        return view('components/core/partials-exam-access-code', ['exam' => $exam]);
+    }
+
+    public function publishExam(Exam $exam){
+        // // validate this to look if there's an examination date
+        // $exam->update(['access_code' => $accessCode]);
+        // return view('components/core/partials-exam-access-code', ['exam' => $exam]);
+    }
 }

@@ -1,22 +1,13 @@
 {% macro breadcrumb(type = null, name = null) %}
     {% set path = app.request.pathInfo %}
     {% set breadcrumbs = [] %}
-    {% set breadcrumbs = breadcrumbs|merge([{'label': 'Home', 'url': '/faculty' }]) %}
-    {% set path_parts = path | split('/') %}
+    {% set path_parts = path | split('/') | slice(1, path|length) %}
     {% set current_url = '' %}
 
     {% for part in path_parts %}
-        {% if not loop.first or loop.last %}
             {% set current_url = current_url ~ '/' ~ part %}
-            {% set breadcrumbs = breadcrumbs|merge([{'label': part|capitalize, 'url': current_url }]) %}
-        {% endif %}
+            {% set breadcrumbs = breadcrumbs|merge([{'label': part|capitalize, 'url': current_url }]) %}            
     {% endfor %}
-
-    {% if type and name %}
-        {% set breadcrumbs = breadcrumbs|slice(0,-1) %}
-        {% set breadcrumbs = breadcrumbs|merge([{'label': name|capitalize, 'url': current_url }]) %}
-        {% set breadcrumbs = breadcrumbs|merge([{'label': type|capitalize, 'url': current_url }]) %}
-    {% endif %}
 
     <div>
         <nav aria-label="breadcrumb" class="w-max">
@@ -32,17 +23,12 @@
 
             {% for breadcrumb in breadcrumbs %}
                 <li class="flex items-center text-slate-500 text-sm transition-colors duration-300 hover:text-slate-800 font-semibold">
-                    {% if loop.last %}
+                    {% if loop.last  %}
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 mx-2">
                             <path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 0 1 1.06-1.06l7.5 7.5Z" clip-rule="evenodd" />
                         </svg>
-                        <span >{{ breadcrumb.label }}</span> 
-                    {% elseif loop.revindex <= 2 and type and name %}
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 mx-2">
-                            <path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 0 1 1.06-1.06l7.5 7.5Z" clip-rule="evenodd" />
-                        </svg>
-                        <span >{{ breadcrumb.label }}</span> 
-                    {% elseif not loop.first %}
+                        <span >{{ breadcrumb.label }}</span>
+                    {% else %}
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 mx-2">
                             <path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 0 1 1.06-1.06l7.5 7.5Z" clip-rule="evenodd" />
                         </svg>
