@@ -1,7 +1,7 @@
 {% import 'components/core/forms' as forms %}
 
 {% for id, role in roles %}    
-    {% if role != "super_admin" %}
+    {% if role != "super_admins" %}
         <tr class="hover:bg-gray-50">
                 <td class="p-2 border-b border-gray-300 text-sm">
                     {{ forms.checkbox(

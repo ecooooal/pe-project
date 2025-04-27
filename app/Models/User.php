@@ -42,26 +42,26 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-    protected function casts(): array
-    {
+    protected function casts(): array{
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
-    public function getFullName()
-    {
+    public function getFullName(){
         return "{$this->first_name} {$this->last_name}";
     }
 
-    public function updatedBy()
-    {
+    public function updatedBy(){
         return $this->belongsTo(User::class, 'updated_by')->withTrashed();
     }
 
-    public function courses()
-    {
+    public function courses(){
         return $this->belongsToMany(Course::class)->withTimestamps();
     }
 
+    public function getCourseIds()
+    {
+        return $this->courses()->pluck('courses.id')->toArray();
+    }
 }

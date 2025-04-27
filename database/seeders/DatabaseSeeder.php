@@ -37,5 +37,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'collegeDean@email.com',
             'password' => bcrypt('testing1234'),
         ])->assignRole('college_dean')->courses()->attach(1);
+
+        $this->call(FakeDataSeeder::class);
     }
 }

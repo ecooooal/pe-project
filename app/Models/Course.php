@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use App\TracksUserActivity;
 
@@ -17,9 +16,19 @@ class Course extends Model
         'abbreviation'
     ];
 
-    public function users()
-    {
+    public function users(){
         return $this->belongsToMany(User::class)->withTimestamps();
     }
+
+    public function subjects(){
+        return $this->hasMany(Subject::class);
+    }
+
+    public function exams(){
+        return $this->hasMany(Exam::class);
+    }
+
+
+
 
 }
