@@ -185,4 +185,9 @@ class QuestionController extends Controller
     public function question_type_show(Question $question){
         return view('questions-types/show', ['question' => $question]);
     }
+
+    
+    public function test(){
+        return view('test-page');
+    }
 }

@@ -112,6 +112,8 @@ Route::group(['middleware' => ['can:view access control']], function () {
     Route::patch('/questions/{question}', [QuestionController::class, 'update']);
     Route::delete('/questions/{question}', [QuestionController::class, 'destroy']);
 
+
+
     Route::get('/questions/create/question-type', function (Request $request) {
         $item_count = (int) $request->input('item_count', 4);
         $type = $request->query('type'); 
@@ -212,3 +214,13 @@ Route::group(['middleware' => ['can:view access control']], function () {
 
 });
 //testing hi i'm new branch
+
+Route::get('/test', function() {
+    return view('test-page');
+});
+
+Route::post('/test/send-data', function() {
+    \Log::info(request()->post());
+    $data = request()->post();
+    return view('test-sent-data-page', ['data'=> $data]);
+});
