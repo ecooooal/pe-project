@@ -217,8 +217,11 @@ Route::group(['middleware' => ['can:view access control']], function () {
 //testing hi i'm new branch
 
 
-Route::post('/test/send-data', function() {
+Route::post('/test/send-data', function(Request $request) {
     \Log::info(request()->post());
-    $data = request()->post();
-    return view('test-sent-data-page', ['data'=> $data]);
+    $data = $request->post();
+    $markdown = Str::of($request->post('instruction'))->markdown([
+        'html_input' => 'strip',
+    ]);
+    return view('test-sent-data-page', ['data'=> $data, 'markdown' => $markdown]);
 });

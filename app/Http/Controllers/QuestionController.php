@@ -11,6 +11,7 @@ use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Str;
 use Validator;
 
 class QuestionController extends Controller
@@ -94,9 +95,12 @@ class QuestionController extends Controller
             'python' => "Python",
         ];
 
+        $markdown = Str::of('- *Laravel*')->markdown();
+
         $data =[
             'courses' => $courses,
-            'programming_languages' => $programming_languages
+            'programming_languages' => $programming_languages,
+            'markdown' => $markdown
         ];
 
         return view('questions-types/coding', $data);
@@ -203,8 +207,4 @@ class QuestionController extends Controller
         return view('questions-types/show', ['question' => $question]);
     }
 
-    
-    public function test(){
-        return view('test-page');
-    }
 }

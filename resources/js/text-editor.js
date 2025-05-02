@@ -5,10 +5,13 @@ import { basicSetup } from "codemirror";
 import {python} from "@codemirror/lang-python"
 import { java } from "@codemirror/lang-java";
 import {cpp} from "@codemirror/lang-cpp"
+import {markdown} from "@codemirror/lang-markdown"
+import { lineNumbers } from "@codemirror/view"
+import { history, historyKeymap } from '@codemirror/commands';
 
 const solution_div = document.getElementById("solution-div");
 const test_case_div = document.getElementById("test-case-div");
-const available_languages = ['python', 'java'];
+const instruction_div = document.getElementById('instruction-div');
 const states = [];
 let currentLang = null;
 
@@ -27,6 +30,40 @@ let currentLang = null;
     export const test_case_editor = new EditorView({
         state: test_case_state,
         parent: test_case_div
+    });
+
+    export const instruction_state = EditorState.create({
+        doc: `Type your Instructions here`,
+        extensions: [
+            markdown(),            
+            history(),                      
+            keymap.of([
+              ...defaultKeymap,
+              ...historyKeymap               
+            ]),
+            EditorView.lineWrapping,
+
+            EditorView.theme({
+              "&": {
+                backgroundColor: "#ffffff",
+                border: "1px solid #e0e0e0",
+                fontFamily: "sans-serif",
+                fontSize: "14px",
+              },
+              ".cm-content": {
+                padding: "1rem"
+              },
+              ".cm-scroller": {
+                width: "100%",
+                height: "100%",   
+                overflow: "auto"
+              }
+            }, { dark: false })
+          ],
+    });
+    export const instruction_editor = new EditorView({
+        state: instruction_state,
+        parent: instruction_div
     });
 
 
@@ -82,8 +119,13 @@ let currentLang = null;
         document.getElementById('test-input').value = test_case_editor.state.doc.toString();
     }
 
+    function getInstructionCode() {
+        document.getElementById('instruction-input').value = instruction_editor.state.doc.toString();
+    }
+
 window.switchLanguageFromEvent = switchLanguageFromEvent;
 window.switchLanguage = switchLanguage;
 window.getSolutionCode = getSolutionCode;
 window.getTestCaseCode = getTestCaseCode;
+window.getInstructionCode = getInstructionCode;
 

@@ -14,6 +14,7 @@
     <input class="hidden" name="type" value="coding">
     <textarea class="hidden" name="code" id="code-input"></textarea>
     <textarea class="hidden" name="test" id="test-input"></textarea>
+    <textarea class="hidden" name="instruction" id="instruction-input"></textarea>
 
     <div class="flex flex-1 flex-col mx-16 gap-y-4">
         <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
@@ -101,7 +102,7 @@
         </div>  
         </div>
         <div class="flex flex-1 justify-between max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5 gap-x-4">
-        <div class="flex flex-col flex-1 shrink-0 min-w-0 p-4 mb-4">   
+        <div class="flex flex-col flex-1 resize-none min-w-0 p-4 mb-4">   
             <div class="flex flex-col h-16"> 
                 {{ forms.form_field(
                     label:forms.label(
@@ -118,8 +119,8 @@
                     )
                 )}}
             </div>
-            <div class="flex flex-1 bg-gray-600 rounded-t-md">
-                <div class="flex flex-col flex-1">
+            <div class="flex flex-1 rounded-t-md">
+                <div class="flex flex-col flex-1 w-full overflow-auto ">
                     <div class="flex w-full bg-gray-800 p-2 rounded-t-md justify-between">
                         <h1 class="text-gray-50 font-semibold text-lg">
                             Instruction
@@ -128,19 +129,12 @@
                             Preview
                         </button>
                     </div>
-                    <div class="w-full h-full">
-                        {{ forms.textarea(
-                            name:'instruction', 
-                            attributes:{
-                                'class':'w-full h-full bg-white px-3 py-1.5 resize-none text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-500 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                'placeholder':'Create your instructions here...',
-                            }
-                        )}}
+                    <div id="instruction-div" class="max-w-full w-full overflow-auto text-gray-500 border-1 border-gray-500">
                     </div>
                 </div>
             </div>
         </div>
-        <div class="flex flex-col flex-1 shrink-0 min-w-0  p-4 ">
+        <div class="flex flex-col flex-1 resize-none min-w-0  p-4 ">
             <div class="flex h-16 pb-4">
                 {{ forms.form_field(
                     label:forms.label(
@@ -178,13 +172,14 @@
         </div>
         <div class="flex gap-x-2">
         <button type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm"
-                hx-on:click="getSolutionCode(), getTestCaseCode()">
+                hx-on:click="getSolutionCode(), getTestCaseCode(), getInstructionCode()">
                 Create Question</button>
         <a href="/questions" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
         </div>
     <div id="data-div">
         replace me with results
     </div>
+
     </div>
 </form>
 
