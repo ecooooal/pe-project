@@ -207,4 +207,18 @@ class QuestionController extends Controller
         return view('questions-types/show', ['question' => $question]);
     }
 
+    public function previewMarkdown(Request $request){
+        $data = $request->post();
+        $markdown = Str::of($request->post('instruction'))->markdown([
+            'html_input' => 'strip',
+        ]);
+
+        return view('components/core/preview-markdown', ['data'=> $data, 'markdown' => $markdown]);
+    }
+
+    public function togglePreviewButton(){
+
+        return view('components/core/toggle-preview');
+    }
+
 }

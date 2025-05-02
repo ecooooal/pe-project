@@ -125,9 +125,12 @@
                         <h1 class="text-gray-50 font-semibold text-lg">
                             Instruction
                         </h1>
-                        <button class="bg-gray-700 hover:bg-gray-600 hover:text-gray-50 cursor-pointer rounded-2xl p-2 text-xs text-gray-100 font-semibold">
+                        <button form="preview-markdown-form" type="submit" id="preview-button" class="bg-gray-700 hover:bg-gray-600 hover:text-gray-50 cursor-pointer rounded-2xl p-2 text-xs text-gray-100 font-semibold"
+                                hx-on:click="previewInstructionCode()"
+                                >
                             Preview
                         </button>
+                        
                     </div>
                     <div id="instruction-div" class="max-w-full w-full overflow-auto text-gray-500 border-1 border-gray-500">
                     </div>
@@ -171,7 +174,7 @@
         </div>
         </div>
         <div class="flex gap-x-2">
-        <button type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm"
+        <button form="test-code" type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm"
                 hx-on:click="getSolutionCode(), getTestCaseCode(), getInstructionCode()">
                 Create Question</button>
         <a href="/questions" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
@@ -182,5 +185,14 @@
 
     </div>
 </form>
+<form   id="preview-markdown-form"
+        class="hidden"
+        hx-post="/questions/create/preview-markdown" 
+        hx-target="#instruction-div"
+        hx-swap="outerHTML"
+        hx-select-oob="#preview-button">
+    {{ csrf_field() }}
+    <textarea class="hidden" name="instruction" id="instruction-preview-input" ></textarea>
 
+</form>
 {% endblock %}

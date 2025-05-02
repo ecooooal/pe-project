@@ -106,6 +106,8 @@ Route::group(['middleware' => ['can:view access control']], function () {
     Route::get('/questions/create/courses', [QuestionController::class, 'getSubjectsForCourses']);
     Route::get('/questions/create/subjects', [QuestionController::class, 'getTopicsForSubjects']);
     Route::get('/questions/create/coding-question', [QuestionController::class, 'createCodingQuestion']);
+    Route::get('/questions/create/preview-markdown', [QuestionController::class, 'togglePreviewButton']);
+    Route::post('/questions/create/preview-markdown', [QuestionController::class, 'previewMarkdown']);
     Route::post('/questions', [QuestionController::class, 'store']);
     Route::get('/question_type.show/{question}', [QuestionController::class, 'question_type_show'])->name('question_type.show');
     Route::get('/questions/{question}', [QuestionController::class, 'show'])->name(name: 'questions.show');
@@ -218,7 +220,6 @@ Route::group(['middleware' => ['can:view access control']], function () {
 
 
 Route::post('/test/send-data', function(Request $request) {
-    \Log::info(request()->post());
     $data = $request->post();
     $markdown = Str::of($request->post('instruction'))->markdown([
         'html_input' => 'strip',

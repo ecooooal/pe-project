@@ -11,9 +11,10 @@ import { history, historyKeymap } from '@codemirror/commands';
 
 const solution_div = document.getElementById("solution-div");
 const test_case_div = document.getElementById("test-case-div");
-const instruction_div = document.getElementById('instruction-div');
+let instruction_div = document.getElementById('instruction-div');
 const states = [];
-let currentLang = null;
+let instruction_previous_state = null;
+let current_lang = null;
 
     export const solution_state = EditorState.create({
         extensions: [basicSetup],
@@ -61,7 +62,7 @@ let currentLang = null;
             }, { dark: false })
           ],
     });
-    export const instruction_editor = new EditorView({
+    let instruction_editor = new EditorView({
         state: instruction_state,
         parent: instruction_div
     });
@@ -73,8 +74,8 @@ let currentLang = null;
     }
 
     function switchLanguage(lang) {
-        if (currentLang && solution_editor?.state) {
-            states[currentLang] = solution_editor.state; 
+        if (current_lang && solution_editor?.state) {
+            states[current_lang] = solution_editor.state; 
         }
 
         let languageExtension;
@@ -108,7 +109,7 @@ let currentLang = null;
             solution_editor.setState(newState);
         }
 
-        currentLang = lang;
+        current_lang = lang;
       }
 
     function getSolutionCode() {
@@ -122,10 +123,75 @@ let currentLang = null;
     function getInstructionCode() {
         document.getElementById('instruction-input').value = instruction_editor.state.doc.toString();
     }
+    function previewInstructionCode() {    
+        if (instruction_editor.state) {
+            instruction_previous_state = instruction_editor.state;
+        } else {
+            instruction_previous_state = EditorState.create({
+                doc: instruction_editor.state.doc.toString(),
+                extensions: [
+                    markdown(),            
+                    history(),                       
+                    keymap.of([ 
+                        ...defaultKeymap,
+                        ...historyKeymap               
+                    ]),
+                    EditorView.lineWrapping,
+                    EditorView.theme({
+                        "&": {
+                            backgroundColor: "#ffffff",
+                            border: "1px solid #e0e0e0",
+                            fontFamily: "sans-serif",
+                            fontSize: "14px",
+                        },
+                        ".cm-content": {
+                            padding: "1rem"
+                        },
+                        ".cm-scroller": {
+                            width: "100%",
+                            height: "100%",   
+                            overflow: "auto"
+                        }
+                    }, { dark: false })
+                ],  
+            });
+        }
+        const input = document.getElementById('instruction-preview-input');
+        if (input) {
+            input.value = instruction_editor.state.doc.toString();
+        } else {
+            console.warn("Element #instruction-preview-input not found.");
+        }
+        }
+    
+    function getPreviousInstructionCode(){
+        console.log('Previous state:', instruction_previous_state);
+        renderEditor(instruction_previous_state);
+
+    }
+
+    function renderEditor(state) {
+        instruction_editor = new EditorView({
+            state: state,
+            parent: instruction_div
+        });
+    }
+    document.body.addEventListener('htmx:afterSwap', () => {
+        instruction_div = document.getElementById('instruction-div');
+    });
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (evt.target.id === 'instruction-div') {
+          getPreviousInstructionCode();
+        }
+    });
 
 window.switchLanguageFromEvent = switchLanguageFromEvent;
 window.switchLanguage = switchLanguage;
 window.getSolutionCode = getSolutionCode;
 window.getTestCaseCode = getTestCaseCode;
 window.getInstructionCode = getInstructionCode;
+window.previewInstructionCode = previewInstructionCode;
+window.getPreviousInstructionCode = getPreviousInstructionCode;
+
+
 

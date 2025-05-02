@@ -1,0 +1,12 @@
+<div id="instruction-div" class="prose p-8">
+    {{ markdown|raw }}
+</div>
+
+<button id="preview-button" type="button" class="bg-gray-700 hover:bg-gray-600 hover:text-gray-50 cursor-pointer rounded-2xl p-2 text-xs text-gray-100 font-semibold"
+        hx-get="/questions/create/preview-markdown"
+        hx-target="this"
+        hx-swap="outerHTML"
+        hx-select-oob="#instruction-div"
+        >
+        Edit
+</button>
