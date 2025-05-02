@@ -63,26 +63,43 @@ class QuestionController extends Controller
     }
     public function create(){
         $courses = $this->userService->getCoursesForUser(auth()->user());
-        $subjects = $this->userService->getSubjectsForUser(auth()->user());
+        // $subjects = $this->userService->getSubjectsForUser(auth()->user());
         $courses = $courses->pluck('name', 'id');
-        $subjects = $subjects->pluck('name', 'id');
+        // $subjects = $subjects->pluck('name', 'id');
         $question_types = [
             '' => 'Select A Question Type',
             'multiple_choice' => 'Multiple Choice',
             'true_or_false'=> 'True or False',
             'identification' => 'Identification',
             'ranking' => 'Ranking/Ordering/Process',
-            'matching' => 'Matching Items',
-            'coding' => 'Coding'
+            'matching' => 'Matching Items'
         ];
 
         $data =[
             'courses' => $courses,
-            'subjects' => $subjects,
+            // 'subjects' => $subjects,
             'question_types' => $question_types
         ];
 
         return view('questions/create', $data);
+    }
+
+    public function createCodingQuestion(){
+        $courses = $this->userService->getCoursesForUser(auth()->user())->pluck('name', 'id');
+        $programming_languages = [
+            '' => 'Choose a Language',
+            'c++' => "C++",
+            'java' => "Java",
+            'sql' => "SQL",
+            'python' => "Python",
+        ];
+
+        $data =[
+            'courses' => $courses,
+            'programming_languages' => $programming_languages
+        ];
+
+        return view('questions-types/coding', $data);
     }
 
     public function store(){

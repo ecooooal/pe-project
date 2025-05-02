@@ -4,6 +4,7 @@ import { defaultKeymap } from "@codemirror/commands";
 import { basicSetup } from "codemirror";
 import {python} from "@codemirror/lang-python"
 import { java } from "@codemirror/lang-java";
+import {cpp} from "@codemirror/lang-cpp"
 
 const solution_div = document.getElementById("solution-div");
 const test_case_div = document.getElementById("test-case-div");
@@ -44,12 +45,16 @@ let currentLang = null;
 
         switch (lang) {
             case 'java':
-                languageExtension = java({});
+                languageExtension = java();
                 doc = `Class ClassName {\n public static data_type function_name() {\n   //Code Here \n  }\n}`;
                 break;
             case 'python':
                 languageExtension = python();
                 doc = `def test_function():\n    pass`;
+                break;
+            case 'c++':
+                languageExtension = cpp();
+                doc = `#include <string>\n#include <vector>\n\nReturnType functionName(const std::vector<std::string> &names) {\n  // Code here\n}`;
                 break;
             default:
                 console.warn("Unsupported language:", lang);
@@ -69,11 +74,16 @@ let currentLang = null;
         currentLang = lang;
       }
 
-    function testCode() {
-    document.getElementById('code-input').value = solution_editor.state.doc.toString();
+    function getSolutionCode() {
+        document.getElementById('code-input').value = solution_editor.state.doc.toString();
+    }
 
+    function getTestCaseCode() {
+        document.getElementById('test-input').value = test_case_editor.state.doc.toString();
     }
 
 window.switchLanguageFromEvent = switchLanguageFromEvent;
 window.switchLanguage = switchLanguage;
-window.testCode = testCode;
+window.getSolutionCode = getSolutionCode;
+window.getTestCaseCode = getTestCaseCode;
+

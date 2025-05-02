@@ -105,6 +105,7 @@ Route::group(['middleware' => ['can:view access control']], function () {
     Route::get('/questions/create', [QuestionController::class, 'create'])->name('questions.create');
     Route::get('/questions/create/courses', [QuestionController::class, 'getSubjectsForCourses']);
     Route::get('/questions/create/subjects', [QuestionController::class, 'getTopicsForSubjects']);
+    Route::get('/questions/create/coding-question', [QuestionController::class, 'createCodingQuestion']);
     Route::post('/questions', [QuestionController::class, 'store']);
     Route::get('/question_type.show/{question}', [QuestionController::class, 'question_type_show'])->name('question_type.show');
     Route::get('/questions/{question}', [QuestionController::class, 'show'])->name(name: 'questions.show');
@@ -215,9 +216,6 @@ Route::group(['middleware' => ['can:view access control']], function () {
 });
 //testing hi i'm new branch
 
-Route::get('/test', function() {
-    return view('test-page');
-});
 
 Route::post('/test/send-data', function() {
     \Log::info(request()->post());
