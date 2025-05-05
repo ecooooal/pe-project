@@ -11,8 +11,8 @@ import { history, historyKeymap } from '@codemirror/commands';
 
 const solution_div = document.getElementById("solution-div");
 const test_case_div = document.getElementById("test-case-div");
-let instruction_div = document.getElementById('instruction-div');
 const states = [];
+let instruction_div = document.getElementById('instruction-div');
 let instruction_previous_state = null;
 let current_lang = null;
 
@@ -52,9 +52,12 @@ let current_lang = null;
                 fontSize: "14px",
               },
               ".cm-content": {
+                minHeight: "16rem",
                 padding: "1rem"
               },
               ".cm-scroller": {
+                minHeight: "16rem",
+                maxHeight:"24rem",
                 width: "100%",
                 height: "100%",   
                 overflow: "auto"
@@ -143,46 +146,42 @@ let current_lang = null;
                             border: "1px solid #e0e0e0",
                             fontFamily: "sans-serif",
                             fontSize: "14px",
-                        },
-                        ".cm-content": {
+                          },
+                          ".cm-content": {
+                            minHeight: "16rem",
                             padding: "1rem"
-                        },
-                        ".cm-scroller": {
+                          },
+                          ".cm-scroller": {
+                            minHeight: "16rem",
+                            maxHeight:"24rem",
                             width: "100%",
                             height: "100%",   
                             overflow: "auto"
-                        }
+                          }
                     }, { dark: false })
                 ],  
             });
         }
-        const input = document.getElementById('instruction-preview-input');
+        let input = document.getElementById('instruction-preview-input');
         if (input) {
             input.value = instruction_editor.state.doc.toString();
         } else {
             console.warn("Element #instruction-preview-input not found.");
         }
-        }
+    }
     
     function getPreviousInstructionCode(){
-        console.log('Previous state:', instruction_previous_state);
-        renderEditor(instruction_previous_state);
+        setTimeout(() => {
+            instruction_editor = new EditorView({
+                state: instruction_previous_state,
+                parent: instruction_div
+            });
+        }, 500); 
 
     }
 
-    function renderEditor(state) {
-        instruction_editor = new EditorView({
-            state: state,
-            parent: instruction_div
-        });
-    }
     document.body.addEventListener('htmx:afterSwap', () => {
         instruction_div = document.getElementById('instruction-div');
-    });
-    document.body.addEventListener('htmx:afterSwap', function (evt) {
-        if (evt.target.id === 'instruction-div') {
-          getPreviousInstructionCode();
-        }
     });
 
 window.switchLanguageFromEvent = switchLanguageFromEvent;

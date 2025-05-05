@@ -1,12 +1,15 @@
-<div id="instruction-div" class="prose p-8">
-    {{ markdown|raw }}
+<div id="instruction-div" class="max-w-full w-full overflow-auto border-1 border-gray-500 max-h-96">
+    <div class="flex flex-1 flex-col prose max-w-none p-4">
+         {{ markdown|raw }}   
+    </div>
 </div>
 
 <button id="preview-button" type="button" class="bg-gray-700 hover:bg-gray-600 hover:text-gray-50 cursor-pointer rounded-2xl p-2 text-xs text-gray-100 font-semibold"
         hx-get="/questions/create/preview-markdown"
         hx-target="this"
         hx-swap="outerHTML"
-        hx-select-oob="#instruction-div"
+        hx-select-oob="#preview-button, #instruction-div, #preview-markdown-form"
+        hx-on:click="getPreviousInstructionCode()"
         >
         Edit
 </button>

@@ -62,7 +62,7 @@
 
 {% macro form_field(label, input, errors, isColumn = false) %}
     {% if not isColumn %}
-        <div class="flex gap-x-4 pt-2 items-center">
+        <div class="flex flex-1 gap-x-4 pt-2 items-center">
             {{ label }}
             {{ input }}
             {% for error in errors %}
