@@ -220,4 +220,8 @@ class QuestionController extends Controller
         return view('components/core/toggle-preview');
     }
 
+    public function validateCompleteSolution(Request $request){
+        return view('questions-types/validate-complete-solution', ['data'=>$request->post()]);
+    }
+
 }

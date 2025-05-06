@@ -108,6 +108,7 @@ Route::group(['middleware' => ['can:view access control']], function () {
     Route::get('/questions/create/coding-question', [QuestionController::class, 'createCodingQuestion']);
     Route::get('/questions/create/preview-markdown', [QuestionController::class, 'togglePreviewButton']);
     Route::post('/questions/create/preview-markdown', [QuestionController::class, 'previewMarkdown']);
+    Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution']);
     Route::post('/questions', [QuestionController::class, 'store']);
     Route::get('/question_type.show/{question}', [QuestionController::class, 'question_type_show'])->name('question_type.show');
     Route::get('/questions/{question}', [QuestionController::class, 'show'])->name(name: 'questions.show');

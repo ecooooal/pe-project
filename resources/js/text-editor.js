@@ -28,8 +28,8 @@ let previous_language = null;
     const test_case_editor = createEditor(test_case_div);
 
     const instruction_state = EditorState.create({
-        doc: `Type your Instructions here`,
         extensions: [
+            placeholder("Type your Instructions here"),
             markdown(),            
             history(),                      
             keymap.of([
@@ -191,9 +191,9 @@ let previous_language = null;
     }
 
     function validateLanguageCompleteSolution(){
-        const language = document.getElementById('programming_language').value;
-        updateSupportedLanguages({ language, is_valid: true });
-
+        document.getElementById('validate-complete-solution-input').value = solution_editor.state.doc.toString();
+        document.getElementById('validate-test-case-input').value = test_case_editor.state.doc.toString();
+        document.getElementById('language_to_validate-input').value = select_form.value;
     }
 
     function getInstructionCode() {

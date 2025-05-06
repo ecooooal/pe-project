@@ -155,7 +155,7 @@
                         )}}
                     </div>
                     <div class="flex">
-                        <button form="none" type="button" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm"
+                        <button form="validate-complete-solution-form" type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm"
                             hx-on:click="validateLanguageCompleteSolution()">
                         Validate Solution
                         </button>
@@ -213,5 +213,15 @@
     {{ csrf_field() }}
     <textarea class="hidden" name="instruction" id="instruction-preview-input" ></textarea>
 
+</form>
+<form   id="validate-complete-solution-form"
+        class="hidden"
+        hx-post="/questions/create/validate-complete-solution"
+        hx-target="#validate-div"
+        hx-swap="outerHTML">
+    {{ csrf_field() }}
+    <textarea class="hidden" name="validate-complete-solution" id="validate-complete-solution-input" ></textarea>
+    <textarea class="hidden" name="validate-test-case" id="validate-test-case-input" ></textarea>
+    <input type="text" class="hidden" name="language-to-validate" id="language_to_validate-input">
 </form>
 {% endblock %}
