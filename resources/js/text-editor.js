@@ -11,10 +11,13 @@ import { history, historyKeymap } from '@codemirror/commands';
 
 const solution_div = document.getElementById("solution-div");
 const test_case_div = document.getElementById("test-case-div");
-const states = [];
+const select_form = document.getElementById('programming_language');
+const available_languages = ['c++', 'java', 'python'];
+const supported_languages = {};
 let instruction_div = document.getElementById('instruction-div');
 let instruction_previous_state = null;
-let current_lang = null;
+let previous_language = null;
+
 
     export const solution_state = EditorState.create({
         extensions: [basicSetup],
@@ -25,7 +28,6 @@ let current_lang = null;
     });
 
     export const test_case_state = EditorState.create({
-        doc: `Class ClassName {\n \tpublic static data_type function_name() {\n\t //Code Here \n}`,
         extensions: [basicSetup],
     });
     export const test_case_editor = new EditorView({
@@ -72,55 +74,119 @@ let current_lang = null;
 
 
     function switchLanguageFromEvent(event) {
-        const selectedLanguage = event.target.value;
-        switchLanguage(selectedLanguage);
+        const selected_language = event.target.value;
+      
+        select_form.addEventListener('pointerdown', () => {
+          previous_language = select_form.value;
+        });
+        if (previous_language && previous_language != selected_language && available_languages.includes(previous_language)) {
+            console.log('got run')
+            updateSupportedLanguages({
+                language: previous_language,
+                complete_solution: solution_editor.state,
+                initial_solution: 'none',
+                test_case: test_case_editor.state
+            });
+        }
+        switchLanguage(selected_language);
     }
 
-    function switchLanguage(lang) {
-        if (current_lang && solution_editor?.state) {
-            states[current_lang] = solution_editor.state; 
-        }
-
+    function switchLanguage(language) {
         let languageExtension;
-        let doc;
-
-        switch (lang) {
+        let doc_solution;
+        let doc_test;
+    
+        switch (language) {
             case 'java':
                 languageExtension = java();
-                doc = `Class ClassName {\n public static data_type function_name() {\n   //Code Here \n  }\n}`;
+                doc_solution = `q`;
+                doc_test = `w`;
                 break;
             case 'python':
                 languageExtension = python();
-                doc = `def test_function():\n    pass`;
+                doc_solution = `e`;
+                doc_test = `r`;
                 break;
             case 'c++':
                 languageExtension = cpp();
-                doc = `#include <string>\n#include <vector>\n\nReturnType functionName(const std::vector<std::string> &names) {\n  // Code here\n}`;
+                doc_solution = `t`;
+                doc_test = `y`;
                 break;
             default:
-                console.warn("Unsupported language:", lang);
+                console.warn("Unsupported language:", language);
                 return;
         }
 
-        if (states[lang]) {
-            solution_editor.setState(states[lang]);
+        if (supported_languages.hasOwnProperty(language) && supported_languages[language] != null) {
+            solution_editor.setState(supported_languages[language]['complete_solution']);
+            test_case_editor.setState(supported_languages[language]['test_case']);
+
         } else {
-            const newState = EditorState.create({
-                doc: doc,
+            const new_solution_state = EditorState.create({
+                doc: doc_solution,
                 extensions: [basicSetup, languageExtension],
             });
-            solution_editor.setState(newState);
+            const new_test_case_state = EditorState.create({
+                doc: doc_test,
+                extensions: [basicSetup, languageExtension],
+            });
+            solution_editor.setState(new_solution_state);
+            test_case_editor.setState(new_test_case_state);
+
         }
 
-        current_lang = lang;
-      }
-
-    function getSolutionCode() {
-        document.getElementById('code-input').value = solution_editor.state.doc.toString();
+        updateSupportedLanguages({
+            language,
+            complete_solution: solution_editor.state,
+            initial_solution: 'none',
+            test_case: test_case_editor.state
+        });
     }
+    
+
+    function updateSupportedLanguages({ language, ...updates }) {
+        if (!language) {
+            throw new Error("The 'language' field is required.");
+        }
+    
+        if (!supported_languages[language]) {
+            supported_languages[language] = {
+                complete_solution: '',
+                initial_solution: '',
+                test_case: '',
+                is_valid: false
+            };
+        }
+    
+        Object.assign(supported_languages[language], updates);
+    }
+    
+    function getSolutionCode() {
+        const language = document.getElementById('programming_language').value;
+    
+        if (language) {
+            updateSupportedLanguages({
+                language,
+                complete_solution: solution_editor.state,
+                initial_solution: 'none',
+                test_case: test_case_editor.state
+            });
+    
+            console.log('Is language validated?', supported_languages[language]['is_valid']);
+        }
+    
+        document.getElementById('code-input').value = JSON.stringify(supported_languages);
+    }
+    
 
     function getTestCaseCode() {
         document.getElementById('test-input').value = test_case_editor.state.doc.toString();
+    }
+
+    function validateLanguageCompleteSolution(){
+        const language = document.getElementById('programming_language').value;
+        updateSupportedLanguages({ language, is_valid: true });
+
     }
 
     function getInstructionCode() {
@@ -130,6 +196,7 @@ let current_lang = null;
         if (instruction_editor.state) {
             instruction_previous_state = instruction_editor.state;
         } else {
+
             instruction_previous_state = EditorState.create({
                 doc: instruction_editor.state.doc.toString(),
                 extensions: [
@@ -161,8 +228,10 @@ let current_lang = null;
                     }, { dark: false })
                 ],  
             });
+
         }
         let input = document.getElementById('instruction-preview-input');
+
         if (input) {
             input.value = instruction_editor.state.doc.toString();
         } else {
@@ -176,21 +245,45 @@ let current_lang = null;
                 state: instruction_previous_state,
                 parent: instruction_div
             });
-        }, 500); 
-
+        }, 250); 
+    }
+    function attachButtonsListener() {
+        const preview_button = document.getElementById("preview-button");
+        const edit_button = document.getElementById("edit-button");        
+        if (preview_button) {
+            preview_button.addEventListener("click", previewInstructionCode);
+        }
+        if (edit_button) {
+            edit_button.addEventListener("click", getPreviousInstructionCode);
+        }
     }
 
-    document.body.addEventListener('htmx:afterSwap', () => {
-        instruction_div = document.getElementById('instruction-div');
+    document.body.addEventListener("htmx:afterSwap", function(evt) {
+        instruction_div = document.getElementById("instruction-div");      
+
+        if (['preview-button', 'edit-button'].includes(evt.detail.target.id)) {
+            attachButtonsListener();
+        }
+        
     });
+    document.addEventListener("DOMContentLoaded", () => {
+        const programming_language_selected = document.getElementById('programming_language');
+        attachButtonsListener();
+        if (programming_language_selected) {
+            switchLanguageFromEvent({ target: { value: programming_language_selected.value } });
+        }   
+    });
+
 
 window.switchLanguageFromEvent = switchLanguageFromEvent;
 window.switchLanguage = switchLanguage;
 window.getSolutionCode = getSolutionCode;
 window.getTestCaseCode = getTestCaseCode;
 window.getInstructionCode = getInstructionCode;
+window.validateLanguageCompleteSolution = validateLanguageCompleteSolution;
 window.previewInstructionCode = previewInstructionCode;
 window.getPreviousInstructionCode = getPreviousInstructionCode;
+
 
 
 

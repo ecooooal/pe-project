@@ -13,7 +13,6 @@
     {{ csrf_field() }}
     <input class="hidden" name="type" value="coding">
     <textarea class="hidden" name="code" id="code-input"></textarea>
-    <textarea class="hidden" name="test" id="test-input"></textarea>
     <textarea class="hidden" name="instruction" id="instruction-input"></textarea>
 
     <div class="flex flex-1 flex-col mx-16 gap-y-4">
@@ -119,9 +118,8 @@
                             <h1 class="text-gray-50 p-2 font-semibold text-lg">
                                 Instruction
                             </h1>
-                            <button form="preview-markdown-form" type="submit" id="preview-button" class="bg-gray-700 hover:bg-gray-600 hover:text-gray-50 cursor-pointer rounded-lg p-2 text-sm text-gray-100 font-semibold"
-                                    hx-on:click="previewInstructionCode()"
-                                    >
+                            <button form="preview-markdown-form" type="submit" id="preview-button" class="bg-gray-700 hover:bg-gray-500 hover:text-gray-100 cursor-pointer rounded-lg p-2 text-sm text-gray-100 font-semibold duration-300"
+                                                                >
                                 Preview
                             </button>
                             
@@ -157,7 +155,7 @@
                     </div>
                     <div class="flex">
                         <button form="none" type="button" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm"
-                        >
+                            hx-on:click="validateLanguageCompleteSolution()">
                         Validate Solution
                         </button>
                     </div>
@@ -167,12 +165,18 @@
 
                 <div class="flex flex-col gap-y-4 mb-4">
                     <div class="flex flex-1 flex-col rounded-md">
-                        <h1 class="bg-gray-800 p-2  text-gray-50 font-semibold rounded-t-md">Student Solution</h1>
+                        <div class="flex w-full bg-gray-800 p-2 gap-x-4 rounded-t-md">
+                            <button type="button" class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 cursor-pointer text-sm">Complete Solution</button>
+                            <button type="button" class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 cursor-pointer text-sm">Initial Solution</button>
+                        </div>
                         <div id="solution-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
                         <span class="text-xs font-semibold text-gray-800 cursor-default">*Code what will be given to student</span>
                     </div>
                     <div class="flex flex-1 flex-col rounded-md">
-                        <h1 class="bg-gray-800 p-2  text-gray-50 font-semibold rounded-t-md">Sample Test</h1>
+                        <div class="flex w-full bg-gray-800 p-2 gap-x-4 rounded-t-md">
+                            <button type="button" class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 cursor-pointer text-sm">Test Case</button>
+                            <button type="button" class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 cursor-pointer text-sm">Test Edge Case</button>
+                        </div>                        
                         <div id="test-case-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
                         <span class="text-xs font-semibold text-gray-800 cursor-default">*Scaffold programing languages codes for both student solution and sample test </span>
                     </div>
@@ -181,13 +185,13 @@
             </div>
         </div>
         <div class="flex gap-x-2">
-            <button form="test-code" type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm"
-                    hx-on:click="getSolutionCode(), getTestCaseCode(), getInstructionCode()">
+            <button form="test-code" type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm "
+                    hx-on:click="getSolutionCode(), getInstructionCode()">
                     Create Question
             </button>
             <a href="/questions" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
         </div>
-        <div id="data-div">
+        <div id="data-div" class="w-full flex flex-1">
             replace me with results
         </div>
 
@@ -196,8 +200,9 @@
 <form   id="preview-markdown-form"
         class="hidden"
         hx-post="/questions/create/preview-markdown"
-        hx-swap="innerHTML"
-        hx-select-oob="#preview-button, #instruction-div">
+        hx-target="#preview-button"
+        hx-swap="outerHTML"
+        hx-select-oob="#instruction-div">
     {{ csrf_field() }}
     <textarea class="hidden" name="instruction" id="instruction-preview-input" ></textarea>
 

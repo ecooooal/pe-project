@@ -88,7 +88,6 @@ class QuestionController extends Controller
     public function createCodingQuestion(){
         $courses = $this->userService->getCoursesForUser(auth()->user())->pluck('name', 'id');
         $programming_languages = [
-            '' => 'Choose a Language',
             'c++' => "C++",
             'java' => "Java",
             'sql' => "SQL",
