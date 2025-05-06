@@ -119,7 +119,8 @@
                                 Instruction
                             </h1>
                             <button form="preview-markdown-form" type="submit" id="preview-button" class="bg-gray-700 hover:bg-gray-500 hover:text-gray-100 cursor-pointer rounded-lg p-2 text-sm text-gray-100 font-semibold duration-300"
-                                                                >
+                            hx-on:click="temporarilyDisable(this)"
+                            >
                                 Preview
                             </button>
                             
@@ -165,19 +166,25 @@
 
                 <div class="flex flex-col gap-y-4 mb-4">
                     <div class="flex flex-1 flex-col rounded-md">
-                        <div class="flex w-full bg-gray-800 p-2 gap-x-4 rounded-t-md">
+                        <div class="flex w-full bg-gray-800 p-2 justify-between rounded-t-md">
                             <button type="button" class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 cursor-pointer text-sm">Complete Solution</button>
                             <button type="button" class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 cursor-pointer text-sm">Initial Solution</button>
                         </div>
-                        <div id="solution-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
+                        <div class="flex">
+                            <div id="solution-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
+                            <div id="initial-solution-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
+                        </div>
                         <span class="text-xs font-semibold text-gray-800 cursor-default">*Code what will be given to student</span>
                     </div>
                     <div class="flex flex-1 flex-col rounded-md">
-                        <div class="flex w-full bg-gray-800 p-2 gap-x-4 rounded-t-md">
+                        <div class="flex w-full bg-gray-800 p-2 justify-between rounded-t-md">
                             <button type="button" class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 cursor-pointer text-sm">Test Case</button>
                             <button type="button" class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 cursor-pointer text-sm">Test Edge Case</button>
-                        </div>                        
-                        <div id="test-case-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
+                        </div>         
+                        <div class="flex">
+                            <div id="test-case-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
+                            <div id="edge-case-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
+                        </div>
                         <span class="text-xs font-semibold text-gray-800 cursor-default">*Scaffold programing languages codes for both student solution and sample test </span>
                     </div>
                 </div>     
