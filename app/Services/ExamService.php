@@ -124,7 +124,7 @@ class ExamService
 
                 // calculate value density = value/weight whereas value = coverage score and weight = question points
                 // The 'best' is defined by density of the item
-                $question->density = log($question->coverage_score + 1) / ($question->points ?? 1);
+                $question->density = $question->coverage_score + 1 / ($question->points ?? 1);
 
                 return $question;
             });
@@ -136,11 +136,15 @@ class ExamService
 
     public function useGreedyAlgorithm(Exam $exam){
         $valued_questions = $this->assignValuesToQuestionsForKnapsack($exam);
+
+        // We sort this to start being greedy by value
         $item_questions = $valued_questions->sortByDesc('value');
         $question_combination = [];
         $max_weight = $exam->max_score;
         $total_value = 0.0;
         $total_weight = 0.0;
+
+        // Since the questions are sorted we can just fetch them from left to right
         foreach ($item_questions as $item) {
             if (($total_weight + $item['weight']) <= $max_weight) {
                 $question_combination[] = $item;
@@ -148,13 +152,79 @@ class ExamService
                 $total_value += $item['value'];
             }
         }
+
         return [
             'questions' => $question_combination, 
             'total value' => $total_value, 
             'Exam Max Score' => $max_weight, 
-            'total weights' => $total_weight
+            'total weights' => $total_weight,
+            'algorithm' => 'Greedy Algorithm'
+        ];
+    }
+
+    public function useDynamicProgramming(Exam $exam){
+        $valued_questions = $this->assignValuesToQuestionsForKnapsack($exam);
+        $question_combination = [];
+        $max_weight = $exam->max_score;
+        $total_value = 0.0;
+
+        // We add one to rows and columns because of zero-indexed array nature
+        $rows = $valued_questions->count() + 1;
+        $columns = $max_weight + 1;
+        $dynamic_programming_table =  array_fill(0, $rows, array_fill(0, $columns, 0));
+
+        // No items or zero capacity, so no value can be obtained
+        if ($valued_questions->count() == 0 || $max_weight == 0) {
+            return 0;  
+        }
+
+        // No need to sort because it will compute for all values anyways
+        for ($item = 1; $item < $rows; $item++) {
+            // Since the questions are object we need to save each objects (rows) weights and values
+            // The reason for $item - 1 is because of zero-based index array 
+            $item_weight = $valued_questions[$item - 1]['weight'];
+            $item_value = $valued_questions[$item - 1]['value'];
+
+            // These are the columns of the dp table
+            for ($weight = 1; $weight < $columns; $weight++){
+
+                // We check if the item (question) weight is greater than the column number because columns are represented as weights
+                if ($item_weight <= $weight){
+                    // This compare the value when the item (question) is excluded vs not excluded and take the highest value between the two
+                    $dynamic_programming_table[$item][$weight] = max(
+                        $dynamic_programming_table[$item - 1][$weight],
+                        $dynamic_programming_table[$item - 1][$weight - $item_weight] + $item_value
+                    );
+                } else {
+                    // Since the $item_weight is over it is automatically skipped
+                    $dynamic_programming_table[$item][$weight] = $dynamic_programming_table[$item - 1][$weight];
+                }
+
+            }
+          }
+
+          // This code will start fetching the optimal set of questions
+          $weight_remaining = $max_weight;
+          // We start from the leftmost cell of the table
+          for ($item = $rows - 1; $item > 0; $item--) {
+            // Check if the item (question) is not the same as the cell above it; if it is the same it means we don't take the item (question)
+            if ($dynamic_programming_table[$item][$weight_remaining] != $dynamic_programming_table[$item - 1][$weight_remaining]) {
+                  $question_item =  $valued_questions[$item - 1];
+                  $question_combination[] = $question_item;  // fetch the selected question
+                  $weight_remaining -= $question_item['weight'];  
+                  $total_value += $question_item['value']; 
+              }
+          }
+
+        return [
+            'questions' => $question_combination,
+            'total value' => $total_value, 
+            'Exam Max Score' => $max_weight, 
+            'weight remaining' => $weight_remaining,
+            'algorithm' => 'Dynamic Programming'
         ];
     }
 
     // algorithm for shuffling the question list
 }
+

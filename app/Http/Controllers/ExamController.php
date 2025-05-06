@@ -182,8 +182,16 @@ class ExamController extends Controller
     }
 
     public function build_exam(Exam $exam){
-        $q = $this->examService->useGreedyAlgorithm($exam);
-        $questions_to_sync =  array_column($q['questions'], 'id');
+        $algorithm = request()->query('algorithm');
+        $greedy_algorithm = $this->examService->useGreedyAlgorithm($exam);
+
+        $optimal_set_of_questions = match ($algorithm) {
+                'greedy' => $this->examService->useGreedyAlgorithm($exam),
+                'dynamic_programming' => $this->examService->useDynamicProgramming($exam),
+                default => $this->examService->useDynamicProgramming($exam), // fallback
+            };
+
+        $questions_to_sync = array_column($optimal_set_of_questions['questions'], 'id');
         $exam->questions()->sync($questions_to_sync);
 
         return response('', 200)->header('HX-Refresh', 'true');    
@@ -199,5 +207,10 @@ class ExamController extends Controller
         // // validate this to look if there's an examination date
         // $exam->update(['access_code' => $accessCode]);
         // return view('components/core/partials-exam-access-code', ['exam' => $exam]);
+    }
+
+    public function swap_partial_algorithm(Exam $exam){
+
+        return view('exams/partials-algorithms', ['exam'=> $exam]);
     }
 }
