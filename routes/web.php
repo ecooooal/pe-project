@@ -99,6 +99,7 @@ Route::group(['middleware' => ['can:view access control']], function () {
     Route::get('/exams/{exam}/builder/swap-algorithm',[ExamController::class, 'swap_partial_algorithm']);
     Route::get('/exams/{exam}/builder/build', [ExamController::class, 'build_exam']);
     Route::get('/exams/{exam}/edit/generate_access_code', [ExamController::class, 'generateAccessCode']);
+    Route::get('/exams/builder/tabs', [ExamController::class, 'swap_tabs']);
 
 
 

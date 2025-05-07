@@ -85,13 +85,14 @@ class ExamService
 
 
     // algorithm for fetching and building the exam
-    public function assignValuesToQuestionsForKnapsack(Exam $exam)
+    public function assignValuesToQuestionsForKnapsack(Exam $exam, $subject_weight, $criteria)
     {
         // Get all questions related to the exam’s course
         $course = $this->getCourseForExam($exam);
-        
-        // Check if course does exist
+
+        // Check if course does exist   
         if ($course) {
+            $topic_weight = 1 - $subject_weight;
 
             $questions = $course->subjects->flatMap(function ($subject) {
                                             return $subject->topics->flatMap->questions;
@@ -119,23 +120,23 @@ class ExamService
 
                 // calculate final coverage score
                 // weight * subject_coverage score + weight * topic_coverage score
-                $question->coverage_score = 0.6 * $question->subject_coverage_score 
-                            + 0.4 * $question->topic_coverage_score;
+                $question->coverage_score = $subject_weight * $question->subject_coverage_score 
+                            + $topic_weight * $question->topic_coverage_score;
 
                 // calculate value density = value/weight whereas value = coverage score and weight = question points
                 // The 'best' is defined by density of the item
-                $question->density = $question->coverage_score + 1 / ($question->points ?? 1);
+                $question->value = $criteria === 'value' ? $question->coverage_score + 1 : $question->coverage_score + 1 / ($question->points ?? 1);                
 
                 return $question;
             });
             // prepare data to represent set of questions to pick as Knapsack
-            $knapsack = $scored_questions->map(fn($question) => ['id'=>$question->id, 'name'=>$question->name, 'value'=>$question->density, 'weight'=>$question->points]);
+            $knapsack = $scored_questions->map(fn($question) => ['id'=>$question->id, 'name'=>$question->name, 'value'=>$question->value, 'weight'=>$question->points]);
         }
         return $knapsack;
     }
 
-    public function useGreedyAlgorithm(Exam $exam){
-        $valued_questions = $this->assignValuesToQuestionsForKnapsack($exam);
+    public function useGreedyAlgorithm(Exam $exam, $subject_weight, $criteria){
+        $valued_questions = $this->assignValuesToQuestionsForKnapsack($exam, $subject_weight, $criteria);
 
         // We sort this to start being greedy by value
         $item_questions = $valued_questions->sortByDesc('value');
@@ -162,8 +163,8 @@ class ExamService
         ];
     }
 
-    public function useDynamicProgramming(Exam $exam){
-        $valued_questions = $this->assignValuesToQuestionsForKnapsack($exam);
+    public function useDynamicProgramming(Exam $exam, $subject_weight, $criteria){
+        $valued_questions = $this->assignValuesToQuestionsForKnapsack($exam, $subject_weight, $criteria);
         $question_combination = [];
         $max_weight = $exam->max_score;
         $total_value = 0.0;

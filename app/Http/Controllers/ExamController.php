@@ -183,12 +183,13 @@ class ExamController extends Controller
 
     public function build_exam(Exam $exam){
         $algorithm = request()->query('algorithm');
-        $greedy_algorithm = $this->examService->useGreedyAlgorithm($exam);
+        $subject_weight = (request()->query('subject_weight') ?: 60) / 100;
+        $criteria = request()->query('criteria');
 
         $optimal_set_of_questions = match ($algorithm) {
-                'greedy' => $this->examService->useGreedyAlgorithm($exam),
-                'dynamic_programming' => $this->examService->useDynamicProgramming($exam),
-                default => $this->examService->useDynamicProgramming($exam), // fallback
+                'greedy' => $this->examService->useGreedyAlgorithm($exam, $subject_weight, $criteria),
+                'dynamic_programming' => $this->examService->useDynamicProgramming($exam, $subject_weight, $criteria),
+                default => $this->examService->useDynamicProgramming($exam, $subject_weight, $criteria),
             };
 
         $questions_to_sync = array_column($optimal_set_of_questions['questions'], 'id');
@@ -212,5 +213,10 @@ class ExamController extends Controller
     public function swap_partial_algorithm(Exam $exam){
 
         return view('exams/partials-algorithms', ['exam'=> $exam]);
+    }
+
+    public function swap_tabs(){
+
+        return view('exams/partials-tabs-algorithm');
     }
 }

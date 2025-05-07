@@ -1,0 +1,125 @@
+<div id="tab-info" class="flex flex-col">
+    <div class="flex">
+        <button class="text-lg rounded-t-lg bg-gray-100 p-4 font-bold text-gray-800">
+            What is Exam builder? 
+        </button>
+        <button class="text-lg p-4 font-bold text-gray-800 cursor-pointer"
+        hx-get="/exams/builder/tabs" hx-target="#tab-content" 
+        hx-swap="innerHTML" hx-select="#tab-greedy">
+            Greedy Algorithm 
+        </button>
+        <button class="text-lg p-4 font-bold text-gray-800 cursor-pointer"
+        hx-get="/exams/builder/tabs" hx-target="#tab-content" 
+        hx-swap="innerHTML" hx-select="#tab-dynamic">
+            Dynamic Programming 
+        </button>
+        <button class="text-lg p-4 font-bold text-gray-800 cursor-pointer"
+        hx-get="/exams/builder/tabs" hx-target="#tab-content" 
+        hx-swap="innerHTML" hx-select="#tab-genetic">
+            Genetics Algorithm 
+        </button>
+    </div>
+    <div class="flex flex-col h-64 p-4 overflow-auto bg-gray-100 w-full rounded-b-lg gap-y-1">
+        <p>Exam builder is a way to scaffold the exam using an algorithm to insert a set of questions.</p>
+        <p>How does it work?</p>
+        <p>The Exam is treated as a 0/1 Knapsack Problem. The following are the metrics of the problem:</p>
+        <div class="bg-blue-100">
+            <ul>
+                <li>Items = Questions</li>
+                <li>Value of Item = Question's Coverage Score</li>
+                <li>Weight of Item = Question's Point</li>
+                <li>Criteria for picking an Item = Density of the item (value/weight)</li>
+            </ul>
+        </div>
+        <div class="bg-blue-200">
+            <div>
+                <p>The Equation for the Question's Coverage score is </p>
+                <p>Coverage Score = subject_weight * subject_coverage_score + topic_weight * topic_coverage_score</p>
+            </div>
+            <div>
+                <p>Wherein,</p>
+                <p>subject_coverage_score = 1 / Total Subjects</p>
+                <p>topic_coverage_score = 1 / Total Topics</p>
+            </div>
+        </div>
+        <p>A 0/1 Knapsack Problem is ...</p>
+    </div>
+</div>
+
+<div id="tab-greedy" class="flex flex-col">
+    <div class="flex">
+        <button class="text-lg p-4 font-bold text-gray-800 cursor-pointer"
+        hx-get="/exams/builder/tabs" hx-target="#tab-content" 
+        hx-swap="innerHTML" hx-select="#tab-info">
+        What is Exam builder? 
+        </button>
+        <button class="text-lg rounded-t-lg bg-gray-100 p-4 font-bold text-gray-800">
+            Greedy Algorithm 
+        </button>
+        <button class="text-lg p-4 font-bold text-gray-800 cursor-pointer"
+        hx-get="/exams/builder/tabs" hx-target="#tab-content" 
+        hx-swap="innerHTML" hx-select="#tab-dynamic">
+            Dynamic Programming 
+        </button>
+        <button class="text-lg p-4 font-bold text-gray-800 cursor-pointer"
+        hx-get="/exams/builder/tabs" hx-target="#tab-content" 
+        hx-swap="innerHTML" hx-select="#tab-genetic">
+            Genetics Algorithm 
+        </button>
+    </div>
+    <div class="h-64 p-4 overflow-auto bg-gray-100 w-full rounded-b-lg">
+        Greedy Algorithm implementation here
+    </div>
+</div>
+
+<div id="tab-dynamic" class="flex flex-col">
+    <div class="flex">
+        <button class="text-lg p-4 font-bold text-gray-800 cursor-pointer"
+        hx-get="/exams/builder/tabs" hx-target="#tab-content" 
+        hx-swap="innerHTML" hx-select="#tab-info">
+        What is Exam builder? 
+        </button>
+        <button class="text-lg p-4 font-bold text-gray-800 cursor-pointer"
+        hx-get="/exams/builder/tabs" hx-target="#tab-content" 
+        hx-swap="innerHTML" hx-select="#tab-greedy">
+            Greedy Algorithm 
+        </button>
+        <button class="text-lg rounded-t-lg bg-gray-100 p-4 font-bold text-gray-800">
+            Dynamic Programming 
+        </button>
+        <button class="text-lg p-4 font-bold text-gray-800 cursor-pointer"
+        hx-get="/exams/builder/tabs" hx-target="#tab-content" 
+        hx-swap="innerHTML" hx-select="#tab-genetic">
+            Genetics Algorithm 
+        </button>
+    </div>
+    <div class="h-64 p-4 overflow-auto bg-gray-100 w-full rounded-b-lg">
+        Dyamic Programming implementation here
+    </div>
+</div>
+
+<div id="tab-genetic" class="flex flex-col">
+    <div class="flex">
+        <button class="text-lg p-4 font-bold text-gray-800 cursor-pointer"
+        hx-get="/exams/builder/tabs" hx-target="#tab-content" 
+        hx-swap="innerHTML" hx-select="#tab-info">
+        What is Exam builder? 
+        </button>
+        <button class="text-lg p-4 font-bold text-gray-800 cursor-pointer"
+        hx-get="/exams/builder/tabs" hx-target="#tab-content" 
+        hx-swap="innerHTML" hx-select="#tab-greedy">
+            Greedy Algorithm 
+        </button>
+        <button class="text-lg p-4 font-bold text-gray-800 cursor-pointer"
+        hx-get="/exams/builder/tabs" hx-target="#tab-content" 
+        hx-swap="innerHTML" hx-select="#tab-dynamic">
+            Dynamic Programming 
+        </button>
+        <button class="text-lg rounded-t-lg bg-gray-100 p-4 font-bold text-gray-800">
+            Genetics Algorithm 
+        </button>
+    </div>
+    <div class="h-64 p-4 overflow-auto bg-gray-100 w-full rounded-b-lg">
+        Genetics Algorithm implementation here
+    </div>
+</div>
