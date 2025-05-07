@@ -184,7 +184,7 @@ class ExamController extends Controller
     public function build_exam(Exam $exam){
         $algorithm = request()->query('algorithm');
         $subject_weight = (request()->query('subject_weight') ?: 60) / 100;
-        $criteria = request()->query('criteria');
+        $criteria = request()->query('criteria') ?: 'density';
 
         $optimal_set_of_questions = match ($algorithm) {
                 'greedy' => $this->examService->useGreedyAlgorithm($exam, $subject_weight, $criteria),

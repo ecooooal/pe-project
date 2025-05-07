@@ -105,7 +105,7 @@ class ExamService
                                             ->map->count();
 
             // Assign score to each question
-            $scored_questions = $questions->map(function ($question) use ($questions_in_subjects, $questions_in_topics) {
+            $scored_questions = $questions->map(function ($question) use ($questions_in_subjects, $questions_in_topics, $subject_weight, $topic_weight, $criteria) {
                 // get subject and topic ids
                 $subject_id = $question->topic->subject->id;
                 $topic_id = $question->topic->id;
