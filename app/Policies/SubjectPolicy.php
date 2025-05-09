@@ -21,7 +21,7 @@ class SubjectPolicy
      */
     public function view(User $user, Subject $subjects): bool
     {
-        return false;
+        return $user->hasPermissionTo('view subjects');
     }
 
     /**
@@ -29,7 +29,7 @@ class SubjectPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('create subjects');
     }
 
     /**

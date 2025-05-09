@@ -21,7 +21,7 @@ class TopicPolicy
      */
     public function view(User $user, Topic $topics): bool
     {
-        return false;
+        return $user->hasPermissionTo('view topics');
     }
 
     /**
@@ -29,7 +29,7 @@ class TopicPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('create topics');
     }
 
     /**

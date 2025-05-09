@@ -11,6 +11,7 @@ use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Str;
 use Validator;
 
 class QuestionController extends Controller
@@ -63,26 +64,45 @@ class QuestionController extends Controller
     }
     public function create(){
         $courses = $this->userService->getCoursesForUser(auth()->user());
-        $subjects = $this->userService->getSubjectsForUser(auth()->user());
+        // $subjects = $this->userService->getSubjectsForUser(auth()->user());
         $courses = $courses->pluck('name', 'id');
-        $subjects = $subjects->pluck('name', 'id');
+        // $subjects = $subjects->pluck('name', 'id');
         $question_types = [
             '' => 'Select A Question Type',
             'multiple_choice' => 'Multiple Choice',
             'true_or_false'=> 'True or False',
             'identification' => 'Identification',
             'ranking' => 'Ranking/Ordering/Process',
-            'matching' => 'Matching Items',
-            'coding' => 'Coding'
+            'matching' => 'Matching Items'
         ];
 
         $data =[
             'courses' => $courses,
-            'subjects' => $subjects,
+            // 'subjects' => $subjects,
             'question_types' => $question_types
         ];
 
         return view('questions/create', $data);
+    }
+
+    public function createCodingQuestion(){
+        $courses = $this->userService->getCoursesForUser(auth()->user())->pluck('name', 'id');
+        $programming_languages = [
+            'c++' => "C++",
+            'java' => "Java",
+            'sql' => "SQL",
+            'python' => "Python",
+        ];
+
+        $markdown = Str::of('- *Laravel*')->markdown();
+
+        $data =[
+            'courses' => $courses,
+            'programming_languages' => $programming_languages,
+            'markdown' => $markdown
+        ];
+
+        return view('questions-types/coding', $data);
     }
 
     public function store(){
@@ -185,4 +205,23 @@ class QuestionController extends Controller
     public function question_type_show(Question $question){
         return view('questions-types/show', ['question' => $question]);
     }
+
+    public function previewMarkdown(Request $request){
+        $data = $request->post();
+        $markdown = Str::of($request->post('instruction'))->markdown([
+            'html_input' => 'strip',
+        ]);
+
+        return view('components/core/preview-markdown', ['data'=> $data, 'markdown' => $markdown]);
+    }
+
+    public function togglePreviewButton(){
+
+        return view('components/core/toggle-preview');
+    }
+
+    public function validateCompleteSolution(Request $request){
+        return view('questions-types/validate-complete-solution', ['data'=>$request->post()]);
+    }
+
 }

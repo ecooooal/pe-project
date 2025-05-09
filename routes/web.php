@@ -25,7 +25,6 @@ Route::get('/', function () {
     //     return redirect('/students');
     // }
 
-
     return view('landing-page');
 });
 
@@ -44,48 +43,43 @@ Route::group(['middleware' => ['can:view faculty']], function () {
     Route::get('/faculty', function () {
         return view('faculty-home');
     });
- });
-Route::group(['middleware' => ['can:view access control']], function () { 
-    Route::get('/admins', [AccessControlController::class, 'redirect']);
-    Route::get('/admins/access-control', [AccessControlController::class, 'index']);
 
-    Route::get('/admins/load-users', [AccessControlController::class, 'viewUsers']);
-    Route::get('/admins/users/create', [RegisteredUserController::class, 'create']);    
-    Route::post('/admins/users', [RegisteredUserController::class, 'store']);
-    Route::get('/admins/users/{user}/edit', [RegisteredUserController::class, 'edit'])->name('admin.users.edit');
-    Route::get('/admins/users/{user}', [RegisteredUserController::class, 'show'])->name('admin.users.show');
-    Route::patch('/admins/users/{user}', [RegisteredUserController::class, 'update']);
-    Route::delete('/admins/users/{user}', [RegisteredUserController::class, 'destroy']);
-
-
-
-    Route::get('/admins/load-roles', [AccessControlController::class, 'viewRoles']);
-    Route::post('/admins/roles/load-role-checkbox', [AccessControlController::class, 'loadRoleCheckbox']);
-    Route::get('/admins/roles/create', [AccessControlController::class, 'createRole']);
-    Route::post('/admins/roles', [AccessControlController::class, 'storeRole']);
-    Route::get('/admins/roles/{role}', [AccessControlController::class, 'showRole'])->name('admin.roles.show');
-    Route::get('/admins/roles/{role}/edit', [AccessControlController::class, 'editRole']);
-    Route::patch('/admins/roles/{role}', [AccessControlController::class, 'updateRole']);
-    Route::delete('/admins/roles/{role}', [AccessControlController::class, 'destroyRole']);
-
-
-    Route::get('/admins/load-permissions', [AccessControlController::class, 'viewPermissions']);
-    Route::get('/admins/permissions/create', [AccessControlController::class, 'createPermission']);
-    Route::post('/admins/permissions', [AccessControlController::class, 'storePermission']);
-    Route::get('/admins/permissions/{permission}', [AccessControlController::class, 'showPermission'])->name('admin.permissions.show');
-    Route::get('/admins/permissions/{permission}/edit', [AccessControlController::class, 'editPermission']);
-    Route::patch('/admins/permissions/{permission}', [AccessControlController::class, 'updatePermission']);
-    Route::delete('/admins/permissions/{permission}', [AccessControlController::class, 'destroyPermission']);
-
-
-    Route::get('/admins/roles', function () {
-        return view('admins/roles');
+    Route::group(['middleware' => ['can:view access control']], function () { 
+        Route::get('/admins', [AccessControlController::class, 'redirect']);
+        Route::get('/admins/access-control', [AccessControlController::class, 'index']);
+    
+        Route::get('/admins/load-users', [AccessControlController::class, 'viewUsers']);
+        Route::get('/admins/users/create', [RegisteredUserController::class, 'create']);    
+        Route::post('/admins/users', [RegisteredUserController::class, 'store']);
+        Route::get('/admins/users/{user}/edit', [RegisteredUserController::class, 'edit'])->name('admin.users.edit');
+        Route::get('/admins/users/{user}', [RegisteredUserController::class, 'show'])->name('admin.users.show');
+        Route::patch('/admins/users/{user}', [RegisteredUserController::class, 'update']);
+        Route::delete('/admins/users/{user}', [RegisteredUserController::class, 'destroy']);
+    
+        Route::get('/admins/roles', function () {
+            return view('admins/roles');
+        });
+        Route::get('/admins/load-roles', [AccessControlController::class, 'viewRoles']);
+        Route::post('/admins/roles/load-role-checkbox', [AccessControlController::class, 'loadRoleCheckbox']);
+        Route::get('/admins/roles/create', [AccessControlController::class, 'createRole']);
+        Route::post('/admins/roles', [AccessControlController::class, 'storeRole']);
+        Route::get('/admins/roles/{role}', [AccessControlController::class, 'showRole'])->name('admin.roles.show');
+        Route::get('/admins/roles/{role}/edit', [AccessControlController::class, 'editRole']);
+        Route::patch('/admins/roles/{role}', [AccessControlController::class, 'updateRole']);
+        Route::delete('/admins/roles/{role}', [AccessControlController::class, 'destroyRole']);
+    
+        Route::get('/admins/permissions', function () {
+            return view('admins/permissions');
+        });
+        Route::get('/admins/load-permissions', [AccessControlController::class, 'viewPermissions']);
+        Route::get('/admins/permissions/create', [AccessControlController::class, 'createPermission']);
+        Route::post('/admins/permissions', [AccessControlController::class, 'storePermission']);
+        Route::get('/admins/permissions/{permission}', [AccessControlController::class, 'showPermission'])->name('admin.permissions.show');
+        Route::get('/admins/permissions/{permission}/edit', [AccessControlController::class, 'editPermission']);
+        Route::patch('/admins/permissions/{permission}', [AccessControlController::class, 'updatePermission']);
+        Route::delete('/admins/permissions/{permission}', [AccessControlController::class, 'destroyPermission']);
+    
     });
-    Route::get('/admins/permissions', function () {
-        return view('admins/permissions');
-    });
-
-
 
     Route::get('/exams', [ExamController::class, 'index']);
     Route::get('/exams/create', [ExamController::class, 'create'])->name('exams.create');
@@ -96,8 +90,10 @@ Route::group(['middleware' => ['can:view access control']], function () {
     Route::delete('/exams/{exam}', [ExamController::class, 'destroy']);
     Route::get('/exams/{exam}/builder', [ExamController::class, 'exam_builder_show']);
     Route::post('/exams/{exam}/builder/add-question/{question}',[ExamController::class, 'toggle_question'])->name('exam.toggleQuestion');
+    Route::get('/exams/{exam}/builder/swap-algorithm',[ExamController::class, 'swap_partial_algorithm']);
     Route::get('/exams/{exam}/builder/build', [ExamController::class, 'build_exam']);
     Route::get('/exams/{exam}/edit/generate_access_code', [ExamController::class, 'generateAccessCode']);
+    Route::get('/exams/builder/tabs', [ExamController::class, 'swap_tabs']);
 
 
 
@@ -105,6 +101,10 @@ Route::group(['middleware' => ['can:view access control']], function () {
     Route::get('/questions/create', [QuestionController::class, 'create'])->name('questions.create');
     Route::get('/questions/create/courses', [QuestionController::class, 'getSubjectsForCourses']);
     Route::get('/questions/create/subjects', [QuestionController::class, 'getTopicsForSubjects']);
+    Route::get('/questions/create/coding-question', [QuestionController::class, 'createCodingQuestion']);
+    Route::get('/questions/create/preview-markdown', [QuestionController::class, 'togglePreviewButton']);
+    Route::post('/questions/create/preview-markdown', [QuestionController::class, 'previewMarkdown']);
+    Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution']);
     Route::post('/questions', [QuestionController::class, 'store']);
     Route::get('/question_type.show/{question}', [QuestionController::class, 'question_type_show'])->name('question_type.show');
     Route::get('/questions/{question}', [QuestionController::class, 'show'])->name(name: 'questions.show');
@@ -158,8 +158,6 @@ Route::group(['middleware' => ['can:view access control']], function () {
     Route::delete('/topics/{topic}', [TopicController::class, 'destroy']);
     Route::get('/topics/{topic}/questions', [TopicController::class, 'showQuestions']);
 
-
-
     Route::get('/subjects', [SubjectController::class, 'index']);
     Route::get('/subjects/create', [SubjectController::class, 'create']);
     Route::post('/subjects', [SubjectController::class, 'store']);
@@ -210,5 +208,12 @@ Route::group(['middleware' => ['can:view access control']], function () {
         return view('profiles/courses');
     });
 
+ });
+
+Route::post('/test/send-data', function(Request $request) {
+    $data = $request->post();
+    $markdown = Str::of($request->post('instruction'))->markdown([
+        'html_input' => 'strip',
+    ]);
+    return view('test-sent-data-page', ['data'=> $data, 'markdown' => $markdown]);
 });
-//testing hi i'm new branch
