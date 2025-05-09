@@ -48,7 +48,10 @@
     <div id="exam-content" class="flex flex-col gap-y-3">
         <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
             <div class="flex flex-col flex-1 p-4 gap-y-4 ">
+                {% if can('update exams') %}
+
                 <div class="flex gap-x-4">
+
                     <div class="flex flex-1 flex-col">
                         {{ forms.form_field(
                             label:forms.label(
@@ -84,6 +87,7 @@
                         <span class="text-gray-500 italic font-semibold text-xs">*Default criteria is density.</span>
 
                     </div>
+
                     <div class="flex flex-col justify-center">
                         <div class="flex gap-x-2 items-center pt-2">
                             <button class="cursor-pointer bg-orange-500 text-gray-200 hover:bg-orange-400 hover:text-white duration-300 rounded-lg p-2 font-semibold text-xs"
@@ -117,6 +121,7 @@
                 
                 </div>
 
+                {% endif %}
                 <div class="flex flex-col flex-1">
                     <div id="tabs" class="flex" 
                             hx-get="/exams/builder/tabs" hx-trigger="load delay:100ms" 
@@ -186,6 +191,8 @@
 
 
         <div id="exam-question-field" class="flex flex-col mx-4 p-4">
+            {% if can('update exams') %}
+
             <div class="flex ml-auto my-2">
                 <button type="button" 
                         class="cursor-pointer bg-blue-600 text-gray-200 hover:bg-blue-500 hover:text-white duration-300 rounded-lg p-2 font-semibold text-sm"
@@ -193,18 +200,21 @@
                         Add Question
                 </button>
             </div>
+
+            {% endif %}
             <div class="flex justify-between items-center w-full h-16 p-8 bg-white border-x border-t border-gray-300 rounded-t-2xl">
                 <h1 class="text-2xl font-medium text-gray-800">Exam Questions </h1>
                 <h1>Filter here</h1>
             </div>
             <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
-                {{ table(questions_header, exam_questions_rows, url:'exams', forAdding:true, openAction:false, exam_id:exam.id, forRemoving:true) }}
+                {{ table(questions_header, exam_questions_rows, url:'exams', forAdding:true, openAction:true, exam_id:exam.id, forRemoving:true, actions:can('update exams') ? true : false) }}
         
             </div>
             <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300 rounded-b-2xl">
                 <h1>Pagination</h1>
             </div>
         </div>
+        {% if can('update exams') %}
 
         <div class="flex gap-x-2 mx-8 justify-end">
             {% if exam.published != 'published' %}
@@ -215,6 +225,8 @@
                 </button>
             {% endif %}
         </div>
+
+
 
         <div popover="manual" class="w-full h-full backdrop:bg-gray-900/15 backdrop:backdrop-blur-[1px] m-auto p-6 bg-gray-50/0 rounded-xl" id="add-question-popover">
             <div id="available-question-field" class="flex flex-col flex-1 w-full p-4">
@@ -256,5 +268,5 @@
         <img class="mr-54" width="150" src="{{ asset('images/bars-scale.svg') }}"/>
     </div>
 
-    
+    {% endif %}
 {% endblock %}
