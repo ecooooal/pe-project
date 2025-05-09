@@ -32,14 +32,47 @@ Route::get('/test', function () {
     return view('test-page');
 });
 
-Route::post('/search', function () {
-
-});
-
 Route::post('/login', [SessionController::class, 'authenticate']);
 Route::post('/logout', [SessionController::class, 'logout'])->middleware(['auth']);;
 
-Route::group(['middleware' => ['can:view faculty']], function () { 
+Route::group(['middleware' => ['can:view student']], function () { 
+});
+
+Route::prefix('student')->group(function() {
+    Route::get('/', function () {
+        return view('students/student-home');
+    });
+    Route::get('/exams', function () {
+        return view('students/exams/index');
+    });
+    Route::get('/exams/exam.id', function () {
+        return view('students/exams/show');
+    });
+    Route::get('/exams/exam.id/question.id/mcq-example', function () {
+        return view('students/exams/index');
+    });
+    Route::get('/exams/exam.id/question.id/t/f-example', function () {
+        return view('students/exams/index');
+    });
+    Route::get('/exams/exam.id/question.id/iden-example', function () {
+        return view('students/exams/index');
+    });
+    Route::get('/exams/exam.id/question.id/rank-example', function () {
+        return view('students/exams/index');
+    });
+    Route::get('/exams/exam.id/question.id/match-example', function () {
+        return view('students/exams/index');
+    });
+    Route::get('/exams/exam.id/question.id/coding-example', function () {
+        return view('students/exams/index');
+    });
+    Route::get('/exams/exam.id/result', function () {
+        return view('students/exams/index');
+    });
+});
+
+
+Route::prefix('')->middleware(['can:view faculty'])->group(function () { 
     Route::get('/faculty', function () {
         return view('faculty-home');
     });

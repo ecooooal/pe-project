@@ -1,5 +1,10 @@
-{% macro sidebar_item(url, icon, label) %}
-{% set is_active = url == '/' ~ app.request.pathInfo|split('/')[1]  %}
+{% macro sidebar_item(url, icon, label, is_faculty = true) %}
+
+{% if is_faculty %}
+    {% set is_active = url|split('/')[1] in app.request.pathInfo  %}
+{% else %}
+    {% set is_active = url|split('/')[2] in app.request.pathInfo  %}
+{% endif %}
 {% if not is_active %}
     <a href="{{ url }}" 
         class="flex items-center px-4 py-4 mt-1 rounded-lg
