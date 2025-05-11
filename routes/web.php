@@ -18,12 +18,9 @@ Route::get('/', function () {
 
     if ($user && $user->can('view faculty')) {
         return redirect('/faculty');
+    } else if ($user && $user->can('view student')) {
+        return redirect('/student');
     }
-    
-    // yet to implement
-    // if ($user->can('access faculty')) {
-    //     return redirect('/students');
-    // }
 
     return view('landing-page');
 });
@@ -39,7 +36,7 @@ Route::post('/questions/create/validate-complete-solution', [QuestionController:
 Route::group(['middleware' => ['can:view student']], function () { 
 });
 
-Route::prefix('student')->group(function() {
+Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/', function () {
         return view('students/student-home');
     });
