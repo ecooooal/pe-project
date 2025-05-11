@@ -34,6 +34,7 @@ Route::get('/test', function () {
 
 Route::post('/login', [SessionController::class, 'authenticate']);
 Route::post('/logout', [SessionController::class, 'logout'])->middleware(['auth']);;
+Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution']);
 
 Route::group(['middleware' => ['can:view student']], function () { 
 });
@@ -48,26 +49,39 @@ Route::prefix('student')->group(function() {
     Route::get('/exams/exam.id', function () {
         return view('students/exams/show');
     });
-    Route::get('/exams/exam.id/question.id/mcq-example', function () {
-        return view('students/exams/index');
+    Route::get('/exams/exam.id/mcq-example', function () {
+        return view('students/exams/mcq-example');
     });
-    Route::get('/exams/exam.id/question.id/t/f-example', function () {
-        return view('students/exams/index');
+    Route::get('/exams/exam.id/torf-example', function () {
+        return view('students/exams/TorF-example');
     });
-    Route::get('/exams/exam.id/question.id/iden-example', function () {
-        return view('students/exams/index');
+    Route::get('/exams/exam.id/iden-example', function () {
+        return view('students/exams/iden-example');
     });
-    Route::get('/exams/exam.id/question.id/rank-example', function () {
-        return view('students/exams/index');
+    Route::get('/exams/exam.id/rank-example', function () {
+        $items = [
+            0 => 'Code writing',
+            1 => 'Syntax checking',
+            2 => 'Compiling',
+            3 => 'Execution'
+        ];
+
+        return view('students/exams/rank-example',['items' => $items]);
     });
-    Route::get('/exams/exam.id/question.id/match-example', function () {
-        return view('students/exams/index');
+    Route::get('/exams/exam.id/match-example', function () {
+        return view('students/exams/match-example');
     });
-    Route::get('/exams/exam.id/question.id/coding-example', function () {
-        return view('students/exams/index');
+    Route::get('/exams/exam.id/coding-example', function () {
+        $programming_languages = [
+            'c++' => "C++",
+            'java' => "Java",
+            'sql' => "SQL",
+            'python' => "Python",
+        ];
+        return view('students/exams/coding-example', ['programming_languages' => $programming_languages]);
     });
     Route::get('/exams/exam.id/result', function () {
-        return view('students/exams/index');
+        return view('students/exams/result-example');
     });
 });
 
@@ -137,7 +151,6 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/questions/create/coding-question', [QuestionController::class, 'createCodingQuestion']);
     Route::get('/questions/create/preview-markdown', [QuestionController::class, 'togglePreviewButton']);
     Route::post('/questions/create/preview-markdown', [QuestionController::class, 'previewMarkdown']);
-    Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution']);
     Route::post('/questions', [QuestionController::class, 'store']);
     Route::get('/question_type.show/{question}', [QuestionController::class, 'question_type_show'])->name('question_type.show');
     Route::get('/questions/{question}', [QuestionController::class, 'show'])->name(name: 'questions.show');
