@@ -22,7 +22,7 @@ class UserService
 
     public function getSubjectsForUser(User $user)
     {
-        return Subject::whereIn('course_id', $user->getCourseIds())->get();
+        return Subject::whereIn('course_id', $user->getCourseIds());
     }
 
     public function getSubjectById($subjectId)
@@ -34,7 +34,7 @@ class UserService
     public function getTopicsForUser(User $user)
     {
         $subjectIds = $this->getSubjectsForUser($user)->pluck('id');
-        return Topic::whereIn('subject_id', $subjectIds)->get();
+        return Topic::whereIn('subject_id', $subjectIds);
     }
 
     public function getTopicById($topicId)
@@ -47,8 +47,7 @@ class UserService
     {
         $topicIds = $this->getTopicsForUser($user)->pluck('id');
         return Question::with('topic.subject.course')
-            ->whereIn('topic_id', $topicIds)
-            ->get();
+            ->whereIn('topic_id', $topicIds);
     }
 
     public function getQuestionById($questionId)

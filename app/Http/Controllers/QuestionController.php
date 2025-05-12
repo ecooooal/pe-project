@@ -24,7 +24,7 @@ class QuestionController extends Controller
     }
 
     public function index(){
-        $questions = $this->userService->getQuestionsForUser(auth()->user());
+        $questions = $this->userService->getQuestionsForUser(auth()->user())->paginate(10);
         $header = ['ID', 'Name', 'Subject', 'Topic', 'Type', 'Author', 'Date Created'];
         $rows = $questions->map(function ($question) {
             return [
@@ -40,7 +40,8 @@ class QuestionController extends Controller
 
         $data = [
             'headers' => $header,
-            'rows' => $rows
+            'rows' => $rows,
+            'questions' => $questions
         ];
 
         return view('questions/index', $data);

@@ -38,7 +38,8 @@ class AccessControlController extends Controller
             'currentUser' => $currentUser,
             'header' => $header,
             'rows' => $rows,
-            'url' => 'users'
+            'url' => 'users',
+            'paginates' => $users
         ];
 
         return view('/admins/load-table', $data);
@@ -59,7 +60,8 @@ class AccessControlController extends Controller
             'roles' => $roles, 
             'header' => $header,
             'rows' => $rows,
-            'url' => 'roles'
+            'url' => 'roles',
+            'paginates' => $roles
         ];
 
         return view('/admins/load-table', $data);

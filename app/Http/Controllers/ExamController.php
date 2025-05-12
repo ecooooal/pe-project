@@ -24,7 +24,7 @@ class ExamController extends Controller
 
     public function index(){
         $courseIds = $this->userService->getCoursesForUser(auth()->user())->pluck('id');
-        $exams = Exam::whereIn('course_id', $courseIds)->get();
+        $exams = Exam::whereIn('course_id', $courseIds)->paginate(10);
 
         $header = ['ID', 'Name', 'Course', 'Questions', 'Status', 'is Published', 'Examination Date'];
         $rows = $exams->map(function ($exam) {
@@ -41,7 +41,8 @@ class ExamController extends Controller
 
         $data = [
             'headers' => $header,
-            'rows' => $rows
+            'rows' => $rows,
+            'exams' => $exams
         ];
 
         return view('exams/index', $data);

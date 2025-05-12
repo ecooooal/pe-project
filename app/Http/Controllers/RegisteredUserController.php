@@ -17,15 +17,18 @@ class RegisteredUserController extends Controller
     public function show(User $user){
         $user_courses = $user->courses()->get()->pluck('abbreviation', 'id');
         $userPermissions = $user->permissions()->pluck('name');
+        $userAllPermissions = $user->getAllPermissions()->pluck('name');
+        $role_permissions = $user->getPermissionsviaRoles()->pluck('name');
         $userRoles = $user->getRoleNames();
-        $permissions = Permission::all()->pluck('name')->diff($userPermissions);
-
+        $permissions = Permission::all()->pluck('name')->diff($userAllPermissions);
+        
         $data = [
             'user' => $user,
             'permissions' => $permissions,
             'user_courses' => $user_courses,
             'user_roles' => $userRoles,
-            'user_permissions' => $userPermissions
+            'user_permissions' => $userPermissions,
+            'role_permissions' => $role_permissions
         ];
 
         return view('users/show', $data);
@@ -87,8 +90,10 @@ class RegisteredUserController extends Controller
         $user_courses = $user->courses()->get()->pluck('abbreviation', 'id');
         $roles = Role::pluck('name', 'id');
         $userRoles = $user->getRoleNames();
+        $userAllPermissions = $user->getAllPermissions()->pluck('name');
         $userPermissions = $user->permissions()->pluck('name', 'id');
-        $permissions = Permission::all()->pluck('name', 'id')->diff($userPermissions);
+        $role_permissions = $user->getPermissionsviaRoles()->pluck('name');
+        $permissions = Permission::all()->pluck('name', 'id')->diff($userAllPermissions);
 
         $data = [
             'user' => $user,
@@ -97,7 +102,8 @@ class RegisteredUserController extends Controller
             'courses' => $courses,
             'user_courses' => $user_courses,
             'user_roles' => $userRoles,
-            'user_permissions' => $userPermissions
+            'user_permissions' => $userPermissions,
+            'role_permissions' => $role_permissions
         ];
 
         return view('users/edit', $data);
