@@ -204,7 +204,7 @@
                 <h1>Filter here</h1>
             </div>
             <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
-                {{ table(questions_header, exam_questions_rows, url:'exams', forAdding:true, openAction:true, exam_id:exam.id, forRemoving:true, actions:can('update exams') ? true : false) }}
+                {{ table(questions_header, exam_questions_rows, url:'exams', forAdding:true, openAction:false, exam_id:exam.id, forRemoving:true, actions:can('update exams') ? true : false) }}
         
             </div>
             <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300 rounded-b-2xl">
