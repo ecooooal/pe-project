@@ -41,7 +41,7 @@
             <div class="flex justify-between">
                 <div class="flex flex-col gap-y-4">
                     {{ show_item('Name',  question.name  )}}
-                    {{ show_item('Topic', question.topic.name )}}
+                    <a href="/topics/{{ question.topic.id }}" class="hover:text-blue-900 hover:underline duration-150">{{ show_item('Topic', question.topic.name )}}</a>
                     {{ show_item('Type',  question.question_type.value|replace({'_': ' '})|title )}}
                 </div>
                 <div class="flex flex-col mr-16 gap-y-4">

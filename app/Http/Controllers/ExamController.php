@@ -192,9 +192,9 @@ class ExamController extends Controller
                 'dynamic_programming' => $this->examService->useDynamicProgramming($exam, $subject_weight, $criteria),
                 default => $this->examService->useDynamicProgramming($exam, $subject_weight, $criteria),
             };
-
         $questions_to_sync = array_column($optimal_set_of_questions['questions'], 'id');
         $exam->questions()->sync($questions_to_sync);
+        $exam->update(['applied_algorithm' => $optimal_set_of_questions['algorithm']]);
 
         return response('', 200)->header('HX-Refresh', 'true');    
     }

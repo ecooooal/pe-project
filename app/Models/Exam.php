@@ -19,7 +19,8 @@ class Exam extends Model
         'duration',
         'retakes',
         'examination_date',
-        'published'
+        'published',
+        'applied_algorithm'
     ];
 
     public function course() {

@@ -89,6 +89,7 @@ class ExamService
     {
         // Get all questions related to the exam’s course
         $course = $this->getCourseForExam($exam);
+        $knapsack = [];
 
         // Check if course does exist   
         if ($course) {
@@ -111,33 +112,53 @@ class ExamService
                 $topic_id = $question->topic->id;
 
                 // get total counts of subjects and topics
-                $subject_total = $questions_in_subjects[$subject_id] ?? 1;
-                $topic_total = $questions_in_topics[$topic_id] ?? 1;
+                $total_questions_in_subject = $questions_in_subjects[$subject_id] ?? 1;
+                $total_questions_in_topic = $questions_in_topics[$topic_id] ?? 1;
 
                 // assign scores for coverage in subject and topic
-                $question->topic_coverage_score = 1 / $topic_total;
-                $question->subject_coverage_score = 1 / $subject_total;
+                // The subject and topic score is using inverse proportional scoring scheme
+                // which means higher count leads to lower score so that lower counts can still be picked
+                $question->topic_coverage_score = 1 / $total_questions_in_topic;
+                $question->subject_coverage_score = 1 / $total_questions_in_subject;
 
-                // calculate final coverage score
-                // weight * subject_coverage score + weight * topic_coverage score
-                $question->coverage_score = $subject_weight * $question->subject_coverage_score 
-                            + $topic_weight * $question->topic_coverage_score;
+                // Calculate value
+                    // value = ax + by
+                // Wherein:
+                    // a and b = subject weight and topic weight
+                    // x and y = subject score and topic score
+                    // subject score = 1/ total questions in subject
+                    // topic score = 1/ total questions in topic
+                $question->coverage_score = $subject_weight * $question->subject_coverage_score + $topic_weight * $question->topic_coverage_score;
 
-                // calculate value density = value/weight whereas value = coverage score and weight = question points
-                // The 'best' is defined by density of the item
-                $question->value = $criteria === 'value' ? $question->coverage_score + 1 : $question->coverage_score + 1 / ($question->points ?? 1);                
-
+                // calculate value density = value/weight 
+                // Wherein: 
+                    // value = coverage score 
+                    // weight = question points
+                // The 'best' is defined by criteria sent by user
+                $question->value = $criteria === 'value'
+                    ? $question->coverage_score + 1
+                    : ($question->coverage_score + 1) / ($question->points ?: 1);
                 return $question;
             });
             // prepare data to represent set of questions to pick as Knapsack
-            $knapsack = $scored_questions->map(fn($question) => ['id'=>$question->id, 'name'=>$question->name, 'value'=>$question->value, 'weight'=>$question->points]);
+            // Normalize the value so that values are within the range of 0 - 1.
+            // Normalization = (value - min(value) ) / (max(value) - min(value))
+            $min = $scored_questions->min('value');
+            $max = $scored_questions->max('value');
+            $normalized_questions = $scored_questions->map(function ($question) use ($min, $max) {
+                $question->value = ($question->value - $min) / max($max - $min, 1e-8);
+                return $question;
+            });
+
+            $knapsack = $normalized_questions->map(fn($question) => ['id'=>$question->id, 'name'=>$question->name, 'value'=>$question->value, 'weight'=>$question->points]);
         }
+        \Log::debug('Knapsack prepared:', $knapsack->toArray());
         return $knapsack;
     }
 
     public function useGreedyAlgorithm(Exam $exam, $subject_weight, $criteria){
         $valued_questions = $this->assignValuesToQuestionsForKnapsack($exam, $subject_weight, $criteria);
-
+        // $dump = dump($valued_questions->sortBy('value'));
         // We sort this to start being greedy by value
         $item_questions = $valued_questions->sortByDesc('value');
         $question_combination = [];
@@ -154,28 +175,34 @@ class ExamService
             }
         }
 
-        return [
+        $data = [
             'questions' => $question_combination, 
-            'total value' => $total_value, 
+            'total value' => round($total_value * 1000), 
             'Exam Max Score' => $max_weight, 
             'total weights' => $total_weight,
-            'algorithm' => 'Greedy Algorithm'
+            'algorithm' => 'Greedy Algorithm',
         ];
+        return $data;
     }
 
     public function useDynamicProgramming(Exam $exam, $subject_weight, $criteria){
-        $valued_questions = $this->assignValuesToQuestionsForKnapsack($exam, $subject_weight, $criteria);
+        $questions = $this->assignValuesToQuestionsForKnapsack($exam, $subject_weight, $criteria);
+        $rounded_valued_questions = $questions->map(function ($question) {
+            $question['value'] = (int) round($question['value'] * 1000);
+            return $question;
+            });
         $question_combination = [];
         $max_weight = $exam->max_score;
         $total_value = 0.0;
+        // $dump = dump($rounded_valued_questions->sortBy('value'));
 
         // We add one to rows and columns because of zero-indexed array nature
-        $rows = $valued_questions->count() + 1;
+        $rows = $rounded_valued_questions->count() + 1;
         $columns = $max_weight + 1;
         $dynamic_programming_table =  array_fill(0, $rows, array_fill(0, $columns, 0));
 
         // No items or zero capacity, so no value can be obtained
-        if ($valued_questions->count() == 0 || $max_weight == 0) {
+        if ($rounded_valued_questions->count() == 0 || $max_weight == 0) {
             return 0;  
         }
 
@@ -183,8 +210,8 @@ class ExamService
         for ($item = 1; $item < $rows; $item++) {
             // Since the questions are object we need to save each objects (rows) weights and values
             // The reason for $item - 1 is because of zero-based index array 
-            $item_weight = $valued_questions[$item - 1]['weight'];
-            $item_value = $valued_questions[$item - 1]['value'];
+            $item_weight = $rounded_valued_questions[$item - 1]['weight'];
+            $item_value = $rounded_valued_questions[$item - 1]['value'];
 
             // These are the columns of the dp table
             for ($weight = 1; $weight < $columns; $weight++){
@@ -210,20 +237,21 @@ class ExamService
           for ($item = $rows - 1; $item > 0; $item--) {
             // Check if the item (question) is not the same as the cell above it; if it is the same it means we don't take the item (question)
             if ($dynamic_programming_table[$item][$weight_remaining] != $dynamic_programming_table[$item - 1][$weight_remaining]) {
-                  $question_item =  $valued_questions[$item - 1];
+                  $question_item =  $rounded_valued_questions[$item - 1];
                   $question_combination[] = $question_item;  // fetch the selected question
                   $weight_remaining -= $question_item['weight'];  
                   $total_value += $question_item['value']; 
               }
           }
 
-        return [
+        $data = [
             'questions' => $question_combination,
             'total value' => $total_value, 
             'Exam Max Score' => $max_weight, 
             'weight remaining' => $weight_remaining,
             'algorithm' => 'Dynamic Programming'
         ];
+        return $data;
     }
 
     // algorithm for shuffling the question list

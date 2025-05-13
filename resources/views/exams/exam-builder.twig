@@ -109,12 +109,7 @@
                                     hx-select="#algorithm-div"
                                     hx-vals='{"algorithm":"dynamic"}'>
                                     Dynamic Programming
-                            </button>
-                            <button class="cursor-pointer bg-orange-500 text-gray-200 hover:bg-orange-400 hover:text-white duration-300 rounded-lg p-2 font-semibold text-xs"
-                                    type="button"
-                                    popovertarget="build-exam-popover">
-                                    Genetics Algorithm
-                            </button>                            
+                            </button>               
                         </div>
                         <span class="text-gray-600 italic font-semibold text-xs self-end">*use an algorithm to scaffold the exam.</span>
                     </div>
@@ -134,10 +129,12 @@
             <div class="flex flex-col p-4 flex-1 items-center">
                 <h1 class="text-2xl font-bold text-gray-800">{{ exam.course.name }} </h1>
                 <div class="flex gap-x-4">
+                    <span id="question-count-field" class="text-xs font-semibold text-gray-500">Total Subjects : {{ exam_subjects.count() }}</span>
+                    <span id="question-count-field" class="text-xs font-semibold text-gray-500">Total Topics : {{ exam_topics.count() }}</span>
                     <span id="question-count-field" class="text-xs font-semibold text-gray-500">Total Questions : {{exam_questions.count()}}</span>
                     <span id="score-count-field" class="text-xs font-semibold text-gray-500">Current Score : {{exam_questions.sum('points')}}</span>    
                 </div>
-                <span id="algortihm-field" class="text-xs italic font-semibold text-gray-500">Current Algorithm : {{ exam_questions.algorithm }}</span>    
+                <span id="algortihm-field" class="text-xs italic font-semibold text-gray-500">Current Algorithm : {{ exam.applied_algorithm }}</span>    
             </div>  
         </div>
 
