@@ -158,10 +158,9 @@ class ExamService
 
     public function useGreedyAlgorithm(Exam $exam, $subject_weight, $criteria){
         $valued_questions = $this->assignValuesToQuestionsForKnapsack($exam, $subject_weight, $criteria);
-        // $dump = dump($valued_questions->sortBy('value'));
         // We sort this to start being greedy by value
         $item_questions = $valued_questions->sortByDesc('value');
-        $question_combination = [];
+        $question_combination = []; 
         $max_weight = $exam->max_score;
         $total_value = 0.0;
         $total_weight = 0.0;
@@ -182,6 +181,7 @@ class ExamService
             'total weights' => $total_weight,
             'algorithm' => 'Greedy Algorithm',
         ];
+        // dump($data);
         return $data;
     }
 
@@ -194,7 +194,6 @@ class ExamService
         $question_combination = [];
         $max_weight = $exam->max_score;
         $total_value = 0.0;
-        // $dump = dump($rounded_valued_questions->sortBy('value'));
 
         // We add one to rows and columns because of zero-indexed array nature
         $rows = $rounded_valued_questions->count() + 1;
@@ -251,6 +250,8 @@ class ExamService
             'weight remaining' => $weight_remaining,
             'algorithm' => 'Dynamic Programming'
         ];
+                // dump($data);
+
         return $data;
     }
 
