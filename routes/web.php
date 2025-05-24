@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccessControlController;
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\RegisteredUserController;
@@ -209,6 +210,16 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::patch('/subjects/{subject}', [SubjectController::class, 'update']);
     Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy']);
     Route::get('/subjects/{subject}/questions', [SubjectController::class, 'showQuestions']);
+
+    Route::get('/courses', [CourseController::class, 'index']);
+    Route::get('/courses/create', [CourseController::class, 'create']);
+    Route::post('/courses', [CourseController::class, 'store']);
+    Route::get('/courses/{course}', [CourseController::class, 'show'])->name('courses.show');
+    Route::get('/courses/{course}/edit', [CourseController::class, 'edit']);
+    Route::patch('/courses/{course}', [CourseController::class, 'update']);
+    Route::delete('/courses/{course}', [CourseController::class, 'destroy']);
+    Route::get('/courses/{course}/subjects', [CourseController::class, 'showSubjects']);
+
 
     Route::get('/reviewers', function(){
         return view('reviewers/index');
