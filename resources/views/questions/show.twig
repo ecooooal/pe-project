@@ -56,25 +56,19 @@
             <div class="flex justify-between">
                 <div class="flex flex-col gap-y-4">
                     {{ show_item('Points', question.points )}}
-                    {{ show_item('Solution', 'A/True/Algorithm/etc')}}
                 </div>
             </div>
         </div>  
     </div>
     <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
-        <div class="flex flex-col p-4 flex-1">
-            {{ show_header(question.question_type.name|replace({'_': ' '})|title ) }}
-            <div class="flex justify-between">
                 <div id="question-type-content" 
-                    class="flex flex-col gap-y-4 h-96 w-full bg-gray-300"
-                    hx-get="{{ url('question_type.show', {'question': question.id}) }}"
+                    class="flex flex-col p-4 flex-1 min-w-full"
+                    hx-get="{{ url('question_type_show', {'question': question.id}) }}"
                     hx-target="this"
                     hx-trigger="load"
                     hx-select="#{{ question.question_type.name }}-content"
                     hx-swap="innerHTML transition:true">
-                </div>
             </div>
-        </div>  
     </div>
 
 </div>

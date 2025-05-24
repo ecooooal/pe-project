@@ -150,7 +150,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/questions/create/preview-markdown', [QuestionController::class, 'togglePreviewButton']);
     Route::post('/questions/create/preview-markdown', [QuestionController::class, 'previewMarkdown']);
     Route::post('/questions', [QuestionController::class, 'store']);
-    Route::get('/question_type.show/{question}', [QuestionController::class, 'question_type_show'])->name('question_type.show');
+    Route::get('/question_type_show/{question}', [QuestionController::class, 'question_type_show'])->name('question_type.show');
     Route::get('/questions/{question}', [QuestionController::class, 'show'])->name(name: 'questions.show');
     Route::get('/questions/{question}/edit', [QuestionController::class, 'edit']);
     Route::patch('/questions/{question}', [QuestionController::class, 'update']);
