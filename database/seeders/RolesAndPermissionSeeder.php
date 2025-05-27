@@ -19,6 +19,8 @@ class RolesAndPermissionSeeder extends Seeder
         // Access Control Permissions
         Permission::create(['name' => 'view access control']);
         Permission::create(['name' => 'view faculty']);
+        Permission::create(['name' => 'view student']);
+
 
 
         // Users Permissions
@@ -88,14 +90,17 @@ class RolesAndPermissionSeeder extends Seeder
             'create roles','view roles', 'update roles', 'destroy roles',
         ]);
 
+        $student_default_permissions = [
+            'view student'
+        ];
+
         // Default Roles
         Role::create(['name' => 'faculty'])->givePermissionTo($faculty_default_permissions);
         Role::create(['name' => 'department_head'])->givePermissionTo($head_default_permissions);
         Role::create(['name' => 'head_secretary'])->givePermissionTo($admin_default_permissions);
         Role::create(['name' => 'college_dean'])->givePermissionTo($admin_default_permissions);
+        Role::create(['name' => 'student'])->givePermissionTo($student_default_permissions);
         Role::create(['name' => 'super_admin'])->givePermissionTo(Permission::all());
-        Role::create(['name' => 'student']);
-
 
     }
 }

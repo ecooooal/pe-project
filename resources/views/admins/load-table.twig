@@ -2,7 +2,8 @@
 {% from 'components/core/show-item' import show_item %}
 {% from 'components/core/index-table' import table %}
 
-<div class="flex flex-1 mr-8">
+<div class="flex flex-1 mx-8">
+    <h1 class="text-2xl self-center font-bold">{{ url|capitalize }}</h1>
     {% if can('create ' ~ url) %}
         <button 
                 class=" ml-auto bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold"
@@ -23,6 +24,5 @@
 
     </div>
     <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300 rounded-b-2xl">
-        <h1>Pagination</h1>
     </div>   
 </div>

@@ -33,7 +33,8 @@
                                     'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'required':true}
                             ),
-                            isColumn:true 
+                            isColumn:true,
+                            errors: errors.get('name'),
                         )}}
                         {{ forms.form_field(
                             label:forms.label(
@@ -66,7 +67,7 @@
                                     'class':'block w-full cursor-not-allowed rounded-md bg-gray-100 px-3 py-1.5 outline-1 -outline-offset-1 outline-gray-300 text-gray-400  sm:text-sm/6',
                                     'disabled':true}
                             ),
-                            isColumn:true 
+                            isColumn:true ,
                         )}}
                     </div>
                 </div>

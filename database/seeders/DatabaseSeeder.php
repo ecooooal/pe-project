@@ -38,6 +38,13 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('testing1234'),
         ])->assignRole('college_dean')->courses()->attach(1);
 
+        User::create([
+            'first_name' => 'Student',
+            'last_name' => 'Example',
+            'email' => 'student@email.com',
+            'password' => bcrypt('testing1234'),
+        ])->assignRole('student')->courses()->attach(1);
+
         $this->call(FakeDataSeeder::class);
     }
 }

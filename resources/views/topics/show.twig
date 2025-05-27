@@ -12,7 +12,9 @@
 <div class="flex flex-col mx-4 pl-4">
     <h1 class="font-bold text-4xl">{{ topic.name }}</h1>
     <div class="flex flex-col pt-1 gap-y-0.5">
-        <span class="pl-2 text-xs text-gray-400 font-semibold">Subject : {{ topic.subject.name }}</span>
+        <a href="/subjects/{{ topic.subject.id }}">
+            <span class="pl-2 text-xs text-gray-400 font-semibold hover:text-blue-900 hover:underline duration-150">Subject : {{ topic.subject.name }}</span>
+        </a>
         <span class="pl-2 text-xs text-gray-400 font-semibold">Course : {{ topic.subject.course.abbreviation }}</span>
         <span class="pl-2 text-xs text-gray-400 font-semibold">ID : {{ topic.id }}</span>
     </div>

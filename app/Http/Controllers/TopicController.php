@@ -19,10 +19,10 @@ class TopicController extends Controller
 
 
     public function index(){
-        $Topics = $this->userService->getTopicsForUser(auth()->user());
+        $topics = $this->userService->gettopicsForUser(auth()->user())->paginate(10);
 
         $header = ['ID', 'Subject', 'Name', 'Question Count', 'Date Created'];
-        $rows = $Topics->map(function ($topic) {
+        $rows = $topics->map(function ($topic) {
             return [
                 'id' => $topic->id,
                 'course' => $topic->subject->name,
@@ -34,7 +34,8 @@ class TopicController extends Controller
 
         $data = [
             'headers' => $header,
-            'rows' => $rows
+            'rows' => $rows,
+            'topics' => $topics
         ];
 
         return view('topics/index', $data);

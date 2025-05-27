@@ -90,9 +90,24 @@
   {{ input(name, value, "file", attributes) }}
 {% endmacro %}
 
-{% macro radio(name, values, value, attributes) %}
+{% macro radio(name, values, value, attributes, label_attributes) %}
   {% for key, label in values %}
-  <label {% if value == key %} class="selected"{% endif %} ><input type="radio" name="{{ name }}" value="{{ key }}"{% if value == key %} checked="checked"{% endif %}{% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %}{% if not attributes.id is defined %} id="{{ name }}"{% endif %}> {{ label }}</label>
+  <label {% if value == key %} class="selected"{% endif %} {% for attr, value in label_attributes %} {{ attr }}="{{ value }}"{% endfor %}><input type="radio" name="{{ name }}" value="{{ key }}"
+    {% if value == key %} checked="checked"{% endif %}
+    {% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %}
+    {% if not attributes.id is defined %} id="{{ name }}"{% endif %}> 
+    <span class="w-full break-words whitespace-normal">{{ label }}</span></label>
   {% endfor %}
 {% endmacro %}
 
+{% macro exam_radio(name, values, value, attributes, label_attributes) %}
+  {% for key, label in values %}
+  <label {% if value == key %} class="selected"{% endif %} {% for attr, value in label_attributes %} {{ attr }}="{{ value }}"{% endfor %}>
+    <span class="font-medium">{{ key|title }}</span>
+    <input type="radio" name="{{ name }}" value="{{ key }}"
+    {% if value == key %} checked="checked"{% endif %}
+    {% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %}
+    {% if not attributes.id is defined %} id="{{ name }}"{% endif %}> 
+    <span class="w-full break-words whitespace-normal">{{ label }}</span></label>
+  {% endfor %}
+{% endmacro %}

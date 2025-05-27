@@ -137,8 +137,18 @@
                     <span class="text-red-500 text-sm font-semibold whitespace-nowrap">{{ error }}</span>    
                     {% endfor %}  
                 </div>
+                <div class="flex flex-1 flex-col bg-blue-950/95 rounded-lg">
+                    <h1 class="sticky top-0 text-gray-50 text-lg font-medium p-4">Role's Permissions</h1>
+                    <div class="p-4 overflow-y-auto overscroll-x-none no-scrollbar">
+                        {% for key, permission in role_permissions %}
+                            <div class="text-gray-50 text-md border-b-1 border-gray-50">
+                                {{ permission }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
                 <div class="flex flex-1 flex-col bg-blue-950 rounded-lg ">
-                    <h1 class="sticky top-0 text-gray-50 text-lg font-medium p-4">My Permissions</h1>
+                    <h1 class="sticky top-0 text-gray-50 text-lg font-medium p-4">Custom Permissions</h1>
                     <div id="user-permissions" class="sortable p-4  overflow-y-auto overscroll-x-none no-scrollbar" hx-trigger="end">
                         <div></div>
                         {% for key, permission in user_permissions %}
