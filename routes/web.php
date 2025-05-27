@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccessControlController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
@@ -85,9 +86,7 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
 
 
 Route::prefix('')->middleware(['can:view faculty'])->group(function () { 
-    Route::get('/faculty', function () {
-        return view('faculty-home');
-    });
+    Route::get('/faculty', [LandingPageController::class, 'facultyShow']);
 
     Route::group(['middleware' => ['can:view access control']], function () { 
         Route::get('/admins', [AccessControlController::class, 'redirect']);

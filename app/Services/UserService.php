@@ -2,6 +2,7 @@
 
 namespace App\Services;
 use App\Models\Course;
+use App\Models\Exam;
 use App\Models\Subject;
 use App\Models\Topic;
 use App\Models\Question;
@@ -14,10 +15,39 @@ class UserService
             ->with('subjects.topics.questions')
             ->get();
     }
+
+public function getCountsForCoursesForUser(User $user)
+{
+    $courses = $user->courses()
+        ->withCount([
+            'subjects',
+            'subjects.topics',
+        ])
+        ->with('subjects.topics.questions')  // eager load questions for manual count
+        ->get()
+        ->map(function ($course) {
+            // sum questions count manually from eager loaded relations
+            $course->questions_count = $course->subjects->flatMap(function ($subject) {
+                return $subject->topics->flatMap->questions;
+            })->count();
+
+            return $course;
+        });
+
+    return $courses;
+}
+
+
+
     public function getCourseById($courseId)
     {
         return Course::with('subjects')
                       ->findOrFail($courseId);
+    }
+
+    public function getExamsForUser(User $user)
+    {
+        return Exam::whereIn('course_id', $user->getCourseIds());
     }
 
     public function getSubjectsForUser(User $user)
