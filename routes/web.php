@@ -7,6 +7,7 @@ use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
+use App\Http\Controllers\MailController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -173,9 +174,11 @@ Route::group(['middleware' => ['can:view faculty']], function () {
     Route::get('/reviewers/create', function(){
         return view('reviewers/create');
     });
-    Route::post('/reviewers', function(Request $request){
-        dd($request->post());
-    });
+    // Route::post('/reviewers', function(Request $request){
+    //     dd($request->post());
+    // });
+    Route::post('/reviewers', [MailController::class, 'index']);
+    
     Route::get('/reviewers/show', function(){
         return view('reviewers/show');
     });
@@ -217,3 +220,5 @@ Route::post('/test/send-data', function(Request $request) {
     ]);
     return view('test-sent-data-page', ['data'=> $data, 'markdown' => $markdown]);
 });
+
+Route::get('send-mail', [MailController::class, 'index'])->name('send-mail');
