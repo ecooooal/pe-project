@@ -18,18 +18,8 @@ class SubjectController extends Controller
     {
         $this->userService = $userService;
     }
-
-    public function getSubjectsForUser()
-    {   
-        $user = auth()->user();
-        $courseIds = $user->courses()->get()->pluck('id');
-
-        return Subject::with('course') 
-            ->whereIn('course_id', $courseIds)
-            ->get();
-    }
     public function index(){
-        $subject_courses = $this->userService->getSubjectsForUser(auth()->user());
+        $subject_courses = $this->userService->getSubjectsForUser(auth()->user())->paginate(10);
         $header = ['ID', 'Course', 'Name',  'Year Level', 'Date Created'];
         $rows = $subject_courses->map(function ($subject) {
             return [
@@ -43,7 +33,8 @@ class SubjectController extends Controller
 
         $data = [
             'headers' => $header,
-            'rows' => $rows
+            'rows' => $rows,
+            'subjects' => $subject_courses
         ];
 
         return view('subjects/index', $data);

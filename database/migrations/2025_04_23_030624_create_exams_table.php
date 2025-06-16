@@ -23,11 +23,11 @@ return new class extends Migration
             $table->integer('retakes')->nullable();
             $table->dateTime('examination_date')->nullable();
             $table->boolean('is_published',)->default(false);
+            $table->string('applied_algorithm')->default('None');
             $table->softDeletes();
             $table->timestamps();
             $table->foreignIdFor(User::class, 'created_by')->nullable()->constrained()->nullOnDelete();
             $table->foreignIdFor(User::class, 'updated_by')->nullable()->constrained()->nullOnDelete();
-
         });
     }
 

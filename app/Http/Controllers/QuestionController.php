@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Factories\QuestionFactory;
+use App\Models\MultipleChoiceQuestion;
 use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Topic;
@@ -17,14 +18,17 @@ use Validator;
 class QuestionController extends Controller
 {
     protected $userService;
+    protected $questionService;
 
-    public function __construct(UserService $userService)
+    public function __construct(UserService $userService, QuestionService $questionService)
     {
         $this->userService = $userService;
+        $this->questionService = $questionService;
+
     }
 
     public function index(){
-        $questions = $this->userService->getQuestionsForUser(auth()->user());
+        $questions = $this->userService->getQuestionsForUser(auth()->user())->paginate(10);
         $header = ['ID', 'Name', 'Subject', 'Topic', 'Type', 'Author', 'Date Created'];
         $rows = $questions->map(function ($question) {
             return [
@@ -40,7 +44,8 @@ class QuestionController extends Controller
 
         $data = [
             'headers' => $header,
-            'rows' => $rows
+            'rows' => $rows,
+            'questions' => $questions
         ];
 
         return view('questions/index', $data);
@@ -203,7 +208,14 @@ class QuestionController extends Controller
     }
 
     public function question_type_show(Question $question){
-        return view('questions-types/show', ['question' => $question]);
+        $choices = $this->questionService->getQuestionTypeShow($question);
+        
+        $data = [
+            'question' => $question,
+            'choices' => $choices
+        ];
+
+        return view('questions-types/show', $data);
     }
 
     public function previewMarkdown(Request $request){
