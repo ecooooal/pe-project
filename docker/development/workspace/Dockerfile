@@ -32,8 +32,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN mkdir -p /var/www/node_modules && chown -R ${UID}:${GID} /var/www
-
 
 # If the group already exists, use it; otherwise, create the 'www' group
 RUN if getent group ${GID}; then \
@@ -44,6 +42,11 @@ RUN if getent group ${GID}; then \
     fi && \
     usermod -aG sudo www && \
     echo 'www ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# Create necessary directories and set permissions for those directories
+RUN mkdir -p /var/www/storage /var/www/node_modules /var/www && \
+    chown -R ${UID}:${GID} /var/www
+
 
 # Switch to the non-root user to install NVM and Node.js
 USER www
