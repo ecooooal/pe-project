@@ -1,4 +1,3 @@
-# docker/nginx/Dockerfile
 # Stage 1: Build assets
 FROM debian AS builder
 
@@ -27,7 +26,6 @@ FROM nginx:alpine
 # that is optimized for serving a Laravel application.
 # -----------------------------------------------------------
 COPY ./docker/production/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY ./docker/production/nginx/default.conf /etc/nginx/conf.d/default.conf
 
 # Copy Laravel's public assets from the builder stage
 # -----------------------------------------------------------

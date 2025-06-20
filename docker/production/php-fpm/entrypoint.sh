@@ -1,39 +1,32 @@
-#!/bin/bash
+#!/bin/sh
+set -e
 
-set -e  # Exit immediately if a command exits with a non-zero status
-
-echo "🎬 Laravel entrypoint started..."
-
-# Set permissions (optional — do only if needed)
-# chown -R www-data:www-data /var/www
-
-# Copy the initial storage structure if it doesn't exist (optional)
-if [ ! -f /var/www/storage/app/.initialized ]; then
-  echo "🗃️ Initializing storage directory..."
-  cp -r /var/www/storage-init/* /var/www/storage/
-  touch /var/www/storage/app/.initialized
+# Initialize storage directory if empty
+# -----------------------------------------------------------
+# If the storage directory is empty, copy the initial contents
+# and set the correct permissions.
+# -----------------------------------------------------------
+if [ ! "$(ls -A /var/www/storage)" ]; then
+  echo "Initializing storage directory..."
+  cp -R /var/www/storage-init/. /var/www/storage
+  chown -R www-data:www-data /var/www/storage
 fi
 
-# Run Laravel storage and cache setup
-echo "🧹 Clearing old caches..."
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
+# Remove storage-init directory
+rm -rf /var/www/storage-init
 
-echo "⚡ Caching config and routes..."
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
-# Optional: run migrations (only if you want auto-migrate in production)
-echo "🗄️ Running database migrations..."
+# Run Laravel migrations
+# -----------------------------------------------------------
+# Ensure the database schema is up to date.
+# -----------------------------------------------------------
 php artisan migrate --force
 
-echo "🗄️ Running database seeders..."
-if ! php artisan db:seed; then
-  echo "⚠️ Seeding failed. Check the seeders for errors."
-fi
+# Clear and cache configurations
+# -----------------------------------------------------------
+# Improves performance by caching config and routes.
+# -----------------------------------------------------------
+php artisan config:cache
+php artisan route:cache
 
-# Finally, run the main container command (PHP-FPM)
-echo "🚀 Starting PHP-FPM..."
+# Run the default command
 exec "$@"
