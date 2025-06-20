@@ -3,7 +3,29 @@ services:
     image: nginx:latest # Using the default Nginx image with custom configuration.
     volumes:
       # Mount the application code for live updates
-      - ./:/var/www
+      - ./app:/var/www/app
+      - ./bootstrap:/var/www/bootstrap
+      - ./routes:/var/www/routes
+      - ./config:/var/www/config
+      - ./resources:/var/www/resources
+      - ./public:/var/www/public
+      - ./database:/var/www/database
+      - ./compose.dev.yaml:/var/www/compose.dev.yaml
+      - ./compose.prod.yaml:/var/www/compose.prod.yaml
+      - ./docker:/var/www/docker
+      - ./composer.json:/var/www/composer.json
+      - ./composer.lock:/var/www/composer.lock
+      - ./package-lock.json:/var/www/package-lock.json
+      - ./package.json:/var/www/package.json
+      - ./vite.config.js:/var/www/vite.config.js
+      - ./.env.example:/var/www/.env.example
+      - ./.dockerignore:/var/www/.dockerignore
+      - ./.editorconfig:/var/www/.editorconfig
+      - ./artisan:/var/www/artisan
+      - ./vendor:/var/www/vendor
+      - app-node-modules:/var/www/node_modules
+      - app-storage:/var/www/storage
+
       # Mount the Nginx configuration file
       - ./docker/development/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
@@ -26,19 +48,35 @@ services:
       args:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
-        XDEBUG_ENABLED: ${XDEBUG_ENABLED:-true}
-        XDEBUG_MODE: develop,coverage,debug,profile
-        XDEBUG_HOST: ${XDEBUG_HOST:-host.docker.internal}
-        XDEBUG_IDE_KEY: ${XDEBUG_IDE_KEY:-DOCKER}
-        XDEBUG_LOG: /dev/stdout
-        XDEBUG_LOG_LEVEL: 0
     env_file:
       # Load the environment variables from the Laravel application
       - .env
     user: "${UID:-1000}:${GID:-1000}"
     volumes:
       # Mount the application code for live updates
-      - ./:/var/www
+      - ./app:/var/www/app
+      - ./bootstrap:/var/www/bootstrap
+      - ./routes:/var/www/routes
+      - ./config:/var/www/config
+      - ./resources:/var/www/resources
+      - ./public:/var/www/public
+      - ./database:/var/www/database
+      - ./compose.dev.yaml:/var/www/compose.dev.yaml
+      - ./compose.prod.yaml:/var/www/compose.prod.yaml
+      - ./docker:/var/www/docker
+      - ./composer.json:/var/www/composer.json
+      - ./composer.lock:/var/www/composer.lock
+      - ./package-lock.json:/var/www/package-lock.json
+      - ./package.json:/var/www/package.json
+      - ./vite.config.js:/var/www/vite.config.js
+      - ./.env.example:/var/www/.env.example
+      - ./.dockerignore:/var/www/.dockerignore
+      - ./.editorconfig:/var/www/.editorconfig
+      - ./artisan:/var/www/artisan
+      - ./vendor:/var/www/vendor
+      - app-node-modules:/var/www/node_modules
+      - app-storage:/var/www/storage
+
     networks:
       - laravel-development
     depends_on:
@@ -53,12 +91,6 @@ services:
       args:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
-        XDEBUG_ENABLED: ${XDEBUG_ENABLED:-true}
-        XDEBUG_MODE: develop,coverage,debug,profile
-        XDEBUG_HOST: ${XDEBUG_HOST:-host.docker.internal}
-        XDEBUG_IDE_KEY: ${XDEBUG_IDE_KEY:-DOCKER}
-        XDEBUG_LOG: /dev/stdout
-        XDEBUG_LOG_LEVEL: 0
     ports:
       - '${VITE_PORT:-5173}:5173'
     tty: true  # Enables an interactive terminal
@@ -66,7 +98,28 @@ services:
     env_file:
       - .env
     volumes:
-      - ./:/var/www
+      - ./app:/var/www/app
+      - ./bootstrap:/var/www/bootstrap
+      - ./routes:/var/www/routes
+      - ./config:/var/www/config
+      - ./resources:/var/www/resources
+      - ./public:/var/www/public
+      - ./database:/var/www/database
+      - ./compose.dev.yaml:/var/www/compose.dev.yaml
+      - ./compose.prod.yaml:/var/www/compose.prod.yaml
+      - ./docker:/var/www/docker
+      - ./composer.json:/var/www/composer.json
+      - ./composer.lock:/var/www/composer.lock
+      - ./package-lock.json:/var/www/package-lock.json
+      - ./package.json:/var/www/package.json
+      - ./vite.config.js:/var/www/vite.config.js
+      - ./.env.example:/var/www/.env.example
+      - ./.dockerignore:/var/www/.dockerignore
+      - ./.editorconfig:/var/www/.editorconfig
+      - ./artisan:/var/www/artisan
+      - ./vendor:/var/www/vendor
+      - app-node-modules:/var/www/node_modules
+      - app-storage:/var/www/storage
     networks:
       - laravel-development
 
@@ -93,3 +146,5 @@ networks:
 
 volumes:
   postgres-data-development:
+  app-node-modules:
+  app-storage:
