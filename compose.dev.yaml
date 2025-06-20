@@ -51,7 +51,7 @@ services:
     env_file:
       # Load the environment variables from the Laravel application
       - .env
-    user: "${UID:-1000}:${GID:-1000}"
+    user: "root"
     volumes:
       # Mount the application code for live updates
       - ./app:/var/www/app
@@ -121,7 +121,8 @@ services:
       - app-node-modules:/var/www/node_modules
       - app-storage:/var/www/storage
     networks:
-      - laravel-development
+      - laravel-development 
+      
 
   postgres:
     image: postgres:16
