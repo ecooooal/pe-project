@@ -52,9 +52,9 @@
             {{ show_header('User\'s Roles and Permissions') }}
         </div>
         <div class="flex gap-x-4 p-4 max-w-full max-h-96">
-            <div class="flex w-32 flex-col gap-y-4">
+            <div class="flex flex-1 md:w-1/5 w-32 flex-col gap-y-4">
                 <div class="flex flex-1 flex-col gap-y-4 w-full p-4 bg-gray-100 rounded-lg">
-                    <div class="flex text-center my-2">
+                    <div class="flex text-center">
                         <h3 class="mx-auto text-lg font-medium">
                             Roles
                         </h3>
@@ -62,7 +62,7 @@
 
                     {% for id, role in user_roles %}
                     <div class="flex items-center hover:bg-gray-50 p-2 text-sm">
-                        <div class="mx-auto max-w-xs">
+                        <div class="mx-auto max-w-xs font-semibold">
                             {{ role|capitalize }}
                         </div>
                     </div>         
@@ -70,18 +70,28 @@
                     
                 </div>
             </div>
-            <div class="flex flex-1 flex-col bg-blue-950 rounded-lg ">
-                <h1 class="sticky top-0 text-gray-50 text-lg font-medium p-4">My Permissions</h1>
+            <div class="flex flex-1 md:w-2/5 flex-col bg-blue-950/95 rounded-lg">
+                <h1 class="sticky top-0 text-gray-50 text-lg font-medium p-4">Role's Permissions</h1>
+                <div class="p-4 overflow-y-auto overscroll-x-none no-scrollbar">
+                    {% for key, permission in role_permissions %}
+                        <div class="text-gray-50 text-md border-b-1 border-gray-50">
+                            {{ permission }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="flex flex-1 md:w-2/5 flex-col bg-blue-950 rounded-lg ">
+                <h1 class="sticky top-0 text-gray-50 text-lg font-medium p-4">Custom Permissions</h1>
                 <div id="user-permissions" class="p-4 overflow-y-auto overscroll-x-none no-scrollbar" hx-trigger="end">
                     <div></div>
-                    {% for key, permission in user_permissions%}
+                    {% for key, permission in user_permissions %}
                         <div class="text-gray-50 text-md border-b-1 border-gray-50">
                             {{ permission }}
                         </div>                        
                     {% endfor %}
                 </div>
             </div>
-            <div class="flex flex-1 flex-col bg-blue-950/95 rounded-lg">
+            <div class="flex flex-1 md:w-2/5 flex-col bg-blue-950/95 rounded-lg">
                 <h1 class="sticky top-0 text-gray-50 text-lg font-medium p-4">Permissions</h1>
                 <div id="permissions" class="p-4 overflow-y-auto overscroll-x-none no-scrollbar" hx-trigger="end">
                     <div></div>
@@ -92,6 +102,7 @@
                     {% endfor %}
                 </div>
             </div>
+            
         </div>
     </div> 
     {% if can('update users') %}
