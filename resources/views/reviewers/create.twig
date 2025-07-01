@@ -20,7 +20,16 @@
 </div>
 
 <div class="flex flex-1 flex-col mx-64">
-    <form action="/reviewers" method="POST" class="flex flex-col gap-y-4">
+    {% if errors is defined and errors|length > 0 %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <form action="/reviewers" method="POST" class="flex flex-col gap-y-4" enctype="multipart/form-data">
         {{ csrf_field() }}
         <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
             <div class="flex flex-col p-4 flex-1">
@@ -29,18 +38,20 @@
                     <div class="flex flex-col gap-y-4 w-full">
                         {{ forms.form_field(
                             label:forms.label(
-                                id:'name', 
-                                content:'Name', 
+                                id:'email', 
+                                content:'Email Addresses (comma or newline separated)',
                                 attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
                             ),
                             input:forms.text(
-                                name:'name', 
+                                name:'email', 
                                 attributes:{
+                                    'rows': 4,
                                     'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                    'placeholder':'e.g. juan@example.com, maria@example.com or one per line',
                                     'required':true}
                             ),
-                            isColumn:true 
+                            isColumn:true
                         )}}
                         {{ forms.form_field(
                             label:forms.label(
@@ -78,17 +89,18 @@
                         {{ forms.form_field(
                             label:forms.label(
                                 id:'file', 
-                                content:'File', 
+                                content:'File(s)', 
                                 attributes:{
                                     'class':'text-base text-slate-900 font-medium mb-3 block'}
                             ),
                             input:forms.file(
-                                name:'file', 
+                                name:'reviewerFile[]', 
                                 file:'file',
                                 attributes:{
+                                    'multiple':true,
                                     'class':'w-full text-slate-500 font-medium text-sm bg-white outline-1 -outline-offset-1 outline-gray-300 file:cursor-pointer cursor-pointer 
                                         file:border-0 file:py-3 file:px-4 file:mr-4 file:bg-gray-100 hover:file:bg-gray-200 file:text-slate-500 rounded',
-                                    'placeholder':'File path'
+                                    'placeholder':'Select one or more files'
                                 }
                             ),
                             isColumn:true 
