@@ -9,6 +9,7 @@ use App\Models\Subject;
 use App\Models\Topic;
 use App\Services\QuestionService;
 use App\Services\UserService;
+use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -95,7 +96,6 @@ class QuestionController extends Controller
         $programming_languages = [
             'c++' => "C++",
             'java' => "Java",
-            'sql' => "SQL",
             'python' => "Python",
         ];
 
@@ -152,7 +152,6 @@ class QuestionController extends Controller
 
     public function update(Question $question){
         $this->authorize('update', $question);
-
 
         request()->validate([
             'name'    => ['required'],
@@ -233,7 +232,37 @@ class QuestionController extends Controller
     }
 
     public function validateCompleteSolution(Request $request){
-        return view('questions-types/validate-complete-solution', ['data'=>$request->post()]);
+        $language = $request->post('language-to-validate');
+        try {
+            switch ($language) {
+                case 'java':
+                    $api_response = Http::timeout(10)->post('http://java-api:8082/validate',[
+                        'completeSolution' => $request->post('validate-complete-solution'),
+                        'testUnit' => $request->post('validate-test-case')
+                    ]);
+                    break;
+                
+                default:
+                    $api_data = ['error' => 'API returned error', 'exception' => "Language not supported"];
+                    break;
+            }
+
+            if ($api_response->successful()) {
+                $api_data = $api_response->json();
+            } else {
+                $api_data = ['error' => 'API returned error', 'status' => $api_response->status()];
+            }
+            } catch (\Exception $e) {
+                $api_data = ['error' => 'API not reachable', 'exception' => $e->getMessage()];
+            }
+
+
+        $data = [
+            'post_data' => $request->post(),
+            'api_data' => $api_data
+        ];
+        
+        return view('questions-types/validate-complete-solution', ['data'=> $data]);
     }
 
 }

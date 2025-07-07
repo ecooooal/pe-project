@@ -142,6 +142,16 @@ services:
     networks:
       - laravel-development
 
+  java-api:
+    image: java-api
+    ports:
+      - "8082:8082"
+    volumes:
+      - /home/echo/JavaAPI:/app
+    networks:
+      - laravel-development
+
+
 networks:
   laravel-development:
 
