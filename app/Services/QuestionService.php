@@ -56,18 +56,33 @@ class QuestionService
         switch ($language) {
             case 'java':
                 try {
-                    $response = Http::timeout(10)->post('http://java-api:8082/validate', [
+                    $response = Http::timeout(30)->post('http://java-api:8082/validate', [
                         'completeSolution' => $solution,
                         'testUnit' => $test
                     ]);
                     if ($response->successful()) {
                         $data = $response->json();
-                        $data['success'] = !isset($data['error']) && !isset($data['exception']) && empty($data['failures']);
+                        $hasFailures = false;
+
+                        if (isset($data['testResults']) && is_array($data['testResults'])) {
+                            foreach ($data['testResults'] as $testResult) {
+                                if (isset($testResult['methods']) && is_array($testResult['methods'])) {
+                                    foreach ($testResult['methods'] as $method) {
+                                        if (isset($method['status']) && $method['status'] === 'FAILED') {
+                                            $hasFailures = true;
+                                            break 2;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        $data['success'] = !$hasFailures;
                         return $data;
                     }
                     return ['success' => false, 'error' => 'API returned error'];
                 } catch (\Exception $e) {
-                    return ['success' => false, 'error' => 'API unreachable', 'exception' => $e->getMessage()];
+                    return ['success' => false, 'error' => 'API unreachable | API may not be available', 'exception' => $e->getMessage()];
                 }
 
             default:

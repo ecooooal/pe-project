@@ -245,10 +245,16 @@ class QuestionController extends Controller
     }
 
     public function validateCompleteSolution(Request $request){
-        $language = $request->post('language-to-validate');
         $complete_solution = $request->post('validate-complete-solution');
         $test_case = $request->post('validate-test-case');
-        $api_data = $this->questionService::validate($language, $complete_solution, $test_case);
+
+        if (empty($complete_solution) || empty($test_case)) {
+            $api_data = ['error' => 'Complete solution and test case are both required.'];
+        } else {
+            $language = $request->post('language-to-validate');
+            $api_data = $this->questionService::validate($language, $complete_solution, $test_case);
+        }
+
 
         $data = [
             'post_data' => $request->post(),
