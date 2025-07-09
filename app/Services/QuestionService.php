@@ -5,6 +5,7 @@ use App\Models\Course;
 use App\Models\Subject;
 use App\Models\Topic;
 use App\Models\Question;
+use Illuminate\Support\Facades\Http;
 class QuestionService
 {
     public function getQuestionTypeShow(Question $question){
@@ -47,6 +48,30 @@ class QuestionService
 
             default:
                 throw new \Exception("Unknown question type: {$question['question_type']}");
+        }
+    }
+
+    public static function validate(string $language, string $solution, string $test): array
+    {
+        switch ($language) {
+            case 'java':
+                try {
+                    $response = Http::timeout(10)->post('http://java-api:8082/validate', [
+                        'completeSolution' => $solution,
+                        'testUnit' => $test
+                    ]);
+                    if ($response->successful()) {
+                        $data = $response->json();
+                        $data['success'] = !isset($data['error']) && !isset($data['exception']) && empty($data['failures']);
+                        return $data;
+                    }
+                    return ['success' => false, 'error' => 'API returned error'];
+                } catch (\Exception $e) {
+                    return ['success' => false, 'error' => 'API unreachable', 'exception' => $e->getMessage()];
+                }
+
+            default:
+                return ['success' => false, 'error' => 'Unsupported language'];
         }
     }
 }

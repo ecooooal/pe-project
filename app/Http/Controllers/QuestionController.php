@@ -59,7 +59,6 @@ class QuestionController extends Controller
             'trueOrFalseQuestion',
             'identificationQuestion',
             'rankingQuestions',
-            'matchingQuestions',
         ]);
         $question_type = $question->getTypeModel();
         $data = [
@@ -94,8 +93,8 @@ class QuestionController extends Controller
     public function createCodingQuestion(){
         $courses = $this->userService->getCoursesForUser(auth()->user())->pluck('name', 'id');
         $programming_languages = [
-            'c++' => "C++",
             'java' => "Java",
+            'c++' => "C++",
             'python' => "Python",
         ];
 
@@ -111,20 +110,34 @@ class QuestionController extends Controller
     }
 
     public function store(){
-        $validator = Validator::make(request()->all(), [
+        $question_type = request('type');
+        $item_count = count(request()->input('items', []));
+
+        $rules = [
             'topic' => ['required', 'exists:topics,id'],
             'type' => ['required'],
             'name' => ['required', 'string', 'unique:questions,name'],
             'points' => ['required', 'integer', 'min:1'],
-            'items.*' => ['required', 'string', 'min:1'],
-            'solution' => ['required', 'string'], 
             'subject' => ['required'],
-        ], [
-            'items.*.required' => 'This field is required.',
-        ]);
+        ];
 
-        $question_type = request('type');
-        $item_count = count(request()->input('items', []));
+        if ($question_type === 'coding') {
+            $rules['supported_languages'] = ['required', 'array', 'min:1'];
+            $rules['supported_languages.*.complete_solution'] = ['required', 'string'];
+            $rules['supported_languages.*.initial_solution'] = ['required', 'string'];
+            $rules['supported_languages.*.test_case'] = ['required', 'string'];
+            $rules['supported_languages.*.is_valid'] = ['accepted'];
+        } else {
+            $rules['items.*'] = ['required', 'string', 'min:1'];
+            $rules['solution'] = ['required', 'string'];
+        }
+
+        $messages = [
+            'items.*.required' => 'This field is required.',
+            'supported_languages.*.is_valid.accepted' => 'Language must be validated before submission.',
+        ];
+
+        $validator = Validator::make(request()->all(), $rules, $messages);
         if ($validator->fails()) {
             return redirect()->route('question.types', ['type' => $question_type, 'item_count' => $item_count])
                 ->withErrors($validator)
@@ -140,7 +153,7 @@ class QuestionController extends Controller
         return response('', 200)->header('HX-Redirect', url('/questions'));
     }
     public function edit(Question $question){
-        $subjects = Subject::whereIn('course_id', $question->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
+        $subjects = Subject::whereIn('course_id', $question->topic->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
 
         $data = [
             'question' => $question, 
@@ -233,29 +246,9 @@ class QuestionController extends Controller
 
     public function validateCompleteSolution(Request $request){
         $language = $request->post('language-to-validate');
-        try {
-            switch ($language) {
-                case 'java':
-                    $api_response = Http::timeout(10)->post('http://java-api:8082/validate',[
-                        'completeSolution' => $request->post('validate-complete-solution'),
-                        'testUnit' => $request->post('validate-test-case')
-                    ]);
-                    break;
-                
-                default:
-                    $api_data = ['error' => 'API returned error', 'exception' => "Language not supported"];
-                    break;
-            }
-
-            if ($api_response->successful()) {
-                $api_data = $api_response->json();
-            } else {
-                $api_data = ['error' => 'API returned error', 'status' => $api_response->status()];
-            }
-            } catch (\Exception $e) {
-                $api_data = ['error' => 'API not reachable', 'exception' => $e->getMessage()];
-            }
-
+        $complete_solution = $request->post('validate-complete-solution');
+        $test_case = $request->post('validate-test-case');
+        $api_data = $this->questionService::validate($language, $complete_solution, $test_case);
 
         $data = [
             'post_data' => $request->post(),

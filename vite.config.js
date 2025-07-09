@@ -10,6 +10,12 @@ export default defineConfig({
             host: 'localhost',
             port: 5173,
         },
+        watch: {
+            ignored: [
+                '**/storage/logs/**', // ignore Laravel logs
+                '**/vendor/**',       // ignore Composer stuff too (optional)
+            ],
+        },
     },
     plugins: [
         laravel({

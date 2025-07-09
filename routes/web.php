@@ -10,6 +10,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
 use App\Models\User;
+use App\Services\QuestionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Role;
@@ -263,10 +264,53 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
 
  });
 
-Route::post('/test/send-data', function(Request $request) {
-    $data = $request->post();
-    $markdown = Str::of($request->post('instruction'))->markdown([
-        'html_input' => 'strip',
-    ]);
-    return view('test-sent-data-page', ['data'=> $data, 'markdown' => $markdown]);
+Route::any('/test/send-data', function(Request $request) {
+        $post_data = $request->post();
+        $question_type = request('type');
+        $item_count = count(request()->input('items', []));
+
+        $rules = [
+            'topic' => ['required', 'exists:topics,id'],
+            'type' => ['required'],
+            'name' => ['required', 'string', 'unique:questions,name'],
+            'points' => ['required', 'integer', 'min:1'],
+            'subject' => ['required'],
+        ];
+
+        if ($question_type === 'coding') {
+            $rules['instruction'] = ['required'];
+            $rules['supported_languages'] = ['required', 'json', function ($attribute, $value, $fail) {
+                $decoded = json_decode($value, true);
+                if (empty($decoded)) {
+                    $fail('Coding question must have at least one programming language.');
+                }
+            }];
+            $instruction = $request->post('instruction');
+            $markdown = Str::of($instruction)->markdown(['html_input' => 'strip']) ?? '';
+            $supported = json_decode($request->post('supported_languages', '{}'));
+        }
+
+        $messages = [
+            'items.*.required' => 'This field is required.',
+            'supported_languages.required' => 'Coding question must have at least one programming language.',
+        ];
+
+        $validator = Validator::make(request()->all(), $rules, $messages);
+        if ($validator->fails()) {
+            return redirect()->route('question.types', ['type' => $question_type, 'item_count' => $item_count])
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $data = $validator->validated();
+
+        $post_data = [
+            'post' => $post_data,
+            'markdown' => $markdown,
+            'supported' => $supported,
+            'validation' => $data
+        ];
+
+
+    return view('test-sent-data-page', ['data' => $post_data]);
 });

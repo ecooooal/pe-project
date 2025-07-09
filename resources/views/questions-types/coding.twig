@@ -12,7 +12,7 @@
       hx-target="#data-div">
     {{ csrf_field() }}
     <input class="hidden" name="type" value="coding">
-    <textarea class="hidden" name="code" id="code-input"></textarea>
+    <textarea class="hidden" name="supported_languages" id="code-input"></textarea>
     <textarea class="hidden" name="instruction" id="instruction-input"></textarea>
 
     <div class="flex flex-1 flex-col mx-16 gap-y-4">
@@ -147,7 +147,7 @@
                                 name:'programming_language', 
                                 values:programming_languages, 
                                 attributes:{
-                                    'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                    'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 capitalize',
                                     'hx-on:change':'switchLanguageFromEvent(event)',
                                     'required':true
                                 }
@@ -196,6 +196,16 @@
             </button>
             <a href="/questions" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
         </div>
+        {% if errors.any %}
+            <ul class="alert alert-danger">
+                {% for field, field_errors in errors.getMessages() %}
+                    {% for error in field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+
         <div id="data-div" class="w-full flex flex-1">
             replace me with results
         </div>

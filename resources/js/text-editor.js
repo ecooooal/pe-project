@@ -20,6 +20,7 @@ import { placeholder } from "@codemirror/view";
     let instruction_div = document.getElementById('instruction-div');
     let instruction_previous_state = null;
     let previous_language = null;
+    let currentLanguage = null;
 
     const solution_editor = createEditor(solution_div);
     const initial_solution_editor = createEditor(initial_solution_div);
@@ -69,6 +70,24 @@ import { placeholder } from "@codemirror/view";
         return new EditorView({ state, parent });
       }
 
+    const onChangeListener = EditorView.updateListener.of((update) => {
+        if (update.docChanged && currentLanguage) {
+
+            if (supported_languages[currentLanguage]) {
+                supported_languages[currentLanguage].is_valid = false;
+                
+                supported_languages[currentLanguage].complete_solution = solution_editor.state;
+                supported_languages[currentLanguage].initial_solution = initial_solution_editor.state;
+                supported_languages[currentLanguage].test_case = test_case_editor.state;
+                updateLanguageBadges();
+                console.log(`[${currentLanguage}] marked as invalid and states updated`);
+            } else {
+                console.warn(`Language not found: ${currentLanguage}`);
+            }
+        }
+    });
+
+
     // Add ability to switch programming languages and have their own codes
     function switchLanguageFromEvent(event) {
         const selected_language = event.target.value;
@@ -92,6 +111,7 @@ import { placeholder } from "@codemirror/view";
 
     // Reinitialize code editors to switch languages
     function switchLanguage(language) {
+        currentLanguage = language;
         let languageExtension;
         let placeholder_solution = placeholder(`Insert complete solution here`);
         let placeholder_initial = placeholder(`This Code will be given to students.`);
@@ -131,14 +151,14 @@ class <YourClass+Test> {
 
         } else {
             const new_solution_state = EditorState.create({
-                extensions: [basicSetup, languageExtension, placeholder_solution],
+                extensions: [basicSetup, languageExtension, placeholder_solution, onChangeListener],
             });
             const new_initial_solution_state = EditorState.create({
-                extensions: [basicSetup, languageExtension, placeholder_initial],
+                extensions: [basicSetup, languageExtension, placeholder_initial, onChangeListener],
             });
             const new_test_case_state = EditorState.create({
                 doc: doc_test,
-                extensions: [basicSetup, languageExtension, placeholder_test],
+                extensions: [basicSetup, languageExtension, placeholder_test, onChangeListener],
             });
             
             solution_editor.setState(new_solution_state);
@@ -174,20 +194,21 @@ class <YourClass+Test> {
     }
     
     function getSolutionCode() {
-        const language = document.getElementById('programming_language').value;
-    
-        if (language) {
-            updateSupportedLanguages({
-                language,
-                complete_solution: solution_editor.state,
-                initial_solution: initial_solution_editor.state,
-                test_case: test_case_editor.state,
-            });
-    
-            console.log('Is language validated?', supported_languages[language]['is_valid']);
+        const processed = {};
+
+        for (const lang in supported_languages) {
+            const entry = supported_languages[lang];
+            if (entry.is_valid){
+                processed[lang] = {
+                    complete_solution: entry.complete_solution.doc.toString(),
+                    initial_solution: entry.initial_solution.doc.toString(),
+                    test_case: entry.test_case.doc.toString(),
+                    is_valid: entry.is_valid,
+                }
+            };
         }
-    
-        document.getElementById('code-input').value = JSON.stringify(supported_languages);
+
+        document.getElementById('code-input').value = JSON.stringify(processed);
     }
     
 
@@ -296,7 +317,38 @@ class <YourClass+Test> {
           }, 0);
       }
       
-      
+    document.body.addEventListener('htmx:afterRequest', function () {
+        const input = document.getElementById('language-validation-status');
+        if (input) {
+            const language = input.dataset.language;
+            const isValid = input.dataset.valid === 'true';
+
+            if (supported_languages[language]) {
+                supported_languages[language].is_valid = isValid;
+                console.log(`✅ ${language} marked as valid:`, isValid);
+                updateLanguageBadges();
+            }
+
+            input.remove(); 
+    }
+});
+
+    function updateLanguageBadges() {
+        const select = document.getElementById('programming_language');
+        for (const option of select.options) {
+            const lang = option.value;
+            if (supported_languages[lang]?.is_valid) {
+                if (!option.text.includes('✅')) {
+                    option.text = `${lang} ✅`;
+                }
+            } else {
+                option.text = lang;
+            }
+        }
+    }
+
+
+
 
 window.switchLanguageFromEvent = switchLanguageFromEvent;
 window.switchLanguage = switchLanguage;

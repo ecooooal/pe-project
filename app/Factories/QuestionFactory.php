@@ -24,6 +24,9 @@ class QuestionFactory
             'items' => $data['items'] ?? [],
             'solution' => $data['solution']
         ];    
+        $coding_question_data = [
+            
+        ];
 
         \Log::info('Question Data', $question_data);
         \Log::info('Question Type Data', $question_type_data);
