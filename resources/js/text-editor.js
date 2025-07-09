@@ -21,6 +21,7 @@ import { placeholder } from "@codemirror/view";
     let instruction_previous_state = null;
     let previous_language = null;
     let currentLanguage = null;
+    
 
     const solution_editor = createEditor(solution_div);
     const initial_solution_editor = createEditor(initial_solution_div);
@@ -305,8 +306,7 @@ class <YourClass+Test> {
         attachButtonsListener();
         if (programming_language_selected) {
             switchLanguageFromEvent({ target: { value: programming_language_selected.value } });
-        }   
-        
+        } 
     });
     function temporarilyDisable(button) {
         setTimeout(() => {
@@ -330,8 +330,8 @@ class <YourClass+Test> {
             }
 
             input.remove(); 
-    }
-});
+        }
+    });
 
     function updateLanguageBadges() {
         const select = document.getElementById('programming_language');

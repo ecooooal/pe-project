@@ -9,7 +9,9 @@
 {{ breadcrumb() }}
 <form id="test-code"
       hx-post="/test/send-data" 
-      hx-target="#data-div">
+      hx-redirect="/questions"
+      hx-target="#name-points-form-error"
+      hx-select-oob="#instruction-form-error, #language-form-error">
     {{ csrf_field() }}
     <input class="hidden" name="type" value="coding">
     <textarea class="hidden" name="supported_languages" id="code-input"></textarea>
@@ -81,20 +83,20 @@
                     )}}
                 </div>
                 <div class="flex flex-1 gap-x-4 w-full">
-                    {{ forms.form_field(
-                        label:forms.label(
-                            id:'name', 
-                            content:'Name', 
-                            attributes:{
-                                'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
-                        ),
-                        input:forms.text(
-                            name:'name', 
-                            attributes:{
-                                'class':'w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                'required':true}
-                        )
-                    )}}
+                        {{ forms.form_field(
+                            label:forms.label(
+                                id:'name', 
+                                content:'Name', 
+                                attributes:{
+                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
+                            ),
+                            input:forms.text(
+                                name:'name', 
+                                attributes:{
+                                    'class':'w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                    'required':true}
+                            )
+                        )}}
                         {{ forms.form_field(
                             label:forms.label(
                                 id:'points', 
@@ -112,6 +114,7 @@
                                     'placeholder':'1 - 10 points'})
                         )}}
                 </div>
+                <div id="name-points-form-error"></div>
                 <div class="flex flex-1 rounded-t-md">
                     <div class="flex flex-col flex-1 w-full overflow-auto ">
                         <div class="flex w-full bg-gray-800 p-2 rounded-t-md justify-between">
@@ -127,6 +130,7 @@
                         </div>
                             <div id="instruction-div" class="max-w-full w-full overflow-auto text-gray-500 border-1 border-gray-500 max-h-96">
                         </div>
+                        <div id="instruction-form-error"></div>
                     </div>
                 </div>
             </div>
@@ -135,7 +139,7 @@
         <div class="flex flex-1 justify-between max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5 gap-x-4">
             <div class="flex flex-col flex-1 min-w-0  p-4 ">
                 <div class="flex h-16 pb-4 justify-between">
-                    <div class="flex">
+                    <div class="flex items-center gap-x-2">
                         {{ forms.form_field(
                             label:forms.label(
                                 id:'programming_language', 
@@ -153,6 +157,7 @@
                                 }
                             )
                         )}}
+                        <div id="language-form-error"></div>
                     </div>
                     <div class="flex">
                         <button form="validate-complete-solution-form" type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm"
@@ -191,25 +196,11 @@
         </div>
         <div class="flex gap-x-2">
             <button form="test-code" type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm "
-                    hx-on:click="getSolutionCode(), getInstructionCode()">
+                    hx-on:click="getSolutionCode(); getInstructionCode();">
                     Create Question
             </button>
             <a href="/questions" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
         </div>
-        {% if errors.any %}
-            <ul class="alert alert-danger">
-                {% for field, field_errors in errors.getMessages() %}
-                    {% for error in field_errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                {% endfor %}
-            </ul>
-        {% endif %}
-
-        <div id="data-div" class="w-full flex flex-1">
-            replace me with results
-        </div>
-
     </div>
 </form>
 <form   id="preview-markdown-form"

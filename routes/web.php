@@ -297,9 +297,15 @@ Route::any('/test/send-data', function(Request $request) {
 
         $validator = Validator::make(request()->all(), $rules, $messages);
         if ($validator->fails()) {
-            return redirect()->route('question.types', ['type' => $question_type, 'item_count' => $item_count])
+            if($question_type == 'coding'){
+                return view('components/core/coding-question-error', [
+                    'errors' => $validator->errors()
+                ]);
+            } else {
+                return redirect()->route('question.types', ['type' => $question_type, 'item_count' => $item_count])
                 ->withErrors($validator)
                 ->withInput();
+            }
         }
 
         $data = $validator->validated();
@@ -312,5 +318,5 @@ Route::any('/test/send-data', function(Request $request) {
         ];
 
 
-    return view('test-sent-data-page', ['data' => $post_data]);
+    return response('', 200)->header('HX-Redirect', url('/questions'));
 });
