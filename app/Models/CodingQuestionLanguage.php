@@ -9,9 +9,11 @@ class CodingQuestionLanguage extends Model
     protected $fillable = [
         'coding_question_id',
         'language',
-        'complete_solution_file',
-        'initial_solution_file',
-        'test_case_file'
+        'complete_solution_file_path',
+        'initial_solution_file_path',
+        'test_case_file_path',
+        'class_name',
+        'test_class_name'
     ];
 
     public function codingQuestion(){

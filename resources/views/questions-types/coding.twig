@@ -8,7 +8,7 @@
 {{ vite('resources/js/text-editor.js')|raw }}
 {{ breadcrumb() }}
 <form id="test-code"
-      hx-post="/test/send-data" 
+      hx-post="/questions" 
       hx-redirect="/questions"
       hx-target="#name-points-form-error"
       hx-select-oob="#instruction-form-error, #language-form-error">
@@ -179,7 +179,9 @@
                             <div id="solution-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
                             <div id="initial-solution-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
                         </div>
-                        <span class="text-xs font-semibold text-gray-800 cursor-default">*Code what will be given to student</span>
+                        <span class="text-xs font-semibold text-gray-800 cursor-default">*Validation is done by running the Complete Solution against the Test Case.</span>
+                        <span class="text-xs font-semibold text-gray-800 cursor-default">*The code inside initial solution will be presented to students.</span>
+
                     </div>
                     <div class="flex flex-1 flex-col rounded-md">
                         <div class="flex w-full bg-gray-800 p-2 justify-between rounded-t-md">

@@ -79,6 +79,10 @@ class Question extends Model
             case QuestionType::Matching:
                 $this->load('matchingQuestions');
                 return $this->matchingQuestions;
+
+            case QuestionType::Coding:
+                $this->load('codingQuestions');
+                return $this->codingQuestions;
         }
     }
     

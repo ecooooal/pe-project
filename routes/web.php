@@ -287,7 +287,7 @@ Route::any('/test/send-data', function(Request $request) {
             }];
             $instruction = $request->post('instruction');
             $markdown = Str::of($instruction)->markdown(['html_input' => 'strip']) ?? '';
-            $supported = json_decode($request->post('supported_languages', '{}'));
+            $supported = json_decode($request->post('supported_languages', '{}'), true);
         }
 
         $messages = [
@@ -317,6 +317,7 @@ Route::any('/test/send-data', function(Request $request) {
             'validation' => $data
         ];
 
-
-    return response('', 200)->header('HX-Redirect', url('/questions'));
+        
+    return view('test-sent-data-page', ['data' => $post_data]);
+    // return response('', 200)->header('HX-Redirect', url('/questions'));
 });

@@ -16,9 +16,11 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(CodingQuestion::class, 'coding_question_id')->constrained();
             $table->string('language'); 
-            $table->string('complete_solution_file');
-            $table->string('initial_solution_file');
-            $table->string('test_case_file');
+            $table->string('complete_solution_file_path');
+            $table->string('initial_solution_file_path');
+            $table->string('test_case_file_path');
+            $table->string('class_name');
+            $table->string('test_class_name');
             $table->timestamps();
         });
     }

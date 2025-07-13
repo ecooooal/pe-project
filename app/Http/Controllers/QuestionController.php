@@ -122,11 +122,16 @@ class QuestionController extends Controller
         ];
 
         if ($question_type === 'coding') {
-            $rules['supported_languages'] = ['required', 'array', 'min:1'];
-            $rules['supported_languages.*.complete_solution'] = ['required', 'string'];
-            $rules['supported_languages.*.initial_solution'] = ['required', 'string'];
-            $rules['supported_languages.*.test_case'] = ['required', 'string'];
-            $rules['supported_languages.*.is_valid'] = ['accepted'];
+            $rules['instruction'] = ['required'];
+            $rules['supported_languages'] = ['required', 'json', function ($attribute, $value, $fail) {
+                $decoded = json_decode($value, true);
+                if (empty($decoded)) {
+                    $fail('Coding question must have at least one programming language.');
+                }
+            }];
+            $instruction = request()->post('instruction');
+            $markdown = Str::of($instruction)->markdown(['html_input' => 'strip']) ?? '';
+            $supported = json_decode(request()->post('supported_languages', '{}'), true);
         } else {
             $rules['items.*'] = ['required', 'string', 'min:1'];
             $rules['solution'] = ['required', 'string'];
@@ -134,14 +139,20 @@ class QuestionController extends Controller
 
         $messages = [
             'items.*.required' => 'This field is required.',
-            'supported_languages.*.is_valid.accepted' => 'Language must be validated before submission.',
+            'supported_languages.required' => 'Coding question must have at least one programming language.',
         ];
 
         $validator = Validator::make(request()->all(), $rules, $messages);
         if ($validator->fails()) {
-            return redirect()->route('question.types', ['type' => $question_type, 'item_count' => $item_count])
+            if($question_type == 'coding'){
+                return view('components/core/coding-question-error', [
+                    'errors' => $validator->errors()
+                ]);
+            } else {
+                return redirect()->route('question.types', ['type' => $question_type, 'item_count' => $item_count])
                 ->withErrors($validator)
                 ->withInput();
+            }
         }
 
         $data = $validator->validated();

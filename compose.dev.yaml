@@ -24,7 +24,8 @@ services:
       - ./artisan:/var/www/artisan
       - ./vendor:/var/www/vendor
       - app-node-modules:/var/www/node_modules
-      - app-storage:/var/www/storage
+      - ./storage:/var/www/storage
+
 
       # Mount the Nginx configuration file
       - ./docker/development/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
@@ -75,7 +76,8 @@ services:
       - ./artisan:/var/www/artisan
       - ./vendor:/var/www/vendor
       - app-node-modules:/var/www/node_modules
-      - app-storage:/var/www/storage
+      - ./storage:/var/www/storage
+
 
     networks:
       - laravel-development
@@ -119,7 +121,8 @@ services:
       - ./artisan:/var/www/artisan
       - ./vendor:/var/www/vendor
       - app-node-modules:/var/www/node_modules
-      - app-storage:/var/www/storage
+      - ./storage:/var/www/storage
+
     networks:
       - laravel-development 
       
@@ -158,4 +161,3 @@ networks:
 volumes:
   postgres-data-development:
   app-node-modules:
-  app-storage:
