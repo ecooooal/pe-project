@@ -152,7 +152,95 @@ class QuestionFactory
         }
     }
 
-    public static function getClassName(string $code, string $language): string
+    public static function update(Question $question, array $data)
+    {
+        DB::beginTransaction();
+
+        try {
+            $question->update([
+                'topic_id' => (int) $data['topic'],
+                'question_type' => $data['type'],
+                'name' => $data['name'],
+                'points' => $data['points']
+            ]);
+
+            // Remove or update old related data based on the type
+            switch ($data['type']) {
+                case 'multiple_choice':
+                    $question->multipleChoiceQuestions()->delete();
+
+                    $choice_keys = ['a', 'b', 'c', 'd'];
+                    $items = array_combine($choice_keys, $data['items']);
+                    foreach ($items as $key => $item) {
+                        $question->multipleChoiceQuestions()->create([
+                            'choice_key' => $key,
+                            'item' => $item,
+                            'is_correct' => $key == $data['solution']
+                        ]);
+                    }
+                    break;
+
+                case 'coding':
+                    // remove old codingQuestion and related language files
+                    if ($question->codingQuestion) {
+                        $question->codingQuestion->codingQuestionLanguages()->delete();
+                        $question->codingQuestion()->delete(); 
+                        $old_slug_name = Str::slug($question['name']);
+                        $old_folder = "codingQuestions/{$question->id}_{$old_slug_name}/";
+                        Storage::deleteDirectory($old_folder);
+                    }
+
+                    $instruction = $data['instruction'];
+                    $language_data = json_decode($data['supported_languages'], true);
+                    $slug_name = Str::slug($data['name']);
+                    $folder = "codingQuestions/{$question->id}_{$slug_name}/";
+                    Storage::makeDirectory($folder);
+
+                    $coding_question = $question->codingQuestion()->create(['instruction' => $instruction]);
+
+                    foreach ($language_data as $language => $codes) {
+                        $language_folder = "{$folder}supportedLanguages/{$language}/";
+                        Storage::makeDirectory($language_folder);
+                        $ext = self::getExtension($language);
+
+                        $complete_solution_name = self::getClassName($codes['complete_solution'], $language);
+                        $test_case_name =  self::getClassName($codes['test_case'], $language);
+
+                        $complete_solution_file_path = "{$language_folder}{$complete_solution_name}.{$ext}";
+                        $initial_solution_file_path = "{$language_folder}initial_solution.{$ext}";
+                        $test_case_file_path = "{$language_folder}{$test_case_name}.{$ext}";
+
+                        Storage::put($complete_solution_file_path, $codes['complete_solution']);
+                        Storage::put($initial_solution_file_path, $codes['initial_solution']);
+                        Storage::put($test_case_file_path, $codes['test_case']);
+
+                        $coding_question->codingQuestionLanguages()->create([
+                            'language' => $language,
+                            'complete_solution_file_path' => $complete_solution_file_path,
+                            'initial_solution_file_path' => $initial_solution_file_path,
+                            'test_case_file_path' => $test_case_file_path,
+                            'class_name' => $complete_solution_name,
+                            'test_class_name' => $test_case_name
+                        ]);
+                    }
+                    break;
+
+                // handle other cases: true_or_false, identification, ranking, matching...
+
+                default:
+                    throw new \Exception("Unsupported question type: {$data['type']}");
+            }
+
+            DB::commit();
+            return $question;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+
+    }
+
+    private static function getClassName(string $code, string $language): string
     {
         $patterns = [
             'java' => '/\bclass\s+(\w+)/',
@@ -170,7 +258,7 @@ class QuestionFactory
         return $class_name;
     }
 
-    public static function getExtension(string $language): string
+    private static function getExtension(string $language): string
     {
         return match (strtolower($language)) {
             'java' => 'java',

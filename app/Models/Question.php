@@ -81,8 +81,8 @@ class Question extends Model
                 return $this->matchingQuestions;
 
             case QuestionType::Coding:
-                $this->load('codingQuestions');
-                return $this->codingQuestions;
+                $this->load('codingQuestion.codingQuestionLanguages');
+                return $this->codingQuestion;
         }
     }
     

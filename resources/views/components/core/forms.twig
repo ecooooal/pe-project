@@ -92,13 +92,24 @@
 
 {% macro radio(name, values, value, attributes, label_attributes) %}
   {% for key, label in values %}
-  <label {% if value == key %} class="selected"{% endif %} {% for attr, value in label_attributes %} {{ attr }}="{{ value }}"{% endfor %}><input type="radio" name="{{ name }}" value="{{ key }}"
-    {% if value == key %} checked="checked"{% endif %}
-    {% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %}
-    {% if not attributes.id is defined %} id="{{ name }}"{% endif %}> 
-    <span class="w-full break-words whitespace-normal">{{ label }}</span></label>
+    {% set is_selected = (value == key) %}
+    {% set label_classes = (label_attributes.class|default('') ~ (is_selected ? ' selected' : ''))|trim %}
+    {% set label_attrs = label_attributes|merge({'class': null}) %}
+
+    <label class="{{ label_classes }}"
+      {% for attr, val in label_attrs %}{% if attr != 'class' %} {{ attr }}="{{ val }}"{% endif %}{% endfor %}>
+      
+      <input type="radio" name="{{ name }}" value="{{ key }}"
+        {% if is_selected %} checked="checked"{% endif %}
+        {% for attr, val in attributes %} {{ attr }}="{{ val }}"{% endfor %}
+        {% if not attributes.id is defined %} id="{{ name }}"{% endif %}>
+      
+      <span class="w-full break-words whitespace-normal">{{ label }}</span>
+    </label>
   {% endfor %}
 {% endmacro %}
+
+
 
 {% macro exam_radio(name, values, value, attributes, label_attributes) %}
   {% for key, label in values %}

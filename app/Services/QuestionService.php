@@ -6,6 +6,8 @@ use App\Models\Subject;
 use App\Models\Topic;
 use App\Models\Question;
 use Illuminate\Support\Facades\Http;
+use Storage;
+use Str;
 class QuestionService
 {
     public function getQuestionTypeShow(Question $question){
@@ -45,6 +47,31 @@ class QuestionService
             case 'matching':
                 // MatchingQuestion::create($data);
                 break;
+
+            case 'coding':
+                $instruction = Str::of($question_type->instruction)->markdown([
+                                    'html_input' => 'strip',
+                                ]);
+                $languages = $question_type->codingQuestionLanguages()->pluck('language');
+                $coding_languages = $question_type->codingQuestionLanguages;            
+
+                $language_codes = $coding_languages->mapWithKeys(function ($item) {
+                    return [
+                        $item->language => [
+                            'complete_solution' => Storage::get($item->complete_solution_file_path),
+                            'initial_solution'  => Storage::get($item->initial_solution_file_path),
+                            'test_case'         => Storage::get($item->test_case_file_path),
+                        ]
+                    ];
+                })->toArray();
+
+                $data = [
+                    'instruction' => $instruction,
+                    'languages' => $languages,
+                    'language_codes' =>$language_codes
+                ];
+                
+                return $data;
 
             default:
                 throw new \Exception("Unknown question type: {$question['question_type']}");

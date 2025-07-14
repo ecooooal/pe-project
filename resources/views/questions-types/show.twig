@@ -5,7 +5,7 @@
 {% set solution = null %}
 
 <div id="MultipleChoice-content">
-    {% for choice in choices %}
+    {% for choice in question_type_data %}
         {% set values = values | merge({ (choice.choice_key): choice.item }) %}
         {% if choice.is_correct %}
             {% set solution = choice.choice_key %}
@@ -19,17 +19,19 @@
     <div class="flex flex-col gap-y-2">
         {{ show_header('')}}
         {{ forms.form_field(
-            input:forms.radio(
-                name:'multiple_choice',
+            input: forms.radio(
+                name: 'multiple_choice',
                 values: values,
-                attributes:{    
-                    'class':'min-w-6 min-h-6 rounded-full bg-red-500 relative flex items-center justify-center',
-                    },
-                label_attributes:{
-                    'class':'flex items-center gap-2 py-4 pl-4 pr-8 m-1 min-h-16 cursor-pointer bg-gray-50 rounded-lg border border-gray-100',
-                    }),
-            isColumn:true)
-        }}
+                value: solution,
+                attributes: {
+                    'class': 'accent-blue-900 w-6 h-6 rounded-full'
+                },
+                label_attributes: {
+                    'class': 'flex items-center gap-2 py-4 pl-4 pr-8 m-1 min-h-16 bg-gray-50 rounded-lg border border-gray-100 pointer-events-none select-none has-checked:bg-blue-900 has-checked:text-white has-checked:font-semibold'
+                }
+            ),
+            isColumn: true
+        ) }}
 
     {{ show_item('Solution', solution|title)}}
     </div>
@@ -40,7 +42,7 @@
         'true' : 'True',
         'false' : 'False',
     } %}
-    {% set solution = choices.solution %}
+    {% set solution = question_type_data.solution %}
     <div class="prose min-w-full">
         <h2>Sample View to Students</h2>
         <h3>{{ question.name|title }}</h3>
@@ -48,24 +50,26 @@
         <div class="flex flex-col gap-y-2">
             {{ show_header('')}}
                 {{ forms.form_field(
-                    input:forms.radio(
-                        name:'true_or_false',
+                    input: forms.radio(
+                        name: 'multiple_choice',
                         values: values,
-                        attributes:{    
-                            'class':'min-w-6 min-h-6 rounded-full bg-red-500 relative flex items-center justify-center',
-                            },
-                        label_attributes:{
-                            'class':'flex items-center gap-2 py-4 pl-4 pr-8 m-1 min-h-16 cursor-pointer bg-gray-50 rounded-lg border border-gray-100',
-                            }),
-                    isColumn:true)
-                }}
+                        value: solution,
+                        attributes: {
+                            'class': 'accent-blue-900 w-6 h-6 rounded-full'
+                        },
+                        label_attributes: {
+                            'class': 'flex items-center gap-2 py-4 pl-4 pr-8 m-1 min-h-16 bg-gray-50 rounded-lg border border-gray-100 pointer-events-none select-none has-checked:bg-blue-900 has-checked:text-white has-checked:font-semibold'
+                        }
+                    ),
+                    isColumn: true
+                ) }}
             {{ show_item('Solution', solution|title)}}
         </div>
     </div>  
 </div>
 
 <div id="Identification-content">
-{% set solution = choices.solution %}
+{% set solution = question_type_data.solution %}
     <div class="prose min-w-full">
         <h2>Sample View to Students</h2>
         <h3>{{ question.name|title }}</h3>
@@ -96,7 +100,7 @@
 
 <div id="Ranking-content">
     {% set values = {} %}
-    {% for choice in choices %}
+    {% for choice in question_type_data %}
         {% set values = values | merge({ (choice.order): choice.item }) %}
     {% endfor %}
 
@@ -156,4 +160,119 @@
 
 <div id="Matching-content">
     Mathcing
+</div>
+  
+<div id="Coding-content">
+    <script>hljs.highlightAll();</script>
+    {{ show_header('Sample View to Students')}}
+    <div class="flex flex-1 flex-col max-w-full gap-y-4">
+        <div class="flex">
+            <div class="flex flex-1 md:w-4/5 flex-col prose prose-lg max-w-none">
+                <h2><strong>{{ question.name }}</strong></h2>
+            </div>
+        </div>
+
+        <div class="flex md:flex-row max-w-full w-full">
+            <div class="flex flex-1 w-full md:w-1/2 flex-col rounded-xl shadow-sm ring-1 ring-gray-950/5">
+                <div class="flex flex-1 rounded-t-md">
+                    <div class="flex flex-col flex-1 w-full ">
+                        <div class="flex w-full bg-gray-800 p-2 rounded-t-md justify-between">
+                            <h1 class="text-gray-50 p-2 font-semibold text-lg">
+                                Instruction
+                            </h1>
+                        </div>
+                         <div class="flex-1 overflow-y-auto p-4 rounded-md border border-gray-200 prose prose-sm">
+                            <p>{{ question_type_data.instruction|raw }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-1 w-full md:w-1/2  flex-col mx-8 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
+                <div class="flex flex-col flex-1 min-w-0 ">
+                    <div class="flex h-16 pb-4 justify-between">
+                        <div class="flex">
+                            {{ forms.form_field(
+                                label:forms.label(
+                                    id:'programming_language', 
+                                    content:'Programming Language', 
+                                    attributes:{
+                                        'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
+                                        ),
+                                input:forms.select(
+                                    name:'programming_language', 
+                                    values:question_type_data.languages, 
+                                    attributes:{
+                                        'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                        'hx-on:change':'switchLanguageFromEvent(event)',
+                                        'required':true
+                                    }
+                                )
+                            )}}
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col gap-y-4">
+                        <div class="flex flex-1 flex-col rounded-md">
+                            <div class="flex w-full bg-gray-800 p-2 rounded-t-md">
+                                <p class="bg-gray-800 text-gray-50 font-semibold p-4 text-sm">Initial Solution</p>
+                            </div>
+                            <div class="flex">
+                                <div class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-1 flex-col rounded-md">
+                            <div class="flex w-full bg-gray-800 p-2 justify-between rounded-t-md">
+                                <p class="bg-gray-800 text-gray-50 font-semibold p-4 text-sm">Test Case</p>
+                            </div>         
+                            <div class="flex">
+                                <div class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
+                            </div>
+                        </div>
+                    </div>     
+                </div>
+            </div>
+        </div>  
+
+        {{ show_header('Supported Languages')}}
+        <div class="flex w-full overflow-x-auto snap-x snap-mandatory space-x-4">
+            {% for language, codes in question_type_data.language_codes %}
+                <div class="flex flex-shrink-0 w-full snap-start flex-col bg-white p-4">
+                    <div class="flex h-16 pb-4">
+                            <p class="whitespace-nowrap text-xl font-bold text-gray-900">Language : {{ language|title }}</p>
+                    </div>
+                    
+                    <div class="flex flex-col gap-y-4">
+                        <div class="flex flex-1 flex-col rounded-md">
+                            <div class="flex w-full bg-gray-800 p-2 rounded-t-md">
+                                <p class="bg-gray-800 text-gray-50 font-semibold p-4 text-sm">Initial Solution</p>
+                            </div>
+                            <div class="flex border-1 border-gray-500">
+                                <pre class="w-full"><code class="language-java">{{ codes.initial_solution }}</code></pre>
+                            </div> 
+                        </div>
+
+                        <div class="flex flex-1 flex-col rounded-md">
+                            <div class="flex w-full bg-gray-800 p-2 justify-between rounded-t-md">
+                                <p class="bg-gray-800 text-gray-50 font-semibold p-4 text-sm">Sample Test Case</p>
+                            </div>         
+                            <div class="flex border-1 border-gray-500">     
+                                <pre class="w-full"><code class="language-java">{{ codes.test_case }}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-1 flex-col rounded-md">
+                            <div class="flex w-full bg-gray-800 p-2 rounded-t-md">
+                                <p class="bg-gray-800 text-gray-50 font-semibold p-4 text-sm">Complete Solution</p>
+                            </div>
+                            <div class="flex border-1 border-gray-500">
+                                <pre class="w-full"><code class="language-java">{{ codes.complete_solution }}</code></pre>
+                            </div>
+                        </div>
+                    </div>     
+                </div>
+            {% endfor %}
+        </div>  
+    </div>
+    
 </div>

@@ -59,6 +59,7 @@ class QuestionController extends Controller
             'trueOrFalseQuestion',
             'identificationQuestion',
             'rankingQuestions',
+            'codingQuestion'
         ]);
         $question_type = $question->getTypeModel();
         $data = [
@@ -231,12 +232,13 @@ class QuestionController extends Controller
     }
 
     public function question_type_show(Question $question){
-        $choices = $this->questionService->getQuestionTypeShow($question);
-        
+        $question_type_data = $this->questionService->getQuestionTypeShow($question);
+
         $data = [
             'question' => $question,
-            'choices' => $choices
+            'question_type_data' => $question_type_data
         ];
+    
 
         return view('questions-types/show', $data);
     }
