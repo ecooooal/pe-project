@@ -155,33 +155,39 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/questions/{question}/edit', [QuestionController::class, 'edit']);
     Route::patch('/questions/{question}', [QuestionController::class, 'update']);
     Route::delete('/questions/{question}', [QuestionController::class, 'destroy']);
+    Route::match(['get', 'post'], '/questions/create/question-type', [QuestionController::class, 'loadQuestionType']);
+    // Route::get('/questions/create/question-type', function (Request $request) {
+    //     $item_count = (int) $request->input('item_count', 4);
+    //     $type = $request->query('type'); 
+    //     $isEdit = filter_var($request->input('edit'), FILTER_VALIDATE_BOOLEAN);
 
-    Route::get('/questions/create/question-type', function (Request $request) {
-        $item_count = (int) $request->input('item_count', 4);
-        $type = $request->query('type'); 
-        switch ($type) {
-            case 'multiple_choice':
-                return view('questions-types/multiple-choice');
+    //     if ($isEdit) {
+    //             $question = Question::findOrFail($request->input('question_id'));
+    //     }
+
+    //     switch ($type) {
+    //         case 'multiple_choice':
+    //             return view('questions-types/multiple-choice');
             
-            case 'true_or_false':
-                return view('questions-types/true-false');
+    //         case 'true_or_false':
+    //             return view('questions-types/true-false');
             
-            case 'identification':
-                return view('questions-types/identification');
+    //         case 'identification':
+    //             return view('questions-types/identification');
 
-            case 'ranking':
-                return view('questions-types/rank-order-process', compact('item_count'));
+    //         case 'ranking':
+    //             return view('questions-types/rank-order-process', compact('item_count'));
             
-            case 'matching':
-                return view('questions-types/matching-items');
+    //         case 'matching':
+    //             return view('questions-types/matching-items');
 
-            case 'coding':
-                return view('questions-types/coding');
+    //         case 'coding':
+    //             return view('questions-types/coding');
 
-            default:
-                return '';
-            }
-        })->name('question.types');
+    //         default:
+    //             return '';
+    //         }
+    //     })->name('question.types');
 
     Route::get('/questions/create/add-item', function () {
         $counter = request('item_count', 4);

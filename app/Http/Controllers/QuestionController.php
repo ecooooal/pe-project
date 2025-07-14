@@ -54,13 +54,6 @@ class QuestionController extends Controller
 
     public function show(Question $question){
         $question->load('topic.subject.course');
-        $question->load([
-            'multipleChoiceQuestions',
-            'trueOrFalseQuestion',
-            'identificationQuestion',
-            'rankingQuestions',
-            'codingQuestion'
-        ]);
         $question_type = $question->getTypeModel();
         $data = [
             'question' => $question,
@@ -166,16 +159,24 @@ class QuestionController extends Controller
     }
     public function edit(Question $question){
         $subjects = Subject::whereIn('course_id', $question->topic->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
-
+        $question_types = [
+            'multiple_choice' => 'Multiple Choice',
+            'true_or_false'=> 'True or False',
+            'identification' => 'Identification',
+            'ranking' => 'Ranking/Ordering/Process',
+            'matching' => 'Matching Items'
+        ];
         $data = [
             'question' => $question, 
-            'subjects' => $subjects
+            'subjects' => $subjects,
+            'question_types' => $question_types
         ];
     
         return view('questions/edit', $data);
     }
 
     public function update(Question $question){
+        dd(request()->post());
         $this->authorize('update', $question);
 
         request()->validate([
@@ -194,7 +195,7 @@ class QuestionController extends Controller
 
         $this->authorize('delete', $question);
 
-        $question->delete();
+        $question->soft();
 
         return redirect('/questions');
 
@@ -241,6 +242,53 @@ class QuestionController extends Controller
     
 
         return view('questions-types/show', $data);
+    }
+
+    public function loadQuestionType(Request $request)
+    {
+        $type = $request->input('type');
+        $itemCount = (int) $request->input('item_count', 4);
+        $isEdit = filter_var($request->input('edit'), FILTER_VALIDATE_BOOLEAN);
+        $question = null;
+        $validTypes = ['multiple_choice', 'true_or_false', 'identification', 'ranking', 'matching', 'coding'];
+        
+        if (!in_array($type, $validTypes)) {
+            abort(400, 'Invalid question type');
+        }
+
+        if ($isEdit) {
+            $questionId = $request->input('question_id');
+            if (!$questionId) {
+                abort(400, 'Missing question_id');
+            }
+            $question = Question::findOrFail($questionId);
+            $question_type_data = $this->questionService->getQuestionTypeShow($question);
+        }
+
+        return match ($type) {
+            'multiple_choice' => view('questions-types/multiple-choice', $isEdit 
+                ? compact('question_type_data', 'isEdit', 'question') 
+                : compact('isEdit')),
+            
+            'true_or_false'   => view('questions-types/true-false', $isEdit 
+                ? compact('question_type_data', 'isEdit') 
+                : compact('isEdit')),
+
+            'identification'  => view('questions-types/identification', $isEdit 
+                ? compact('question_type_data', 'isEdit') 
+                : compact('isEdit')),
+
+            'ranking' => view('questions-types/rank-order-process', compact('itemCount', 'question', 'isEdit')),
+
+            'matching' => view('questions-types/matching-items', $isEdit 
+                ? compact('question_type_data', 'isEdit') 
+                : compact('isEdit')),
+
+            'coding' => view('questions-types/coding', $isEdit 
+                ? compact('question_type_data', 'isEdit') 
+                : compact('isEdit')),
+        };
+
     }
 
     public function previewMarkdown(Request $request){
