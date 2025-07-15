@@ -158,19 +158,25 @@ class QuestionController extends Controller
         return response('', 200)->header('HX-Redirect', url('/questions'));
     }
     public function edit(Question $question){
-        $subjects = Subject::whereIn('course_id', $question->topic->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
-        $question_types = [
-            'multiple_choice' => 'Multiple Choice',
-            'true_or_false'=> 'True or False',
-            'identification' => 'Identification',
-            'ranking' => 'Ranking/Ordering/Process',
-            'matching' => 'Matching Items'
-        ];
-        $data = [
-            'question' => $question, 
-            'subjects' => $subjects,
-            'question_types' => $question_types
-        ];
+        if ($question->question_type->value == 'coding'){
+            $data = [
+            'question' => $question
+            ];
+        } else {
+            $subjects = Subject::whereIn('course_id', $question->topic->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
+            $question_types = [
+                'multiple_choice' => 'Multiple Choice',
+                'true_or_false'=> 'True or False',
+                'identification' => 'Identification',
+                'ranking' => 'Ranking/Ordering/Process',
+                'matching' => 'Matching Items'
+            ];
+            $data = [
+                'question' => $question, 
+                'subjects' => $subjects,
+                'question_types' => $question_types
+            ];
+        }
     
         return view('questions/edit', $data);
     }
@@ -263,6 +269,15 @@ class QuestionController extends Controller
             }
             $question = Question::findOrFail($questionId);
             $question_type_data = $this->questionService->getQuestionTypeShow($question);
+            if ($type == 'coding'){
+                $subjects = Subject::whereIn('course_id', $question->topic->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
+                $programming_languages = [
+                        'java' => "Java",
+                        'c++' => "C++",
+                        'python' => "Python",
+                    ];
+            }
+            
         }
 
         return match ($type) {
@@ -285,7 +300,7 @@ class QuestionController extends Controller
                 : compact('isEdit')),
 
             'coding' => view('questions-types/coding', $isEdit 
-                ? compact('question_type_data', 'isEdit') 
+                ? compact('question_type_data', 'isEdit', 'subjects', 'question', 'programming_languages') 
                 : compact('isEdit')),
         };
 

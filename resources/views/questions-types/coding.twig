@@ -1,12 +1,22 @@
 {% from 'components/core/breadcrumbs' import breadcrumb %}
 {% from 'components/core/show-header' import show_header %}
 {% import 'components/core/forms' as forms %}
+{% set faculty_layout = '' %}
+{% if isEdit %}
+    {% set faculty_layout = 'components/core/blank' %}
+{% else %}
+    {% set faculty_layout = 'components/core/faculty-layout' %}
+{% endif %}
 
-{% extends 'components/core/faculty-layout' %}
+{% extends faculty_layout %}
 
 {% block content %}
-{{ vite('resources/js/text-editor.js')|raw }}
-{{ breadcrumb() }}
+{% if isEdit %}
+    {{ vite('resources/js/edit-coding-text-editor.js')|raw }}
+{% else %}
+    {{ breadcrumb() }}
+    {{ vite('resources/js/text-editor.js')|raw }}
+{% endif %}
 <form id="test-code"
       hx-post="/questions" 
       hx-redirect="/questions"
@@ -22,6 +32,7 @@
             {{ show_header('Create Coding Question') }}
             <div class="flex flex-col gap-y-4 justify-between w-full">
                 <div class="flex flex-1 gap-x-4 w-full">
+                    {% if not isEdit %}
                     {{ forms.form_field(
                         label:forms.label(
                             id:'course', 
@@ -43,6 +54,7 @@
                                 'hx-trigger':'load, change'}
                         ),
                     )}}
+                    {% endif %}
                     {{ forms.form_field(
                         label:forms.label(
                             id:'subject', 
@@ -53,6 +65,7 @@
                         input:forms.select(
                             name:'subject', 
                             values:subjects, 
+                            value : isEdit ? question.topic.subject.id : 1,
                             attributes:{
                                 'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                 'placeholder':'Select a Subject',
@@ -74,6 +87,7 @@
                                 ),
                         input:forms.select(
                             name:'topic',
+                            value : isEdit ? question.topic.id : 1,
                             attributes:{
                                 'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                 'placeholder':'Select a Topic',
@@ -92,6 +106,7 @@
                             ),
                             input:forms.text(
                                 name:'name', 
+                                value : isEdit ? question.name : '',
                                 attributes:{
                                     'class':'w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'required':true}
@@ -106,6 +121,7 @@
                                 ),
                             input:forms.number(
                                 name:'points', 
+                                value : isEdit ? question.points,
                                 attributes:{
                                     'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'required':true,
@@ -159,15 +175,21 @@
                         )}}
                         <div id="language-form-error"></div>
                     </div>
+                    <div id="loader" class="htmx-indicator mx-auto transition-opacity duration-500 opacity-0 pointer-events-none">
+                        <img class="mr-10" width="50" src="{{ asset('images/bars-scale.svg') }}"/>
+                    </div>
                     <div class="flex">
-                        <button form="validate-complete-solution-form" type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm"
-                            hx-on:click="validateLanguageCompleteSolution()">
+                        <button 
+                            form="validate-complete-solution-form" 
+                            type="submit" 
+                            class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm">
                         Validate Solution
                         </button>
                     </div>
                 </div>
-                
+
                 <div id="validate-div"></div>
+
 
                 <div class="flex flex-col gap-y-4 mb-4">
                     <div class="flex flex-1 flex-col rounded-md">
@@ -199,7 +221,7 @@
         <div class="flex gap-x-2">
             <button form="test-code" type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm "
                     hx-on:click="getSolutionCode(); getInstructionCode();">
-                    Create Question
+                    Edit Coding Question
             </button>
             <a href="/questions" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
         </div>
@@ -215,14 +237,25 @@
     <textarea class="hidden" name="instruction" id="instruction-preview-input" ></textarea>
 
 </form>
+
 <form   id="validate-complete-solution-form"
         class="hidden"
         hx-post="/questions/create/validate-complete-solution"
         hx-target="#validate-div"
-        hx-swap="outerHTML">
+        hx-swap="outerHTML"
+        hx-indicator="#loader" 
+        onsubmit="validateLanguageCompleteSolution()">
     {{ csrf_field() }}
     <textarea class="hidden" name="validate-complete-solution" id="validate-complete-solution-input" ></textarea>
     <textarea class="hidden" name="validate-test-case" id="validate-test-case-input" ></textarea>
     <input type="text" class="hidden" name="language-to-validate" id="language_to_validate-input">
 </form>
+{% if isEdit %}
+<script>
+    window.instruction = JSON.parse('{{ question_type_data.instruction_raw|json_encode|e("js") }}');
+    window.question_supported_languages = JSON.parse('{{ question_type_data.language_codes|json_encode|e("js") }}');
+</script>
+
+
+{% endif %}
 {% endblock %}

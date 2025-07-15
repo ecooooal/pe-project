@@ -52,6 +52,7 @@ class QuestionService
                 $instruction = Str::of($question_type->instruction)->markdown([
                                     'html_input' => 'strip',
                                 ]);
+                $instruction_raw = $question_type->instruction;
                 $languages = $question_type->codingQuestionLanguages()->pluck('language');
                 $coding_languages = $question_type->codingQuestionLanguages;            
 
@@ -67,6 +68,7 @@ class QuestionService
 
                 $data = [
                     'instruction' => $instruction,
+                    'instruction_raw' =>  $instruction_raw,
                     'languages' => $languages,
                     'language_codes' =>$language_codes
                 ];

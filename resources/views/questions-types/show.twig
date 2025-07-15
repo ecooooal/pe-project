@@ -167,8 +167,11 @@
     {{ show_header('Sample View to Students')}}
     <div class="flex flex-1 flex-col max-w-full gap-y-4">
         <div class="flex">
-            <div class="flex flex-1 md:w-4/5 flex-col prose prose-lg max-w-none">
+            <div class="flex-1 prose prose-lg max-w-none">
                 <h2><strong>{{ question.name }}</strong></h2>
+            </div>
+            <div class="mt-2">
+                <a href="#" class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold text-s">Test This Coding Question</a>
             </div>
         </div>
 
@@ -187,7 +190,7 @@
                     </div>
                 </div>
             </div>
-            <div class="flex flex-1 w-full md:w-1/2  flex-col mx-8 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
+            <div class="flex flex-1 w-full md:w-1/2  flex-col ml-8 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
                 <div class="flex flex-col flex-1 min-w-0 ">
                     <div class="flex h-16 pb-4 justify-between">
                         <div class="flex">
@@ -254,7 +257,7 @@
 
                         <div class="flex flex-1 flex-col rounded-md">
                             <div class="flex w-full bg-gray-800 p-2 justify-between rounded-t-md">
-                                <p class="bg-gray-800 text-gray-50 font-semibold p-4 text-sm">Sample Test Case</p>
+                                <p class="bg-gray-800 text-gray-50 font-semibold p-4 text-sm">Test Case</p>
                             </div>         
                             <div class="flex border-1 border-gray-500">     
                                 <pre class="w-full"><code class="language-java">{{ codes.test_case }}</code></pre>
@@ -274,5 +277,4 @@
             {% endfor %}
         </div>  
     </div>
-    
 </div>

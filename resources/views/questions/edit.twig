@@ -38,154 +38,166 @@
                         </svg>',
                         'Discussion') }}
     </div>  
-    <form method="POST" hx-post="/questions" hx-redirect="/questions" hx-target="#question-type-content"  hx-select-oob="#name-form-error, #points-form-error, #topic" class="flex flex-col gap-y-4">
-    {{ csrf_field() }}
-        <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
-            <div class="flex flex-col p-4 flex-1">
-                {{ show_header('Details') }}
-                <div class="flex gap-x-32 justify-between w-full">
-                    <div class="flex flex-col gap-y-4 w-full">
-                        {{ forms.form_field(
-                            label:forms.label(
-                                id:'type', 
-                                content:'Type', 
-                                attributes:{
-                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
-                            ),
-                            input:forms.select(
-                                name:'type', 
-                                values:question_types,
-                                value:question.question_type.value,
-                                attributes:{
-                                    'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                    'required':true,
-                                    'hx-post':'/questions/create/question-type',
-                                    'hx-headers': '{"X-CSRF-TOKEN": "' ~ csrf_token() ~ '"}',
-                                    'hx-target':'#question-type-content',
-                                    'hx-vals': '{"question_id": "' ~ question.id ~ '", "edit": true}',
-                                    'hx-trigger' :'load, change'
-                                }
-                            ),
-                            isColumn:true 
-                        )}}
-                        <div id="question-name-form">
+    {% if question.question_type.value == 'coding' %}
+        <div id="question-type-content"
+            hx-post='/questions/load/question-type'
+            hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token( )}}"}'
+            hx-target='#question-type-content',
+            hx-vals='{"question_id": "{{ question.id }}", "edit": true, "type":"{{ question.question_type.value }}"}',
+            hx-trigger='load'
+            hx-swap="outerHTML">
+        </div>
+    {% else %}
+        <form method="POST" hx-post="/questions" hx-redirect="/questions" hx-target="#question-type-content"  hx-select-oob="#name-form-error, #points-form-error, #topic" class="flex flex-col gap-y-4">
+            {{ csrf_field() }}
+            <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
+                <div class="flex flex-col p-4 flex-1">
+                    {{ show_header('Details') }}
+                    <div class="flex gap-x-32 justify-between w-full">
+                        <div class="flex flex-col gap-y-4 w-full">
                             {{ forms.form_field(
                                 label:forms.label(
-                                    id:'name', 
-                                    content:'Name', 
+                                    id:'type', 
+                                    content:'Type', 
                                     attributes:{
                                         'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
                                 ),
-                                input:forms.textarea(
-                                    name:'name', 
-                                    value:question.name,
+                                input:forms.select(
+                                    name:'type', 
+                                    values:question_types,
+                                    value:question.question_type.value,
                                     attributes:{
                                         'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                        }
+                                        'required':true,
+                                        'hx-post':'/questions/load/question-type',
+                                        'hx-headers': '{"X-CSRF-TOKEN": "' ~ csrf_token() ~ '"}',
+                                        'hx-target':'#question-type-content',
+                                        'hx-vals': '{"question_id": "' ~ question.id ~ '", "edit": true}',
+                                        'hx-trigger' :'load, change'
+                                    }
+                                ),
+                                isColumn:true 
+                            )}}
+                            <div id="question-name-form">
+                                {{ forms.form_field(
+                                    label:forms.label(
+                                        id:'name', 
+                                        content:'Name', 
+                                        attributes:{
+                                            'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
+                                    ),
+                                    input:forms.textarea(
+                                        name:'name', 
+                                        value:question.name,
+                                        attributes:{
+                                            'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                            }
+                                    ),
+                                    isColumn:true 
+                                )}}
+                            </div>
+                        </div>
+                        <div class="flex flex-1/2 flex-col gap-y-4 w-full">
+                            {{ forms.form_field(
+                                label:forms.label(
+                                    id:'subject', 
+                                    content:'Subject', 
+                                    attributes:{
+                                        'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
+                                        ),
+                                input:forms.select(
+                                    name:'subject', 
+                                    values:subjects, 
+                                    value:question.topic.subject.id,
+                                    attributes:{
+                                        'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                        'placeholder':'Select a Subject',
+                                        'required':true,
+                                        'hx-get' :'/questions/create/subjects',
+                                        'hx-target': '#topics',
+                                        'hx-select': '#topics',
+                                        'hx-swap':'outerHTML',
+                                        'hx-trigger':'load, change',
+                                        'id': 'subjects'}
+                                ),
+                                isColumn:true 
+                            )}}
+                            {{ forms.form_field(
+                                label:forms.label(
+                                    id:'topic', 
+                                    content:'Topic', 
+                                    attributes:{
+                                        'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
+                                        ),
+                                input:forms.select(
+                                    name:'topic',
+                                    value:question.topic.id,
+                                    attributes:{
+                                        'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                        'placeholder':'Select a Topic',
+                                        'required':true,
+                                        'id': 'topics'}
+                                ),
+                                isColumn:true 
+                            )}}
+                            {{ forms.form_field(
+                                label:forms.label(
+                                    id:'author', 
+                                    content:'Author', 
+                                    attributes:{
+                                        'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
+                                ),
+                                input:forms.text(
+                                    name:'author', 
+                                    value:question.author.getFullName(),
+                                    attributes:{
+                                        'class':'block w-full cursor-not-allowed rounded-md bg-gray-100 px-3 py-1.5 outline-1 -outline-offset-1 outline-gray-300 text-gray-400  sm:text-sm/6',
+                                        'disabled':true}
                                 ),
                                 isColumn:true 
                             )}}
                         </div>
                     </div>
-                    <div class="flex flex-1/2 flex-col gap-y-4 w-full">
-                        {{ forms.form_field(
-                            label:forms.label(
-                                id:'subject', 
-                                content:'Subject', 
-                                attributes:{
-                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
+                </div>  
+            </div>
+
+            <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
+                <div class="flex flex-col p-4 flex-1">
+                    {{ show_header('Settings') }}
+                    <div class="flex gap-x-32 justify-between w-full">
+                        <div class="flex flex-col gap-y-4 w-full mr-96">
+                            {{ forms.form_field(
+                                label:forms.label(
+                                    id:'points', 
+                                    content:'Points', 
+                                    attributes:{
+                                        'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
                                     ),
-                            input:forms.select(
-                                name:'subject', 
-                                values:subjects, 
-                                value:question.topic.subject.id,
-                                attributes:{
-                                    'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                    'placeholder':'Select a Subject',
-                                    'required':true,
-                                    'hx-get' :'/questions/create/subjects',
-                                    'hx-target': '#topics',
-                                    'hx-select': '#topics',
-                                    'hx-swap':'outerHTML',
-                                    'hx-trigger':'load, change',
-                                    'id': 'subjects'}
-                            ),
-                            isColumn:true 
-                        )}}
-                        {{ forms.form_field(
-                            label:forms.label(
-                                id:'topic', 
-                                content:'Topic', 
-                                attributes:{
-                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
-                                    ),
-                            input:forms.select(
-                                name:'topic',
-                                value:question.topic.id,
-                                attributes:{
-                                    'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                    'placeholder':'Select a Topic',
-                                    'required':true,
-                                    'id': 'topics'}
-                            ),
-                            isColumn:true 
-                        )}}
-                        {{ forms.form_field(
-                            label:forms.label(
-                                id:'author', 
-                                content:'Author', 
-                                attributes:{
-                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
-                            ),
-                            input:forms.text(
-                                name:'author', 
-                                value:question.author.getFullName(),
-                                attributes:{
-                                    'class':'block w-full cursor-not-allowed rounded-md bg-gray-100 px-3 py-1.5 outline-1 -outline-offset-1 outline-gray-300 text-gray-400  sm:text-sm/6',
-                                    'disabled':true}
-                            ),
-                            isColumn:true 
-                        )}}
+                                input:forms.number(
+                                    name:'points', 
+                                    value:question.points,
+                                    attributes:{
+                                        'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                        'required':true,
+                                        'min':0,
+                                        'max':10,
+                                        'placeholder':'1 - 10 points'})
+                            )}}
+                        </div>
                     </div>
-                </div>
-            </div>  
-        </div>
+                </div>  
+            </div>
+            <div id="question-type-content" class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
+            </div>
 
-        <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
-            <div class="flex flex-col p-4 flex-1">
-                {{ show_header('Settings') }}
-                <div class="flex gap-x-32 justify-between w-full">
-                    <div class="flex flex-col gap-y-4 w-full mr-96">
-                        {{ forms.form_field(
-                            label:forms.label(
-                                id:'points', 
-                                content:'Points', 
-                                attributes:{
-                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
-                                ),
-                            input:forms.number(
-                                name:'points', 
-                                value:question.points,
-                                attributes:{
-                                    'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                    'required':true,
-                                    'min':0,
-                                    'max':10,
-                                    'placeholder':'1 - 10 points'})
-                        )}}
-                    </div>
-                </div>
-            </div>  
-        </div>
-        <div id="question-type-content" class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
-        </div>
+            <div class="flex gap-x-2 mx-8">
+                <button type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm">Edit Question</button>
+                <a href="{{ app.request.headers.get('referer') }}" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
 
-        <div class="flex gap-x-2 mx-8">
-            <button type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm">Edit Question</button>
-            <a href="{{ app.request.headers.get('referer') }}" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
+            </div>
+        </form>
+    {% endif %}
 
-        </div>
-    </form>
     
     <form method="POST" action="/questions/{{ question.id }}" class="hidden" id="delete-form">
         {{ csrf_field() }}
