@@ -191,12 +191,13 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
 
     Route::get('/questions/create/add-item', function () {
         $counter = request('item_count', 4);
+        $is_matching = request('is_matching', false);
         $item_count = session('counter', $counter);
         $item_count++;
 
         session()->flash('counter', $item_count);
 
-        return view('questions-types/new-text-item', ['counter' => $item_count]);
+        return view('questions-types/new-text-item', ['counter' => $item_count, 'is_matching' => $is_matching]);
      });
 
     Route::get('/topics', [TopicController::class, 'index']);

@@ -6,5 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class MatchingQuestion extends Model
 {
-    //
+    protected $fillable = [
+        'question_id',
+        'first_item',
+        'second_item',
+    ];
+
+    public function question(){
+        return $this->belongsTo(Question::class);
+    }
 }

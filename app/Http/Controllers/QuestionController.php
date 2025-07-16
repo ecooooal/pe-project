@@ -126,15 +126,26 @@ class QuestionController extends Controller
             $instruction = request()->post('instruction');
             $markdown = Str::of($instruction)->markdown(['html_input' => 'strip']) ?? '';
             $supported = json_decode(request()->post('supported_languages', '{}'), true);
+            $messages = [
+                'supported_languages.required' => 'Coding question must have at least one programming language.',
+            ];
         } else {
-            $rules['items.*'] = ['required', 'string', 'min:1'];
-            $rules['solution'] = ['required', 'string'];
+            if ($question_type === 'matching'){
+                $rules['items.*.left'] = ['required', 'string', 'min:1'];
+                $rules['items.*.right'] = ['required', 'string', 'min:1'];
+                $rules['solution'] = ['required', 'string'];
+                $messages = [
+                    'items.*.left.required' => 'Left side is required.',
+                    'items.*.right.required' => 'Right side is required.',
+                ];
+            } else {
+                $rules['items.*'] = ['required', 'string', 'min:1'];
+                $messages = [
+                    'items.*.required' => 'This field is required.',
+                ];
+            }
         }
 
-        $messages = [
-            'items.*.required' => 'This field is required.',
-            'supported_languages.required' => 'Coding question must have at least one programming language.',
-        ];
 
         $validator = Validator::make(request()->all(), $rules, $messages);
         if ($validator->fails()) {
@@ -303,7 +314,7 @@ class QuestionController extends Controller
 
             'matching' => view('questions-types/matching-items', $isEdit 
                 ? compact('question_type_data', 'isEdit') 
-                : compact('isEdit')),
+                : compact('itemCount','isEdit')),
 
             'coding' => view('questions-types/coding', $isEdit 
                 ? compact('question_type_data', 'isEdit', 'subjects', 'question', 'programming_languages') 

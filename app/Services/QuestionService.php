@@ -45,8 +45,13 @@ class QuestionService
                 return $choices;
 
             case 'matching':
-                // MatchingQuestion::create($data);
-                break;
+                $choices = $question_type->map(function ($choice) {
+                    return [
+                        'left' => $choice->first_item,
+                        'right' => $choice->second_item,
+                    ];
+                })->toArray();
+                return $choices;
 
             case 'coding':
                 $instruction = Str::of($question_type->instruction)->markdown([

@@ -76,9 +76,12 @@ class QuestionFactory
 
                 case 'matching':
                     foreach($question_type_data['items'] as $item){
-                        \Log::info('Question Type items', [$item]);
+                        $question->matchingQuestions()->create([
+                            'first_item' => $item['left'],
+                            'second_item' => $item['right']
+                        ]);                    
                     }
-                    // MatchingQuestion::create($data);
+                    DB::commit();
                     break;
 
                 case 'coding':

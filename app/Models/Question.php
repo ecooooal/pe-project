@@ -48,8 +48,8 @@ class Question extends Model
     public function rankingQuestions(){
         return $this->hasMany(RankingQuestion::class);
     }
-    public function matchingQuestion(){
-        return $this->hasOne(MatchingQuestion::class);
+    public function matchingQuestions(){
+        return $this->hasMany(MatchingQuestion::class);
     }
 
     public function codingQuestion(){

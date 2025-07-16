@@ -15,7 +15,7 @@
     <div class="flex gap-x-32 justify-between w-full">
         <div class="flex flex-col w-full">
             <div class="sortable">
-                {% for i in range(1, values|length) %}
+                {% for i in range(1, isEdit ? values|length : itemCount) %}
                     {{ forms.form_field(
                         label:forms.label(
                             id: 'items[]', 
@@ -42,7 +42,7 @@
             <button 
                 type="button" 
                 class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-gray-600 hover:text-white duration-300 rounded-lg px-2 py-2 font-semibold text-sm"
-                hx-get="/questions/create/add-item?item_count={{ values|length }}"
+                hx-get="/questions/create/add-item?item_count={{ isEdit ? values|length : item_count }}&is_matching=false"
                 hx-target="#swap"
                 hx-swap="beforebegin"
                 >

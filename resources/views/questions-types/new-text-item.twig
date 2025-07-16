@@ -1,5 +1,6 @@
 {% import 'components/core/forms' as forms %}
 
+{% if is_matching %}
 {{ forms.form_field(
     label:forms.label(
         id: 'items[]', 
@@ -8,10 +9,46 @@
             'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
         ),
     input:forms.text(
-        name: 'items[]', 
-        values:values, 
+        name: 'items[]',
         attributes:{
             'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
             'required': true
         })
 )}}
+
+{% else %}
+<div class="flex justify-between gap-x-4">
+{{ forms.form_field(
+    label:forms.label(
+        id: 'items[' ~ (counter) ~ '][left]', 
+        content:'Left Item ' ~ (counter), 
+        attributes:{
+            'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 '}
+        ),
+    input:forms.text(
+        name:'items[' ~ (counter) ~ '][left]',
+        value: old('items')[counter]['left'],
+        attributes:{
+            'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 '
+        }),
+    errors:errors.get('items.' ~ (counter) ~ '.left'),
+    isColumn: true
+)}}
+{{ forms.form_field(
+    label:forms.label(
+        id: 'items[' ~ (counter) ~ '][right]', 
+        content:'Right Item ' ~ (counter), 
+        attributes:{
+            'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
+        ),
+    input:forms.text(
+        name:'items[' ~ (counter) ~ '][right]',
+        value: old('items')[counter]['right'],
+        attributes:{
+            'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 '
+        }),
+    errors:errors.get('items.' ~ (counter) ~ '.right'),
+    isColumn: true
+)}}
+</div>
+{% endif %}
