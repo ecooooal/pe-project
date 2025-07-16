@@ -155,7 +155,11 @@ class QuestionController extends Controller
         QuestionFactory::create($data);
         \Log::info('Question Creation Successful');
         
-        return response('', 200)->header('HX-Redirect', url('/questions'));
+        if (request()->header('HX-Request')) {
+            return response('', 200)->header('HX-Redirect', url('/questions'));
+        }
+
+        return redirect('/questions');    
     }
     public function edit(Question $question){
         if ($question->question_type->value == 'coding'){
@@ -201,7 +205,7 @@ class QuestionController extends Controller
 
         $this->authorize('delete', $question);
 
-        $question->soft();
+        $question->delete();
 
         return redirect('/questions');
 
@@ -282,7 +286,7 @@ class QuestionController extends Controller
 
         return match ($type) {
             'multiple_choice' => view('questions-types/multiple-choice', $isEdit 
-                ? compact('question_type_data', 'isEdit', 'question') 
+                ? compact('question_type_data', 'isEdit') 
                 : compact('isEdit')),
             
             'true_or_false'   => view('questions-types/true-false', $isEdit 
@@ -293,7 +297,9 @@ class QuestionController extends Controller
                 ? compact('question_type_data', 'isEdit') 
                 : compact('isEdit')),
 
-            'ranking' => view('questions-types/rank-order-process', compact('itemCount', 'question', 'isEdit')),
+            'ranking' => view('questions-types/rank-order-process', $isEdit 
+                ? compact('question_type_data', 'isEdit') 
+                : compact('itemCount', 'question', 'isEdit')),
 
             'matching' => view('questions-types/matching-items', $isEdit 
                 ? compact('question_type_data', 'isEdit') 

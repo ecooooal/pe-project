@@ -155,7 +155,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/questions/{question}/edit', [QuestionController::class, 'edit']);
     Route::patch('/questions/{question}', [QuestionController::class, 'update']);
     Route::delete('/questions/{question}', [QuestionController::class, 'destroy']);
-    Route::match(['get', 'post'], '/questions/load/question-type', [QuestionController::class, 'loadQuestionType']);
+    Route::match(['get', 'post'], '/questions/load/question-type', [QuestionController::class, 'loadQuestionType'])->name('question.types');
     // Route::get('/questions/create/question-type', function (Request $request) {
     //     $item_count = (int) $request->input('item_count', 4);
     //     $type = $request->query('type'); 

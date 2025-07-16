@@ -63,39 +63,16 @@ class QuestionFactory
                     break;
 
                 case 'ranking':
-                    switch ($question_type_data['solution']){
-                        case 'ascending':
-                            $ascending_solution = array_reverse($question_type_data['items']);
-
-                            $order = 1;
-                            foreach($ascending_solution as $item){
-                            $question->rankingQuestions()->create([
-                                'order' => $order, 
-                                'item' => $item]);
-                            $order++;
-
-                            }      
-                            DB::commit();
-
-                            break;
-
-                        case 'descending':
-                            $order = 1;
-                            foreach($question_type_data['items'] as $item){
-                                $question->rankingQuestions()->create([
-                                    'order' => $order, 
-                                    'item' => $item]);
-                                $order++;
-
-                                } 
-                                DB::commit();
-
-                                break;       
-
-                        default:
-                        throw new \Exception("Unknown ranking solution: {$question_type_data['solution']}");
+                    $order = 1;
+                    foreach ($question_type_data['items'] as $item) {
+                        $question->rankingQuestions()->create([
+                            'order' => $order,
+                            'item' => $item
+                        ]);
+                        $order++;
                     }
-                    break;
+                    DB::commit();
+                    break;       
 
                 case 'matching':
                     foreach($question_type_data['items'] as $item){
@@ -164,10 +141,10 @@ class QuestionFactory
                 'points' => $data['points']
             ]);
 
-            // Remove or update old related data based on the type
+            Self::prepareUpdateQuestion($question);
+
             switch ($data['type']) {
                 case 'multiple_choice':
-                    $question->multipleChoiceQuestions()->delete();
 
                     $choice_keys = ['a', 'b', 'c', 'd'];
                     $items = array_combine($choice_keys, $data['items']);
@@ -179,17 +156,18 @@ class QuestionFactory
                         ]);
                     }
                     break;
+                    
+                case 'true_or_false':
+                    $question->trueOrFalseQuestion()->update(['solution' => $data['solution']]);
+                    DB::commit();
+                    break;
+
+                case 'identification':
+                    $question->identificationQuestion()->update(['solution' => $data['solution']]);
+                    DB::commit();
+                    break;
 
                 case 'coding':
-                    // remove old codingQuestion and related language files
-                    if ($question->codingQuestion) {
-                        $question->codingQuestion->codingQuestionLanguages()->delete();
-                        $question->codingQuestion()->delete(); 
-                        $old_slug_name = Str::slug($question['name']);
-                        $old_folder = "codingQuestions/{$question->id}_{$old_slug_name}/";
-                        Storage::deleteDirectory($old_folder);
-                    }
-
                     $instruction = $data['instruction'];
                     $language_data = json_decode($data['supported_languages'], true);
                     $slug_name = Str::slug($data['name']);
@@ -224,9 +202,6 @@ class QuestionFactory
                         ]);
                     }
                     break;
-
-                // handle other cases: true_or_false, identification, ranking, matching...
-
                 default:
                     throw new \Exception("Unsupported question type: {$data['type']}");
             }
@@ -240,6 +215,39 @@ class QuestionFactory
 
     }
 
+    private static function prepareUpdateQuestion(Question $question)
+    {
+        switch ($question->question_type->value) {
+            case 'multiple_choice':
+                $question->multipleChoiceQuestions()->delete();
+                break;
+                
+            case 'true_or_false':
+                $question->trueOrFalseQuestion()->delete();
+                break;
+
+            case 'identification':
+                $question->identificationQuestion()->delete();
+                break;
+
+            case 'ranking':
+                $question->rankingQuestions()->delete();
+                break;
+
+            case 'coding':
+                if ($question->codingQuestion) {
+                    $question->codingQuestion->codingQuestionLanguages()->delete();
+                    $question->codingQuestion()->delete(); 
+                    $old_slug_name = Str::slug($question['name']);
+                    $old_folder = "codingQuestions/{$question->id}_{$old_slug_name}/";
+                    Storage::deleteDirectory($old_folder);
+                    }
+                break;
+
+            default:
+            throw new \Exception("Unsupported question type: {$question->question_type->value}");
+        }
+    }
     private static function getClassName(string $code, string $language): string
     {
         $patterns = [
