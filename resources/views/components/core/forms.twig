@@ -60,11 +60,16 @@
 {% endmacro %}
 
 
-{% macro form_field(label, input, errors, isColumn = false) %}
+{% macro form_field(label, input, errors, isColumn = false, isReverse = false) %}
     {% if not isColumn %}
         <div class="flex flex-1 gap-x-4 pt-2 items-center">
-            {{ label }}
-            {{ input }}
+            {% if not isReverse %}
+                {{ label }}
+                {{ input }}
+            {% else %}
+                {{ input }}
+                {{ label }}
+            {% endif %}
             {% for error in errors %}
             <span class="text-red-500 text-sm font-semibold whitespace-nowrap">{{ error }}</span>    
             {% endfor %}  
