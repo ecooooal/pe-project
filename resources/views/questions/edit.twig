@@ -48,7 +48,7 @@
             hx-swap="outerHTML">
         </div>
     {% else %}
-        <form method="POST" hx-post="/questions" hx-redirect="/questions" hx-target="#question-type-content"  hx-select-oob="#name-form-error, #points-form-error, #topic" class="flex flex-col gap-y-4">
+        <form hx-patch="/questions/{{ question.id }}" hx-redirect="/questions" hx-target="#question-type-content"  hx-select-oob="#name-form-error, #points-form-error, #topic" class="flex flex-col gap-y-4">
             {{ csrf_field() }}
             <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
                 <div class="flex flex-col p-4 flex-1">
@@ -95,6 +95,7 @@
                                     ),
                                     isColumn:true 
                                 )}}
+                                <div id="name-form-error" class="flex gap-x-4 justify-between"></div>
                             </div>
                         </div>
                         <div class="flex flex-1/2 flex-col gap-y-4 w-full">
@@ -183,6 +184,7 @@
                                         'max':10,
                                         'placeholder':'1 - 10 points'})
                             )}}
+                            <div id="points-form-error" class="flex gap-x-4 justify-between"></div>
                         </div>
                     </div>
                 </div>  

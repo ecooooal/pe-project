@@ -133,7 +133,6 @@ class QuestionController extends Controller
             if ($question_type === 'matching'){
                 $rules['items.*.left'] = ['required', 'string', 'min:1'];
                 $rules['items.*.right'] = ['required', 'string', 'min:1'];
-                $rules['solution'] = ['required', 'string'];
                 $messages = [
                     'items.*.left.required' => 'Left side is required.',
                     'items.*.right.required' => 'Right side is required.',
@@ -144,6 +143,7 @@ class QuestionController extends Controller
                     'items.*.required' => 'This field is required.',
                 ];
             }
+            $rules['solution'] = ['required', 'string'];
         }
 
 
@@ -197,19 +197,73 @@ class QuestionController extends Controller
     }
 
     public function update(Question $question){
-        dd(request()->post());
         $this->authorize('update', $question);
 
-        request()->validate([
-            'name'    => ['required'],
-            'subject'     => ['required', 'integer'],
-        ]);
+        $question_type = request('type');
+        $item_count = count(request()->input('items', []));
 
-        $question->update([
-            'name' => request('name'),
-            'subject_id' => request('subject'),
-        ]);
+        $rules = [
+            'topic' => ['required', 'exists:topics,id'],
+            'type' => ['required'],
+            'name' => ['required', 'string', Rule::unique('questions', 'name')->ignore($question->id)->whereNull('deleted_at'),],
+            'points' => ['required', 'integer', 'min:1'],
+            'subject' => ['required'],
+        ];
 
+        if ($question_type === 'coding') {
+            $rules['instruction'] = ['required'];
+            $rules['supported_languages'] = ['required', 'json', function ($attribute, $value, $fail) {
+                $decoded = json_decode($value, true);
+                if (empty($decoded)) {
+                    $fail('Coding question must have at least one programming language.');
+                }
+            }];
+            $instruction = request()->post('instruction');
+            $markdown = Str::of($instruction)->markdown(['html_input' => 'strip']) ?? '';
+            $supported = json_decode(request()->post('supported_languages', '{}'), true);
+            $messages = [
+                'supported_languages.required' => 'Coding question must have at least one programming language.',
+            ];
+        } else {
+            if ($question_type === 'matching'){
+                $rules['items.*.left'] = ['required', 'string', 'min:1'];
+                $rules['items.*.right'] = ['required', 'string', 'min:1'];
+                $messages = [
+                    'items.*.left.required' => 'Left side is required.',
+                    'items.*.right.required' => 'Right side is required.',
+                ];
+            } else {
+                $rules['items.*'] = ['required', 'string', 'min:1'];
+                $messages = [
+                    'items.*.required' => 'This field is required.',
+                ];
+            }
+            $rules['solution'] = ['required', 'string'];
+        }
+
+        $validator = Validator::make(request()->all(), $rules, $messages);
+        if ($validator->fails()) {
+            if($question_type == 'coding'){
+                return view('components/core/coding-question-error', [
+                    'errors' => $validator->errors()
+                ]);
+            } else {
+                return redirect()->route('question.types', ['type' => $question_type, 'item_count' => $item_count])
+                ->withErrors($validator)
+                ->withInput();
+            }
+        }
+
+        $data = $validator->validated();
+
+        \Log::info('data can be updated', $data);
+        QuestionFactory::update($question, $data);
+        \Log::info('Question Update Successful');
+        
+        if (request()->header('HX-Request')) {
+            return response('', 200)->header('HX-Redirect', route('questions.show', $question));
+        }
+        
         return redirect()->route('questions.show', $question);
     }
     public function destroy(Question $question){

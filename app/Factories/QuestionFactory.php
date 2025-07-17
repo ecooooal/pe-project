@@ -135,20 +135,12 @@ class QuestionFactory
     public static function update(Question $question, array $data)
     {
         DB::beginTransaction();
-
         try {
-            $question->update([
-                'topic_id' => (int) $data['topic'],
-                'question_type' => $data['type'],
-                'name' => $data['name'],
-                'points' => $data['points']
-            ]);
-
-            Self::prepareUpdateQuestion($question);
+            $previous_question_type = $question->question_type->value;
 
             switch ($data['type']) {
                 case 'multiple_choice':
-
+                    Self::prepareUpdateQuestion($question);
                     $choice_keys = ['a', 'b', 'c', 'd'];
                     $items = array_combine($choice_keys, $data['items']);
                     foreach ($items as $key => $item) {
@@ -161,16 +153,44 @@ class QuestionFactory
                     break;
                     
                 case 'true_or_false':
-                    $question->trueOrFalseQuestion()->update(['solution' => $data['solution']]);
-                    DB::commit();
+                    if ($previous_question_type != $data['type']){
+                        Self::prepareUpdateQuestion($question);
+                    }
+                    $question->trueOrFalseQuestion()->updateOrCreate(['solution' => $data['solution']]);
                     break;
 
                 case 'identification':
-                    $question->identificationQuestion()->update(['solution' => $data['solution']]);
-                    DB::commit();
+                    if ($previous_question_type != $data['type']){
+                        Self::prepareUpdateQuestion($question);
+                    }
+                    $question->identificationQuestion()->updateOrCreate(['solution' => $data['solution']]);
+                    break;
+
+                case 'ranking':
+                    Self::prepareUpdateQuestion($question);
+                    $order = 1;
+                    foreach ($data['items'] as $item) {
+                        $question->rankingQuestions()->create([
+                            'order' => $order,
+                            'item' => $item
+                        ]);
+                        $order++;
+                    }
+                    break;       
+
+                case 'matching':
+                    Self::prepareUpdateQuestion($question);
+
+                    foreach($data['items'] as $item){
+                        $question->matchingQuestions()->create([
+                            'first_item' => $item['left'],
+                            'second_item' => $item['right']
+                        ]);                    
+                    }
                     break;
 
                 case 'coding':
+                    Self::prepareUpdateQuestion($question);
                     $instruction = $data['instruction'];
                     $language_data = json_decode($data['supported_languages'], true);
                     $slug_name = Str::slug($data['name']);
@@ -208,7 +228,12 @@ class QuestionFactory
                 default:
                     throw new \Exception("Unsupported question type: {$data['type']}");
             }
-
+            $question->update([
+                'topic_id' => (int) $data['topic'],
+                'question_type' => $data['type'],
+                'name' => $data['name'],
+                'points' => $data['points']
+            ]);
             DB::commit();
             return $question;
         } catch (\Exception $e) {
@@ -235,6 +260,10 @@ class QuestionFactory
 
             case 'ranking':
                 $question->rankingQuestions()->delete();
+                break;
+
+            case 'matching':
+                $question->matchingQuestions()->delete();
                 break;
 
             case 'coding':
