@@ -30,6 +30,7 @@ import { placeholder } from "@codemirror/view";
 
     // Initialize States for Code Editors
     const instruction_state = EditorState.create({
+        doc:window.instruction,
         extensions: [
             placeholder("Type your Instructions here"),
             markdown(),            
@@ -174,6 +175,8 @@ class <YourClass+Test> {
             initial_solution: initial_solution_editor.state,
             test_case: test_case_editor.state,
         });
+        console.log(supported_languages);
+
     }
     
     // Create language object and add to an array to keep track
@@ -231,7 +234,6 @@ class <YourClass+Test> {
         if (instruction_editor.state) {
             instruction_previous_state = instruction_editor.state;
         } else {
-
             instruction_previous_state = EditorState.create({
                 doc: instruction_editor.state.doc.toString(),
                 extensions: [
@@ -242,24 +244,25 @@ class <YourClass+Test> {
                         ...historyKeymap               
                     ]),
                     EditorView.lineWrapping,
+
                     EditorView.theme({
-                        "&": {
-                            backgroundColor: "#ffffff",
-                            border: "1px solid #e0e0e0",
-                            fontFamily: "sans-serif",
-                            fontSize: "14px",
-                          },
-                          ".cm-content": {
-                            minHeight: "16rem",
-                            padding: "1rem"
-                          },
-                          ".cm-scroller": {
-                            minHeight: "16rem",
-                            maxHeight:"24rem",
-                            width: "100%",
-                            height: "100%",   
-                            overflow: "auto"
-                          }
+                    "&": {
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #e0e0e0",
+                        fontFamily: "sans-serif",
+                        fontSize: "14px",
+                    },
+                    ".cm-content": {
+                        minHeight: "16rem",
+                        padding: "1rem"
+                    },
+                    ".cm-scroller": {
+                        minHeight: "16rem",
+                        maxHeight:"24rem",
+                        width: "100%",
+                        height: "100%",   
+                        overflow: "auto"
+                    }
                     }, { dark: false })
                 ],  
             });
@@ -274,14 +277,21 @@ class <YourClass+Test> {
         }
     }
     
-    function getPreviousInstructionCode(){
+    function getPreviousInstructionCode() {
         setTimeout(() => {
+            if (instruction_editor) {
+                instruction_editor.destroy(); 
+            }
+
+            instruction_div.innerHTML = "";
+
             instruction_editor = new EditorView({
                 state: instruction_previous_state,
                 parent: instruction_div
             });
-        }, 500); 
+        }, 500);
     }
+
     function attachButtonsListener() {
         const preview_button = document.getElementById("preview-button");
         const edit_button = document.getElementById("edit-button");        
@@ -301,13 +311,25 @@ class <YourClass+Test> {
         }
         
     });
-    document.addEventListener("DOMContentLoaded", () => {
-        const programming_language_selected = document.getElementById('programming_language');
-        attachButtonsListener();
-        if (programming_language_selected) {
-            switchLanguageFromEvent({ target: { value: programming_language_selected.value } });
-        } 
+
+    document.body.addEventListener("htmx:load", function(evt) {
+        initializeCodingQuestionPage();
     });
+
+    function initializeCodingQuestionPage() {
+        const select = document.getElementById('programming_language');
+        if (!select || select.dataset.initialized === "true") return;
+
+        console.log("Initializing CodeMirror");
+        attachButtonsListener();
+        console.log(window.question_supported_languages);
+        loadSupportedLanguages(window.question_supported_languages);
+
+        switchLanguageFromEvent({ target: { value: select.value } });
+        select.dataset.initialized = "true"; 
+    }
+
+
     function temporarilyDisable(button) {
         setTimeout(() => {
             button.disabled = true;
@@ -346,9 +368,61 @@ class <YourClass+Test> {
             }
         }
     }
+    
 
+    function loadSupportedLanguages(question_supported_languages) {
+        console.log( Object.keys(question_supported_languages)[0]);
+        const currentLanguage =  Object.keys(question_supported_languages)[0];
+        for (const language in question_supported_languages) {
+            const values = question_supported_languages[language];
+            let extension;
 
+            switch (language) {
+                case "python":
+                    extension = python();
+                    break;
+                case "java":
+                    extension = java();
+                    break;
+                case "c++":
+                    extension = cpp();
+                    break;
+                default:
+                    console.warn(`Unsupported language: ${language}`);
+                    continue;
+            }
 
+            const complete_solution_state = EditorState.create({
+                doc: values.complete_solution || "",
+                extensions: [basicSetup, extension, onChangeListener]
+            });
+            const initial_solution_state = EditorState.create({
+                doc: values.initial_solution || "",
+                extensions: [basicSetup, extension, onChangeListener]
+            });
+            const test_case_state = EditorState.create({
+                doc: values.test_case || "",
+                extensions: [basicSetup, extension, onChangeListener]
+            });
+
+            supported_languages[language] = {
+                complete_solution: complete_solution_state,
+                initial_solution: initial_solution_state,
+                test_case: test_case_state,
+                is_valid: true
+            };
+
+            console.log(supported_languages);
+
+            if (currentLanguage === language) {
+                solution_editor.setState(complete_solution_state);
+                initial_solution_editor.setState(initial_solution_state);
+                test_case_editor.setState(test_case_state);
+            }
+        }
+
+        updateLanguageBadges();
+    }
 
 window.switchLanguageFromEvent = switchLanguageFromEvent;
 window.switchLanguage = switchLanguage;

@@ -9,6 +9,7 @@ enum QuestionType: string
     case Identification = 'identification';
     case Ranking = 'ranking';
     case Matching = 'matching';
+    case Coding = 'coding';
 
     public function getName(): string {
         return match($this) {
@@ -17,6 +18,7 @@ enum QuestionType: string
             self::Identification => 'Identification Question',
             self::Ranking => 'Ranking Question',
             self::Matching => 'Matching Question',
+            self::Coding => 'Coding Question',
         };
     }
 }

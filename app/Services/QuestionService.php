@@ -5,6 +5,9 @@ use App\Models\Course;
 use App\Models\Subject;
 use App\Models\Topic;
 use App\Models\Question;
+use Illuminate\Support\Facades\Http;
+use Storage;
+use Str;
 class QuestionService
 {
     public function getQuestionTypeShow(Question $question){
@@ -42,11 +45,82 @@ class QuestionService
                 return $choices;
 
             case 'matching':
-                // MatchingQuestion::create($data);
-                break;
+                $choices = $question_type->map(function ($choice) {
+                    return [
+                        'left' => $choice->first_item,
+                        'right' => $choice->second_item,
+                    ];
+                })->toArray();
+                return $choices;
+
+            case 'coding':
+                $instruction = Str::of($question_type->instruction)->markdown([
+                                    'html_input' => 'strip',
+                                ]);
+                $instruction_raw = $question_type->instruction;
+                $languages = $question_type->codingQuestionLanguages()->pluck('language');
+                $coding_languages = $question_type->codingQuestionLanguages;            
+
+                $language_codes = $coding_languages->mapWithKeys(function ($item) {
+                    return [
+                        $item->language => [
+                            'complete_solution' => Storage::get($item->complete_solution_file_path),
+                            'initial_solution'  => Storage::get($item->initial_solution_file_path),
+                            'test_case'         => Storage::get($item->test_case_file_path),
+                        ]
+                    ];
+                })->toArray();
+
+                $data = [
+                    'instruction' => $instruction,
+                    'instruction_raw' =>  $instruction_raw,
+                    'languages' => $languages,
+                    'language_codes' =>$language_codes
+                ];
+                
+                return $data;
 
             default:
                 throw new \Exception("Unknown question type: {$question['question_type']}");
+        }
+    }
+
+    public static function validate(string $language, string $solution, string $test): array
+    {
+        switch ($language) {
+            case 'java':
+                try {
+                    $response = Http::timeout(30)->post('http://java-api:8082/validate', [
+                        'completeSolution' => $solution,
+                        'testUnit' => $test
+                    ]);
+                    if ($response->successful()) {
+                        $data = $response->json();
+                        $hasFailures = false;
+
+                        if (isset($data['testResults']) && is_array($data['testResults'])) {
+                            foreach ($data['testResults'] as $testResult) {
+                                if (isset($testResult['methods']) && is_array($testResult['methods'])) {
+                                    foreach ($testResult['methods'] as $method) {
+                                        if (isset($method['status']) && $method['status'] === 'FAILED') {
+                                            $hasFailures = true;
+                                            break 2;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        $data['success'] = !$hasFailures;
+                        return $data;
+                    }
+                    return ['success' => false, 'error' => 'API returned error'];
+                } catch (\Exception $e) {
+                    return ['success' => false, 'error' => 'API unreachable | API may not be available', 'exception' => $e->getMessage()];
+                }
+
+            default:
+                return ['success' => false, 'error' => 'Unsupported language'];
         }
     }
 }

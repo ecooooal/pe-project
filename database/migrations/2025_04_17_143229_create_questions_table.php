@@ -21,7 +21,8 @@ return new class extends Migration
                 'true_or_false',
                 'identification',
                 'ranking',
-                'matching'
+                'matching',
+                'coding'
             ]);           
             $table->string('name');
             $table->unsignedTinyInteger('points');

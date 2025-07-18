@@ -12,7 +12,7 @@
 </div>
 
 <div class="flex flex-1 flex-col mx-16">
-    <form method="POST" hx-post="/questions" HX-Redirect:/questions hx-target="#question-type-content" hx-select-oob="#question-name-form, #topic" class="flex flex-col gap-y-4">
+    <form method="POST" hx-post="/questions" hx-redirect="/questions" hx-target="#question-type-content" hx-select-oob="#name-form-error, #points-form-error, #topic" class="flex flex-col gap-y-4">
     {{ csrf_field() }}
         <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
             <div class="flex flex-col p-4 flex-1">
@@ -32,7 +32,7 @@
                                 attributes:{
                                     'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'required':true,
-                                    'hx-get':'/questions/create/question-type',
+                                    'hx-get':'/questions/load/question-type',
                                     'hx-target':'#question-type-content',
                                     'hx-params' : 'type'
                                 }
@@ -52,11 +52,15 @@
                                     name:'name', 
                                     attributes:{
                                         'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                        }
+                                        'required':''
+                                    }
                                 ),
                                 isColumn:true 
                             )}}
+                            <div id="name-form-error" class="flex gap-x-4 justify-between"></div>
+
                         </div>
+
                     </div>
                     <div class="flex flex-1/2 flex-col gap-y-4 w-full">
                         {{ forms.form_field(
@@ -161,8 +165,9 @@
                                     'required':true,
                                     'min':0,
                                     'max':10,
-                                    'placeholder':'1 - 10 points'})
+                                    'placeholder':'1 - 10 points'}),
                         )}}
+                        <div id="points-form-error" class="flex gap-x-4 justify-between"></div>
                     </div>
                 </div>
             </div>  

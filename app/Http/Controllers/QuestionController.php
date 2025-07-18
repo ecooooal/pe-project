@@ -9,6 +9,7 @@ use App\Models\Subject;
 use App\Models\Topic;
 use App\Services\QuestionService;
 use App\Services\UserService;
+use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -53,13 +54,6 @@ class QuestionController extends Controller
 
     public function show(Question $question){
         $question->load('topic.subject.course');
-        $question->load([
-            'multipleChoiceQuestions',
-            'trueOrFalseQuestion',
-            'identificationQuestion',
-            'rankingQuestions',
-            'matchingQuestions',
-        ]);
         $question_type = $question->getTypeModel();
         $data = [
             'question' => $question,
@@ -93,9 +87,8 @@ class QuestionController extends Controller
     public function createCodingQuestion(){
         $courses = $this->userService->getCoursesForUser(auth()->user())->pluck('name', 'id');
         $programming_languages = [
-            'c++' => "C++",
             'java' => "Java",
-            'sql' => "SQL",
+            'c++' => "C++",
             'python' => "Python",
         ];
 
@@ -111,24 +104,60 @@ class QuestionController extends Controller
     }
 
     public function store(){
-        $validator = Validator::make(request()->all(), [
+        $question_type = request('type');
+        $item_count = count(request()->input('items', []));
+
+        $rules = [
             'topic' => ['required', 'exists:topics,id'],
             'type' => ['required'],
             'name' => ['required', 'string', 'unique:questions,name'],
             'points' => ['required', 'integer', 'min:1'],
-            'items.*' => ['required', 'string', 'min:1'],
-            'solution' => ['required', 'string'], 
             'subject' => ['required'],
-        ], [
-            'items.*.required' => 'This field is required.',
-        ]);
+        ];
 
-        $question_type = request('type');
-        $item_count = count(request()->input('items', []));
+        if ($question_type === 'coding') {
+            $rules['instruction'] = ['required'];
+            $rules['supported_languages'] = ['required', 'json', function ($attribute, $value, $fail) {
+                $decoded = json_decode($value, true);
+                if (empty($decoded)) {
+                    $fail('Coding question must have at least one programming language.');
+                }
+            }];
+            $instruction = request()->post('instruction');
+            $markdown = Str::of($instruction)->markdown(['html_input' => 'strip']) ?? '';
+            $supported = json_decode(request()->post('supported_languages', '{}'), true);
+            $messages = [
+                'supported_languages.required' => 'Coding question must have at least one programming language.',
+            ];
+        } else {
+            if ($question_type === 'matching'){
+                $rules['items.*.left'] = ['required', 'string', 'min:1'];
+                $rules['items.*.right'] = ['required', 'string', 'min:1'];
+                $messages = [
+                    'items.*.left.required' => 'Left side is required.',
+                    'items.*.right.required' => 'Right side is required.',
+                ];
+            } else {
+                $rules['items.*'] = ['required', 'string', 'min:1'];
+                $messages = [
+                    'items.*.required' => 'This field is required.',
+                ];
+            }
+            $rules['solution'] = ['required', 'string'];
+        }
+
+
+        $validator = Validator::make(request()->all(), $rules, $messages);
         if ($validator->fails()) {
-            return redirect()->route('question.types', ['type' => $question_type, 'item_count' => $item_count])
+            if($question_type == 'coding'){
+                return view('components/core/coding-question-error', [
+                    'errors' => $validator->errors()
+                ]);
+            } else {
+                return redirect()->route('question.types', ['type' => $question_type, 'item_count' => $item_count])
                 ->withErrors($validator)
                 ->withInput();
+            }
         }
 
         $data = $validator->validated();
@@ -137,15 +166,32 @@ class QuestionController extends Controller
         QuestionFactory::create($data);
         \Log::info('Question Creation Successful');
         
-        return response('', 200)->header('HX-Redirect', url('/questions'));
+        if (request()->header('HX-Request')) {
+            return response('', 200)->header('HX-Redirect', url('/questions'));
+        }
+
+        return redirect('/questions');    
     }
     public function edit(Question $question){
-        $subjects = Subject::whereIn('course_id', $question->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
-
-        $data = [
-            'question' => $question, 
-            'subjects' => $subjects
-        ];
+        if ($question->question_type->value == 'coding'){
+            $data = [
+            'question' => $question
+            ];
+        } else {
+            $subjects = Subject::whereIn('course_id', $question->topic->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
+            $question_types = [
+                'multiple_choice' => 'Multiple Choice',
+                'true_or_false'=> 'True or False',
+                'identification' => 'Identification',
+                'ranking' => 'Ranking/Ordering/Process',
+                'matching' => 'Matching Items'
+            ];
+            $data = [
+                'question' => $question, 
+                'subjects' => $subjects,
+                'question_types' => $question_types
+            ];
+        }
     
         return view('questions/edit', $data);
     }
@@ -153,17 +199,71 @@ class QuestionController extends Controller
     public function update(Question $question){
         $this->authorize('update', $question);
 
+        $question_type = request('type');
+        $item_count = count(request()->input('items', []));
 
-        request()->validate([
-            'name'    => ['required'],
-            'subject'     => ['required', 'integer'],
-        ]);
+        $rules = [
+            'topic' => ['required', 'exists:topics,id'],
+            'type' => ['required'],
+            'name' => ['required', 'string', Rule::unique('questions', 'name')->ignore($question->id)->whereNull('deleted_at'),],
+            'points' => ['required', 'integer', 'min:1'],
+            'subject' => ['required'],
+        ];
 
-        $question->update([
-            'name' => request('name'),
-            'subject_id' => request('subject'),
-        ]);
+        if ($question_type === 'coding') {
+            $rules['instruction'] = ['required'];
+            $rules['supported_languages'] = ['required', 'json', function ($attribute, $value, $fail) {
+                $decoded = json_decode($value, true);
+                if (empty($decoded)) {
+                    $fail('Coding question must have at least one programming language.');
+                }
+            }];
+            $instruction = request()->post('instruction');
+            $markdown = Str::of($instruction)->markdown(['html_input' => 'strip']) ?? '';
+            $supported = json_decode(request()->post('supported_languages', '{}'), true);
+            $messages = [
+                'supported_languages.required' => 'Coding question must have at least one programming language.',
+            ];
+        } else {
+            if ($question_type === 'matching'){
+                $rules['items.*.left'] = ['required', 'string', 'min:1'];
+                $rules['items.*.right'] = ['required', 'string', 'min:1'];
+                $messages = [
+                    'items.*.left.required' => 'Left side is required.',
+                    'items.*.right.required' => 'Right side is required.',
+                ];
+            } else {
+                $rules['items.*'] = ['required', 'string', 'min:1'];
+                $messages = [
+                    'items.*.required' => 'This field is required.',
+                ];
+            }
+            $rules['solution'] = ['required', 'string'];
+        }
 
+        $validator = Validator::make(request()->all(), $rules, $messages);
+        if ($validator->fails()) {
+            if($question_type == 'coding'){
+                return view('components/core/coding-question-error', [
+                    'errors' => $validator->errors()
+                ]);
+            } else {
+                return redirect()->route('question.types', ['type' => $question_type, 'item_count' => $item_count])
+                ->withErrors($validator)
+                ->withInput();
+            }
+        }
+
+        $data = $validator->validated();
+
+        \Log::info('data can be updated', $data);
+        QuestionFactory::update($question, $data);
+        \Log::info('Question Update Successful');
+        
+        if (request()->header('HX-Request')) {
+            return response('', 200)->header('HX-Redirect', route('questions.show', $question));
+        }
+        
         return redirect()->route('questions.show', $question);
     }
     public function destroy(Question $question){
@@ -208,14 +308,73 @@ class QuestionController extends Controller
     }
 
     public function question_type_show(Question $question){
-        $choices = $this->questionService->getQuestionTypeShow($question);
-        
+        $question_type_data = $this->questionService->getQuestionTypeShow($question);
+
         $data = [
             'question' => $question,
-            'choices' => $choices
+            'question_type_data' => $question_type_data
         ];
+    
 
         return view('questions-types/show', $data);
+    }
+
+    public function loadQuestionType(Request $request)
+    {
+        $type = $request->input('type');
+        $itemCount = (int) $request->input('item_count', 4);
+        $isEdit = filter_var($request->input('edit'), FILTER_VALIDATE_BOOLEAN);
+        $question = null;
+        $validTypes = ['multiple_choice', 'true_or_false', 'identification', 'ranking', 'matching', 'coding'];
+        
+        if (!in_array($type, $validTypes)) {
+            abort(400, 'Invalid question type');
+        }
+
+        if ($isEdit) {
+            $questionId = $request->input('question_id');
+            if (!$questionId) {
+                abort(400, 'Missing question_id');
+            }
+            $question = Question::findOrFail($questionId);
+            $question_type_data = $this->questionService->getQuestionTypeShow($question);
+            if ($type == 'coding'){
+                $subjects = Subject::whereIn('course_id', $question->topic->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
+                $programming_languages = [
+                        'java' => "Java",
+                        'c++' => "C++",
+                        'python' => "Python",
+                    ];
+            }
+            
+        }
+
+        return match ($type) {
+            'multiple_choice' => view('questions-types/multiple-choice', $isEdit 
+                ? compact('question_type_data', 'isEdit') 
+                : compact('isEdit')),
+            
+            'true_or_false'   => view('questions-types/true-false', $isEdit 
+                ? compact('question_type_data', 'isEdit') 
+                : compact('isEdit')),
+
+            'identification'  => view('questions-types/identification', $isEdit 
+                ? compact('question_type_data', 'isEdit') 
+                : compact('isEdit')),
+
+            'ranking' => view('questions-types/rank-order-process', $isEdit 
+                ? compact('question_type_data', 'isEdit') 
+                : compact('itemCount', 'question', 'isEdit')),
+
+            'matching' => view('questions-types/matching-items', $isEdit 
+                ? compact('question_type_data', 'isEdit') 
+                : compact('itemCount','isEdit')),
+
+            'coding' => view('questions-types/coding', $isEdit 
+                ? compact('question_type_data', 'isEdit', 'subjects', 'question', 'programming_languages') 
+                : compact('isEdit')),
+        };
+
     }
 
     public function previewMarkdown(Request $request){
@@ -233,7 +392,23 @@ class QuestionController extends Controller
     }
 
     public function validateCompleteSolution(Request $request){
-        return view('questions-types/validate-complete-solution', ['data'=>$request->post()]);
+        $complete_solution = $request->post('validate-complete-solution');
+        $test_case = $request->post('validate-test-case');
+
+        if (empty($complete_solution) || empty($test_case)) {
+            $api_data = ['error' => 'Complete solution and test case are both required.'];
+        } else {
+            $language = $request->post('language-to-validate');
+            $api_data = $this->questionService::validate($language, $complete_solution, $test_case);
+        }
+
+
+        $data = [
+            'post_data' => $request->post(),
+            'api_data' => $api_data
+        ];
+        
+        return view('questions-types/validate-complete-solution', ['data'=> $data]);
     }
 
 }

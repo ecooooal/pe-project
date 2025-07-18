@@ -10,6 +10,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
 use App\Models\User;
+use App\Services\QuestionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Role;
@@ -154,42 +155,49 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/questions/{question}/edit', [QuestionController::class, 'edit']);
     Route::patch('/questions/{question}', [QuestionController::class, 'update']);
     Route::delete('/questions/{question}', [QuestionController::class, 'destroy']);
+    Route::match(['get', 'post', 'patch'], '/questions/load/question-type', [QuestionController::class, 'loadQuestionType'])->name('question.types');
+    // Route::get('/questions/create/question-type', function (Request $request) {
+    //     $item_count = (int) $request->input('item_count', 4);
+    //     $type = $request->query('type'); 
+    //     $isEdit = filter_var($request->input('edit'), FILTER_VALIDATE_BOOLEAN);
 
-    Route::get('/questions/create/question-type', function (Request $request) {
-        $item_count = (int) $request->input('item_count', 4);
-        $type = $request->query('type'); 
-        switch ($type) {
-            case 'multiple_choice':
-                return view('questions-types/multiple-choice');
+    //     if ($isEdit) {
+    //             $question = Question::findOrFail($request->input('question_id'));
+    //     }
+
+    //     switch ($type) {
+    //         case 'multiple_choice':
+    //             return view('questions-types/multiple-choice');
             
-            case 'true_or_false':
-                return view('questions-types/true-false');
+    //         case 'true_or_false':
+    //             return view('questions-types/true-false');
             
-            case 'identification':
-                return view('questions-types/identification');
+    //         case 'identification':
+    //             return view('questions-types/identification');
 
-            case 'ranking':
-                return view('questions-types/rank-order-process', compact('item_count'));
+    //         case 'ranking':
+    //             return view('questions-types/rank-order-process', compact('item_count'));
             
-            case 'matching':
-                return view('questions-types/matching-items');
+    //         case 'matching':
+    //             return view('questions-types/matching-items');
 
-            case 'coding':
-                return view('questions-types/coding');
+    //         case 'coding':
+    //             return view('questions-types/coding');
 
-            default:
-                return '';
-            }
-        })->name('question.types');
+    //         default:
+    //             return '';
+    //         }
+    //     })->name('question.types');
 
     Route::get('/questions/create/add-item', function () {
         $counter = request('item_count', 4);
+        $is_matching = request('is_matching', false);
         $item_count = session('counter', $counter);
         $item_count++;
 
         session()->flash('counter', $item_count);
 
-        return view('questions-types/new-text-item', ['counter' => $item_count]);
+        return view('questions-types/new-text-item', ['counter' => $item_count, 'is_matching' => $is_matching]);
      });
 
     Route::get('/topics', [TopicController::class, 'index']);
@@ -263,10 +271,60 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
 
  });
 
-Route::post('/test/send-data', function(Request $request) {
-    $data = $request->post();
-    $markdown = Str::of($request->post('instruction'))->markdown([
-        'html_input' => 'strip',
-    ]);
-    return view('test-sent-data-page', ['data'=> $data, 'markdown' => $markdown]);
+Route::any('/test/send-data', function(Request $request) {
+        $post_data = $request->post();
+        $question_type = request('type');
+        $item_count = count(request()->input('items', []));
+
+        $rules = [
+            'topic' => ['required', 'exists:topics,id'],
+            'type' => ['required'],
+            'name' => ['required', 'string', 'unique:questions,name'],
+            'points' => ['required', 'integer', 'min:1'],
+            'subject' => ['required'],
+        ];
+
+        if ($question_type === 'coding') {
+            $rules['instruction'] = ['required'];
+            $rules['supported_languages'] = ['required', 'json', function ($attribute, $value, $fail) {
+                $decoded = json_decode($value, true);
+                if (empty($decoded)) {
+                    $fail('Coding question must have at least one programming language.');
+                }
+            }];
+            $instruction = $request->post('instruction');
+            $markdown = Str::of($instruction)->markdown(['html_input' => 'strip']) ?? '';
+            $supported = json_decode($request->post('supported_languages', '{}'), true);
+        }
+
+        $messages = [
+            'items.*.required' => 'This field is required.',
+            'supported_languages.required' => 'Coding question must have at least one programming language.',
+        ];
+
+        $validator = Validator::make(request()->all(), $rules, $messages);
+        if ($validator->fails()) {
+            if($question_type == 'coding'){
+                return view('components/core/coding-question-error', [
+                    'errors' => $validator->errors()
+                ]);
+            } else {
+                return redirect()->route('question.types', ['type' => $question_type, 'item_count' => $item_count])
+                ->withErrors($validator)
+                ->withInput();
+            }
+        }
+
+        $data = $validator->validated();
+
+        $post_data = [
+            'post' => $post_data,
+            'markdown' => $markdown,
+            'supported' => $supported,
+            'validation' => $data
+        ];
+
+        
+    return view('test-sent-data-page', ['data' => $post_data]);
+    // return response('', 200)->header('HX-Redirect', url('/questions'));
 });

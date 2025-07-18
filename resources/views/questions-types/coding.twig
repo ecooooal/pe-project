@@ -1,18 +1,30 @@
 {% from 'components/core/breadcrumbs' import breadcrumb %}
 {% from 'components/core/show-header' import show_header %}
 {% import 'components/core/forms' as forms %}
+{% set faculty_layout = '' %}
+{% if isEdit %}
+    {% set faculty_layout = 'components/core/blank' %}
+{% else %}
+    {% set faculty_layout = 'components/core/faculty-layout' %}
+{% endif %}
 
-{% extends 'components/core/faculty-layout' %}
+{% extends faculty_layout %}
 
 {% block content %}
-{{ vite('resources/js/text-editor.js')|raw }}
-{{ breadcrumb() }}
+{% if isEdit %}
+    {{ vite('resources/js/edit-coding-text-editor.js')|raw }}
+{% else %}
+    {{ breadcrumb() }}
+    {{ vite('resources/js/text-editor.js')|raw }}
+{% endif %}
 <form id="test-code"
-      hx-post="/test/send-data" 
-      hx-target="#data-div">
+      hx-post="/questions" 
+      hx-redirect="/questions"
+      hx-target="#name-points-form-error"
+      hx-select-oob="#instruction-form-error, #language-form-error">
     {{ csrf_field() }}
     <input class="hidden" name="type" value="coding">
-    <textarea class="hidden" name="code" id="code-input"></textarea>
+    <textarea class="hidden" name="supported_languages" id="code-input"></textarea>
     <textarea class="hidden" name="instruction" id="instruction-input"></textarea>
 
     <div class="flex flex-1 flex-col mx-16 gap-y-4">
@@ -20,6 +32,7 @@
             {{ show_header('Create Coding Question') }}
             <div class="flex flex-col gap-y-4 justify-between w-full">
                 <div class="flex flex-1 gap-x-4 w-full">
+                    {% if not isEdit %}
                     {{ forms.form_field(
                         label:forms.label(
                             id:'course', 
@@ -41,6 +54,7 @@
                                 'hx-trigger':'load, change'}
                         ),
                     )}}
+                    {% endif %}
                     {{ forms.form_field(
                         label:forms.label(
                             id:'subject', 
@@ -51,6 +65,7 @@
                         input:forms.select(
                             name:'subject', 
                             values:subjects, 
+                            value : isEdit ? question.topic.subject.id : 1,
                             attributes:{
                                 'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                 'placeholder':'Select a Subject',
@@ -72,6 +87,7 @@
                                 ),
                         input:forms.select(
                             name:'topic',
+                            value : isEdit ? question.topic.id : 1,
                             attributes:{
                                 'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                 'placeholder':'Select a Topic',
@@ -81,20 +97,21 @@
                     )}}
                 </div>
                 <div class="flex flex-1 gap-x-4 w-full">
-                    {{ forms.form_field(
-                        label:forms.label(
-                            id:'name', 
-                            content:'Name', 
-                            attributes:{
-                                'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
-                        ),
-                        input:forms.text(
-                            name:'name', 
-                            attributes:{
-                                'class':'w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                'required':true}
-                        )
-                    )}}
+                        {{ forms.form_field(
+                            label:forms.label(
+                                id:'name', 
+                                content:'Name', 
+                                attributes:{
+                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
+                            ),
+                            input:forms.text(
+                                name:'name', 
+                                value : isEdit ? question.name : '',
+                                attributes:{
+                                    'class':'w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                    'required':true}
+                            )
+                        )}}
                         {{ forms.form_field(
                             label:forms.label(
                                 id:'points', 
@@ -104,6 +121,7 @@
                                 ),
                             input:forms.number(
                                 name:'points', 
+                                value : isEdit ? question.points,
                                 attributes:{
                                     'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'required':true,
@@ -112,6 +130,7 @@
                                     'placeholder':'1 - 10 points'})
                         )}}
                 </div>
+                <div id="name-points-form-error"></div>
                 <div class="flex flex-1 rounded-t-md">
                     <div class="flex flex-col flex-1 w-full overflow-auto ">
                         <div class="flex w-full bg-gray-800 p-2 rounded-t-md justify-between">
@@ -127,6 +146,7 @@
                         </div>
                             <div id="instruction-div" class="max-w-full w-full overflow-auto text-gray-500 border-1 border-gray-500 max-h-96">
                         </div>
+                        <div id="instruction-form-error"></div>
                     </div>
                 </div>
             </div>
@@ -135,7 +155,7 @@
         <div class="flex flex-1 justify-between max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5 gap-x-4">
             <div class="flex flex-col flex-1 min-w-0  p-4 ">
                 <div class="flex h-16 pb-4 justify-between">
-                    <div class="flex">
+                    <div class="flex items-center gap-x-2">
                         {{ forms.form_field(
                             label:forms.label(
                                 id:'programming_language', 
@@ -147,22 +167,29 @@
                                 name:'programming_language', 
                                 values:programming_languages, 
                                 attributes:{
-                                    'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                    'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 capitalize',
                                     'hx-on:change':'switchLanguageFromEvent(event)',
                                     'required':true
                                 }
                             )
                         )}}
+                        <div id="language-form-error"></div>
+                    </div>
+                    <div id="loader" class="htmx-indicator mx-auto transition-opacity duration-500 opacity-0 pointer-events-none">
+                        <img class="mr-10" width="50" src="{{ asset('images/bars-scale.svg') }}"/>
                     </div>
                     <div class="flex">
-                        <button form="validate-complete-solution-form" type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm"
-                            hx-on:click="validateLanguageCompleteSolution()">
+                        <button 
+                            form="validate-complete-solution-form" 
+                            type="submit" 
+                            class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm">
                         Validate Solution
                         </button>
                     </div>
                 </div>
-                
-                <div id="validate-div" class="flex flex-1 p-4 bg-gray-500 my-4 rounded-lg"> validation results here</div>
+
+                <div id="validate-div"></div>
+
 
                 <div class="flex flex-col gap-y-4 mb-4">
                     <div class="flex flex-1 flex-col rounded-md">
@@ -174,16 +201,16 @@
                             <div id="solution-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
                             <div id="initial-solution-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
                         </div>
-                        <span class="text-xs font-semibold text-gray-800 cursor-default">*Code what will be given to student</span>
+                        <span class="text-xs font-semibold text-gray-800 cursor-default">*Validation is done by running the Complete Solution against the Test Case.</span>
+                        <span class="text-xs font-semibold text-gray-800 cursor-default">*The code inside initial solution will be presented to students.</span>
+
                     </div>
                     <div class="flex flex-1 flex-col rounded-md">
                         <div class="flex w-full bg-gray-800 p-2 justify-between rounded-t-md">
                             <button type="button" class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 cursor-pointer text-sm">Test Case</button>
-                            <button type="button" class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 cursor-pointer text-sm">Test Edge Case</button>
                         </div>         
                         <div class="flex">
                             <div id="test-case-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
-                            <div id="edge-case-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
                         </div>
                         <span class="text-xs font-semibold text-gray-800 cursor-default">*Scaffold programing languages codes for both student solution and sample test </span>
                     </div>
@@ -193,15 +220,11 @@
         </div>
         <div class="flex gap-x-2">
             <button form="test-code" type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm "
-                    hx-on:click="getSolutionCode(), getInstructionCode()">
-                    Create Question
+                    hx-on:click="getSolutionCode(); getInstructionCode();">
+                    {{ isEdit ? 'Edit' : 'Create' }}  Coding Question
             </button>
             <a href="/questions" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
         </div>
-        <div id="data-div" class="w-full flex flex-1">
-            replace me with results
-        </div>
-
     </div>
 </form>
 <form   id="preview-markdown-form"
@@ -214,14 +237,25 @@
     <textarea class="hidden" name="instruction" id="instruction-preview-input" ></textarea>
 
 </form>
+
 <form   id="validate-complete-solution-form"
         class="hidden"
         hx-post="/questions/create/validate-complete-solution"
         hx-target="#validate-div"
-        hx-swap="outerHTML">
+        hx-swap="outerHTML"
+        hx-indicator="#loader" 
+        onsubmit="validateLanguageCompleteSolution()">
     {{ csrf_field() }}
     <textarea class="hidden" name="validate-complete-solution" id="validate-complete-solution-input" ></textarea>
     <textarea class="hidden" name="validate-test-case" id="validate-test-case-input" ></textarea>
     <input type="text" class="hidden" name="language-to-validate" id="language_to_validate-input">
 </form>
+{% if isEdit %}
+<script>
+    window.instruction = JSON.parse('{{ question_type_data.instruction_raw|json_encode|e("js") }}');
+    window.question_supported_languages = JSON.parse('{{ question_type_data.language_codes|json_encode|e("js") }}');
+</script>
+
+
+{% endif %}
 {% endblock %}

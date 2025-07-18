@@ -30,4 +30,7 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+    .swap-highlight {
+        @apply border-r-4 border-dotted border-blue-900 pr-2;
+    }
   }

@@ -60,17 +60,22 @@
 {% endmacro %}
 
 
-{% macro form_field(label, input, errors, isColumn = false) %}
+{% macro form_field(label, input, errors, isColumn = false, isReverse = false) %}
     {% if not isColumn %}
         <div class="flex flex-1 gap-x-4 pt-2 items-center">
-            {{ label }}
-            {{ input }}
+            {% if not isReverse %}
+                {{ label }}
+                {{ input }}
+            {% else %}
+                {{ input }}
+                {{ label }}
+            {% endif %}
             {% for error in errors %}
             <span class="text-red-500 text-sm font-semibold whitespace-nowrap">{{ error }}</span>    
             {% endfor %}  
         </div>
     {% else %}
-        <div class="flex flex-col gap-y-1 pt-2">
+        <div class="flex w-full flex-col gap-y-1 pt-2">
             {{ label }}
             {{ input }}
             {% for error in errors %}
@@ -92,13 +97,23 @@
 
 {% macro radio(name, values, value, attributes, label_attributes) %}
   {% for key, label in values %}
-  <label {% if value == key %} class="selected"{% endif %} {% for attr, value in label_attributes %} {{ attr }}="{{ value }}"{% endfor %}><input type="radio" name="{{ name }}" value="{{ key }}"
-    {% if value == key %} checked="checked"{% endif %}
-    {% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %}
-    {% if not attributes.id is defined %} id="{{ name }}"{% endif %}> 
-    <span class="w-full break-words whitespace-normal">{{ label }}</span></label>
+    {% set is_selected = (value == key) %}
+    {% set label_classes = (label_attributes.class|default('') ~ (is_selected ? ' selected' : ''))|trim %}
+
+    <label class="{{ label_classes }}"
+      {% for attr, val in label_attrs %}{% if attr != 'class' %} {{ attr }}="{{ val }}"{% endif %}{% endfor %}>
+      
+      <input type="radio" name="{{ name }}" value="{{ key }}"
+        {% if is_selected %} checked="checked"{% endif %}
+        {% for attr, val in attributes %} {{ attr }}="{{ val }}"{% endfor %}
+        {% if not attributes.id is defined %} id="{{ name }}"{% endif %}>
+      
+      <span class="w-full break-words whitespace-normal">{{ label }}</span>
+    </label>
   {% endfor %}
 {% endmacro %}
+
+
 
 {% macro exam_radio(name, values, value, attributes, label_attributes) %}
   {% for key, label in values %}

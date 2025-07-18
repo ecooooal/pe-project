@@ -52,6 +52,10 @@ class Question extends Model
         return $this->hasMany(MatchingQuestion::class);
     }
 
+    public function codingQuestion(){
+        return $this->hasOne(CodingQuestion::class);
+    }
+
     public function getTypeModel()
     {                
 
@@ -75,6 +79,10 @@ class Question extends Model
             case QuestionType::Matching:
                 $this->load('matchingQuestions');
                 return $this->matchingQuestions;
+
+            case QuestionType::Coding:
+                $this->load('codingQuestion.codingQuestionLanguages');
+                return $this->codingQuestion;
         }
     }
     

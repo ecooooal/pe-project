@@ -10,10 +10,16 @@ export default defineConfig({
             host: 'localhost',
             port: 5173,
         },
+        watch: {
+            ignored: [
+                '**/storage/logs/**', // ignore Laravel logs
+                '**/vendor/**',       // ignore Composer stuff too (optional)
+            ],
+        },
     },
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js','resources/js/text-editor.js'],
+            input: ['resources/css/app.css', 'resources/js/app.js','resources/js/text-editor.js','resources/js/edit-coding-text-editor.js'],
             refresh: true,
         }),
         tailwindcss(),
