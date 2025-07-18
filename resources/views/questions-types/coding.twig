@@ -221,7 +221,7 @@
         <div class="flex gap-x-2">
             <button form="test-code" type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm "
                     hx-on:click="getSolutionCode(); getInstructionCode();">
-                    Edit Coding Question
+                    {{ isEdit ? 'Edit' : 'Create' }}  Coding Question
             </button>
             <a href="/questions" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
         </div>
