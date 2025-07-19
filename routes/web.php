@@ -9,6 +9,7 @@ use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
+use App\Http\Controllers\Student\ExamController as StudentExamController;
 use App\Models\User;
 use App\Services\QuestionService;
 use Illuminate\Http\Request;
@@ -43,12 +44,12 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/', function () {
         return view('students/student-home');
     });
-    Route::get('/exams', function () {
-        return view('students/exams/index');
-    });
-    Route::get('/exams/exam.id', function () {
-        return view('students/exams/show');
-    });
+    Route::redirect('/exams', '/student#exam-div');
+    Route::get('/exams/exam.id', [StudentExamController::class, 'show']);
+    Route::get('/exams/exam.id/exam-record.id', [StudentExamController::class, 'showExamRecord']);
+    Route::get('/exams/exam.id/get-overview', [StudentExamController::class, 'getExamOverview']);
+    Route::get('/exams/exam.id/get-papers', [StudentExamController::class, 'getExamPapers']);
+
     Route::get('/exams/exam.id/mcq-example', function () {
         return view('students/exams/mcq-example');
     });
@@ -140,8 +141,6 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/exams/{exam}/edit/generate_access_code', [ExamController::class, 'generateAccessCode']);
     Route::get('/exams/builder/tabs', [ExamController::class, 'swap_tabs']);
 
-
-
     Route::get('/questions', [QuestionController::class, 'index']);
     Route::get('/questions/create', [QuestionController::class, 'create'])->name('questions.create');
     Route::get('/questions/create/courses', [QuestionController::class, 'getSubjectsForCourses']);
@@ -156,39 +155,6 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::patch('/questions/{question}', [QuestionController::class, 'update']);
     Route::delete('/questions/{question}', [QuestionController::class, 'destroy']);
     Route::match(['get', 'post', 'patch'], '/questions/load/question-type', [QuestionController::class, 'loadQuestionType'])->name('question.types');
-    // Route::get('/questions/create/question-type', function (Request $request) {
-    //     $item_count = (int) $request->input('item_count', 4);
-    //     $type = $request->query('type'); 
-    //     $isEdit = filter_var($request->input('edit'), FILTER_VALIDATE_BOOLEAN);
-
-    //     if ($isEdit) {
-    //             $question = Question::findOrFail($request->input('question_id'));
-    //     }
-
-    //     switch ($type) {
-    //         case 'multiple_choice':
-    //             return view('questions-types/multiple-choice');
-            
-    //         case 'true_or_false':
-    //             return view('questions-types/true-false');
-            
-    //         case 'identification':
-    //             return view('questions-types/identification');
-
-    //         case 'ranking':
-    //             return view('questions-types/rank-order-process', compact('item_count'));
-            
-    //         case 'matching':
-    //             return view('questions-types/matching-items');
-
-    //         case 'coding':
-    //             return view('questions-types/coding');
-
-    //         default:
-    //             return '';
-    //         }
-    //     })->name('question.types');
-
     Route::get('/questions/create/add-item', function () {
         $counter = request('item_count', 4);
         $is_matching = request('is_matching', false);
