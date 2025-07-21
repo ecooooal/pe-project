@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->foreignIdFor(Course::class, 'course_id')->constrained()->onDelete('set null');;
-            $table->string('access_code')->unique();
             $table->integer('max_score');
             $table->integer('duration')->nullable();
             $table->integer('retakes')->nullable();

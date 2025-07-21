@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Exam;
+use App\Models\ExamAccessCode;
 use App\Models\Question;
 use App\Services\ExamService;
 use App\Services\UserService;
@@ -72,16 +73,19 @@ class ExamController extends Controller
             'max_score' => 'The max score field is required',
             'examination_date' => 'The examination date field must be a date after now.'
         ]);
-        $accessCode = strtoupper(implode('-', str_split(Str::random(8), 4)));
-        Exam::create([
+
+        $exam = Exam::create([
             'name' => request('name'),
             'course_id' => request('course_id'),
-            'access_code' => $accessCode,
+            'access_code' => 'nothing_delete_this_column',
             'max_score' => request('max_score'),
             'duration' => request('duration') ?? null,
             'retakes' => request('retakes') ?? null, 
             'examination_date' => request('examination_date'),
         ]);
+
+        $access_code = $this->examService->generateAccessCode();
+        $this->examService->saveAccessCode($exam, $access_code);
 
         return redirect('/exams');
     }
@@ -200,9 +204,24 @@ class ExamController extends Controller
     }
 
     public function generateAccessCode(Exam $exam){
-        $accessCode = strtoupper(implode('-', str_split(Str::random(8), 4)));
-        $exam->update(['access_code' => $accessCode]);
-        return view('components/core/partials-exam-access-code', ['exam' => $exam]);
+        $access_code = $this->examService->generateAccessCode();
+        return view('components/core/partials-exam-access-code', ['exam' => $exam, 'access_code' => $access_code, 'generate' => true]);
+    }
+
+    public function getAccessCode(Exam $exam){
+        $access_codes = $this->examService->getAccessCodesForExam($exam);
+        return view('exams/get-access-codes', ['exam' => $exam ,'access_codes' => $access_codes]);
+    }
+
+    public function saveAccessCode(Exam $exam, Request $request){
+        $access_code = $request->post('code');
+        $is_success =$this->examService->saveAccessCode($exam, $access_code);
+        
+        if ($is_success !== true) {
+            return back()->withErrors(['access_code' => $is_success]);
+        }
+
+        return view('components/core/partials-exam-access-code', ['access_code' => $access_code, 'generate' => false]);
     }
 
     public function publishExam(Exam $exam){

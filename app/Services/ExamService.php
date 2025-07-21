@@ -2,7 +2,10 @@
 
 namespace App\Services;
 use App\Models\Exam;
+use App\Models\ExamAccessCode;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
+use Str;
 class ExamService
 {
     public function getCourseForExam(Exam $exam)
@@ -13,6 +16,32 @@ class ExamService
     public function getQuestionsForExam(Exam $exam)
     {
         return $exam->questions()->with('topic.subject')->get();
+    }
+
+    public function getAccessCodesForExam(Exam $exam)
+    {
+        return $exam->load('accessCodes')->accessCodes;
+    }
+
+     public function generateAccessCode(): string
+    {
+        do {
+            $access_code = strtoupper(implode('-', str_split(Str::random(8), 4)));
+        } while (ExamAccessCode::where('access_code', $access_code)->exists());
+
+        return $access_code;
+    }
+    public function saveAccessCode(Exam $exam, string $access_code): bool|string
+    {
+        try {
+            $exam->accessCodes()->create(['access_code' => $access_code]);
+            return true;
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return 'Code is already used. Please generate a new one.';
+            }
+            throw $e;
+        }
     }
 
     public function getAvailableQuestionsForExam(Exam $exam)

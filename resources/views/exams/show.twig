@@ -2,6 +2,7 @@
 {% from 'components/core/breadcrumbs' import breadcrumb %}
 {% from 'components/core/show-header' import show_header %}
 {% from 'components/core/show-item' import show_item %}
+{% import 'components/core/forms' as forms %}
 
 
 {% extends 'components/core/faculty-layout' %}
@@ -103,32 +104,45 @@
         <div class="flex flex-col p-8 max-w-full rounded-xl bg-white">
             <div class="flex flex-col p-4 flex-1">  
                     <div class="flex flex-col gap-y-4 w-full">
-                            <div class="flex justify-between gap-x-2 bg-white p-4 rounded border-1 border-gray-900/10">
+                            <div class="flex w-full justify-center gap-x-2 bg-white p-4 rounded border-1 border-gray-900/10">
                                 <div class="m-auto">
-                                    <span   id="add-access-code-input"
-                                            class="flex justify-center text-sm font-mono font-semibold text-gray-700">
-                                        CODE-SAMP
-                                    </span>
+                                    {{ forms.label(
+                                            id:'code', 
+                                            content:'Access Code', 
+                                            attributes:{
+                                                'class':'hidden'}
+                                        )}}
+                                    {{forms.text(
+                                            name:'code', 
+                                            attributes:{
+                                                'class':'font-mono w-full cursor-not-allowed rounded-md bg-gray-100 p-2 text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 sm:text-sm/6',
+                                                'placeholder': 'CODE-SAMP',
+                                                'disabled':true}
+                                        )
+                                    }}
                                 </div>
+                                <button id="save-access-code-button" type="button" class="hidden" disabled></button>
+                                
                                 <button 
-                                    type="submit" 
-                                    class="cursor-pointer ml-2 bg-green-900 text-xs text-white px-3 py-1.5 rounded hover:bg-green-700 transition">
-                                    Save
-                                </button>
-                                <button 
-                                    class="cursor-pointer bg-blue-900 text-xs text-white px-4 py-2 font-semibold rounded hover:bg-blue-700 duration-300">
-                                    Generate
+                                        type="button"
+                                        hx-get="/exams/{{ exam.id }}/edit/generate_access_code" hx-target="#code" hx-select-oob="#save-access-code-button" hx-swap="outerHTML transition:true" hx-trigger="revealed, click"
+                                        class="cursor-pointer bg-blue-900 text-xs text-white p-2 font-semibold rounded hover:bg-blue-700 duration-300">
+                                        Generate
                                 </button>
                             </div>
-                        <div class="bg-white rounded shadow overflow-x-auto">
+                        <div class="bg-white rounded shadow overflow-y-auto max-h-[300px]">
                         <table class="min-w-full table-auto">
-                            <thead class="bg-blue-900 text-left">
+                            <thead class="bg-blue-900 text-left sticky top-0">
                                 <tr class="text-center">
                                     <th class="px-4 py-2 text-white font-bold">Access Codes</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                    <tr class="border-t text-center hover:bg-blue-50">
+                            <tbody  hx-get="/exams/{{ exam.id }}/edit/get_access_codes"
+                                    hx-trigger="revealed"
+                                    hx-swap="outerHTML"
+                                >
+                                    <tr
+                                        class="border-t text-center hover:bg-blue-50">
                                         <td 
                                             class="px-4 py-2 font-mono cursor-pointer select-all">
                                             access-code

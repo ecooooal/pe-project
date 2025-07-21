@@ -139,6 +139,8 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/exams/{exam}/builder/swap-algorithm',[ExamController::class, 'swap_partial_algorithm']);
     Route::get('/exams/{exam}/builder/build', [ExamController::class, 'build_exam']);
     Route::get('/exams/{exam}/edit/generate_access_code', [ExamController::class, 'generateAccessCode']);
+    Route::post('/exams/{exam}/edit/generate_access_code', [ExamController::class, 'saveAccessCode']);
+    Route::get('/exams/{exam}/edit/get_access_codes', [ExamController::class, 'getAccessCode']);
     Route::get('/exams/builder/tabs', [ExamController::class, 'swap_tabs']);
 
     Route::get('/questions', [QuestionController::class, 'index']);
