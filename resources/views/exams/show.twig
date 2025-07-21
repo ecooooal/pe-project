@@ -48,7 +48,13 @@
                     {{ show_item('Current Total Score', exam.questions.sum('points'))}}
                 </div>
                 <div class="flex flex-col mr-16 gap-y-4">
-                    {{ show_item('Access Code', exam.access_code, value_attributes:'text-gray-400')}}
+                    <div class="flex gap-x-2">
+                        <span class="font-medium">Access Codes :</span>
+                        <input  type="button" 
+                                class="hover:font-medium underline cursor-pointer"
+                                popovertarget="create-course-popover" 
+                                value="View Access Codes">
+                    </div>
                     {{ show_item('Author', exam.createdBy.getFullName()) }}
                     {{ show_item('Updated By', exam.updatedBy.getFullName()) }}
                 </div>
@@ -80,4 +86,60 @@
     </div>
 </div>
 
+<div popover="manual"
+    class="backdrop:bg-gray-900/15 backdrop:backdrop-blur-[1px] transition-discrete m-auto ease-in-out transition-opacity rounded-xl w-96" 
+    id="create-course-popover"
+    >
+        <button type="button"
+                popovertarget="create-course-popover" 
+                popovertargetaction="hide" 
+                class="absolute top-2 right-2 p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6 cursor-pointer text-gray-900">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+
+        </button>
+
+        <div class="flex flex-col p-8 max-w-full rounded-xl bg-white">
+            <div class="flex flex-col p-4 flex-1">  
+                    <div class="flex flex-col gap-y-4 w-full">
+                            <div class="flex justify-between gap-x-2 bg-white p-4 rounded border-1 border-gray-900/10">
+                                <div class="m-auto">
+                                    <span   id="add-access-code-input"
+                                            class="flex justify-center text-sm font-mono font-semibold text-gray-700">
+                                        CODE-SAMP
+                                    </span>
+                                </div>
+                                <button 
+                                    type="submit" 
+                                    class="cursor-pointer ml-2 bg-green-900 text-xs text-white px-3 py-1.5 rounded hover:bg-green-700 transition">
+                                    Save
+                                </button>
+                                <button 
+                                    class="cursor-pointer bg-blue-900 text-xs text-white px-4 py-2 font-semibold rounded hover:bg-blue-700 duration-300">
+                                    Generate
+                                </button>
+                            </div>
+                        <div class="bg-white rounded shadow overflow-x-auto">
+                        <table class="min-w-full table-auto">
+                            <thead class="bg-blue-900 text-left">
+                                <tr class="text-center">
+                                    <th class="px-4 py-2 text-white font-bold">Access Codes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    <tr class="border-t text-center hover:bg-blue-50">
+                                        <td 
+                                            class="px-4 py-2 font-mono cursor-pointer select-all">
+                                            access-code
+                                        </td>
+                                    </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>  
+            </div>
+        </div>
+
+</div>
 {% endblock %}
