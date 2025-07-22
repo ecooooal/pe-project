@@ -51,6 +51,8 @@ class ExamController extends Controller
     }
 
     public function show(Exam $exam){
+        $exam->load('questions');
+
         return view('exams/show', ['exam' => $exam]);
     }
 
@@ -90,8 +92,10 @@ class ExamController extends Controller
     }
 
     public function edit(Exam $exam){
-        return view('exams/edit', ['exam'=>$exam]);
-
+        if ($exam->is_published) {
+            return back();
+        }
+            return view('exams/edit', ['exam'=>$exam]);
     }
 
     public function update(Exam $exam){
@@ -224,9 +228,13 @@ class ExamController extends Controller
     }
 
     public function publishExam(Exam $exam){
-        // // validate this to look if there's an examination date
-        // $exam->update(['access_code' => $accessCode]);
-        // return view('components/core/partials-exam-access-code', ['exam' => $exam]);
+        $is_published = $this->examService->attemptToPublish($exam);
+        if (!$is_published){
+            return view('components/core/partials-exam-builder-publish-form-error', [
+                'error' => 'Sum of question points do not match the max score.'
+            ]);        
+        }
+        return response('', 200)->header('HX-Refresh', 'true');
     }
 
     public function swap_partial_algorithm(Exam $exam){

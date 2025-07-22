@@ -19,7 +19,7 @@ class Exam extends Model
         'duration',
         'retakes',
         'examination_date',
-        'published',
+        'is_published',
         'applied_algorithm'
     ];
 

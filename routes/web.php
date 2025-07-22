@@ -134,10 +134,12 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/exams/{exam}/edit', [ExamController::class, 'edit']);
     Route::patch('/exams/{exam}', [ExamController::class, 'update']);
     Route::delete('/exams/{exam}', [ExamController::class, 'destroy']);
+
     Route::get('/exams/{exam}/builder', [ExamController::class, 'exam_builder_show']);
     Route::post('/exams/{exam}/builder/add-question/{question}',[ExamController::class, 'toggle_question'])->name('exam.toggleQuestion');
     Route::get('/exams/{exam}/builder/swap-algorithm',[ExamController::class, 'swap_partial_algorithm']);
     Route::get('/exams/{exam}/builder/build', [ExamController::class, 'build_exam']);
+    Route::patch('/exams/{exam}/publishExam', [ExamController::class, 'publishExam'])->name('exams.publish');;
     Route::get('/exams/{exam}/edit/generate_access_code', [ExamController::class, 'generateAccessCode']);
     Route::post('/exams/{exam}/edit/generate_access_code', [ExamController::class, 'saveAccessCode']);
     Route::get('/exams/{exam}/edit/get_access_codes', [ExamController::class, 'getAccessCode']);

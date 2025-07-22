@@ -284,6 +284,25 @@ class ExamService
         return $data;
     }
 
+    public function attemptToPublish(Exam $exam)
+    {        
+        if (!$exam->is_published) {
+                $exam->load('questions');
+
+                $sum_of_points = $exam->questions->sum('points');
+
+                if ($sum_of_points !== $exam->max_score) {
+                    return false;
+                }
+
+                $exam->update(['is_published' => true]);
+            } else {
+                $exam->update(['is_published' => false]);
+            }
+
+            return true;
+    }
+
     // algorithm for shuffling the question list
 }
 
