@@ -38,7 +38,7 @@ class QuestionController extends Controller
                 'subject' => $question->topic->subject->name,
                 'topic' => $question->topic->name,
                 'type' => $question->question_type->name,
-                'author' => $question->author->getFullName(),
+                // 'author' => $question->author->getFullName(),
                 'Date Created' => Carbon::parse($question->created_at)->format('m/d/Y')
             ];
         });

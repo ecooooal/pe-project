@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Factories\QuestionFactory as OwnQuestionFactory;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\Question;
@@ -12,220 +13,186 @@ use Illuminate\Database\Seeder;
 
 class FakeDataSeeder extends Seeder
 {
-    protected $subjects_with_topics = [
-        [
-            'name' => 'Introduction to Computer Science',
-            'topics' => [
-                ['name' => 'Basic computer hardware and software'],
-                ['name' => 'History of computing'],
-                ['name' => 'Problem-solving and algorithmic thinking'],
-                ['name' => 'Introduction to programming concepts'],
-                ['name' => 'Overview of computer science branches'],
-            ]
+
+//     public function run()
+// {
+// $subjects_with_topics = [
+//     [
+//         'name' => 'Introduction to Computer Science',
+//         'topics' => [
+//             [
+//                 'name' => 'Basic computer hardware and software',
+//                 'questions' => [
+//                     [
+//                         'name' => 'What is the function of a CPU?',
+//                         'type_of_a_question' => ['multiple_choice'],
+//                         'points' => 5
+//                     ],
+//                     [
+//                         'name' => 'Explain the use of RAM in computing.',
+//                         'type_of_a_question' => ['short_answer'],
+//                         'points' => 10
+//                     ]
+//                 ]
+//             ],
+//             // Add more topics...
+//         ]
+//     ],
+//     // Add more subjects...
+// ];
+
+    // foreach ($subjects_with_topics as $subjectData) {
+    //     $subject = \App\Models\Subject::create([
+    //         'name' => $subjectData['name']
+    //     ]);
+
+    //     foreach ($subjectData['topics'] as $topicData) {
+    //         $topic = $subject->topics()->create([
+    //             'name' => $topicData['name']
+    //         ]);
+
+    //         foreach ($topicData['questions'] ?? [] as $questionData) {
+    //             $topic->questions()->create([
+    //                 'name' => $questionData['name'],
+    //                 'type_of_a_question' => json_encode($questionData['type_of_a_question']),
+    //                 'points' => $questionData['points']
+    //             ]);
+    //         }
+    //     }
+    // }
+// }
+
+protected $subjects_with_topics = [
+    [
+        'name' => 'Computer Programming 1',
+        'Date Created' => '01/01/2025',
+        'topics' => [
+            [
+                'name' => 'Data Types',
+                'questions' => [
+                    [
+                        'name' => 'A byte is an 8-bit signed integer?',
+                        'type' => 'true_or_false',
+                        'points' => 1,
+                        'solution' => 'true',
+                        'author' => 'superAdmin',
+                        'Date Created' => '01/01/2025'
+                    ],
+                    [
+                        'name' => 'What is the name for a memory location that stores specific value, such as numbers and letters?',
+                        'type' => 'identification',
+                        'points' => 1,
+                        'solution' => 'variable',
+                        'author' => 'superAdmin',
+                        'Date Created' => '01/01/2025'
+                    ],
+                    [
+                        'name' => 'This is a memory location whose value cannot be changed during program execution.',
+                        'type' => 'identification',
+                        'points' => 7,
+                        'solution' => 'Constant',
+                        'author' => 'superAdmin',
+                        'Date Created' => '01/01/2025'
+                    ],
+                ],
+                'Date Created' => '01/01/2025'
+            ],
+            [
+                'name' => 'Programming Environments',
+                'questions' => [
+                    [
+                        'name' => 'What is the basic unit of a java program?',
+                        'type' => 'multiple_choice',
+                        'points' => 1,
+                        'items' => ['Applet', 'Source Code', 'Class', 'Syntax'],
+                        'solution' => 'c',
+                        'author' => 'superAdmin',
+                        'Date Created' => '01/01/2025'
+                    ],
+                    [
+                        'name' => 'A reserved words or keywords can used in naming variables while retaining its original purpose.',
+                        'type' => 'true_or_false',
+                        'points' => 1,
+                        'solution' => 'false',
+                        'author' => 'superAdmin',
+                        'Date Created' => '01/01/2025'
+                    ],
+                    [
+                        'name' => 'In java environment what method does the execution always begins?',
+                        'type' => 'identification',
+                        'points' => 2,
+                        'solution' => 'main',
+                        'author' => 'superAdmin',
+                        'Date Created' => '01/01/2025'
+                    ],
+                ],
+                'Date Created' => '01/01/2025'
+            ],
+            [
+                'name' => 'Syntax and Logical Errors',
+                'questions' => [
+                    [
+                        'name' => 'What does it mean when syntax errors is encountered',
+                        'type' => 'multiple_choice',
+                        'points' => 1,
+                        'items' => ['It means there is a logical error.', 'There is a grammatical mistake in the code of the program', 'There are comments in the codes.', 'The code was compiled but got unexpected output.'],
+                        'solution' => 'b',
+                        'author' => 'superAdmin',
+                        'Date Created' => '01/01/2025'
+                    ],
+                    [
+                        'name' => 'Logical errors can be fixed as simple as correcting grammatical mistakes in the program.',
+                        'type' => 'true_or_false',
+                        'points' => 1,
+                        'solution' => 'false',
+                        'author' => 'superAdmin',
+                        'Date Created' => '01/01/2025'
+                    ],
+                    [
+                        'name' => 'This error is encountered when the program produced unexpected result. (2 words)',
+                        'type' => 'identification',
+                        'points' => 2,
+                        'solution' => 'logical error',
+                        'author' => 'superAdmin',
+                        'Date Created' => '01/01/2025'
+                    ],
+                ],
+                'Date Created' => '01/01/2025'
+            ],
         ],
-        [
-            'name' => 'Introduction to Programming',
-            'topics' => [
-                ['name' => 'Basic syntax and semantics (e.g., variables, data types)'],
-                ['name' => 'Control structures (loops, conditionals)'],
-                ['name' => 'Functions and modular programming'],
-                ['name' => 'Input/output handling'],
-                ['name' => 'Basic error handling and debugging'],
-            ]
-        ],
-        [
-            'name' => 'Object-Oriented Programming',
-            'topics' => [
-                ['name' => 'Classes and objects'],
-                ['name' => 'Encapsulation, inheritance, and polymorphism'],
-                ['name' => 'Constructors and destructors'],
-                ['name' => 'Object-oriented design principles'],
-                ['name' => 'Exception handling in OOP'],
-            ]
-        ],
-        [
-            'name' => 'Data Structures and Algorithms',
-            'topics' => [
-                ['name' => 'Arrays, stacks, queues, linked lists'],
-                ['name' => 'Trees, graphs, and hash tables'],
-                ['name' => 'Sorting and searching algorithms'],
-                ['name' => 'Time complexity analysis (Big-O notation)'],
-                ['name' => 'Recursion and iteration'],
-            ]
-        ],
-        [
-            'name' => 'Computer Organization and Architecture',
-            'topics' => [
-                ['name' => 'Basic hardware components (CPU, RAM, I/O devices)'],
-                ['name' => 'Machine-level architecture (binary, instructions)'],
-                ['name' => 'Assembly language basics'],
-                ['name' => 'Memory hierarchy (cache, RAM, hard drives)'],
-                ['name' => 'Input/Output operations'],
-            ]
-        ],
-        [
-            'name' => 'Operating Systems',
-            'topics' => [
-                ['name' => 'Processes and threads'],
-                ['name' => 'Memory management (paging, segmentation)'],
-                ['name' => 'File systems and storage management'],
-                ['name' => 'Scheduling algorithms (FIFO, Round Robin)'],
-                ['name' => 'Inter-process communication (IPC)'],
-            ]
-        ],
-        [
-            'name' => 'Database Management Systems',
-            'topics' => [
-                ['name' => 'Database design (ER diagrams, normalization)'],
-                ['name' => 'SQL basics (SELECT, INSERT, UPDATE, DELETE)'],
-                ['name' => 'Relational model'],
-                ['name' => 'Indexing and optimization techniques'],
-                ['name' => 'Transactions and ACID properties'],
-            ]
-        ],
-        [
-            'name' => 'Computer Networks',
-            'topics' => [
-                ['name' => 'OSI model and TCP/IP stack'],
-                ['name' => 'IP addressing and subnetting'],
-                ['name' => 'Routing and switching'],
-                ['name' => 'Network protocols (HTTP, FTP, DNS)'],
-                ['name' => 'Introduction to wireless networks'],
-            ]
-        ],
-        [
-            'name' => 'Software Engineering',
-            'topics' => [
-                ['name' => 'Software development life cycle (SDLC)'],
-                ['name' => 'Requirements gathering and analysis'],
-                ['name' => 'Design patterns and principles (e.g., MVC)'],
-                ['name' => 'Version control systems (e.g., Git)'],
-                ['name' => 'Agile methodologies (Scrum, Kanban)'],
-            ]
-        ],
-        [
-            'name' => 'Introduction to Web Development',
-            'topics' => [
-                ['name' => 'HTML, CSS, and JavaScript basics'],
-                ['name' => 'Client-server architecture'],
-                ['name' => 'Front-end frameworks (e.g., React, Angular)'],
-                ['name' => 'Web APIs and AJAX'],
-                ['name' => 'Responsive web design'],
-            ]
-        ],
-        [
-            'name' => 'Human-Computer Interaction (HCI)',
-            'topics' => [
-                ['name' => 'User interface design principles'],
-                ['name' => 'Usability testing'],
-                ['name' => 'Interaction design'],
-                ['name' => 'Accessibility in design'],
-                ['name' => 'Prototyping and wireframing tools'],
-            ]
-        ],
-        [
-            'name' => 'Cybersecurity Fundamentals',
-            'topics' => [
-                ['name' => 'Cryptography basics (symmetric and asymmetric encryption)'],
-                ['name' => 'Authentication methods (passwords, biometrics)'],
-                ['name' => 'Network security protocols (TLS, VPN)'],
-                ['name' => 'Ethical hacking and penetration testing'],
-                ['name' => 'Risk management and threat modeling'],
-            ]
-        ],
-        [
-            'name' => 'Mobile Application Development',
-            'topics' => [
-                ['name' => 'Mobile development platforms (Android, iOS)'],
-                ['name' => 'UI design principles for mobile apps'],
-                ['name' => 'Mobile app architecture (MVC, MVVM)'],
-                ['name' => 'Mobile databases (SQLite, Firebase)'],
-                ['name' => 'Integrating APIs in mobile apps'],
-            ]
-        ],
-        [
-            'name' => 'Theory of Computation',
-            'topics' => [
-                ['name' => 'Finite automata and regular expressions'],
-                ['name' => 'Context-free grammars'],
-                ['name' => 'Turing machines and decidability'],
-                ['name' => 'Complexity classes (P, NP, NP-complete)'],
-                ['name' => 'Formal languages and parsing techniques'],
-            ]
-        ],
-        [
-            'name' => 'Digital Logic Design',
-            'topics' => [
-                ['name' => 'Logic gates (AND, OR, NOT, XOR)'],
-                ['name' => 'Boolean algebra and simplification'],
-                ['name' => 'Combinational circuits (adders, multiplexers)'],
-                ['name' => 'Sequential circuits (flip-flops, counters)'],
-                ['name' => 'State machines and FSMs'],
-            ]
-        ],
-        [
-            'name' => 'Project Management for IT',
-            'topics' => [
-                ['name' => 'Project life cycle (initiation, planning, execution, closure)'],
-                ['name' => 'Risk management in IT projects'],
-                ['name' => 'Resource allocation and budgeting'],
-                ['name' => 'Time management and scheduling (Gantt charts, Agile boards)'],
-                ['name' => 'Team collaboration and communication'],
-            ]
-        ],
-        [
-            'name' => 'Unix/Linux Systems',
-            'topics' => [
-                ['name' => 'Unix/Linux command line basics'],
-                ['name' => 'File system navigation and manipulation'],
-                ['name' => 'Shell scripting and automation'],
-                ['name' => 'Process management and signals'],
-                ['name' => 'System administration basics (user management, permissions)'],
-            ]
-        ],
-        [
-            'name' => 'Software Testing and Debugging',
-            'topics' => [
-                ['name' => 'Types of software testing (unit, integration, system, acceptance)'],
-                ['name' => 'Writing test cases and test scripts'],
-                ['name' => 'Debugging techniques (breakpoints, logging)'],
-                ['name' => 'Test-driven development (TDD)'],
-                ['name' => 'Automation testing tools (JUnit, Selenium)'],
-            ]
-        ],
-        [
-            'name' => 'Programming Paradigms',
-            'topics' => [
-                ['name' => 'Procedural programming'],
-                ['name' => 'Functional programming basics'],
-                ['name' => 'Event-driven programming'],
-                ['name' => 'Declarative programming'],
-                ['name' => 'Multi-paradigm languages (e.g., Python, JavaScript)'],
-            ]
-        ],
-        [
-            'name' => 'Introduction to Machine Learning',
-            'topics' => [
-                ['name' => 'Overview of machine learning types (supervised, unsupervised, reinforcement learning)'],
-                ['name' => 'Basic algorithms (linear regression, decision trees)'],
-                ['name' => 'Data preprocessing and feature engineering'],
-                ['name' => 'Model evaluation metrics'],
-                ['name' => 'Overfitting and regularization'],
-            ]
-        ],
-    ];
+    ],
+];
+
+
     
     public function run(): void
     {
-        foreach ($this->subjects_with_topics as $subject_data) {
-            $subject = Subject::factory()->create([
-                'course_id' =>  Course::find(1)->id,
-                'name' => $subject_data['name'],
+       
+        foreach ($this->subjects_with_topics as $subjectData) {
+            $subject = Subject::firstOrCreate([
+                'name' => $subjectData['name'],
+                'course_id' => 1,
+                'year_level' => 1,
             ]);
-            foreach ($subject_data['topics'] as $topic_data) {
-                $subject->topics()->create($topic_data);
+
+            foreach ($subjectData['topics'] as $topicData) {
+                $topic = Topic::firstOrCreate([
+                    'name' => $topicData['name'],
+                    'subject_id' => $subject->id,
+                ]);
+
+
+                foreach ($topicData['questions'] ?? [] as $questionData) {
+                    $exists = Question::where('name', $questionData['name'])
+                        ->where('topic_id', $topic->id)
+                        ->exists();
+
+                    if (! $exists) {
+                        $questionData['topic'] = $topic->id;
+                        OwnQuestionFactory::create($questionData);
+                    }
+                }
             }
         }
-        Question::factory()->count(200)->create();
     }
 }

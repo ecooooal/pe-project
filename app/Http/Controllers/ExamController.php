@@ -77,7 +77,6 @@ class ExamController extends Controller
         $exam = Exam::create([
             'name' => request('name'),
             'course_id' => request('course_id'),
-            'access_code' => 'nothing_delete_this_column',
             'max_score' => request('max_score'),
             'duration' => request('duration') ?? null,
             'retakes' => request('retakes') ?? null, 

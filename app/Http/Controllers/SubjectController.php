@@ -24,7 +24,7 @@ class SubjectController extends Controller
         $rows = $subject_courses->map(function ($subject) {
             return [
                 'id' => $subject->id,
-                'course' => $subject->course->name,
+                'course' => $subject->course->abbreviation,
                 'name' => $subject->name,
                 'year_level' => $subject->year_level,
                 'Date Created' => Carbon::parse($subject->created_at)->format('m/d/Y')

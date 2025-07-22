@@ -38,7 +38,7 @@ class QuestionFactory
         DB::beginTransaction();
 
         try {
-            $question = Question::create($question_data);
+            $question = Question::Create($question_data);
 
             switch ($question_data['question_type']) {
                 case 'multiple_choice':
