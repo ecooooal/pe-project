@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Topic;
 use App\Services\UserService;
@@ -43,23 +44,22 @@ class TopicController extends Controller
     }
 
     public function show(Topic $topic){
-        $topic->load( 'subject.course');
-        $topic->load('questions');
-
         $header = ['ID', 'Name', 'Type', 'Date Created'];
-        $rows = $topic->questions->map(function ($question) {
-            return [
+        $questions = Question::with(['topic'])
+            ->where('topic_id', $topic->id)
+            ->Paginate(5);
+
+        $rows = $questions->map(fn($question) => [
                 'id' => $question->id,
                 'name' => $question->name,
                 'type' => $question->question_type->name,
                 'Date Created' => Carbon::parse($question->created_at)->format('m/d/Y')
-            ];
-        });
-
+        ]);
         $data = [
             'headers' => $header,
             'rows' => $rows,
-            'topic'=>$topic
+            'topic'=>$topic,
+            'questions' => $questions
         ];
 
         return view('topics/show', $data);

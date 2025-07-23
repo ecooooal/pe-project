@@ -117,7 +117,10 @@ class ExamService
 
 
     public function transformQuestionRows(Collection $questions)
-    {
+    {   
+        foreach ($questions as $question){
+            $question->load('topic.subject');
+        }
         return $questions->map(fn ($question) => [
             'id' => $question->id, 
             'name' => $question->name,
@@ -135,6 +138,9 @@ class ExamService
     {
         // Get all questions related to the exam’s course
         $course = $this->getCourseForExam($exam);
+        $course->load([
+            'subjects.topics.questions.topic.subject'
+        ]);
         $knapsack = [];
 
         // Check if course does exist   

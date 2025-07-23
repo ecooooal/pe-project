@@ -48,7 +48,7 @@
             hx-swap="outerHTML">
         </div>
     {% else %}
-        <form hx-patch="/questions/{{ question.id }}" hx-redirect="/questions" hx-target="#question-type-content"  hx-select-oob="#name-form-error, #points-form-error, #topic" class="flex flex-col gap-y-4">
+        <form hx-patch="{{ route('questions.update', { question:question } ) }}" hx-redirect="/questions" hx-target="#question-type-content"  hx-select-oob="#name-form-error, #points-form-error, #topic" class="flex flex-col gap-y-4">
             {{ csrf_field() }}
             <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
                 <div class="flex flex-col p-4 flex-1">
@@ -201,7 +201,7 @@
     {% endif %}
 
     
-    <form method="POST" action="/questions/{{ question.id }}" class="hidden" id="delete-form">
+    <form method="POST" action="{{ route('questions.destroy', { question:question } ) }}" class="hidden" id="delete-form">
         {{ csrf_field() }}
         {{ method_field('DELETE') }}
     </form>

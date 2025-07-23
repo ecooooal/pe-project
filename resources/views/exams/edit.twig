@@ -44,7 +44,7 @@
     </div>
     
     <div class="flex flex-1 flex-col mx-16">
-        <form action="/exams/{{ exam.id }}" method="POST" class="flex flex-col gap-y-4">
+        <form action="{{ route('exams.update', { exam:exam } ) }}" method="POST" class="flex flex-col gap-y-4">
             {{ csrf_field() }}
             {{ method_field('PATCH') }}
             <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
@@ -104,7 +104,7 @@
                                 ),
                                 isColumn:true 
                             )}}
-Z                        </div>
+                        </div>
                     </div>
                 </div>  
             </div>
@@ -184,11 +184,11 @@ Z                        </div>
                 <button type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm">
                     Update Exam
                 </button>
-                <a href="/exams" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
+                <a href="{{ route('exams.show', { exam:exam } ) }}" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
             </div>
         </form>
 
-        <form method="POST" action="/exams/{{ exam.id }}" class="hidden" id="delete-form">
+        <form method="POST" action="{{ route('exams.destroy', { exam:exam } ) }}" class="hidden" id="delete-form">
             {{ csrf_field() }}
             {{ method_field('DELETE') }}
         </form>

@@ -131,7 +131,7 @@ class ExamController extends Controller
         return redirect('/exams');
     }
 
-    public function exam_builder_show(Exam $exam){
+    public function exam_builder_show(Exam $exam){  
         $exam_course = $this->examService->getCourseForExam($exam);
         $exam_questions =  $this->examService->getQuestionsForExam($exam);
         $exam_topics = $this->examService->getTopicsForExam($exam);

@@ -12,7 +12,7 @@
 </div>
 
 <div class="flex flex-1 flex-col mx-16">
-    <form method="POST" hx-post="/questions" hx-redirect="/questions" hx-target="#question-type-content" hx-select-oob="#name-form-error, #points-form-error, #topic" class="flex flex-col gap-y-4">
+    <form method="POST" hx-post="{{ route('questions.store') }}" hx-redirect="/questions" hx-target="#question-type-content" hx-select-oob="#name-form-error, #points-form-error, #topic" class="flex flex-col gap-y-4">
     {{ csrf_field() }}
         <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
             <div class="flex flex-col p-4 flex-1">
@@ -172,8 +172,7 @@
 
         <div class="flex gap-x-2">
             <button type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm">Create Question</button>
-            <button type="submit" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-gray-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm">Create Question & create another</button>
-            <a href="/questions" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
+            <a href="{{ route('questions.index') }}" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
 
         </div>
     </form>

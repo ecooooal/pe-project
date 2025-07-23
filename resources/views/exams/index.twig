@@ -15,7 +15,7 @@
         <h1 class="font-bold text-4xl">Exam Management</h1>
     </div>
     {% if can('create exams') %}
-        <a href="/exams/create" class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold">Create Exam</a>
+        <a href="{{ route('exams.create', { exam:exam } ) }}" class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold">Create Exam</a>
     {% endif %}
 </div>
 <div class="mx-4 p-4">

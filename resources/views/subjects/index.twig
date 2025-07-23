@@ -14,7 +14,7 @@
         <h1 class="font-bold text-4xl">Subject Management</h1>
     </div>
     {% if can('create subjects') %}
-        <a href="/subjects/create" class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold">Create Subject</a>
+        <button type="button" popovertarget="create-subject-popover" class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold">Create Subject</button>
     {% endif %}
 </div>
 <div class="mx-4 p-4">
@@ -29,5 +29,16 @@
         {{ subjects.onEachSide(3).links() }}
     </div>
 </div>
-
+{% if can('create subjects') %}
+    <div popover="manual"
+        class="backdrop:bg-gray-900/15 transition-discrete m-auto ease-in-out transition-opacity rounded-xl w-96" 
+        id="create-subject-popover"
+        >
+        <form   hx-get="{{ route('subjects.create') }}"
+                hx-trigger="revealed"
+                hx-target="this"
+                hx-swap="innerHTML">  
+        </form>
+    </div>
+{% endif %}
 {% endblock %}

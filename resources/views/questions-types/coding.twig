@@ -18,7 +18,7 @@
     {{ vite('resources/js/text-editor.js')|raw }}
 {% endif %}
 <form id="test-code"
-      hx-post="/questions" 
+      hx-post="{{ route('questions.store') }}" 
       hx-redirect="/questions"
       hx-target="#name-points-form-error"
       hx-select-oob="#instruction-form-error, #language-form-error">
@@ -223,7 +223,7 @@
                     hx-on:click="getSolutionCode(); getInstructionCode();">
                     {{ isEdit ? 'Edit' : 'Create' }}  Coding Question
             </button>
-            <a href="/questions" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
+            <a href="{{ route('questions.index') }}" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
         </div>
     </div>
 </form>

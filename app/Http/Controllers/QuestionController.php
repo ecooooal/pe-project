@@ -30,6 +30,7 @@ class QuestionController extends Controller
 
     public function index(){
         $questions = $this->userService->getQuestionsForUser(auth()->user())->paginate(10);
+        $questions->load('author'); 
         $header = ['ID', 'Name', 'Subject', 'Topic', 'Type', 'Author', 'Date Created'];
         $rows = $questions->map(function ($question) {
             return [
@@ -38,7 +39,7 @@ class QuestionController extends Controller
                 'subject' => $question->topic->subject->name,
                 'topic' => $question->topic->name,
                 'type' => $question->question_type->name,
-                // 'author' => $question->author->getFullName(),
+                // 'author' => $question->author->getFullName() ?? "No Author",
                 'Date Created' => Carbon::parse($question->created_at)->format('m/d/Y')
             ];
         });

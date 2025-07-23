@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Subject;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CourseController extends Controller
 {
@@ -37,7 +39,25 @@ class CourseController extends Controller
     }
 
     public function show(Course $course){
-        return view('courses/show', ['course' => $course]);
+        $header = ['ID', 'Name', 'Year Level', 'Date Created'];
+        $subjects = Subject::with(['course'])
+            ->where('course_id', $course->id)
+            ->Paginate(10);
+
+        $rows = $subjects->map(fn($subject) => [
+                'id' => $subject->id,
+                'name' => $subject->name,
+                'type' => $subject->year_level,
+                'Date Created' => Carbon::parse($subject->created_at)->format('m/d/Y')
+        ]);
+
+        $data = [
+            'headers' => $header,
+            'rows' => $rows,
+            'course'=>$course,
+            'subjects' => $subjects
+        ];
+        return view('courses/show', $data);
     }
 
     public function create(){
@@ -45,17 +65,23 @@ class CourseController extends Controller
     }
 
     public function store(){
-        request()->validate([
+        $validator = Validator::make(request()->post(), [
             'name'    => ['required'],
             'abbreviation' => ['required']
         ]);
+
+        if ($validator->fails()) {
+            return response()->view('courses.create', [
+                'errors' => $validator->errors(),
+                'old' => request()->all()]);
+        }
 
         Course::create([
             'name' => request('name'),
             'abbreviation' => request('abbreviation')
         ]);
 
-        return redirect('/courses');
+        return response('', 200)->header('HX-Redirect', route('courses.index'));
     }
 
     public function edit(Course $course){
@@ -91,26 +117,5 @@ class CourseController extends Controller
 
         return redirect('/courses');
 
-    }
-
-        public function showSubjects(Course $course){
-        $course->load('subjects')->paginate(10);
-
-        $header = ['ID', 'Name', 'Year Level', 'Date Created'];
-        $rows = $course->subjects->map(function ($subject) {
-            return [
-                'id' => $subject->id,
-                'name' => $subject->name,
-                'type' => $subject->year_level,
-                'Date Created' => Carbon::parse($subject->created_at)->format('m/d/Y')
-            ];
-        });
-
-        $data = [
-            'headers' => $header,
-            'rows' => $rows,
-            'course'=>$course
-        ];
-        return view('courses/subjects', $data);
     }
 }
