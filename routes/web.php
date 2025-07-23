@@ -173,14 +173,13 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
         return view('questions-types/new-text-item', ['counter' => $item_count, 'is_matching' => $is_matching]);
      });
 
-    Route::get('/topics', [TopicController::class, 'index']);
-    Route::get('/topics/create', [TopicController::class, 'create']);
-    Route::post('/topics', [TopicController::class, 'store']);
+    Route::get('/topics', [TopicController::class, 'index'])->name('topics.index');
+    Route::get('/topics/create', [TopicController::class, 'create'])->name('topics.create');
+    Route::post('/topics', [TopicController::class, 'store'])->name('topics.store');
     Route::get('/topics/{topic}', [TopicController::class, 'show'])->name(name: 'topics.show');
-    Route::get('/topics/{topic}/edit', [TopicController::class, 'edit']);
-    Route::patch('/topics/{topic}', [TopicController::class, 'update']);
-    Route::delete('/topics/{topic}', [TopicController::class, 'destroy']);
-    Route::get('/topics/{topic}/questions', [TopicController::class, 'showQuestions']);
+    Route::get('/topics/{topic}/edit', [TopicController::class, 'edit'])->name('topics.edit');
+    Route::patch('/topics/{topic}', [TopicController::class, 'update'])->name('topics.update');
+    Route::delete('/topics/{topic}', [TopicController::class, 'destroy'])->name('topics.destroy');
 
     Route::get('/subjects', [SubjectController::class, 'index']);
     Route::get('/subjects/create', [SubjectController::class, 'create']);

@@ -69,7 +69,8 @@ public function getCountsForCoursesForUser(User $user)
 
     public function getTopicById($topicId)
     {
-        return Topic::with('questions') // eager load questions
+        // eager load questions
+        return Topic::with('questions') 
                     ->findOrFail($topicId);
     }
 

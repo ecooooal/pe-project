@@ -25,8 +25,9 @@ class ExamController extends Controller
 
     public function index(){
         $courseIds = $this->userService->getCoursesForUser(auth()->user())->pluck('id');
-        $exams = Exam::whereIn('course_id', $courseIds)->paginate(10);
-
+        $exams = Exam::with('course', 'questions') 
+                    ->whereIn('course_id', $courseIds)
+                    ->paginate(10);
         $header = ['ID', 'Name', 'Course', 'Questions', 'Status', 'is Published', 'Examination Date'];
         $rows = $exams->map(function ($exam) {
             return [

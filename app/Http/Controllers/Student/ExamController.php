@@ -26,22 +26,16 @@ class ExamController extends Controller
         $this->examService = $examService;
     }
 
-    public function index(){
-
-        return;
-
-    }
-
     public function show(Exam $exam){
-        return view( 'students/exams/show', ['exam'=> $exam]);
+        $exam->load('questions');
+        $questions = $exam->questions->mapWithKeys(function ($question) {
+            return [$question->id => $question->getTypeModel()];
+        });
+        return view( 'students/exams/show', ['exam'=> $exam, 'questions' => $questions]);
     }
 
     public function showExamRecord(Exam $exam){
         return view(view: 'students/records/show');
-    }
-    public function create(){
-        return;
-
     }
 
     public function store(User $user){
@@ -67,20 +61,6 @@ class ExamController extends Controller
         return response('', 200)->header('HX-Refresh', 'true');
     }
 
-    public function edit(Exam $exam){
-        return;
-
-    }
-
-    public function update(Exam $exam){
-        return;
-
-    }
-
-    public function destroy(Exam $exam)
-    {
-        return;
-    }
     public function getExamPapers(Exam $exam)
     {
         return view(view: 'students/exams/get-exam-papers');
@@ -89,9 +69,5 @@ class ExamController extends Controller
     {
         $exam->load('course');
         return view('students/exams/get-exam-overview', ['exam' => $exam]);
-    }
-    public function getAccessCodeForm()
-    {
-
     }
 }

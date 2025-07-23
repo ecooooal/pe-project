@@ -10,24 +10,24 @@
 {{ breadcrumb() }}
 <div class="flex flex-1 flex-col gap-y-4">
     <div class="flex flex-col max-w-full mx-8 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
-            {{ show_header('Exam Name') }}  
+            {{ show_header(exam.name|title) }}  
             <div class="flex gap-x-4">
-                <button     hx-get="{{ route('exams.student.overview', { exam: exam }) }}" 
-
-
+                <button hx-get="{{ route('exams.student.overview', { exam: exam }) }}" 
                         hx-target="#exam-content"
                         hx-trigger="load, click" 
-
-                        hx-swap="outerHTML">
+                        hx-swap="outerHTML"
+                        class="cursor-pointer hover:text-blue-900 hover:underline">
                     Overview
                 </button>
                 <button hx-get="/student/exams/exam.id/get-papers" 
                         hx-target="#exam-content"
-                        hx-swap="outerHTML">
+                        hx-swap="outerHTML"
+                        class="cursor-pointer hover:text-blue-900 hover:underline">
                     Exam Records
                 </button>
             </div>
     </div>  
+    {{ dump()}}
 
     <div id="exam-content"></div>
 

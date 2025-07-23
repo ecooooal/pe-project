@@ -1,5 +1,6 @@
 {% from 'components/core/breadcrumbs' import breadcrumb %}
 {% from 'components/core/index-table' import table %}
+{% from 'components/core/show-header' import show_header %}
 {% extends 'components/core/faculty-layout' %}
 
 {% block content %}
@@ -12,7 +13,9 @@
         </svg>
         <h1 class="font-bold text-4xl">Topic Management</h1>
     </div>
-    <a href="/topics/create" class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold">Create Topic</a>
+    {% if can('create topics') %}
+    <button type="button" popovertarget="create-course-popover"  class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold">Create Topic</button>
+    {% endif %}
 </div>
 <div class="mx-4 p-4">
     <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-t border-gray-300 rounded-t-2xl">
@@ -26,5 +29,16 @@
         {{ topics.onEachSide(3).links() }}
     </div>
 </div>
-
+{% if can('create topics') %}
+    <div popover="manual"
+        class="backdrop:bg-gray-900/15 transition-discrete m-auto ease-in-out transition-opacity rounded-xl w-96" 
+        id="create-course-popover"
+        >
+        <form   hx-get="{{ route('topics.create') }}"
+                hx-trigger="revealed"
+                hx-target="this"
+                hx-swap="innerHTML">  
+        </form>
+    </div>
+{% endif %}
 {% endblock %}

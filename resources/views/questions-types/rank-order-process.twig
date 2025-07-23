@@ -46,15 +46,23 @@
         </div>
         <div class="flex flex-col gap-y-4">
             <input type="hidden" id="solution" name="solution" value="creating ranking">
-            <button 
-                type="button" 
-                class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-gray-600 hover:text-white duration-300 rounded-lg px-2 py-2 font-semibold text-sm"
-                hx-get="/questions/create/add-item?item_count={{ isEdit ? values|length : item_count }}&is_matching=false"
-                hx-target="#swap"
-                hx-swap="beforebegin transition:true"
-                >
-                Add more Items
-            </button>
+            <div class="flex gap-x-2">
+                <img id="loader" class="htmx-indicator mx-auto transition-opacity duration-500 pointer-events-none" width="20" src="{{ asset('images/bars-scale.svg') }}"/>
+                <button 
+                    type="button" 
+                    class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-gray-600 hover:text-white duration-300 rounded-lg px-2 py-2 font-semibold text-sm"
+                    hx-get="/questions/create/add-item?item_count={{ isEdit ? values|length : item_count }}&is_matching=false"
+                    hx-target="#swap"
+                    hx-swap="beforebegin transition:true"
+                    hx-trigger="click throttle:1s"
+                    hx-indicator="#loader"
+                    >
+                    Add more Items
+                </button>
+            </div>
+            
+
+
         </div>
     </div>
 </div>  
