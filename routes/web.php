@@ -10,6 +10,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\Student\ExamController as StudentExamController;
+use App\Http\Controllers\Student\StudentController;
 use App\Models\User;
 use App\Services\QuestionService;
 use Illuminate\Http\Request;
@@ -41,13 +42,15 @@ Route::group(['middleware' => ['can:view student']], function () {
 });
 
 Route::prefix('student')->middleware(['can:view student'])->group(function() {
-    Route::get('/', function () {
-        return view('students/student-home');
-    });
+    Route::get('/', [StudentController::class, 'index']);
     Route::redirect('/exams', '/student#exam-div');
-    Route::get('/exams/exam.id', [StudentExamController::class, 'show']);
-    Route::get('/exams/exam.id/exam-record.id', [StudentExamController::class, 'showExamRecord']);
-    Route::get('/exams/exam.id/get-overview', [StudentExamController::class, 'getExamOverview']);
+
+    Route::post('/exams', [StudentExamController::class, 'store'])->name('exams.enroll');
+    Route::post('/exams/{user}/enroll-exam', [StudentExamController::class, 'store'])->name('exams.enroll');
+
+    Route::get('/exams/{exam}', [StudentExamController::class, 'show'])->name('exams.student.show');
+    Route::get('/exams/exam.id/exam-record.id', [StudentExamController::class, 'showExamRecord'])->name('exams.student.record');;
+    Route::get('/exams/{exam}/get-overview', [StudentExamController::class, 'getExamOverview'])->name('exams.student.overview');;
     Route::get('/exams/exam.id/get-papers', [StudentExamController::class, 'getExamPapers']);
 
     Route::get('/exams/exam.id/mcq-example', function () {

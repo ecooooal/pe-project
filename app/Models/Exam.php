@@ -35,6 +35,14 @@ class Exam extends Model
     public function questions() {
         return $this->belongsToMany(Question::class)->withTimestamps();
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'exams_enrolled_users')
+                    ->withPivot('access_code')
+                    ->withTimestamps();
+    }
+
     public function createdBy(){
         return $this->belongsTo(User::class, 'created_by');
         }

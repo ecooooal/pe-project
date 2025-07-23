@@ -1,25 +1,18 @@
 {% from 'components/core/show-item' import show_item %}
-
 <div id="exam-content" class="flex flex-1 ml-4 ">
     <div class="flex flex-col p-4 gap-y-8 w-full">
-        <div class="prose max-w-full">
-            <h2>Exam Description</h2>
-            <p>This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...</p>
-            
-        </div>
         <div class="flex">
             <a href="/student/exams/exam.id/mcq-example" class="p-2 max-h-fit bg-orange-500 rounded-lg font-medium text-white hover:bg-orange-400 hover:text-gray-50 cursor-pointer">Take Exam</a>
         </div>
     </div>
-
     <div class="flex flex-col max-h-fit min-w-fit gap-y-2 mr-8">
-        <div class="flex flex-col justify-between gap-y-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
-            {{ show_item('Course', 'Course name')}}
-            {{ show_item('Max Score', '00')}}
-            {{ show_item('Duration', '90 minutes')}}
-            {{ show_item('Examination Date', "Examination date") }}
-            {{ show_item('Retakes', 'Unlimited')}}
-            {{ show_item('Open?', 'False')}}
+        <div class="flex flex-col min-w-64   justify-between gap-y-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
+            {{ show_item('Course', exam.course.abbreviation)}}
+            {{ show_item('Max Score', exam.max_score)}}
+            {{ show_item('Duration', exam.duration ?: 'No Timer')}}
+            {{ show_item('Examination Date', exam.examination_date ?: 'Anytime') }}
+            {{ show_item('Retakes', exam.retakes ?: 'Unlimited')}}
+            {{ show_item('Status', exam.is_published ? 'Can be taken' : 'On Maintenance', value_attributes:exam.is_published ? 'text-green-600 font-semibold' : 'text-orange-600 font-semibold')}}
         </div> 
         <div class="flex flex-col prose prose-sm rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
             <h4>Exam Structure</h4>

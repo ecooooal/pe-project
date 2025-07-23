@@ -3,8 +3,10 @@
 namespace App\Services;
 use App\Models\Exam;
 use App\Models\ExamAccessCode;
+use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Str;
 class ExamService
 {
@@ -42,6 +44,21 @@ class ExamService
             }
             throw $e;
         }
+    }
+
+    public function enrollAccessCode(User $user ,ExamAccessCode $examAccessCode)
+    {
+        $exam_id = $examAccessCode->exam_id;
+        $alreadyEnrolled = $user->exams()->where('exam_id', $exam_id)->exists();
+
+        if (! $alreadyEnrolled) {
+            $user->exams()->syncWithoutDetaching([
+                $exam_id => ['access_code' => $examAccessCode->access_code],
+            ]);
+            return true;
+        }
+        
+        return false;
     }
 
     public function getAvailableQuestionsForExam(Exam $exam)
@@ -302,6 +319,8 @@ class ExamService
 
             return true;
     }
+
+    
 
     // algorithm for shuffling the question list
 }
