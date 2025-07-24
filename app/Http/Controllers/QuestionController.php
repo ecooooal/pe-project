@@ -55,10 +55,8 @@ class QuestionController extends Controller
 
     public function show(Question $question){
         $question->load('topic.subject.course');
-        $question_type = $question->getTypeModel();
         $data = [
-            'question' => $question,
-            'question_type' => $question_type
+            'question' => $question
         ];
         return view('questions/show', $data);
     }
