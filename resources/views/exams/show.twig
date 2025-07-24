@@ -46,7 +46,7 @@
                 <div class="flex flex-col gap-y-4">
                     {{ show_item('Name', exam.name)}}
                     {{ show_item('Current Question Count', exam.questions.count())}}
-                    {{ show_item('Current Total Score', exam.questions.sum('points'))}}
+                    {{ show_item('Current Total Score', exam.questions.sum('total_points'))}}
                 </div>
                 <div class="flex flex-col mr-16 gap-y-4">
                     <div class="flex gap-x-2">
@@ -73,9 +73,9 @@
                     {{ show_item('Retakes', exam.retakes ?: 'Unlimited Retakes')}}
                 </div>
                 <div class="flex flex-col mr-16 gap-y-4">
-                    {% if exam.questions.sum('points') == exam.max_score %}
+                    {% if exam.questions.sum('total_points') == exam.max_score %}
                         {{ show_item('Is Currently', 'Can be Published', value_attributes:'text-green-600')}}
-                    {% elseif exam.questions.sum('points') > exam.max_score %}
+                    {% elseif exam.questions.sum('total_points') > exam.max_score %}
                         {{ show_item('Is Currently', 'Current Points exceeds Maximum Score', value_attributes:'text-orange-600')}}
                     {% else %}
                         {{ show_item('Is Currently', 'Current Points is not equal to Maximum Score', value_attributes:'text-red-600')}}

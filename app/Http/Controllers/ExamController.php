@@ -35,7 +35,7 @@ class ExamController extends Controller
                 'name' => $exam->name,
                 'course' => $exam->course->name,
                 'questions' => $exam->questions->count(),
-                'status' => $exam->questions()->sum('points') >= $exam->max_score ? 'Complete' : 'Incomplete',
+                'status' => $exam->questions()->sum('total_points') >= $exam->max_score ? 'Complete' : 'Incomplete',
                 'is_published' => $exam->is_published ? 'Yes' : 'No',
                 'examination date' => Carbon::parse($exam->examination_date)->format('m/d/Y')
             ];

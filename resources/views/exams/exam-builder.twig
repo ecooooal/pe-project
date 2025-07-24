@@ -129,10 +129,10 @@
             <div class="flex flex-col p-4 flex-1 items-center">
                 <h1 class="text-2xl font-bold text-gray-800">{{ exam.course.name }} </h1>
                 <div class="flex gap-x-4">
-                    <span id="question-count-field" class="text-xs font-semibold text-gray-500">Total Subjects : {{ exam_subjects.count() }}</span>
-                    <span id="question-count-field" class="text-xs font-semibold text-gray-500">Total Topics : {{ exam_topics.count() }}</span>
+                    <span id="subject-count-field" class="text-xs font-semibold text-gray-500">Total Subjects : {{ exam_subjects.count() }}</span>
+                    <span id="topic-count-field" class="text-xs font-semibold text-gray-500">Total Topics : {{ exam_topics.count() }}</span>
                     <span id="question-count-field" class="text-xs font-semibold text-gray-500">Total Questions : {{exam_questions.count()}}</span>
-                    <span id="score-count-field" class="text-xs font-semibold text-gray-500">Current Score : {{exam_questions.sum('points')}}</span>    
+                    <span id="score-count-field" class="text-xs font-semibold text-gray-500">Current Score : {{exam_questions.sum('total_points')}}</span>    
                 </div>
                 <span id="algortihm-field" class="text-xs italic font-semibold text-gray-500">Current Algorithm : {{ exam.applied_algorithm }}</span>    
             </div>  

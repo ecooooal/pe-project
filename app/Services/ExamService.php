@@ -189,7 +189,7 @@ class ExamService
                 // The 'best' is defined by criteria sent by user
                 $question->value = $criteria === 'value'
                     ? $question->coverage_score + 1
-                    : ($question->coverage_score + 1) / ($question->points ?: 1);
+                    : ($question->coverage_score + 1) / ($question->total_points ?: 1);
                 return $question;
             });
             // prepare data to represent set of questions to pick as Knapsack
@@ -202,7 +202,7 @@ class ExamService
                 return $question;
             });
 
-            $knapsack = $normalized_questions->map(fn($question) => ['id'=>$question->id, 'name'=>$question->name, 'value'=>$question->value, 'weight'=>$question->points]);
+            $knapsack = $normalized_questions->map(fn($question) => ['id'=>$question->id, 'name'=>$question->name, 'value'=>$question->value, 'weight'=>$question->total_points]);
         }
         \Log::debug('Knapsack prepared:', $knapsack->toArray());
         return $knapsack;
@@ -312,7 +312,7 @@ class ExamService
         if (!$exam->is_published) {
                 $exam->load('questions');
 
-                $sum_of_points = $exam->questions->sum('points');
+                $sum_of_points = $exam->questions->sum('total_points');
 
                 if ($sum_of_points !== $exam->max_score) {
                     return false;
