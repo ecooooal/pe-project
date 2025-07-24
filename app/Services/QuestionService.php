@@ -39,7 +39,8 @@ class QuestionService
                 $choices = $question_type->map(function ($choice) {
                     return [
                         'order' => $choice->order,
-                        'item' => $choice->item,
+                        'solution' => $choice->item,
+                        'item_points' => $choice->item_points
                     ];
                 })->toArray();
                 return $choices;
@@ -49,6 +50,8 @@ class QuestionService
                     return [
                         'left' => $choice->first_item,
                         'right' => $choice->second_item,
+                        'item_points' => $choice->item_points
+
                     ];
                 })->toArray();
                 return $choices;

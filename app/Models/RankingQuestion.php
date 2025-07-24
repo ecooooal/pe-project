@@ -13,7 +13,7 @@ class RankingQuestion extends Model
         'question_id',
         'item',
         'order',
-        'points'
+        'item_points'
     ];
 
     public function question(){

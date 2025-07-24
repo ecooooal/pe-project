@@ -27,25 +27,19 @@ class FakeDataSeeder extends Seeder
                             'name' => 'A byte is an 8-bit signed integer?',
                             'type' => 'true_or_false',
                             'points' => 1,
-                            'solution' => 'true',
-                            'author' => 'superAdmin',
-                            'Date Created' => '01/01/2025'
+                            'solution' => 'true'
                         ],
                         [
                             'name' => 'What is the name for a memory location that stores specific value, such as numbers and letters?',
                             'type' => 'identification',
                             'points' => 1,
-                            'solution' => 'variable',
-                            'author' => 'superAdmin',
-                            'Date Created' => '01/01/2025'
+                            'solution' => 'variable'
                         ],
                         [
                             'name' => 'This is a memory location whose value cannot be changed during program execution.',
                             'type' => 'identification',
                             'points' => 7,
-                            'solution' => 'Constant',
-                            'author' => 'superAdmin',
-                            'Date Created' => '01/01/2025'
+                            'solution' => 'Constant'
                         ],
                     ],
                     'Date Created' => '01/01/2025'
@@ -58,26 +52,46 @@ class FakeDataSeeder extends Seeder
                             'type' => 'multiple_choice',
                             'points' => 1,
                             'items' => ['Applet', 'Source Code', 'Class', 'Syntax'],
-                            'solution' => 'c',
-                            'author' => 'superAdmin',
-                            'Date Created' => '01/01/2025'
+                            'solution' => 'c'
                         ],
                         [
                             'name' => 'A reserved words or keywords can used in naming variables while retaining its original purpose.',
                             'type' => 'true_or_false',
                             'points' => 1,
-                            'solution' => 'false',
-                            'author' => 'superAdmin',
-                            'Date Created' => '01/01/2025'
+                            'solution' => 'false'
                         ],
                         [
                             'name' => 'In java environment what method does the execution always begins?',
                             'type' => 'identification',
                             'points' => 2,
-                            'solution' => 'main',
-                            'author' => 'superAdmin',
-                            'Date Created' => '01/01/2025'
+                            'solution' => 'main'
                         ],
+                        [
+                            'name' => 'In descending order, rank the flow on how a java program is created',
+                            'type' => 'ranking',
+                            'items' => [
+                                1 => [
+                                    "solution" => "Code is written",
+                                    "points" => "2"
+                                ],
+                                2 => [
+                                    "solution" => "Code is compiled",
+                                    "points" => "2"
+                                ],
+                                3 => [
+                                    "solution" => "Code is run",
+                                    "points" => "2"
+                                ],
+                                4 => [
+                                    "solution" => "terminate if the code has syntax errors",
+                                    "points" => "2"
+                                ],
+                                5 => [
+                                    "solution" => "Check if the output is not unexpected",
+                                    "points" => "2"
+                                ]
+                            ]
+                        ]
                     ],
                     'Date Created' => '01/01/2025'
                 ],
@@ -89,26 +103,41 @@ class FakeDataSeeder extends Seeder
                             'type' => 'multiple_choice',
                             'points' => 1,
                             'items' => ['It means there is a logical error.', 'There is a grammatical mistake in the code of the program', 'There are comments in the codes.', 'The code was compiled but got unexpected output.'],
-                            'solution' => 'b',
-                            'author' => 'superAdmin',
-                            'Date Created' => '01/01/2025'
+                            'solution' => 'b'
                         ],
                         [
                             'name' => 'Logical errors can be fixed as simple as correcting grammatical mistakes in the program.',
                             'type' => 'true_or_false',
                             'points' => 1,
-                            'solution' => 'false',
-                            'author' => 'superAdmin',
-                            'Date Created' => '01/01/2025'
+                            'solution' => 'false'
                         ],
                         [
                             'name' => 'This error is encountered when the program produced unexpected result. (2 words)',
                             'type' => 'identification',
                             'points' => 2,
-                            'solution' => 'logical error',
-                            'author' => 'superAdmin',
-                            'Date Created' => '01/01/2025'
+                            'solution' => 'logical error'
                         ],
+                        [
+                            'name' => 'Match The the following errors:',
+                            'type' => 'matching',
+                            'items' => [
+                                1 => [
+                                    "left" => "syntax error",
+                                    "right" => "error on grammar",
+                                    "points" => "2"
+                                ],
+                                2 => [
+                                    "left" => "logical error",
+                                    "right" => "unexpected output by the program",
+                                    "points" => "2"
+                                ],
+                                3 => [
+                                    "left" => "test case error",
+                                    "right" => "failure in test cases",
+                                    "points" => "5"
+                                ]
+                            ]
+                        ]
                     ],
                     'Date Created' => '01/01/2025'
                 ],

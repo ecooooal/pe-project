@@ -18,7 +18,7 @@ class QuestionTypeService
                 'choice_key' => $key,
                 'item' => $item,
                 'is_correct' => $key == $question_type_data['solution'],
-                'points' => $item['points']
+                'points' => $question_type_data['points']
             ]);
         }   
     }
@@ -40,7 +40,7 @@ class QuestionTypeService
             $question->rankingQuestions()->create([
                 'order' => $order,
                 'item' => $item['solution'],
-                'points' => $item['points']
+                'item_points' => $item['points']
             ]);
             $order++;
         }    
@@ -50,7 +50,7 @@ class QuestionTypeService
             $question->matchingQuestions()->create([
                 'first_item' => $item['left'],
                 'second_item' => $item['right'],
-                'points' => $item['points']
+                'item_points' => $item['points']
             ]);                    
         }
     }
@@ -93,47 +93,58 @@ class QuestionTypeService
         }
     }
 
-    public function updateMultipleChoice(Question $question, array $data){
+    public function updateMultipleChoice(Question $question, array $question_type_data){
         Self::prepareUpdateQuestion($question);
         $choice_keys = ['a', 'b', 'c', 'd'];
-        $items = array_combine($choice_keys, $data['items']);
+        $items = array_combine($choice_keys, $question_type_data['items']);
         foreach ($items as $key => $item) {
             $question->multipleChoiceQuestions()->create([
                 'choice_key' => $key,
                 'item' => $item,
-                'is_correct' => $key == $data['solution']
+                'is_correct' => $key == $question_type_data['solution'],
+                'points' => $question_type_data['points']
             ]);
         }
     }
-    public function updateTrueOrFalse(Question $question, array $data, array $previous_data,  $previous_question_type){
+    public function updateTrueOrFalse(Question $question, array $question_type_data, array $previous_data,  $previous_question_type){
         if ($previous_question_type != $previous_data['type']){
             Self::prepareUpdateQuestion($question);
         }
-        $question->trueOrFalseQuestion()->updateOrCreate(['question_id' => $question->id], ['solution' => $data['solution']]);
+        $question->trueOrFalseQuestion()->updateOrCreate(['question_id' => $question->id], 
+        [
+            'solution' => $question_type_data['solution'],
+            'points' => $question_type_data['points']
+        ]);
     }
-    public function updateIdentification(Question $question, array $data, array $previous_data,  $previous_question_type){
+    public function updateIdentification(Question $question, array $question_type_data, array $previous_data,  $previous_question_type){
         if ($previous_question_type != $previous_data['type']){
             Self::prepareUpdateQuestion($question);
         }
-        $question->identificationQuestion()->updateOrCreate(['question_id' => $question->id], ['solution' => $data['solution']]);
+        $question->identificationQuestion()->updateOrCreate(['question_id' => $question->id], 
+        [
+            'solution' => $question_type_data['solution'],
+            'points' => $question_type_data['points']
+        ]);
     }
-    public function updateRanking(Question $question, array $data){
+    public function updateRanking(Question $question, array $question_type_data){
         Self::prepareUpdateQuestion($question);
         $order = 1;
-        foreach ($data['items'] as $item) {
+        foreach ($question_type_data['items'] as $item) {
             $question->rankingQuestions()->create([
                 'order' => $order,
-                'item' => $item
+                'item' => $item['solution'],
+                'item_points' => $item['points']
             ]);
             $order++;
         }
     }
-    public function updateMatching(Question $question, array $data){
+    public function updateMatching(Question $question, array $question_type_data){
        Self::prepareUpdateQuestion($question);
-        foreach($data['items'] as $item){
+        foreach($question_type_data['items'] as $item){
             $question->matchingQuestions()->create([
                 'first_item' => $item['left'],
-                'second_item' => $item['right']
+                'second_item' => $item['right'],
+                'item_points' => $item['points']
             ]);                    
         }
     }

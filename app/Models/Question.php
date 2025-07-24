@@ -16,7 +16,7 @@ class Question extends Model
         'question_type',
         'topic_id',
         'name',
-        'points'
+        'total_points'
     ];
 
     protected $casts = [
