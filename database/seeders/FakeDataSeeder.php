@@ -8,6 +8,7 @@ use App\Models\Exam;
 use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Topic;
+use App\Models\User;
 use App\Services\QuestionTypeService;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -119,8 +120,6 @@ class FakeDataSeeder extends Seeder
     
     public function run(): void
     {
-        $question_type_service = app(QuestionTypeService::class);
-       
         foreach ($this->subjects_with_topics as $subjectData) {
             $subject = Subject::firstOrCreate([
                 'name' => $subjectData['name'],
@@ -142,8 +141,9 @@ class FakeDataSeeder extends Seeder
 
                     if (! $exists) {
                         $questionData['topic'] = $topic->id;
-                        $question_factory = new OwnQuestionFactory($question_type_service);
-                        $question_factory->create($questionData);
+                        $super_admin_id = User::role('super_admin')->first()->id;
+                        $question_factory = new OwnQuestionFactory();
+                        $question_factory->createFakeData($questionData, $super_admin_id);
                     }
                 }
             }

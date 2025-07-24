@@ -18,6 +18,7 @@ return new class extends Migration
             $table->char('choice_key');
             $table->string('item');
             $table->boolean('is_correct');
+            $table->unsignedTinyInteger('points');
             $table->timestamps();
         });
     }

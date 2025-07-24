@@ -17,22 +17,30 @@ class QuestionTypeService
             $question->multipleChoiceQuestions()->create([
                 'choice_key' => $key,
                 'item' => $item,
-                'is_correct' => $key == $question_type_data['solution']
+                'is_correct' => $key == $question_type_data['solution'],
+                'points' => $item['points']
             ]);
         }   
     }
     public function storeTrueOrFalse(Question $question, array $question_type_data){
-        $question->trueOrFalseQuestion()->create(['solution' => $question_type_data['solution']]);
+        $question->trueOrFalseQuestion()->create([
+            'solution' => $question_type_data['solution'],
+            'points' => $question_type_data['points']
+        ]);
     }
     public function storeIdentification(Question $question, array $question_type_data){
-        $question->identificationQuestion()->create(['solution' => $question_type_data['solution']]);
+        $question->identificationQuestion()->create([
+            'solution' => $question_type_data['solution'],
+            'points' => $question_type_data['points']
+        ]);
     }
     public function storeRanking(Question $question, array $question_type_data){
         $order = 1;
         foreach ($question_type_data['items'] as $item) {
             $question->rankingQuestions()->create([
                 'order' => $order,
-                'item' => $item
+                'item' => $item['solution'],
+                'points' => $item['points']
             ]);
             $order++;
         }    
@@ -41,16 +49,22 @@ class QuestionTypeService
         foreach($question_type_data['items'] as $item){
             $question->matchingQuestions()->create([
                 'first_item' => $item['left'],
-                'second_item' => $item['right']
+                'second_item' => $item['right'],
+                'points' => $item['points']
             ]);                    
         }
     }
-    public function storeCoding(Question $question, array $question_data, $coding_instruction, array $coding_question_language_data){
+    public function storeCoding(Question $question, array $question_data, $coding_question_data, array $coding_question_language_data){
         $slug_name = Str::slug($question_data['name']);
         $folder = "codingQuestions/{$question->id}_{$slug_name}/";
         Storage::makeDirectory($folder);
 
-        $coding_question = $question->codingQuestion()->create(['instruction' => $coding_instruction]);
+        $coding_question = $question->codingQuestion()->create([
+            'instruction' => $coding_question_data['instruction'],
+            'syntax_points' => $coding_question_data['syntax_points'],
+            'runtime_points' => $coding_question_data['runtime_points'],
+            'test_case_points' => $coding_question_data['test_case_points']
+        ]);
         
         foreach ($coding_question_language_data as $language => $codes) {
             $language_folder = "{$folder}supportedLanguages/{$language}/";

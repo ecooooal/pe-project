@@ -105,46 +105,59 @@ class QuestionController extends Controller
     public function store(){
         $question_type = request('type');
         $item_count = count(request()->input('items', []));
-
         $rules = [
             'topic' => ['required', 'exists:topics,id'],
             'type' => ['required'],
             'name' => ['required', 'string', 'unique:questions,name'],
-            'points' => ['required', 'integer', 'min:1'],
             'subject' => ['required'],
         ];
+        switch ($question_type) {
+            case('coding'):
+                    $rules['instruction'] = ['required'];
+                    $rules['supported_languages'] = ['required', 'json', function ($attribute, $value, $fail) {
+                        $decoded = json_decode($value, true);
+                        if (empty($decoded)) {
+                            $fail('Coding question must have at least one programming language.');
+                        }
+                    }];
+                    $instruction = request()->post('instruction');
+                    $markdown = Str::of($instruction)->markdown(['html_input' => 'strip']) ?? '';
+                    $supported = json_decode(request()->post('supported_languages', '{}'), true);
+                    $messages = [
+                        'supported_languages.required' => 'Coding question must have at least one programming language.',
+                    ];
+                break;
+            case('matching') :
+                    $rules['items.*.left'] = ['required', 'string', 'min:1'];
+                    $rules['items.*.right'] = ['required', 'string', 'min:1'];
+                    $rules['items.*.points'] = ['required', 'integer', 'min:1'];
+                    $messages = [
+                        'items.*.left.required' => 'Left side is required.',
+                        'items.*.right.required' => 'Right side is required.',
+                        'items.*.points.required' => 'required.'
+                    ];
+                    break;
 
-        if ($question_type === 'coding') {
-            $rules['instruction'] = ['required'];
-            $rules['supported_languages'] = ['required', 'json', function ($attribute, $value, $fail) {
-                $decoded = json_decode($value, true);
-                if (empty($decoded)) {
-                    $fail('Coding question must have at least one programming language.');
-                }
-            }];
-            $instruction = request()->post('instruction');
-            $markdown = Str::of($instruction)->markdown(['html_input' => 'strip']) ?? '';
-            $supported = json_decode(request()->post('supported_languages', '{}'), true);
-            $messages = [
-                'supported_languages.required' => 'Coding question must have at least one programming language.',
-            ];
-        } else {
-            if ($question_type === 'matching'){
-                $rules['items.*.left'] = ['required', 'string', 'min:1'];
-                $rules['items.*.right'] = ['required', 'string', 'min:1'];
-                $messages = [
-                    'items.*.left.required' => 'Left side is required.',
-                    'items.*.right.required' => 'Right side is required.',
-                ];
-            } else {
-                $rules['items.*'] = ['required', 'string', 'min:1'];
-                $messages = [
-                    'items.*.required' => 'This field is required.',
-                ];
+            case('ranking'):
+                    $rules['items.*.solution'] = ['required', 'string', 'min:1'];
+                    $rules['items.*.points'] = ['required', 'integer', 'min:1'];
+                    $messages = [
+                        'items.*.solution.required' => 'required.',
+                        'items.*.points.required' => 'required.'
+                    ];
+                break;
+
+            default:
+                    $rules['solution'] = ['required', 'string'];
+                    $rules['points'] = ['required', 'integer'];
+                    $rules['items.*'] = ['required', 'string', 'min:1'];
+                    $messages = [
+                        'items.*.required' => 'This field is required.',
+                        'solution.*.required' => 'This field is required.',
+                        'points.*.required' => 'This field is required.',
+                    ];
+                break;
             }
-            $rules['solution'] = ['required', 'string'];
-        }
-
 
         $validator = Validator::make(request()->all(), $rules, $messages);
         if ($validator->fails()) {
@@ -158,8 +171,24 @@ class QuestionController extends Controller
                 ->withInput();
             }
         }
-
+      
         $data = $validator->validated();
+
+        if ($question_type == 'coding'){
+            //
+        } else if ($question_type == 'ranking' || $question_type == 'matching'){
+            $items = request()->input('items', []);
+            $totalPoints = 0;
+
+            foreach ($items as $item) {
+                // Ensure key exists and value is numeric
+                if (isset($item['points']) && is_numeric($item['points'])) {
+                    $totalPoints += (int) $item['points'];
+                }
+            }
+            $data['points'] = $totalPoints;
+        }
+        dd($data);
 
         \Log::info('data can be stored', $data);
         QuestionFactory::create($data);

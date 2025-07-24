@@ -12,7 +12,8 @@ class RankingQuestion extends Model
     protected $fillable = [
         'question_id',
         'item',
-        'order'
+        'order',
+        'points'
     ];
 
     public function question(){

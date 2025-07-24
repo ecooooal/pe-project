@@ -50,8 +50,9 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
 
     Route::get('/exams/{exam}', [StudentExamController::class, 'show'])->name('exams.student.show');
     Route::get('/exams/exam.id/exam-record.id', [StudentExamController::class, 'showExamRecord'])->name('exams.student.record');;
-    Route::get('/exams/{exam}/get-overview', [StudentExamController::class, 'getExamOverview'])->name('exams.student.overview');;
-    Route::get('/exams/exam.id/get-papers', [StudentExamController::class, 'getExamPapers']);
+    Route::get('/exams/{exam}/get-overview', [StudentExamController::class, 'showExamOverview'])->name('exams.student.overview');;
+    Route::get('/exams/exam.id/get-papers', [StudentExamController::class, 'showExamPapers']);
+    Route::get('/exams/{exam}/taking-exam', [StudentExamController::class, 'takeExam'])->name('exams.take');
 
     Route::get('/exams/exam.id/mcq-example', function () {
         return view('students/exams/mcq-example');

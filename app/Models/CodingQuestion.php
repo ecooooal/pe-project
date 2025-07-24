@@ -8,7 +8,10 @@ class CodingQuestion extends Model
 {
     protected $fillable = [
         'question_id',
-        'instruction'
+        'instruction',
+        'syntax_points',
+        'runtime_points',
+        'test_case_points'
     ];
 
     public function question(){
