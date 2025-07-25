@@ -51,16 +51,6 @@
         </div>  
     </div>
     <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
-        <div class="flex flex-col p-4 flex-1">
-            {{ show_header('Settings') }}
-            <div class="flex justify-between">
-                <div class="flex flex-col gap-y-4">
-                    {{ show_item('Total Points', question.total_points )}}
-                </div>
-            </div>
-        </div>  
-    </div>
-    <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
                 <div id="question-type-content" 
                     class="flex flex-col p-4 flex-1 min-w-full"
                     hx-get="{{ url('question_type_show', {'question': question.id}) }}"

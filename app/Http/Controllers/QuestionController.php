@@ -113,6 +113,9 @@ class QuestionController extends Controller
         ];
         switch ($question_type) {
             case('coding'):
+                    $rules['syntax_points'] = ['required', 'integer', 'min:1'];
+                    $rules['runtime_points'] = ['required', 'integer', 'min:1'];
+                    $rules['test_case_points'] = ['required', 'integer', 'min:1'];
                     $rules['instruction'] = ['required'];
                     $rules['supported_languages'] = ['required', 'json', function ($attribute, $value, $fail) {
                         $decoded = json_decode($value, true);
@@ -125,6 +128,10 @@ class QuestionController extends Controller
                     $supported = json_decode(request()->post('supported_languages', '{}'), true);
                     $messages = [
                         'supported_languages.required' => 'Coding question must have at least one programming language.',
+                        'syntax_points.required' => 'Syntax Points is required.',
+                        'runtime_points.required' => 'Run Time Points is required.',
+                        'test_case_points.required' => 'Test Case Points is required.',
+
                     ];
                 break;
             case('matching') :
@@ -175,11 +182,14 @@ class QuestionController extends Controller
         $data = $validator->validated();
 
         if ($question_type == 'coding'){
-            //
+            $syntax_points = request()->input('syntax_points', 0);
+            $runtime_points = request()->input('runtime_points', 0);
+            $test_case_points = request()->input('test_case_points', 0);
+            $totalPoints = $syntax_points + $runtime_points + $test_case_points;
+            $data['points'] = $totalPoints;
         } else if ($question_type == 'ranking' || $question_type == 'matching'){
             $items = request()->input('items', []);
             $totalPoints = 0;
-
             foreach ($items as $item) {
                 if (isset($item['points']) && is_numeric($item['points'])) {
                     $totalPoints += (int) $item['points'];
@@ -188,10 +198,7 @@ class QuestionController extends Controller
             $data['points'] = $totalPoints;
         }
         
-
-        \Log::info('data can be stored', $data);
         QuestionFactory::create($data);
-        \Log::info('Question Creation Successful');
         
         if (request()->header('HX-Request')) {
             return response('', 200)->header('HX-Redirect', url('/questions'));
@@ -238,6 +245,9 @@ class QuestionController extends Controller
 
        switch ($question_type) {
             case('coding'):
+                    $rules['syntax_points'] = ['required', 'integer', 'min:1'];
+                    $rules['runtime_points'] = ['required', 'integer', 'min:1'];
+                    $rules['test_case_points'] = ['required', 'integer', 'min:1'];
                     $rules['instruction'] = ['required'];
                     $rules['supported_languages'] = ['required', 'json', function ($attribute, $value, $fail) {
                         $decoded = json_decode($value, true);
@@ -250,6 +260,10 @@ class QuestionController extends Controller
                     $supported = json_decode(request()->post('supported_languages', '{}'), true);
                     $messages = [
                         'supported_languages.required' => 'Coding question must have at least one programming language.',
+                        'syntax_points.required' => 'Syntax Points is required.',
+                        'runtime_points.required' => 'Run Time Points is required.',
+                        'test_case_points.required' => 'Test Case Points is required.',
+
                     ];
                 break;
             case('matching') :
@@ -300,7 +314,11 @@ class QuestionController extends Controller
         $data = $validator->validated();
 
         if ($question_type == 'coding'){
-            //
+            $syntax_points = request()->input('syntax_points', 0);
+            $runtime_points = request()->input('runtime_points', 0);
+            $test_case_points = request()->input('test_case_points', 0);
+            $totalPoints = $syntax_points + $runtime_points + $test_case_points;
+            $data['points'] = $totalPoints;
         } else if ($question_type == 'ranking' || $question_type == 'matching'){
             $items = request()->input('items', []);
             $totalPoints = 0;

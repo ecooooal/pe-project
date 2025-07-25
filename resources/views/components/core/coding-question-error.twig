@@ -1,6 +1,17 @@
-<div id="name-points-form-error" class="flex gap-x-4 justify-between">
+<div id="name-form-error" class="flex gap-x-4 justify-between">
     <span class="text-red-500 text-sm font-semibold whitespace-nowrap italic">{{ errors.get('name')[0] }}</span>  
-    <span class="text-red-500 text-sm font-semibold whitespace-nowrap italic">{{ errors.get('points')[0] }}</span>  
+</div>
+
+<div id="syntax-points-form-error" class="flex gap-x-4 justify-between">
+    <span class="text-red-500 text-sm font-semibold whitespace-nowrap italic">{{ errors.get('syntax_points')[0] }}</span>  
+</div>
+
+<div id="runtime-points-form-error" class="flex gap-x-4 justify-between">
+    <span class="text-red-500 text-sm font-semibold whitespace-nowrap italic">{{ errors.get('runtime_points')[0] }}</span>  
+</div>
+
+<div id="test-case-points-form-error" class="flex gap-x-4 justify-between">
+    <span class="text-red-500 text-sm font-semibold whitespace-nowrap italic">{{ errors.get('test_case_points')[0] }}</span>  
 </div>
 
 <div id="instruction-form-error">
@@ -9,6 +20,6 @@
 
 
 <div id="language-form-error">
-     <span class="text-red-500 text-sm font-semibold whitespace-nowrap mt-1 italic">{{ errors.get('supported_languages')[0] }}</span>  
+     <span class="flex justify-center items-center text-red-500 text-sm font-semibold whitespace-nowrapitalic">{{ errors.get('supported_languages')[0] }}</span>  
 </div>
 

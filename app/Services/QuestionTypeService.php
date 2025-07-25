@@ -148,15 +148,19 @@ class QuestionTypeService
             ]);                    
         }
     }
-    public function updateCoding(Question $question, array $data){
+    public function updateCoding(Question $question, array $coding_question_data){
         Self::prepareUpdateQuestion($question);
-        $instruction = $data['instruction'];
-        $language_data = json_decode($data['supported_languages'], true);
-        $slug_name = Str::slug($data['name']);
+        $language_data = json_decode($coding_question_data['supported_languages'], true);
+        $slug_name = Str::slug($coding_question_data['name']);
         $folder = "codingQuestions/{$question->id}_{$slug_name}/";
         Storage::makeDirectory($folder);
 
-        $coding_question = $question->codingQuestion()->create(['instruction' => $instruction]);
+       $coding_question = $question->codingQuestion()->create([
+            'instruction' => $coding_question_data['instruction'],
+            'syntax_points' => $coding_question_data['syntax_points'],
+            'runtime_points' => $coding_question_data['runtime_points'],
+            'test_case_points' => $coding_question_data['test_case_points']
+        ]);
 
         foreach ($language_data as $language => $codes) {
             $language_folder = "{$folder}supportedLanguages/{$language}/";
@@ -211,7 +215,7 @@ class QuestionTypeService
             default => 'txt',
         };
     }
-        private static function prepareUpdateQuestion(Question $question)
+    private static function prepareUpdateQuestion(Question $question)
     {
         switch ($question->question_type->value) {
             case 'multiple_choice':

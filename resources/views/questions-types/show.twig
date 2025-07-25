@@ -4,201 +4,235 @@
 {% set values = {} %}
 {% set solution = null %}
 
-<div id="MultipleChoice-content">
+<div id="MultipleChoice-content" class="flex flex-1 flex-col max-w-full gap-y-8">
     {% for choice in question_type_data %}
         {% set values = values | merge({ (choice.choice_key): choice.item }) %}
         {% if choice.is_correct %}
             {% set solution = choice.choice_key %}
         {% endif %}
     {% endfor %}
+    <div class="flex flex-col flex-1">
+        {{ show_header('Settings') }}
+        <div class="flex gap-x-8">
+                {{ show_item('Total Points', question.total_points )}}
+                {{ show_item('Solution', solution|title)}}
+        </div>
+    </div>  
 
-    <div class="prose min-w-full">
-        <h2>Sample View to Students</h2>
-        <h3>{{ question.name|title }}</h3>
-    </div>
-    <div class="flex flex-col gap-y-2">
-        {{ show_header('')}}
-        {{ forms.form_field(
-            input: forms.radio(
-                name: 'multiple_choice',
-                values: values,
-                value: solution,
-                attributes: {
-                    'class': 'accent-blue-900 w-6 h-6 rounded-full'
-                },
-                label_attributes: {
-                    'class': 'flex items-center gap-2 py-4 pl-4 pr-8 m-1 min-h-16 bg-gray-50 rounded-lg border border-gray-100 pointer-events-none select-none has-checked:bg-blue-900 has-checked:text-white has-checked:font-semibold'
-                }
-            ),
-            isColumn: true
-        ) }}
+    <div class="flex flex-col">
+        {{ show_header('Sample View to Students')}}
+        <div class="flex-1 prose prose-lg max-w-none">
+            <h2><strong>{{ question.name }}</strong></h2>
+        </div>
 
-    {{ show_item('Solution', solution|title)}}
+        <div class="flex flex-col gap-y-2">
+            {{ forms.form_field(
+                input: forms.radio(
+                    name: 'multiple_choice',
+                    values: values,
+                    value: solution,
+                    attributes: {
+                        'class': 'accent-blue-900 w-6 h-6 rounded-full'
+                    },
+                    label_attributes: {
+                        'class': 'flex items-center gap-2 py-4 pl-4 pr-8 m-1 min-h-16 bg-gray-50 rounded-lg border border-gray-100 pointer-events-none select-none has-checked:bg-blue-900 has-checked:text-white has-checked:font-semibold'
+                    }
+                ),
+                isColumn: true
+                ) 
+            }}
+        </div>
     </div>
 </div>
 
-<div id="TrueOrFalse-content">
+<div id="TrueOrFalse-content" class="flex flex-1 flex-col max-w-full gap-y-8">
     {% set values = {
         'true' : 'True',
         'false' : 'False',
     } %}
     {% set solution = question_type_data.solution %}
-    <div class="prose min-w-full">
-        <h2>Sample View to Students</h2>
-        <h3>{{ question.name|title }}</h3>
-    </div>
+    <div class="flex flex-col flex-1">
+        {{ show_header('Settings') }}
+        <div class="flex gap-x-8">
+                {{ show_item('Total Points', question.total_points )}}
+                {{ show_item('Solution', solution|title)}}
+        </div>
+    </div>  
+
+    <div class="flex flex-col">
+        {{ show_header('Sample View to Students')}}
+        <div class="flex-1 prose prose-lg max-w-none">
+            <h2><strong>{{ question.name }}</strong></h2>
+        </div>
         <div class="flex flex-col gap-y-2">
-            {{ show_header('')}}
-                {{ forms.form_field(
-                    input: forms.radio(
-                        name: 'multiple_choice',
-                        values: values,
-                        value: solution,
-                        attributes: {
-                            'class': 'accent-blue-900 w-6 h-6 rounded-full'
-                        },
-                        label_attributes: {
-                            'class': 'flex items-center gap-2 py-4 pl-4 pr-8 m-1 min-h-16 bg-gray-50 rounded-lg border border-gray-100 pointer-events-none select-none has-checked:bg-blue-900 has-checked:text-white has-checked:font-semibold'
-                        }
-                    ),
-                    isColumn: true
-                ) }}
-            {{ show_item('Solution', solution|title)}}
+            {{ forms.form_field(
+                input: forms.radio(
+                    name: 'multiple_choice',
+                    values: values,
+                    value: solution,
+                    attributes: {
+                        'class': 'accent-blue-900 w-6 h-6 rounded-full'
+                    },
+                    label_attributes: {
+                        'class': 'flex items-center gap-2 py-4 pl-4 pr-8 m-1 min-h-16 bg-gray-50 rounded-lg border border-gray-100 pointer-events-none select-none has-checked:bg-blue-900 has-checked:text-white has-checked:font-semibold'
+                    }
+                ),
+                isColumn: true
+            ) }}
         </div>
     </div>  
 </div>
 
-<div id="Identification-content">
-{% set solution = question_type_data.solution %}
-    <div class="prose min-w-full">
-        <h2>Sample View to Students</h2>
-        <h3>{{ question.name|title }}</h3>
-    </div>
-    
+<div id="Identification-content" class="flex flex-1 flex-col max-w-full gap-y-8">
+    {% set solution = question_type_data.solution %}
+    <div class="flex flex-col flex-1">
+        {{ show_header('Settings') }}
+        <div class="flex gap-x-8">
+                {{ show_item('Total Points', question.total_points )}}
+                {{ show_item('Solution', solution|title)}}
+        </div>
+    </div>  
+
+    <div class="flex flex-col">
+        {{ show_header('Sample View to Students')}}
+        <div class="flex-1 prose prose-lg max-w-none">
+            <h2><strong>{{ question.name }}</strong></h2>
+        </div>
         <div class="flex flex-col gap-y-2">
-            {{ show_header('')}}
+            {{ forms.form_field(
+                label:forms.label(
+                    id:'solution', 
+                    content:'Answer', 
+                    attributes:{
+                        'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900',}
+                    ),
+                input:forms.text(
+                    name:'solution', 
+                    value: solution, 
+                    attributes:{
+                        'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                        'required':true}),
+                errors: errors.get('solution'),
+                isColumn:true
+            )}}
+        </div>
+    </div>  
+</div>
+
+<div id="Ranking-content" class="flex flex-1 flex-col max-w-full gap-y-8">
+    <div class="flex flex-col flex-1">
+        {{ show_header('Settings') }}
+        <div class="flex gap-x-8">
+                {{ show_item('Total Points', question.total_points )}}
+        </div>
+    </div>  
+
+    <div class="flex flex-col">
+        {{ show_header('Sample View to Students')}}
+        <div class="flex-1 prose prose-lg max-w-none">
+            <h2><strong>{{ question.name }}</strong></h2>
+        </div>
+        <div class="sortable bg-gray-50 p-4 rounded-lg">
+            {% for i in range(1, question_type_data|length) %}
+                <div class="flex gap-x-4">
+                <span class="flex justify-center items-center pt-2 text-gray-900 font-semibold font-mono text-sm">{{  question_type_data[i-1]['item_points'] }} points</span>
                 {{ forms.form_field(
                     label:forms.label(
-                        id:'solution', 
-                        content:'Solution', 
+                        id: 'items[]', 
+                        content:'☰', 
                         attributes:{
-                            'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900',}
+                            'class':'handle cursor-grab active:cursor-grabbing whitespace-nowrap text-xl font-bold text-blue-900'}
                         ),
                     input:forms.text(
-                        name:'solution', 
-                        value: solution, 
+                        name:'items[]',
+                        value:  question_type_data[i-1]['solution'],
                         attributes:{
-                            'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                            'required':true}),
-                    errors: errors.get('solution'),
-                    isColumn:true
+                            'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 cursor-default',
+                            'readonly':true
+                        }),
+                    isReverse: true
                 )}}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script>
+        htmx.onLoad(function(content) {
+            var sortables = content.querySelectorAll(".sortable");
+            for (var i = 0; i < sortables.length; i++) {
+            var sortable = sortables[i];
+            var sortableInstance = new Sortable(sortable, {
+                animation: 150,
+                ghostClass: 'blue-background-class',
+                handle: '.handle',
+                swap: true,
+                swapClass: 'swap-highlight',
+            });
             
-            {{ show_item('Solution', solution|title)}}
+            // Re-enable sorting on the `htmx:afterSwap` event
+            sortable.addEventListener("htmx:afterSwap", function() {
+                sortableInstance.option("disabled", false);
+            });
+            }
+        })
+    </script>
+</div>
+
+<div id="Matching-content" class="flex flex-1 flex-col max-w-full gap-y-8">
+    <div class="flex flex-col flex-1">
+        {{ show_header('Settings') }}
+        <div class="flex gap-x-8">
+                {{ show_item('Total Points', question.total_points )}}
         </div>
     </div>  
-</div>
 
-<div id="Ranking-content">
-    <div class="prose min-w-full">
-        <h2>Sample View to Students</h2>
-        <h3>{{ question.name|title }}</h3>
-    </div>
-    {{ show_header('')}}
-    <div class="sortable bg-gray-50 p-4 rounded-lg">
-        {% for i in range(1, question_type_data|length) %}
-            <div class="flex gap-x-4">
-            <span class="flex justify-center items-center pt-2 text-gray-900 font-semibold font-mono text-sm">{{  question_type_data[i-1]['item_points'] }} points</span>
-            {{ forms.form_field(
-                label:forms.label(
-                    id: 'items[]', 
-                    content:'☰', 
-                    attributes:{
-                        'class':'handle cursor-grab active:cursor-grabbing whitespace-nowrap text-xl font-bold text-blue-900'}
-                    ),
-                input:forms.text(
-                    name:'items[]',
-                    value:  question_type_data[i-1]['solution'],
-                    attributes:{
-                        'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 cursor-default',
-                        'readonly':true
-                    }),
-                isReverse: true
-            )}}
-            </div>
-        {% endfor %}
-    </div>
-    
-<script>
-    htmx.onLoad(function(content) {
-        var sortables = content.querySelectorAll(".sortable");
-        for (var i = 0; i < sortables.length; i++) {
-        var sortable = sortables[i];
-        var sortableInstance = new Sortable(sortable, {
-            animation: 150,
-            ghostClass: 'blue-background-class',
-            handle: '.handle',
-            swap: true,
-            swapClass: 'swap-highlight',
-        });
-        
-        // Re-enable sorting on the `htmx:afterSwap` event
-        sortable.addEventListener("htmx:afterSwap", function() {
-            sortableInstance.option("disabled", false);
-        });
-        }
-    })
-
-</script>
-</div>
-
-<div id="Matching-content">
-    <div class="prose min-w-full">
-        <h2>Sample View to Students</h2>
-        <h3>{{ question.name|title }}</h3>
-    </div>
-    {{ show_header('') }}
-    {% for i in range(1, question_type_data|length) %}
-    <div class="flex justify-center bg-gray-50 p-4 gap-x-4 rounded-lg">
-        <span class="flex justify-center items-center pt-2 min-w-fit text-gray-900 font-semibold font-mono text-sm">{{ question_type_data[i-1]['item_points'] }} points</span>
-        <div class="flex flex-col max-w-72">
-            {{ forms.form_field(
-                label:forms.label(
-                    id: 'items[' ~ (i) ~ '][left]', 
-                    content: question_type_data[i-1]['left'], 
-                    attributes:{
-                        'class':'w-fit text-pretty shrink-0 rounded-md cursor-default bg-white p-4 font-semibold text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:ring-0 sm:text-sm/6'}
-                    ),
-                input:forms.text(
-                    name:'items[' ~ (i) ~ '][left]',
-                    value: question_type_data[i-1]['left'],
-                    attributes:{
-                        'class':'hidden',
-                        'readonly': true
-                    })
-            )}}
+    <div class="flex flex-col">
+        {{ show_header('Sample View to Students')}}
+        <div class="flex-1 prose prose-lg max-w-none">
+            <h2><strong>{{ question.name }}</strong></h2>
         </div>
-        <div class="flex flex-1 border-t-5 border-dotted border-gray-600 w-full my-auto"></div>
-        <div class="flex flex-1 sortable shrink-0">
-            {{ forms.form_field(
-                label:forms.label(
-                    id: 'items[' ~ (i) ~ '][right]', 
-                    content:'☰', 
-                    attributes:{
-                        'class':'handle cursor-grab active:cursor-grabbing whitespace-nowrap text-xl font-bold text-blue-900'}
-                    ),
-                input:forms.text(
-                    name:'items[' ~ (i) ~ '][right]',
-                    value:  question_type_data[i-1]['right'],
-                    attributes:{
-                        'class':'flex-1 w-fit rounded-md shrink-0 whitespace-nowrap text-center cursor-default bg-blue-900 px-3 py-4 font-semibold text-white outline-0 -outline-offset-0 focus:ring-0 sm:text-sm/6',
-                        'readonly': true
-                    }),
-                isReverse: true
-            )}}
-        </div>   
-    </div>
+        {% for i in range(1, question_type_data|length) %}
+        <div class="flex justify-center bg-gray-50 p-4 gap-x-4 rounded-lg">
+            <span class="flex justify-center items-center pt-2 min-w-fit text-gray-900 font-semibold font-mono text-sm">{{ question_type_data[i-1]['item_points'] }} points</span>
+            <div class="flex flex-col max-w-72">
+                {{ forms.form_field(
+                    label:forms.label(
+                        id: 'items[' ~ (i) ~ '][left]', 
+                        content: question_type_data[i-1]['left'], 
+                        attributes:{
+                            'class':'w-fit text-pretty shrink-0 rounded-md cursor-default bg-white p-4 font-semibold text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:ring-0 sm:text-sm/6'}
+                        ),
+                    input:forms.text(
+                        name:'items[' ~ (i) ~ '][left]',
+                        value: question_type_data[i-1]['left'],
+                        attributes:{
+                            'class':'hidden',
+                            'readonly': true
+                        })
+                )}}
+            </div>
+            <div class="flex flex-1 border-t-5 border-dotted border-gray-600 w-full my-auto"></div>
+            <div class="flex flex-1 sortable shrink-0">
+                {{ forms.form_field(
+                    label:forms.label(
+                        id: 'items[' ~ (i) ~ '][right]', 
+                        content:'☰', 
+                        attributes:{
+                            'class':'handle cursor-grab active:cursor-grabbing whitespace-nowrap text-xl font-bold text-blue-900'}
+                        ),
+                    input:forms.text(
+                        name:'items[' ~ (i) ~ '][right]',
+                        value:  question_type_data[i-1]['right'],
+                        attributes:{
+                            'class':'flex-1 w-fit rounded-md shrink-0 whitespace-nowrap text-center cursor-default bg-blue-900 px-3 py-4 font-semibold text-white outline-0 -outline-offset-0 focus:ring-0 sm:text-sm/6',
+                            'readonly': true
+                        }),
+                    isReverse: true
+                )}}
+            </div>   
+        </div>
     {% endfor %}
+    </div>
     
 <script>
     htmx.onLoad(function(content) {
@@ -252,14 +286,26 @@
   
 <div id="Coding-content">
     <script>hljs.highlightAll();</script>
-    {{ show_header('Sample View to Students')}}
-    <div class="flex flex-1 flex-col max-w-full gap-y-4">
-        <div class="flex">
-            <div class="flex-1 prose prose-lg max-w-none">
-                <h2><strong>{{ question.name }}</strong></h2>
+    <div class="flex flex-1 flex-col max-w-full gap-y-8">
+        <div class="flex flex-col flex-1">
+            {{ show_header('Settings') }}
+            <div class="flex gap-x-8">
+                    {{ show_item('Syntax Points', question_type_data.syntax_points )}}
+                    {{ show_item('Runtime Points', question_type_data.runtime_points )}}
+                    {{ show_item('Test Case Points', question_type_data.test_case_points )}}
+                    {{ show_item('Total Points', question.total_points )}}
             </div>
-            <div class="mt-2">
-                <a href="#" class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold text-s">Test This Coding Question</a>
+        </div>  
+
+        <div class="flex flex-col">
+            {{ show_header('Sample View to Students')}}
+            <div class="flex">
+                <div class="flex-1 prose prose-lg max-w-none">
+                    <h2><strong>{{ question.name }}</strong></h2>
+                </div>
+                <div class="mt-2">
+                    <a href="#" class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold text-s">Test This Coding Question</a>
+                </div>
             </div>
         </div>
 

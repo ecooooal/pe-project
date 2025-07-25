@@ -17,19 +17,23 @@
     {{ breadcrumb() }}
     {{ vite('resources/js/text-editor.js')|raw }}
 {% endif %}
-<form id="test-code"
-      hx-post="{{ route('questions.store') }}" 
-      hx-redirect="/questions"
-      hx-target="#name-points-form-error"
-      hx-select-oob="#instruction-form-error, #language-form-error">
+<form   id="test-code"
+        {% if isEdit %}
+            hx-patch="{{ route('questions.update', { question: question }) }}"
+        {% else %}
+            hx-post="{{ route('questions.store') }}"
+        {% endif %}
+        hx-redirect="/questions"
+        hx-target="#name-form-error"
+        hx-select-oob="#instruction-form-error, #language-form-error, #syntax-points-form-error, #runtime-points-form-error, #test-case-points-form-error">
     {{ csrf_field() }}
     <input class="hidden" name="type" value="coding">
     <textarea class="hidden" name="supported_languages" id="code-input"></textarea>
     <textarea class="hidden" name="instruction" id="instruction-input"></textarea>
-
+    {{ dump() }}
     <div class="flex flex-1 flex-col mx-16 gap-y-4">
         <div class="flex flex-col flex-1 p-4 max-w-full rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5">
-            {{ show_header('Create Coding Question') }}
+            {{ show_header(isEdit ? 'Update ' ~ question.name : 'Create Coding Question') }}
             <div class="flex flex-col gap-y-4 justify-between w-full">
                 <div class="flex flex-1 gap-x-4 w-full" hx-sync="this:queue">
                     {% if not isEdit %}
@@ -113,7 +117,9 @@
                             )
                         )}}
                 </div>
+                <div id="name-form-error"></div>
                 <div class="flex flex-1 gap-x-4 w-full">
+                    <div class="flex flex-col flex-1">
                         {{ forms.form_field(
                             label:forms.label(
                                 id:'syntax_points', 
@@ -123,15 +129,19 @@
                                 ),
                             input:forms.number(
                                 name:'syntax_points', 
+                                value : isEdit ? question_type_data.syntax_points : '',
                                 attributes:{
                                     'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                    'required':true,
+                                    'required': true,
                                     'min':0,
                                     'max':10,
                                     'placeholder':'1 - 10 points'}),
                             isColumn: true
                         )}}
-                         {{ forms.form_field(
+                        <div id="syntax-points-form-error"></div>
+                    </div>
+                    <div class="flex flex-col flex-1">
+                           {{ forms.form_field(
                             label:forms.label(
                                 id:'runtime_points', 
                                 content:'Runtime Points', 
@@ -140,14 +150,18 @@
                                 ),
                             input:forms.number(
                                 name:'runtime_points', 
+                                value : isEdit ? question_type_data.runtime_points : '',
                                 attributes:{
                                     'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                    'required':true,
+                                    'required': true,
                                     'min':0,
                                     'max':10,
                                     'placeholder':'1 - 10 points'}),
                             isColumn: true
                         )}}
+                        <div id="runtime-points-form-error"></div>
+                    </div>
+                    <div class="flex flex-col flex-1">
                          {{ forms.form_field(
                             label:forms.label(
                                 id:'test_case_points', 
@@ -157,16 +171,18 @@
                                 ),
                             input:forms.number(
                                 name:'test_case_points', 
+                                value : isEdit ? question_type_data.test_case_points : '',
                                 attributes:{
                                     'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                    'required':true,
+                                    'required': true,
                                     'min':0,
                                     'max':10,
                                     'placeholder':'1 - 10 points'}),
                             isColumn: true
                         )}}
+                        <div id="test-case-points-form-error"></div>
+                    </div>
                 </div>
-                <div id="name-points-form-error"></div>
                 <div class="flex flex-1 rounded-t-md">
                     <div class="flex flex-col flex-1 w-full overflow-auto ">
                         <div class="flex w-full bg-gray-800 p-2 rounded-t-md justify-between">

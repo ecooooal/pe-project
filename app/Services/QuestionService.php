@@ -61,9 +61,12 @@ class QuestionService
                                     'html_input' => 'strip',
                                 ]);
                 $instruction_raw = $question_type->instruction;
+                $syntax_points = $question_type->syntax_points;
+                $runtime_points = $question_type->runtime_points;
+                $test_case_points = $question_type->test_case_points;
+
                 $languages = $question_type->codingQuestionLanguages()->pluck('language');
                 $coding_languages = $question_type->codingQuestionLanguages;            
-
                 $language_codes = $coding_languages->mapWithKeys(function ($item) {
                     return [
                         $item->language => [
@@ -76,6 +79,9 @@ class QuestionService
 
                 $data = [
                     'instruction' => $instruction,
+                    'syntax_points' => $syntax_points,
+                    'runtime_points' => $runtime_points,
+                    'test_case_points' => $test_case_points,
                     'instruction_raw' =>  $instruction_raw,
                     'languages' => $languages,
                     'language_codes' =>$language_codes
