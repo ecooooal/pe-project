@@ -365,13 +365,13 @@ class QuestionController extends Controller
         return view('/components/core/partials-subject', ['subjects' => $subjects]);    
     }
     public function getTopicsForSubjects(Request $request){
-        $subjectId = $request->input('subject');
-
-        if(empty($subjectId)){
+        $subject_id = $request->input('subject');
+        $topic_id= $request->input('topic_id') ?? 1;
+        if(empty($subject_id)){
             return view('/components/core/partial-topic', ['topics' => [""=>"No Topics Available"]]);    
         }   
 
-        $subject = $this->userService->getSubjectById($subjectId);
+        $subject = $this->userService->getSubjectById($subject_id);
 
         $topics = $subject->topics->pluck('name', 'id');
 
@@ -379,7 +379,7 @@ class QuestionController extends Controller
             return view('/components/core/partial-topic', ['topics' => ["No Topics Available"]]);    
         }   
 
-        return view('/components/core/partial-topic', ['topics' => $topics]);    
+        return view('/components/core/partial-topic', ['topics' => $topics, 'topic_id' => $topic_id]);    
     }
 
     public function question_type_show(Question $question){

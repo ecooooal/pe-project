@@ -21,17 +21,20 @@ class QuestionService
                         'is_correct' => $choice->is_correct,
                     ];
                 })->toArray();
+                $choices['points'] = $question->total_points;
                 return $choices;
 
             case 'true_or_false':
                 $choices = [
                     'solution' => $question_type->solution,
+                    'points' => $question->total_points
                 ];                
                 return $choices;
 
             case 'identification':
                 $choices = [
                     'solution' => $question_type->solution,
+                    'points' => $question->total_points
                 ];                
                 return $choices;
 
