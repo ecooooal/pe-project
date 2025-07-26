@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignIdFor(Question::class, 'question_id')->constrained()->cascadeOnDelete();
             $table->char('choice_key');
             $table->string('item');
-            $table->boolean('is_correct');
+            $table->boolean('is_solution');
             $table->unsignedTinyInteger('points');
             $table->timestamps();
         });

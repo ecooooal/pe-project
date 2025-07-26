@@ -31,7 +31,10 @@ class Exam extends Model
         return $this->hasMany(ExamAccessCode::class);
     }
 
-    
+    public function studentPapers() {
+        return $this->hasMany(StudentPaper::class);
+    }
+
     public function questions() {
         return $this->belongsToMany(Question::class)->withTimestamps();
     }

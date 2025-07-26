@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\StudentAnswer;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,6 +14,10 @@ return new class extends Migration
     {
         Schema::create('matching_answers', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(StudentAnswer::class, 'student_answer_id')->constrained()->cascadeOnDelete();
+            $table->string('first_item_answer');
+            $table->string('second_item_answer');
+            $table->unsignedTinyInteger('answer_points')->default(0);
             $table->timestamps();
         });
     }

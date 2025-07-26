@@ -17,7 +17,7 @@ class QuestionTypeService
             $question->multipleChoiceQuestions()->create([
                 'choice_key' => $key,
                 'item' => $item,
-                'is_correct' => $key == $question_type_data['solution'],
+                'is_solution' => $key == $question_type_data['solution'],
                 'points' => $question_type_data['points']
             ]);
         }   
@@ -101,7 +101,7 @@ class QuestionTypeService
             $question->multipleChoiceQuestions()->create([
                 'choice_key' => $key,
                 'item' => $item,
-                'is_correct' => $key == $question_type_data['solution'],
+                'is_solution' => $key == $question_type_data['solution'],
                 'points' => $question_type_data['points']
             ]);
         }
