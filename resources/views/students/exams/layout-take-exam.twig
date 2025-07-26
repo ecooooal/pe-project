@@ -2,20 +2,41 @@
 {% from 'components/core/breadcrumbs' import breadcrumb %}
 {% from 'components/core/show-header' import show_header %}
 {% from 'components/core/show-item' import show_item %}
+{% import 'components/core/forms' as forms %}
 
+{% set values = {
+    'a' : 'int[][] arr = new int[3][4];',
+    'b' : 'int[3][4] arr = new int[][];',
+    'c' : 'int arr = new int[3, 4];',
+    'd' : 'int[] arr = new int[3][4];'
+
+} %}
 
 {% extends 'components/core/student-layout' %}
 
 {% block content %}
-<div class="flex flex-1 flex-col gap-y-4">
-    <div class="flex flex-col max-w-full mx-8 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
-            {{ show_header(exam.name|title) }}  
+<div class="flex flex-1 gap-x-4 m-4">
+    <div class="flex flex-1 flex-col">
+        <div id="exam-content" class="flex flex-col rounded-xl bg-gray-400 p-4 shadow-sm ring-1 ring-gray-950/5">
+                  {{ dump()}}  
+        </div>
+    </div>
+    <div class="flex flex-col md:w-1/5 ml-auto max-w-full gap-y-2 text-wrap rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
+        {{ show_item('Exam', exam.name|title)}}
+        {{ show_header('') }}
+        {{ show_item('Duration', '90 minutes')}}
+        {{ show_item('Question', '15/80')}}
+        {{ show_header('') }}
+        <div class="flex flex-1 flex-col pl-5">
+            <ul class="list-disc  w-full">
+                <li><a href="#" class="flex gap-x-4 border-r-5 border-blue-900">{{ show_item('Q1', 'multiple choice')}}<span>✔</span></a></li>
+                <li><a href="#" class="flex gap-x-4 border-r-5 border-blue-900">{{ show_item('Q2', 'multiple choice')}}<span>❗</span></a></li>
+            </ul>
+        </div>
+            {{ show_header('') }}
+            <a href="#" class="flex gap-x-4">{{ show_item('Submit')}}<span>❗</span></a>
     </div>  
-    {{ dump()}}
 
-    <div id="exam-content"></div>
-
-   
 </div>
 
 {% endblock %}

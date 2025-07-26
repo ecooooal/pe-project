@@ -26,7 +26,13 @@ class ExamController extends Controller
         $this->examService = $examService;
     }
 
-    public function takeExam(Exam $exam){
+    public function takeExam(Exam $exam, User $user){
+        // check if user is enrolled
+        // check if exam is published
+        // check examination date
+        // check if current take exceed amount of exam retakes
+        
+        
         return view( 'students/exams/layout-take-exam', ['exam'=> $exam]); ;
     }
 

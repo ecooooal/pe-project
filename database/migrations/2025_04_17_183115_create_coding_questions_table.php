@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('coding_questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Question::class, 'question_id')->constrained();
+            $table->foreignIdFor(Question::class, 'question_id')->constrained()->cascadeOnDelete();
             $table->text('instruction');
             $table->unsignedTinyInteger('syntax_points');
             $table->unsignedTinyInteger('runtime_points');

@@ -23,7 +23,7 @@ return new class extends Migration
                 'ranking',
                 'matching',
                 'coding'
-            ]);           
+            ])->index();           
             $table->string('name');
             $table->unsignedTinyInteger('total_points');
             $table->timestamps();
