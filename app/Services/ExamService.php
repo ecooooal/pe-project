@@ -3,6 +3,7 @@
 namespace App\Services;
 use App\Models\Exam;
 use App\Models\ExamAccessCode;
+use App\Models\Question;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
@@ -325,9 +326,5 @@ class ExamService
 
             return true;
     }
-
-    
-
-    // algorithm for shuffling the question list
 }
 

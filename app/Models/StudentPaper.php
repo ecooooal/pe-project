@@ -26,6 +26,6 @@ class StudentPaper extends Model
     }
 
     public function studentAnswers() {
-        return $this->hasMany(StudentAnswer::class)->withTimestamps();
+        return $this->hasMany(StudentAnswer::class);
     }
 }

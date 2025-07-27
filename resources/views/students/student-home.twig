@@ -79,7 +79,7 @@
             </div>
 
             <div class="flex gap-x-2 px-4">
-                <button hx-post="{{ route('exams.enroll',{user: user.id}) }}"
+                <button hx-post="{{ route('exams.student.store') }}"
                         hx-target="#access-code-form"
                         hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
                         hx-trigger="click throttle:5000ms"

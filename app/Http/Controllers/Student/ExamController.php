@@ -8,6 +8,7 @@ use App\Models\ExamAccessCode;
 use App\Models\Question;
 use App\Models\User;
 use App\Services\ExamService;
+use App\Services\ExamTakingService;
 use App\Services\UserService;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
@@ -19,40 +20,26 @@ class ExamController extends Controller
 {
     protected $userService;
     protected $examService;
+    protected $examTakingService;
 
-    public function __construct(UserService $userService, ExamService $examService)
+    public function __construct(UserService $userService, ExamService $examService, ExamTakingService $examTakingService)
     {
         $this->userService = $userService;
         $this->examService = $examService;
-    }
-
-    public function takeExam(Exam $exam, User $user){
-        // check if user is enrolled
-        // check if exam is published
-        // check examination date
-        // check if current take exceed amount of exam retakes
-        
-        
-        return view( 'students/exams/layout-take-exam', ['exam'=> $exam]); ;
+        $this->examTakingService = $examTakingService;
     }
 
     public function show(Exam $exam){
         return view( 'students/exams/show', ['exam'=> $exam]);
     }
-
-    public function showExamRecord(Exam $exam){
-        return view(view: 'students/records/show');
-    }
-    public function showExamPapers(Exam $exam)
-    {
-        return view(view: 'students/exams/get-exam-papers');
-    }
+    
     public function showExamOverview(Exam $exam)
     {
         $exam->load('course');
         return view('students/exams/get-exam-overview', ['exam' => $exam]);
     }
-    public function store(User $user){
+    public function store(){
+        $user = auth()->user();
         $access_code = request('access-code');
         
         try {

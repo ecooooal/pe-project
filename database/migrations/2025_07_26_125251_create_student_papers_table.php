@@ -19,9 +19,9 @@ return new class extends Migration
             $table->foreignIdFor(User::class, 'user_id')->constrained()->cascadeOnDelete();
             $table->unsignedSmallInteger('question_count')->nullable();
             $table->json('questions_order')->nullable();
-            $table->unsignedSmallInteger('current_position')->nullable();
+            $table->unsignedSmallInteger('current_position')->default(0)->nullable();
             $table->enum('status', ['in_progress', 'completed', 'auto_completed'])->default('in_progress')->index();
-            $table->timestamp('last_seen_at')->nullable()->index();
+            $table->timestamp('last_seen_at')->nullable()->default(now())->index();
             $table->timestamp('submitted_at')->nullable()->index();
             $table->timestamp('expired_at')->nullable()->index();
             $table->timestamps();

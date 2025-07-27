@@ -7,6 +7,8 @@ use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\Student\ExamRecordController;
+use App\Http\Controllers\Student\StudentPaperController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\Student\ExamController as StudentExamController;
@@ -45,15 +47,22 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/', [StudentController::class, 'index']);
     Route::redirect('/exams', '/student#exam-div');
 
-    Route::post('/exams', [StudentExamController::class, 'store'])->name('exams.enroll');
-    Route::post('/exams/{user}/enroll-exam', [StudentExamController::class, 'store'])->name('exams.enroll');
-
+    Route::post('/exams', [StudentExamController::class, 'store'])->name('exams.student.store');
     Route::get('/exams/{exam}', [StudentExamController::class, 'show'])->name('exams.student.show');
-    Route::get('/exams/exam.id/exam-record.id', [StudentExamController::class, 'showExamRecord'])->name('exams.student.record');;
-    Route::get('/exams/{exam}/get-overview', [StudentExamController::class, 'showExamOverview'])->name('exams.student.overview');;
-    Route::get('/exams/exam.id/get-papers', [StudentExamController::class, 'showExamPapers']);
-    Route::get('/exams/{exam}/taking-exam', [StudentExamController::class, 'takeExam'])->name('exams.take');
+    Route::get('/exams/{exam}/show-overview', [StudentExamController::class, 'showExamOverview'])->name('exams.student.overview');;
 
+    Route::get('/exams/exam.id/exam-record.id', [ExamRecordController::class, 'index'])->name('exam_records.index');;
+    Route::get('/exams/exam.id/get-papers', [ExamRecordController::class, 'show'])->name('exam_records.show');;
+
+    Route::get('/exams/{exam}/take-exam', [StudentPaperController::class, 'store'])->name('exam_papers.store');
+
+
+
+
+
+
+
+    
     Route::get('/exams/exam.id/mcq-example', function () {
         return view('students/exams/mcq-example');
     });

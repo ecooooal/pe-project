@@ -4,14 +4,6 @@
 {% from 'components/core/show-item' import show_item %}
 {% import 'components/core/forms' as forms %}
 
-{% set values = {
-    'a' : 'int[][] arr = new int[3][4];',
-    'b' : 'int[3][4] arr = new int[][];',
-    'c' : 'int arr = new int[3, 4];',
-    'd' : 'int[] arr = new int[3][4];'
-
-} %}
-
 {% extends 'components/core/student-layout' %}
 
 {% block content %}
@@ -21,16 +13,17 @@
                   {{ dump()}}  
         </div>
     </div>
-    <div class="flex flex-col md:w-1/5 ml-auto max-w-full gap-y-2 text-wrap rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
+    <div class="flex flex-col md:w-1/5 ml-auto max-h-fit max-w-full gap-y-2 text-wrap rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
         {{ show_item('Exam', exam.name|title)}}
         {{ show_header('') }}
-        {{ show_item('Duration', '90 minutes')}}
-        {{ show_item('Question', '15/80')}}
+        {{ show_item('Duration', exam.duration ?: 'No Timer')}}
+        {{ show_item('Total Questions', student_paper.question_count )}}
         {{ show_header('') }}
-        <div class="flex flex-1 flex-col pl-5">
-            <ul class="list-disc  w-full">
-                <li><a href="#" class="flex gap-x-4 border-r-5 border-blue-900">{{ show_item('Q1', 'multiple choice')}}<span>✔</span></a></li>
-                <li><a href="#" class="flex gap-x-4 border-r-5 border-blue-900">{{ show_item('Q2', 'multiple choice')}}<span>❗</span></a></li>
+        <div class="flex flex-1 flex-col">
+            <ul class="max-h-64 overflow-y-auto w-full space-y-1">
+                {% for question in student_paper.questions_in_array %}
+                <li class="flex justify-between p-1 group"><a href="#">{{ show_item(loop.index, question|replace({'_': ' '})|lower|capitalize, label_attributes:'group-hover:text-blue-900 duration', value_attributes:'group-hover:text-blue-900 duration group-hover:underline')}}</a></li>
+                {% endfor %}
             </ul>
         </div>
             {{ show_header('') }}
