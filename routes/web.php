@@ -8,6 +8,7 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\Student\ExamRecordController;
+use App\Http\Controllers\Student\StudentAnswerController;
 use App\Http\Controllers\Student\StudentPaperController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
@@ -54,7 +55,9 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/exams/exam.id/exam-record.id', [ExamRecordController::class, 'index'])->name('exam_records.index');;
     Route::get('/exams/exam.id/get-papers', [ExamRecordController::class, 'show'])->name('exam_records.show');;
 
-    Route::get('/exams/{exam}/take-exam', [StudentPaperController::class, 'store'])->name('exam_papers.store');
+    Route::get('/exams/{exam}/take', [StudentPaperController::class, 'store'])->name('exam_papers.store');
+    Route::get('/student_papers/{student_paper}/question', [StudentPaperController::class, 'show'])->name('exam_papers.show');
+    Route::patch('/student_papers/{student_paper}/{question}', [StudentAnswerController::class, 'update'])->name('student_answer.update');
 
 
 

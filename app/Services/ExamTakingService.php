@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Models\Exam;
 use App\Models\ExamAccessCode;
 use App\Models\Question;
+use App\Models\StudentAnswer;
 use App\Models\StudentPaper;
 use App\Models\User;
 use Illuminate\Database\QueryException;
@@ -12,6 +13,12 @@ use Illuminate\Support\Facades\DB;
 use Str;
 class ExamTakingService
 {
+    protected $questionService;
+
+    public function __construct(QuestionService $questionService)
+    {
+        $this->questionService = $questionService;
+    }
     public function validateExamAccess(Exam $exam, User $user){
         $isEnrolled = $user->exams()->where('exam_id', $exam->id)->exists();
         if (!$isEnrolled){
@@ -59,6 +66,13 @@ class ExamTakingService
             'question_count' => $question_count
         ]);
 
+        foreach($shuffled_ids as $id){
+            StudentAnswer::create([
+                'student_paper_id' => $student_paper->id,
+                'question_id' => $id
+            ]);
+        }
+
         // Put data to be shown to user
         $questions = self::getShuffledQuestionsInfo($exam, $shuffled_ids);
 
@@ -90,6 +104,23 @@ class ExamTakingService
             'question_type' => $questions[$id]->question_type->value
         ])->pluck('question_type' ,'id')->toArray();
         return $questions;
+    }
+
+    public function getCurrentQuestion(StudentPaper $student_paper){
+        if ($student_paper->current_position >= $student_paper->question_count){
+                        $student_paper->update(['current_position' => 0]);
+
+            dd('done');
+        }
+        $questions = json_decode($student_paper->questions_order);
+        $question = Question::find($questions[$student_paper->current_position]);
+        $question_type = $this->questionService->getQuestionTypeShow($question);
+        unset($question_type['points']);
+        $question_data = [
+            'question' => $question,
+            'question_type_data' => $question_type
+        ];
+        return $question_data;
     }
 
 }
