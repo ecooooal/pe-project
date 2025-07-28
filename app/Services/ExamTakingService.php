@@ -115,12 +115,54 @@ class ExamTakingService
         $questions = json_decode($student_paper->questions_order);
         $question = Question::find($questions[$student_paper->current_position]);
         $question_type = $this->questionService->getQuestionTypeShow($question);
-        unset($question_type['points']);
+        
+        $question_type = self::filterQuestionTypeData($question, $question_type);
+
         $question_data = [
             'question' => $question,
             'question_type_data' => $question_type
         ];
         return $question_data;
+    }
+
+    public static function filterQuestionTypeData(Question $question, $question_type){
+        switch ($question->question_type->value){
+            case('multiple_choice') :
+                unset($question_type['points']);
+                shuffle($question_type);
+                break;
+            case('true_or_false') :
+                unset($question_type['solution']);
+                unset($question_type['points']);
+                break;
+            case('identification') :
+                unset($question_type['solution']);
+                unset($question_type['points']);
+                break;
+            case('ranking') :
+                foreach ($question_type as $item => &$data) {
+                    unset($data['order']);
+                    unset($data['item_points']);
+                }
+                shuffle($question_type);
+                break;
+            case('matching') :
+                foreach ($question_type as $item => &$data) {
+                    unset($data['item_points']);
+                }
+                shuffle($question_type);
+                break;
+            case('coding') : 
+                foreach ($question_type['language_codes'] as $item => &$data) {
+                    unset($data['complete_solution']);
+                }
+                unset($question_type['syntax_points']);
+                unset($question_type['runtime_points']);
+                unset($question_type['test_case_points']);
+                break;
+        }
+
+        return $question_type;
     }
 
 }
