@@ -330,7 +330,6 @@ class QuestionController extends Controller
             }
             $data['points'] = $totalPoints;
         }
-
         \Log::info('data can be updated', $data);
         QuestionFactory::update($question, $data);
         \Log::info('Question Update Successful');

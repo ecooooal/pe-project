@@ -3,15 +3,8 @@
 namespace App\Factories;
 
 use App\Models\Question;
-use App\Models\MultipleChoiceQuestion;
-use App\Models\TrueOrFalseQuestion;
-use App\Models\IdentificationQuestion;
-use App\Models\RankingQuestion;
-use App\Models\MatchingQuestion;
 use App\Services\QuestionTypeService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Str;
 
 class QuestionFactory
 {

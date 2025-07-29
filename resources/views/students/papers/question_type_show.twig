@@ -5,7 +5,7 @@
 
     {% set values = {} %}
 
-    {% for choice in question_type_data %}
+    {% for choice in question_type_data.choices %}
         {% set values = values | merge({ (choice.choice_key): choice.item }) %}
     {% endfor %}
 
@@ -68,13 +68,13 @@
             <div class="flex gap-x-4">
             {{ forms.form_field(
                 label:forms.label(
-                    id: 'answers[]', 
+                    id: 'answer[]', 
                     content:'☰', 
                     attributes:{
                         'class':'handle cursor-grab active:cursor-grabbing whitespace-nowrap text-xl font-bold text-blue-900'}
                     ),
                 input:forms.text(
-                    name:'answers[]',
+                    name:'answer[]',
                     value:  question_type_data[i-1]['solution'],
                     attributes:{
                         'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 cursor-default',
@@ -113,13 +113,13 @@
             <div class="flex flex-col max-w-72">
                 {{ forms.form_field(
                     label:forms.label(
-                        id: 'answers[' ~ (i) ~ '][left]', 
+                        id: 'answer[' ~ (i) ~ '][left]', 
                         content: question_type_data[i-1]['left'], 
                         attributes:{
                             'class':'w-fit text-pretty shrink-0 rounded-md cursor-default bg-white p-4 font-semibold text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:ring-0 sm:text-sm/6'}
                         ),
                     input:forms.text(
-                        name:'answers[' ~ (i) ~ '][left]',
+                        name:'answer[' ~ (i) ~ '][left]',
                         value: question_type_data[i-1]['left'],
                         attributes:{
                             'class':'hidden',
@@ -131,13 +131,13 @@
             <div class="flex flex-1 sortable shrink-0">
                 {{ forms.form_field(
                     label:forms.label(
-                        id: 'answers[' ~ (i) ~ '][right]', 
+                        id: 'answer[' ~ (i) ~ '][right]', 
                         content:'☰', 
                         attributes:{
                             'class':'handle cursor-grab active:cursor-grabbing whitespace-nowrap text-xl font-bold text-blue-900'}
                         ),
                     input:forms.text(
-                        name:'answers[' ~ (i) ~ '][right]',
+                        name:'answer[' ~ (i) ~ '][right]',
                         value:  question_type_data[i-1]['right'],
                         attributes:{
                             'class':'flex-1 w-fit rounded-md shrink-0 whitespace-nowrap text-center cursor-default bg-blue-900 px-3 py-4 font-semibold text-white outline-0 -outline-offset-0 focus:ring-0 sm:text-sm/6',
@@ -199,6 +199,10 @@
 {% endif %}
 
 {% if question.question_type.value == 'coding' %}
+<form id="code-form">
+    <textarea class="hidden" name="answer" id="answer-input"></textarea>
+</form>
+
 <div id="coding-question"
      data-instruction='{{ question_type_data.instruction_raw|json_encode|e("html_attr") }}'
      data-language-codes='{{ question_type_data.language_codes|json_encode|e("html_attr") }}'
@@ -266,4 +270,12 @@
                 </div>
             </div>
         </div>  
+
+<script>
+    // Safety check in case this is already defined
+    if (window.initializeEditors) {
+        window.initializeEditors();
+    }
+</script>
+
 {% endif %}

@@ -21,4 +21,24 @@ class StudentAnswer extends Model
     public function question(){
         return $this->belongsTo(Question::class);
     }
+
+    public function multipleChoiceAnswers(){
+        return $this->hasMany(MultipleChoiceAnswer::class);
+    }
+    public function trueOrFalseAnswer(){
+        return $this->hasOne(TrueOrFalseAnswer::class);
+    }
+    public function identificationAnswer(){
+        return $this->hasOne(IdentificationAnswer::class);
+    }
+    public function rankingAnswers(){
+        return $this->hasMany(RankingAnswer::class);
+    }
+    public function matchingAnswers(){
+        return $this->hasMany(MatchingAnswer::class);
+    }
+
+    public function codingAnswer(){
+        return $this->hasOne(CodingAnswer::class);
+    }
 }

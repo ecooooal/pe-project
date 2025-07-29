@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Student;
 
 use App\Models\Exam;
 use App\Models\Question;
+use App\Factories\StudentAnswerFactory;
 use App\Models\StudentPaper;
 use App\Services\ExamTakingService;
 use DB;
@@ -27,6 +28,7 @@ class StudentAnswerController extends Controller
             dd('yes');
         }   
         // update and check student answer here
+        StudentAnswerFactory::update($student_answer, request()->post());
         // increment current position
         match (request()->input('action')) {
             'back' => $student_paper->decrement('current_position'),

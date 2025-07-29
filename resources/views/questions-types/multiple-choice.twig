@@ -8,9 +8,9 @@
 {% include 'components/core/create-question-name-form' %}
 
 {% if isEdit %}
-    {% for choice in question_type_data %}
+    {% for choice in question_type_data.choices %}
         {% set values = values | merge([choice.item]) %}
-        {% if choice.is_correct %}
+        {% if choice.is_solution %}
             {% set solution = choice.choice_key|trim %}
         {% endif %}
     {% endfor %}

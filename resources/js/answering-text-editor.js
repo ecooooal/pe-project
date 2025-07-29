@@ -136,7 +136,23 @@ import { placeholder } from "@codemirror/view";
         select.dataset.initialized = "true"; 
     }
 
+    function getAnswerCode() {
+        document.getElementById('answer-input').value = initial_solution_editor.state.doc.toString();
+    }
+
+    function syncCodeMirrorToTextarea() {
+        const textarea = document.getElementById('answer-input');
+        if (textarea && initial_solution_editor) {
+            setTimeout(() => {
+                textarea.value = initial_solution_editor.state.doc.toString();
+            }, 0); // flush any in-flight input
+        }
+    }
+
+
+
     document.body.addEventListener("htmx:afterSettle", function () {
+        console.log('run');
         const container = document.getElementById("coding-question");
         if (!container) return;
 
@@ -156,6 +172,7 @@ import { placeholder } from "@codemirror/view";
 
 
     document.addEventListener("DOMContentLoaded", () => {
+        console.log('run');
         const container = document.getElementById("coding-question");
         if (!container) return;
 
@@ -174,4 +191,5 @@ import { placeholder } from "@codemirror/view";
 
 window.initializeCodingQuestionPage = initializeCodingQuestionPage;
 window.initializeEditors = initializeEditors; 
-
+window.getAnswerCode = getAnswerCode;
+window.syncCodeMirrorToTextarea = syncCodeMirrorToTextarea;

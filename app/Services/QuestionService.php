@@ -14,11 +14,11 @@ class QuestionService
         $question_type = $question->getTypeModel();
         switch ($question->question_type->value) {
             case 'multiple_choice':
-                $choices = $question_type->map(function ($choice) {
+                $choices['choices'] = $question_type->map(function ($choice) {
                     return [
                         'choice_key' => $choice->choice_key,
                         'item' => $choice->item,
-                        'is_correct' => $choice->is_correct,
+                        'is_solution' => $choice->is_solution,
                     ];
                 })->toArray();
                 $choices['points'] = $question->total_points;

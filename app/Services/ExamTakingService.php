@@ -2,15 +2,10 @@
 
 namespace App\Services;
 use App\Models\Exam;
-use App\Models\ExamAccessCode;
 use App\Models\Question;
 use App\Models\StudentAnswer;
 use App\Models\StudentPaper;
 use App\Models\User;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
-use Str;
 class ExamTakingService
 {
     protected $questionService;
@@ -114,6 +109,11 @@ class ExamTakingService
         }
         $questions = json_decode($student_paper->questions_order);
         $question = Question::find($questions[$student_paper->current_position]);
+        // check if there are answers regarding this question and send it instead of new question
+        $student_answer = $student_paper->studentAnswers()->where('question_id', $question->id)->first();
+        if($student_answer->answered_at != null){
+            dd('yes');
+        }
         $question_type = $this->questionService->getQuestionTypeShow($question);
         
         $question_type = self::filterQuestionTypeData($question, $question_type);
@@ -129,7 +129,9 @@ class ExamTakingService
         switch ($question->question_type->value){
             case('multiple_choice') :
                 unset($question_type['points']);
-                shuffle($question_type);
+                foreach ($question_type as $item => &$data) {
+                    unset($data['is_solution']);
+                }                
                 break;
             case('true_or_false') :
                 unset($question_type['solution']);
@@ -150,12 +152,22 @@ class ExamTakingService
                 foreach ($question_type as $item => &$data) {
                     unset($data['item_points']);
                 }
+                $rightItems = array_column($question_type, 'right');
+                shuffle($rightItems); 
+
+                foreach ($question_type as $index => &$pair) {
+                    $pair['right'] = $rightItems[$index];
+                }
+                
                 shuffle($question_type);
                 break;
             case('coding') : 
                 foreach ($question_type['language_codes'] as $item => &$data) {
                     unset($data['complete_solution']);
                 }
+                $question_type['languages'] = $question_type['languages']->mapWithKeys(function ($item) {
+                    return [$item => $item];
+                });
                 unset($question_type['syntax_points']);
                 unset($question_type['runtime_points']);
                 unset($question_type['test_case_points']);
