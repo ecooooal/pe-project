@@ -33,6 +33,7 @@ class StudentAnswerController extends Controller
         match (request()->input('action')) {
             'back' => $student_paper->decrement('current_position'),
             'next' => $student_paper->increment('current_position'),
+            
             'submit' => dd('hello'),
             default => dd($student_paper),
         };

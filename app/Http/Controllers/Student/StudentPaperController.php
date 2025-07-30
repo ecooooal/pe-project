@@ -31,11 +31,9 @@ class StudentPaperController extends Controller
         // Check if the user has an existing exam paper that's not expired or submitted
         $student_paper = $this->examTakingService->checkUnsubmittedExamPaper($exam, $user);
 
-        $session = session('yes', 'no');
         $data = [
             'student_paper' => $student_paper,
-            'exam' => $exam,
-            'see' => $session
+            'exam' => $exam
         ];
 
         return view( 'students/papers/layout-take-exam', $data);
@@ -47,8 +45,6 @@ class StudentPaperController extends Controller
         }
         $data = $this->examTakingService->getCurrentQuestion($student_paper);
         $data['student_paper'] = $student_paper;
-        $tables = DB::select("Table student_answers ");
-        $data['student_answers'] = $tables;
         return view( 'students/papers/show', $data);
     }
 }

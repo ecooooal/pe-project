@@ -22,8 +22,8 @@ class StudentAnswer extends Model
         return $this->belongsTo(Question::class);
     }
 
-    public function multipleChoiceAnswers(){
-        return $this->hasMany(MultipleChoiceAnswer::class);
+    public function multipleChoiceAnswer(){
+        return $this->hasOne(MultipleChoiceAnswer::class);
     }
     public function trueOrFalseAnswer(){
         return $this->hasOne(TrueOrFalseAnswer::class);

@@ -10,7 +10,7 @@
 <div class="flex flex-1 gap-x-4 m-4">
     <div class="flex flex-1 flex-col">
         <div    id="exam-content" 
-                class="flex flex-1 flex-col max-w-full gap-y-8 bg-white rounded-xl p-4 shadow-sm ring-1 ring-gray-950/5"
+                class="flex flex-1 flex-col max-w-full max-h-fit gap-y-8 bg-white rounded-xl p-4 shadow-sm ring-1 ring-gray-950/5"
                 hx-get="{{ route('exam_papers.show', {student_paper:student_paper.student_paper}) }}"
                 hx-swap="innerHTML"
                 hx-trigger="load"
@@ -25,9 +25,18 @@
         {{ show_header('') }}
         <div id="exam-paper-questions" class="flex flex-1 flex-col">
             <ul class="max-h-64 overflow-y-auto w-full space-y-1">
+                {{ dump() }}
                 {% for question in student_paper.questions_in_array %}
                 <li class="flex justify-between p-1 group {{ student_paper.student_paper.current_position >= loop.index - 1   ? '' : 'hidden' }}">
-                    <a href="#" class="{{ student_paper.student_paper.current_position > loop.index - 1   ? 'text-gray-700' : 'text-gray-900' }}">{{ show_item(loop.index, question|replace({'_': ' '})|lower|capitalize, label_attributes:'group-hover:text-blue-900 duration', value_attributes:'group-hover:text-blue-900 duration group-hover:underline')}}</a>
+                    <button hx-patch="{{ route('student_answer.update', {student_paper : student_paper.student_paper, question:question} ) }}"
+                            hx-target="#exam-content"
+                            hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
+                            hx-include="#answer-form"
+                            hx-swap="innerHTML"
+                            hx-trigger="click throttle:1000ms"
+                            hx-vals='{"action":"back"}'
+                            type="button" 
+                            class="{{ student_paper.student_paper.current_position > loop.index - 1   ? 'text-gray-700' : 'text-gray-900' }}">{{ show_item(loop.index, question.question_type.value|replace({'_': ' '})|lower|capitalize, label_attributes:'group-hover:text-blue-900 duration', value_attributes:'group-hover:text-blue-900 duration group-hover:underline')}}</button>
                 </li>
                 {% endfor %}
             </ul>

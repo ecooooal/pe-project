@@ -6,6 +6,8 @@ use App\Models\Question;
 use App\Models\StudentAnswer;
 use App\Models\StudentPaper;
 use App\Models\User;
+use DB;
+use Str;
 class ExamTakingService
 {
     protected $questionService;
@@ -37,7 +39,7 @@ class ExamTakingService
         }
 
         $question_count = count(json_decode($exam_paper->questions_order));
-        $questions = self::getShuffledQuestionsInfo($exam, json_decode($exam_paper->questions_order));
+        $questions = $exam->questions->whereIn('id', json_decode($exam_paper->questions_order))->keyBy('id');
 
         $exam_paper_data = [
             'student_paper' => $exam_paper,
@@ -94,16 +96,16 @@ class ExamTakingService
 
     public static function getShuffledQuestionsInfo(Exam $exam, array $shuffled_ids){
         $questions = $exam->questions->whereIn('id', $shuffled_ids)->keyBy('id');
-        $questions = collect($shuffled_ids)->map(fn($id) => [
-            'id' => $questions[$id]->id,
-            'question_type' => $questions[$id]->question_type->value
-        ])->pluck('question_type' ,'id')->toArray();
+        // $questions = collect($shuffled_ids)->map(fn($id) => [
+        //     'id' => $questions[$id]->id,
+        //     'question_type' => $questions[$id]->question_type->value
+        // ])->pluck('question_type' ,'id')->toArray();
         return $questions;
     }
 
     public function getCurrentQuestion(StudentPaper $student_paper){
         if ($student_paper->current_position >= $student_paper->question_count){
-                        $student_paper->update(['current_position' => 0]);
+                $student_paper->update(['current_position' => 0]);
 
             dd('done');
         }
@@ -111,16 +113,19 @@ class ExamTakingService
         $question = Question::find($questions[$student_paper->current_position]);
         // check if there are answers regarding this question and send it instead of new question
         $student_answer = $student_paper->studentAnswers()->where('question_id', $question->id)->first();
-        if($student_answer->answered_at != null){
-            dd('yes');
-        }
         $question_type = $this->questionService->getQuestionTypeShow($question);
         
         $question_type = self::filterQuestionTypeData($question, $question_type);
-
+        $filtered_question_type['choices'] = $question_type; 
+        if($student_answer->answered_at != null){
+            $question_type_answer = self::getAnswerType($student_answer, $question);
+            if ($question_type_answer != null){
+                $filtered_question_type['student_answer'] = $question_type_answer;
+            } 
+        }
         $question_data = [
             'question' => $question,
-            'question_type_data' => $question_type
+            'question_type_data' => $filtered_question_type
         ];
         return $question_data;
     }
@@ -177,5 +182,19 @@ class ExamTakingService
         return $question_type;
     }
 
+    public static function getAnswerType(StudentAnswer $student_answer, Question $question){
+        match ($question->question_type->value){
+            'multiple_choice' => $student_answer->load('multipleChoiceAnswer'),
+            'true_or_false' => $student_answer->load('trueOrFalseAnswer'),
+            'identification' => $student_answer->load('identificationAnswer'),
+            'ranking' => $student_answer->load('rankingAnswers'),
+            'matching' => $student_answer->load('matchingAnswers'),
+            default => throw new \InvalidArgumentException("Unknown question type: {$question->question_type->value}"),
+        };
+        $suffix = in_array($question->question_type->value, ['ranking', 'matching']) ? 'Answers' : 'Answer';
+        $question_type_answer = Str::camel($question->question_type->value) . $suffix;
+
+        return $student_answer->$question_type_answer;
+    }
 }
 
