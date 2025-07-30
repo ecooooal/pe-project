@@ -23,7 +23,9 @@ class AnswerService
                 }
             }
         }
-        $student_answer->multipleChoiceAnswer()->UpdateorCreate(['answer' => $answer]);
+        $student_answer->multipleChoiceAnswer()->updateOrCreate(
+             ['student_answer_id' => $student_answer->id],
+             ['answer' => $answer]);
         
         return ['total_points' => $this->total_points, 'is_correct' => $this->is_correct];
     }
@@ -32,7 +34,9 @@ class AnswerService
             $this->total_points = $question['total_points'];
             $this ->is_correct = true;
         }         
-        $student_answer->trueOrFalseAnswer()->UpdateorCreate(['answer' => $answer]);
+        $student_answer->trueOrFalseAnswer()->updateOrCreate(
+             ['student_answer_id' => $student_answer->id],
+             ['answer' => $answer]);
         
         return ['total_points' => $this->total_points, 'is_correct' => $this->is_correct];
     }
@@ -41,11 +45,13 @@ class AnswerService
             $this->total_points = $question['total_points'];
             $this ->is_correct = true;
         } 
-        $student_answer->identificationAnswer()->UpdateorCreate(['answer' => $answer]);
-        
+    
+        $student_answer->identificationAnswer()->updateOrCreate(
+             ['student_answer_id' => $student_answer->id],
+             ['answer' => $answer]);
         return ['total_points' => $this->total_points, 'is_correct' => $this->is_correct];
     }
-    public function storeRanking(StudentAnswer $student_answer, $answer, $question_type){
+    public function storeRanking(StudentAnswer $student_answer, $answer, $question_type, $question){
         $current_total_points = 0;
         foreach ($answer as $index => $row_answer) {
             $matched = false;
@@ -73,13 +79,16 @@ class AnswerService
         }
         $student_answer->rankingAnswers()->delete();
         foreach($results as $result => $data){
-            $student_answer->rankingAnswers()->UpdateorCreate([
+            $student_answer->rankingAnswers()->Create(
+                 [
                 'answer_order' => $data['answer_order'],
                 'answer' => $data['answer'],
                 'answer_points' => $data['item_points']
             ]);
             $current_total_points += $data['item_points'];
         }
+        $this->is_correct = $question['total_points'] === $current_total_points;
+
         
         return ['total_points' => $this->total_points, 'is_correct' => $this->is_correct];
     }
@@ -113,11 +122,12 @@ class AnswerService
         }
         $student_answer->matchingAnswers()->delete();
         foreach($results as $result => $data){
-            $student_answer->matchingAnswers()->UpdateorCreate([
+            $student_answer->matchingAnswers()->Create(
+                [
                 'first_item_answer' => $data['left'],
                 'second_item_answer' => $data['right'],
                 'answer_points' => $data['item_points']
-            ]);
+                ]);
             $current_total_points += $data['item_points'];
         }
         $this->is_correct = $question['total_points'] === $current_total_points;

@@ -10,7 +10,6 @@
         {% include 'students/papers/question_type_show' with { 'question':question, 'question_type_data':question_type_data} %}
     </div>
 </div>
-
 <div class="flex mt-8 gap-x-2 justify-end">
     {% if student_paper.current_position != 0 %}
         <button hx-patch="{{ route('student_answer.update', {student_paper : student_paper, question:question} ) }}"
@@ -18,7 +17,7 @@
                 hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
                 hx-include="#answer-form"
                 hx-swap="innerHTML"
-                hx-trigger="click throttle:1000ms"
+                hx-trigger="click throttle:500ms"
                 hx-vals='{"action":"back"}'
                 type="button" 
                 class="flex gap-x-1 justify-center items-center p-2 bg-blue-900 duration-300 transition rounded-lg font-medium text-white hover:bg-blue-700 hover:text-gray-50 cursor-pointer">        
@@ -34,9 +33,8 @@
                 hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
                 hx-include="#answer-form"
                 hx-swap="innerHTML"
-                hx-trigger="click throttle:1000ms"
+                hx-trigger="click throttle:500ms"
                 hx-vals='{"action":"next"}'
-                hx-on::before-request="syncCodeMirrorToTextarea()"
                 type="button" 
                 class="flex gap-x-1 justify-center items-center p-2 bg-blue-900 duration-300 transition rounded-lg font-medium text-white hover:bg-blue-700 hover:text-gray-50 cursor-pointer">
             Next
@@ -46,7 +44,11 @@
         </button>
     {% endif %}
     {% if student_paper.current_position + 1 == student_paper.question_count %}
-        <button 
+        <button hx-post ="{{ route('exam_records.store', {student_paper : student_paper} ) }}"
+                hx-target="#exam-content"
+                hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
+                hx-swap="innerHTML"
+                hx-trigger="click throttle:500ms"
                 type="button" 
                 class="flex gap-x-1 justify-center items-center p-2 bg-green-900 duration-300 transition  rounded-lg font-medium text-white hover:bg-green-700 hover:text-gray-50 cursor-pointer">
             Submit 

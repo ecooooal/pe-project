@@ -36,6 +36,8 @@ class ExamTakingService
         $exam_paper = $user->studentPapers()->where(['exam_id' => $exam->id, 'status' => 'in_progress'])->first();
         if (!$exam_paper){
             return self::generateExamPaper($exam, $user);
+        } else {
+            $exam_paper['last_seen_at'] = now();
         }
 
         $question_count = count(json_decode($exam_paper->questions_order));

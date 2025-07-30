@@ -11,6 +11,7 @@
             X
         </button>
     </div>
+    {{ dump() }}
     <div class="flex p-4 gap-x-4">
         <div class="flex flex-col gap-y-8 w-full">
             {{ show_header('Exam Results')}}
@@ -21,106 +22,52 @@
                         <thead>
                         <tr>
                             <th>Subject</th>
-                            <th>Total Marks</th>
-                            <th>Marks Obtained</th>
+                            <th>Max Score</th>
+                            <th>Score Obtained</th>
                         </tr>
                         </thead>
                         <tbody>
+                            {% for subject in exam_record.subjects %}
                             <tr>
-                                <td>Programming Basics</td>
-                                <td>20</td>
-                                <td>18</td>
+                                <td>{{ subject.subject_name }}</td>
+                                <td>{{ subject.score }}</td>
+                                <td>{{ subject.score_obtained }}</td>
                             </tr>
-                            <tr>
-                                <td>Data Structures</td>
-                                <td>20</td>
-                                <td>16</td>
-                            </tr>
-                            <tr>
-                                <td>Algorithms</td>
-                                <td>20</td>
-                                <td>15</td>
-                            </tr>
-                            <tr>
-                                <td>Computer Architecture</td>
-                                <td>20</td>
-                                <td>10</td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 <div class="bg-gray-100 px-4 rounded-2xl text-gray-800">            
                     <table>
-            <thead>
-            <tr>
-            <th>Q#</th>
-            <th>Question Summary</th>
-            <th>Your Answer</th>
-            <th>Correct Answer</th>
-            <th>Score</th>
-            <th>Status</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-            <td>1</td>
-            <td>What is a variable in Python?</td>
-            <td>A container for a value</td>
-            <td>A container for a value</td>
-            <td>2/2</td>
-            <td>✅</td>
-            </tr>
-            <tr>
-            <td>2</td>
-            <td>Identify the correct loop structure</td>
-            <td>Used <code>while</code> instead of <code>for</code></td>
-            <td><code>for</code> loop with range</td>
-            <td>1/2</td>
-            <td>❌</td>
-            </tr>
-            <tr>
-            <td>3</td>
-            <td>Which data structure uses LIFO?</td>
-            <td>Stack</td>
-            <td>Stack</td>
-            <td>2/2</td>
-            <td>✅</td>
-            </tr>
-            <tr>
-            <td>4</td>
-            <td>Time complexity of binary search?</td>
-            <td>O(n)</td>
-            <td>O(log n)</td>
-            <td>0/2</td>
-            <td>❌</td>
-            </tr>
-            <tr>
-            <td>5</td>
-            <td>Draw CPU block diagram (text-based answer)</td>
-            <td>Partial components listed</td>
-            <td>All components required</td>
-            <td>1/2</td>
-            <td>⚠️ Partial</td>
-            </tr>
-            <tr>
-            <td>…</td>
-            <td>…</td>
-            <td>…</td>
-            <td>…</td>
-            <td>…</td>
-            <td>…</td>
-            </tr>
-            <tr>
-            <td>25</td>
-            <td>Rank this process in ascending order</td>
-            <td>1. Code Writing</td>
-            <td>Well-explained with code</td>
-            <td>4/4</td>
-            <td>✅</td>
-            </tr>
-            </tbody>
+                        <thead>
+                        <tr>
+                        <th>Q#</th>
+                        <th>Question</th>
+                        <th>Score</th>
+                        <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                        <td>1</td>
+                        <td>What is a variable in Pythonasdasdasdsadadasdsadasdasdadad?</td>
+                        <td>2/2</td>
+                        <td>✅</td>
+                        </tr>
+                        <td>…</td>
+                        <td>…</td>
+                        <td>…</td>
+                        <td>…</td>
+                        </tr>
+                        <tr>
+                        <td>25</td>
+                        <td>Rank this process in ascending order</td>
+                        <td>4/4</td>
+                        <td>✅</td>
+                        </tr>
+                        </tbody>
                     </table>
-                </div>
+            </div>
 
             </div>
             <div class="flex flex-col rounded-2xl gap-y-4 text-gray-800">            
@@ -203,11 +150,11 @@
 
         <div class="flex flex-col max-h-fit min-w-fit gap-y-2">
             <div class="flex flex-col justify-between gap-y-4 rounded-xl bg-gray-10 p-4 shadow-sm ring-1 ring-gray-950/5">
-                {{ show_item('Attempt #', '1')}}
+                {{ show_item('Attempt #', exam_record.attempt)}}
                 {{ show_item('Score', '##/##')}}
-                {{ show_item('Time Taken', '## minutes')}}
-                {{ show_item('Date Taken', '##/##/####')}}
-                {{ show_item('Status', "Pass/More Review Required") }}
+                {{ show_item('Time Taken', exam_record.time_taken ~ ' minutes')}}
+                {{ show_item('Date Taken', exam_record.date_taken)}}
+                {{ show_item('Status', exam_record.status) }}
             </div> 
             <div class="flex flex-col prose rounded-xl bg-gray-10 p-4 shadow-sm ring-1 ring-gray-950/5">
                 <h4>Exam Structure</h4>

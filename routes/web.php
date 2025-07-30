@@ -52,10 +52,11 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/exams/{exam}', [StudentExamController::class, 'show'])->name('exams.student.show');
     Route::get('/exams/{exam}/show-overview', [StudentExamController::class, 'showExamOverview'])->name('exams.student.overview');;
 
-    Route::get('/exams/exam.id/exam-record.id', [ExamRecordController::class, 'index'])->name('exam_records.index');;
-    Route::get('/exams/exam.id/get-papers', [ExamRecordController::class, 'show'])->name('exam_records.show');;
+    Route::get('/exams/{exam}/records', [ExamRecordController::class, 'index'])->name('exam_records.index');;
+    Route::get('/exams/{exam}/records/{exam_record}', [ExamRecordController::class, 'show'])->name('exam_records.show');;
+    Route::post('/exams/{student_paper}/evaluate', [ExamRecordController::class, 'store'])->name('exam_records.store');;
 
-    Route::get('/exams/{exam}/take', [StudentPaperController::class, 'store'])->name('exam_papers.store');
+    Route::get('/exams/{exam}/take', [StudentPaperController::class, 'takeExam'])->name('exam_papers.take');
     Route::get('/student_papers/{student_paper}/question', [StudentPaperController::class, 'show'])->name('exam_papers.show');
     Route::patch('/student_papers/{student_paper}/{question}', [StudentAnswerController::class, 'update'])->name('student_answer.update');
 

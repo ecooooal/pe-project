@@ -17,12 +17,23 @@ class StudentPaper extends Model
         'submitted_at',
         'expired_at'
     ];
+    protected $casts = [
+        'submitted_at' => 'datetime',
+        'created_at' => 'datetime',
+        'last_seen_at' => 'datetime',
+        'expired_at' => 'datetime',
+    ];
+
 
     public function exam(){
         return $this->belongsTo(Exam::class);
     }
     public function user(){
         return $this->belongsTo(User::class);
+    }
+
+    public function examRecord(){
+        return $this->hasOne(ExamRecord::class);
     }
 
     public function studentAnswers() {

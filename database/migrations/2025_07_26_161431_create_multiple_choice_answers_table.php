@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('multiple_choice_answers', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(StudentAnswer::class, 'student_answer_id')->constrained()->cascadeOnDelete();
-            $table->string('choice_key', 1)->nullable(); 
+            $table->string('answer', 1)->nullable(); 
             $table->timestamps();
         });
     }

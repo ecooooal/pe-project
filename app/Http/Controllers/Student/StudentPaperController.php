@@ -18,7 +18,7 @@ class StudentPaperController extends Controller
         $this->examTakingService = $examTakingService;
     }
 
-    public function store(Exam $exam)
+    public function takeExam(Exam $exam)
     {
         $user = auth()->user();
 

@@ -16,9 +16,6 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(StudentPaper::class, 'student_paper_id')->constrained()->cascadeOnDelete();
             $table->unsignedTinyInteger('attempt');
-            $table->unsignedSmallInteger('subjects');
-            $table->unsignedSmallInteger('subject_score_obtained');
-            $table->unsignedSmallInteger('subject_score');
             $table->unsignedSmallInteger('total_score');
             $table->timestamp('date_taken')->nullable();
             $table->integer('time_taken')->nullable();

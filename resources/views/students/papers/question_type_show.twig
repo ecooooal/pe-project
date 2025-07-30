@@ -1,5 +1,6 @@
 {% import 'components/core/forms' as forms %}
 {% from 'components/core/show-header' import show_header %}
+{{ dump()}}
 
 {% if question.question_type.value == 'multiple_choice' %}
     {% set values = {} %}

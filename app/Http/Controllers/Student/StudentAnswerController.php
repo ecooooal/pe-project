@@ -28,20 +28,20 @@ class StudentAnswerController extends Controller
             dd('yes');
         }   
         // update and check student answer here
+
         StudentAnswerFactory::update($student_answer, request()->post());
+
+
         // increment current position
         match (request()->input('action')) {
             'back' => $student_paper->decrement('current_position'),
             'next' => $student_paper->increment('current_position'),
-            
             'submit' => dd('hello'),
             default => dd($student_paper),
         };
 
         $data = $this->examTakingService->getCurrentQuestion($student_paper);
         $data['student_paper'] = $student_paper;
-        $tables = DB::select("Table student_answers ");
-        $data['student_answers'] = $tables;
         return view( 'students/papers/show', $data);
     }
 }

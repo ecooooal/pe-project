@@ -17,7 +17,17 @@ class ExamRecord extends Model
         'time_taken',
         'status'
     ];
+    protected $casts = [
+        'date_taken' => 'datetime',
+        'created_at' => 'datetime',
+    ];
+
 
     public function studentPaper(){
-        return $this->hasOne(StudentPaper::class);
-    }}
+        return $this->belongsTo(StudentPaper::class);
+    }
+
+    public function subjects(){
+        return $this->hasMany(ExamRecordsSubject::class, 'exam_record_id');
+    }
+}

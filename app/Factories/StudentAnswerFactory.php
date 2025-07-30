@@ -33,10 +33,10 @@ class StudentAnswerFactory
                 $update_student_answer = $student_answer_service->storeIdentification($student_answer, $answer, $question_type, $question);
                 break;
             case('ranking'):
-                $update_student_answer =$student_answer_service->storeRanking($student_answer, $answer, $question_type, $question);
+                $update_student_answer = $student_answer_service->storeRanking($student_answer, $answer, $question_type, $question);
                 break;
             case('matching'):
-                $update_student_answer =$student_answer_service->storeMatching($student_answer, $answer, $question_type, $question);
+                $update_student_answer = $student_answer_service->storeMatching($student_answer, $answer, $question_type, $question);
         }
         $student_answer->update([
             'points' =>  $update_student_answer['total_points'],
