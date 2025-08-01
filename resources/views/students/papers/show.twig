@@ -44,11 +44,13 @@
         </button>
     {% endif %}
     {% if student_paper.current_position + 1 == student_paper.question_count %}
-        <button hx-post ="{{ route('exam_records.store', {student_paper : student_paper} ) }}"
+        <button hx-patch ="{{ route('student_answer.update', {student_paper : student_paper, question:question} ) }}"
                 hx-target="#exam-content"
                 hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
                 hx-swap="innerHTML"
                 hx-trigger="click throttle:500ms"
+                hx-include="#answer-form"
+                hx-vals='{"action":"next"}'
                 type="button" 
                 class="flex gap-x-1 justify-center items-center p-2 bg-green-900 duration-300 transition  rounded-lg font-medium text-white hover:bg-green-700 hover:text-gray-50 cursor-pointer">
             Submit 

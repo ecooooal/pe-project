@@ -10,6 +10,7 @@ use App\Services\ExamTakingService;
 use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Str;
 
 class ExamRecordController extends Controller
 {
@@ -20,7 +21,7 @@ class ExamRecordController extends Controller
             $query->where('exam_id', $exam->id)
                 ->where('user_id', $user->id);
         })->with('subjects')->get();
-        
+    
         
         return view( 'students/records/index', ['exam' => $exam, 'exam_records' => $exam_records]);
     }
@@ -30,6 +31,7 @@ class ExamRecordController extends Controller
         // validate that the student_paper's author is the authenticated user
         $student_paper->update(['submitted_at' => now()]);
         $exam_id = $student_paper->exam->id;
+        $exam = Exam::find($exam_id);
         $attempt_count = ExamRecord::whereHas('studentPaper', function($query) use ($exam_id, $student_paper) {
             $query->where('exam_id', $exam_id)
                 ->where('user_id', $student_paper->user_id);
@@ -81,7 +83,9 @@ class ExamRecordController extends Controller
         ['score_obtained', 'score', 'updated_at']
         );
 
-        return redirect('/student');
+        $student_paper->update(['status'  => 'completed']);
+
+        return response('', 204)->header('HX-Redirect', route('exam_records.show', ['exam' => $exam, 'exam_record' => $exam_record]));
     }
 
     public function show(Exam $exam, ExamRecord $examRecord)
@@ -91,32 +95,55 @@ class ExamRecordController extends Controller
             ->find($examRecord->student_paper_id);
 
         $rows = [];
-
         foreach ($student_paper->studentAnswers as $i => $answer) {
             $question = $answer->question;
-            
+
+            $neededRelations = $student_paper->studentAnswers
+                ->map(fn($a) => $a->question->question_type->value)
+                ->unique()
+                ->map(fn($type) => 'studentAnswers.' . Str::camel($type) . (in_array($type, ['ranking', 'matching']) ? 'Answers' : 'Answer'))
+                ->values()
+                ->all();
+
+            $student_paper->load(array_merge(['studentAnswers.question'], $neededRelations));
+
+
+            // if ($i === 0) {
+            //     dump([
+            //         'neededRelations' => $neededRelations,
+            //         'student_paper' => $student_paper,
+            //         'loaded_relations' => $answer->getRelations(),
+            //     ]);
+            // }
+
 
             // Load and get the specific answer
-            $question_type_answer = ExamTakingService::getAnswerType($answer, $question);
-
-            if ($question_type_answer != null){
-                $yourAnswer = match ($question->question_type->value) {
-                                'multiple_choice' => $question_type_answer?->choice ?? 'N/A',
-                                'true_or_false' => $question_type_answer?->answer ? 'True' : 'False',
-                                'identification' => $question_type_answer?->answer ?? 'N/A',
-                                'ranking' => dd($question_type_answer),
-                                'matching' => $question_type_answer->map(fn($a) => "{$a->prompt} → {$a->match}")->implode(', '),
-                                default => 'Unsupported',
-                            };
+            if ($answer->is_answered){
+                $question_type_answer = ExamTakingService::getAnswerType($answer, $question);
+                if ($question_type_answer != null){
+                    $yourAnswer = match ($question->question_type->value) {
+                                    'multiple_choice' => $question_type_answer?->answer ?? 'N/A',
+                                    'true_or_false' => $question_type_answer?->answer ? 'True' : 'False',
+                                    'identification' => $question_type_answer?->answer ?? 'N/A',
+                                    'ranking' => $question_type_answer ?? 'N/A',
+                                    'matching' => $question_type_answer->map(fn($a) => "{$a->first_item_answer} → {$a->secondd_item_answer}")->implode(', '),
+                                    default => 'Unsupported',
+                                };
+                }
             }
-        
 
             $rows[] = [
+                's' => ExamTakingService::getAnswerType($answer, $question),
                 'number' => $i + 1,
-                'question' => $question->text,
-                'your_answer' => $yourAnswer ?? 'No answer',
-                'score' => $answer->gained_points,
+                'question' => $question->name,
+                'question_type' => $question->question_type->getName(),
+                'your_answer' => $yourAnswer ?? $answer->is_answered ?? 'Not answered',
+                'is_answered'=> $answer->is_answered,
+                'score' => $answer->points ?? 0,
+                'max_score' => $question->total_points,
                 'status' => ($answer->gained_points >= $question->points) ? 'Correct' : 'Incorrect',
+                'question_type_answer' => $question_type_answer ?? null,
+                'answer_test' => $answer
             ];
         }
 
@@ -124,6 +151,7 @@ class ExamRecordController extends Controller
         $data = [
             'exam_record' => $examRecord,
             'student_paper' => $student_paper,
+            'exam' => $exam,
             'rows' => $rows
         ];
 

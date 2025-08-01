@@ -1,18 +1,57 @@
-{% from 'components/core/show-item' import show_item %}
+{% from 'components/core/show-nav-item' import show_nav_item %}
+{% from 'components/core/breadcrumbs' import breadcrumb %}
 {% from 'components/core/show-header' import show_header %}
+{% from 'components/core/show-item' import show_item %}
+
+
+{% extends 'components/core/student-layout' %}
+
+{% block content %}
+<div class="ml-8 mt-4 max-w-fit">
+    <a   href="{{ route('students.index') }}" 
+            class="cursor-pointer text-gray-900 hover:text-blue-900 hover:underline">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
+        </svg>
+    </a>    
+</div>
+
+    <div class="flex flex-col max-w-full mx-8 my-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
+            {{ show_header( exam.name|title ) }}
+            <div class="flex gap-x-4">
+                <button  
+                        hx-get="{{ route('exams.student.overview', { exam: exam }) }}" 
+                        hx-target="#exam-content"
+                        
+                        hx-swap="outerHTML"
+                        class="cursor-pointer hover:text-blue-900 hover:underline">
+                    Overview
+                </button>
+                <button 
+                        hx-get="{{ route('exam_records.index', { exam: exam }) }}" 
+                        hx-target="#exam-content"
+                        hx-trigger="click" 
+                        hx-swap="outerHTML"
+                        class="cursor-pointer hover:text-blue-900 hover:underline">
+                    Exam Records
+                </button>
+            </div>
+</div> 
 
 <div id="exam-content" class="flex flex-1 flex-col gap-y-4 mx-8 bg-white rounded-xl shadow-sm ring-1 ring-gray-950/5">
     <div class="flex flex-1 p-4 bg-blue-900 text-white font-bold text-lg rounded-xl justify-between">
-        Exam Name Record 1
-        <button hx-get="/student/exams/exam.id/get-papers" 
+        Attempt #{{ exam_record.attempt }}
+        <button hx-get="{{ route('exam_records.index', { exam: exam }) }}" 
                 hx-target="#exam-content"
-                hx-swap="outerHTML"
-                class="font-bold text-2xl text-white">
+                hx-swap="outerHTML" 
+                class="font-bold text-2xl text-white cursor-pointer hover:text-blue-300 duration-300 transition">
             X
         </button>
     </div>
-    {{ dump() }}
+                   {{ dump() }}
     <div class="flex p-4 gap-x-4">
+
+
         <div class="flex flex-col gap-y-8 w-full">
             {{ show_header('Exam Results')}}
 
@@ -42,30 +81,76 @@
                         <thead>
                         <tr>
                         <th>Q#</th>
+                        <th>Question Type</th>
                         <th>Question</th>
+                        <th>Your Answer</th>
                         <th>Score</th>
                         <th>Status</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr>
-                        <td>1</td>
-                        <td>What is a variable in Pythonasdasdasdsadadasdsadasdasdadad?</td>
-                        <td>2/2</td>
-                        <td>✅</td>
+                        {% for row in rows %}
+                            <tr>
+                                <td>{{ row.number }}</td>
+                                <td>{{ row.question_type }}</td>
+                                <td>{{ row.question }}</td>
+                                <td class="text-xs">{{ row.is_answered ? row.question_type|lower not in ['ranking', 'matching', 'coding'] ? row.your_answer|title : '📝 see details' : 'No answer' }}</td>
+                                <td>{{ row.score }}/{{ row.max_score }}</td>
+                                <td>{{ row.score == row.max_score ? '🟢' : row.score > 0 and row.max_score != row.score ? '🟡' : '🔴'}}</td>
+                            </tr>
+                            {% if row.question_type|lower  in ['ranking', 'matching', 'coding'] %}
+                            <tr>
+                                    <td colspan="6">
+                                        <details>
+                                            <summary>
+                                                Details
+                                            </summary>
+                                            <table class="inner-table">
+                                                {% if row.question_type|lower == 'ranking' %}
+                                                    <thead>
+                                                    <tr>
+                                                    <th>Order</th>
+                                                    <th>Answer</th>
+                                                    <th>Points</th>
+                                                    <th>Status</th>
+                                                    </tr>
+                                                    </thead>
+                                                    {% for ranking_answer in row.question_type_answer %}
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>{{ ranking_answer.answer_order }}</td>
+                                                                <td>{{ ranking_answer.answer }}</td>
+                                                                <td>{{ ranking_answer.answer_points }}</td>
+                                                                <td>{{ ranking_answer.answer_points > 0 ? '🟢' : '🟡' }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    {% endfor %}
+                                                {% elseif row.question_type|lower == 'matching' %}
+                                                    <thead>
+                                                        <tr>
+                                                        <th>To match</th>
+                                                        <th>Your Answer</th>
+                                                        <th>Points</th>
+                                                        <th>Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    {% for matching_answer in row.question_type_answer %}
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>{{ matching_answer.first_item_answer }}</td>
+                                                                <td>{{ matching_answer.second_item_answer }}</td>
+                                                                <td>{{ matching_answer.answer_points }}</td>
+                                                                <td>{{ matching_answer.answer_points > 0 ? '🟢' : '🟡' }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </table>
+                                        </details>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
                         </tr>
-                        <td>…</td>
-                        <td>…</td>
-                        <td>…</td>
-                        <td>…</td>
-                        </tr>
-                        <tr>
-                        <td>25</td>
-                        <td>Rank this process in ascending order</td>
-                        <td>4/4</td>
-                        <td>✅</td>
-                        </tr>
-                        </tbody>
                     </table>
             </div>
 
@@ -151,9 +236,9 @@
         <div class="flex flex-col max-h-fit min-w-fit gap-y-2">
             <div class="flex flex-col justify-between gap-y-4 rounded-xl bg-gray-10 p-4 shadow-sm ring-1 ring-gray-950/5">
                 {{ show_item('Attempt #', exam_record.attempt)}}
-                {{ show_item('Score', '##/##')}}
+                {{ show_item('Score', exam_record.total_score ~ '/' ~ exam.max_score )}}
                 {{ show_item('Time Taken', exam_record.time_taken ~ ' minutes')}}
-                {{ show_item('Date Taken', exam_record.date_taken)}}
+                {{ show_item('Date Taken', exam_record.date_taken|date("m/d/Y"))}}
                 {{ show_item('Status', exam_record.status) }}
             </div> 
             <div class="flex flex-col prose rounded-xl bg-gray-10 p-4 shadow-sm ring-1 ring-gray-950/5">
@@ -187,3 +272,4 @@
     </div>
 
 </div>
+{% endblock %}

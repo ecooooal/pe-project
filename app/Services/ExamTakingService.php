@@ -108,8 +108,6 @@ class ExamTakingService
     public function getCurrentQuestion(StudentPaper $student_paper){
         if ($student_paper->current_position >= $student_paper->question_count){
                 $student_paper->update(['current_position' => 0]);
-
-            dd('done');
         }
         $questions = json_decode($student_paper->questions_order);
         $question = Question::find($questions[$student_paper->current_position]);
