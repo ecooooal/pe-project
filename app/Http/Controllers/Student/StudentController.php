@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Student;
 
+use App\Models\ExamRecord;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\Request;
@@ -18,9 +19,15 @@ class StudentController extends Controller
     public function index(){
         $user = auth()->user();
         $enrolled_exams = $user->exams ?? [];
+        $exam_records = $user->examRecords()
+            ->with(['studentPaper:id,exam_id,id', 'studentPaper.exam:id,name,max_score,id']) // adjust fields
+            ->orderByDesc('updated_at')
+            ->limit(4)
+            ->get();
 
         $data = [
             'enrolled_exams' => $enrolled_exams,
+            'exam_records' => $exam_records,
             'user' => $user
         ];
 

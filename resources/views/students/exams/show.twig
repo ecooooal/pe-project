@@ -15,7 +15,7 @@
                 <button  
                         hx-get="{{ route('exams.student.overview', { exam: exam }) }}" 
                         hx-target="#exam-content"
-
+                        hx-trigger="load, click" 
                         hx-swap="outerHTML"
                         class="cursor-pointer hover:text-blue-900 hover:underline">
                     Overview
@@ -23,7 +23,6 @@
                 <button 
                         hx-get="{{ route('exam_records.index', { exam: exam }) }}" 
                         hx-target="#exam-content"
-                        hx-trigger="load, click" 
                         hx-swap="outerHTML"
                         class="cursor-pointer hover:text-blue-900 hover:underline">
                     Exam Records

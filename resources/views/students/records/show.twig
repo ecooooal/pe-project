@@ -22,7 +22,6 @@
                 <button  
                         hx-get="{{ route('exams.student.overview', { exam: exam }) }}" 
                         hx-target="#exam-content"
-                        
                         hx-swap="outerHTML"
                         class="cursor-pointer hover:text-blue-900 hover:underline">
                     Overview
@@ -48,7 +47,6 @@
             X
         </button>
     </div>
-                   {{ dump() }}
     <div class="flex p-4 gap-x-4">
 
 
@@ -76,7 +74,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="bg-gray-100 px-4 rounded-2xl text-gray-800">            
+                <div class="ring-2 ring-gray-900/20 px-4 rounded-2xl text-gray-800">            
                     <table>
                         <thead>
                         <tr>

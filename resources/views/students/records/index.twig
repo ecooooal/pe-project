@@ -6,7 +6,6 @@
                 <span class="text-blue-900 text-xl font-bold group-hover:text-white">Record #{{ record.attempt }}
                     <span class="text-xs text-slate-600 font-semibold group-hover:text-gray-400"> Total Score : {{ record.total_score }}pts</span>
                 </span>
-                
                 <a      href="{{ route('exam_records.show', { exam: exam, exam_record: record}) }}"
                         hx-get="{{ route('exam_records.show', { exam: exam, exam_record: record}) }}"
                         hx-target="body"

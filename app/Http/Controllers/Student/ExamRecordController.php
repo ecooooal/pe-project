@@ -51,7 +51,7 @@ class ExamRecordController extends Controller
         ->get()
         ->keyBy('id');
 
-        $total_score = $subject_table->sum('subject_score');
+        $total_score = $subject_table->sum('subject_score_obtained');
         $date_taken = $student_paper->created_at;
         
         $time_taken = round($student_paper->created_at->diffInMinutes($student_paper->submitted_at));
@@ -106,16 +106,6 @@ class ExamRecordController extends Controller
                 ->all();
 
             $student_paper->load(array_merge(['studentAnswers.question'], $neededRelations));
-
-
-            // if ($i === 0) {
-            //     dump([
-            //         'neededRelations' => $neededRelations,
-            //         'student_paper' => $student_paper,
-            //         'loaded_relations' => $answer->getRelations(),
-            //     ]);
-            // }
-
 
             // Load and get the specific answer
             if ($answer->is_answered){
