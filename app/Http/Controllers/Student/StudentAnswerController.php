@@ -35,6 +35,7 @@ class StudentAnswerController extends Controller
         match ($action) {
             'back' => $student_paper->decrement('current_position'),
             'next' => $student_paper->increment('current_position'),
+            'jump' => $student_paper->update(['current_position' => request('index')]),
             default => dd($student_paper),
         };
 

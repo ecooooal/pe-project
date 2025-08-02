@@ -7,7 +7,14 @@
 {% extends 'components/core/student-layout' %}
 
 {% block content %}
-{{ breadcrumb() }}
+<div class="ml-8 my-4 max-w-fit">
+    <a   href="{{ route('students.index') }}" 
+            class="cursor-pointer text-gray-900 hover:text-blue-900 hover:underline">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
+        </svg>
+    </a>    
+</div>
 <div class="flex flex-1 flex-col gap-y-4">
     <div class="flex flex-col max-w-full mx-8 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
             {{ show_header(exam.name|title) }}  

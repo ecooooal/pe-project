@@ -3,7 +3,13 @@
     <div class="flex flex-col p-4 gap-y-8 w-full">
         {% if exam.is_published %}
             <div class="flex">
-                <a href="{{ route('exam_papers.take', { exam:exam } ) }}" class="p-2 max-h-fit bg-orange-500 rounded-lg font-medium text-white hover:bg-orange-400 hover:text-gray-50 cursor-pointer">Take Exam</a>
+                <a  href="{{ route('exam_papers.take', { exam:exam } ) }}" 
+                    hx-get="{{ route('exam_papers.take', { exam:exam } ) }}" 
+                    hx-target="body"
+                    hx-push-url=false
+                    class="p-2 max-h-fit bg-orange-500 rounded-lg font-medium text-white hover:bg-orange-400 hover:text-gray-50 cursor-pointer">
+                    Take Exam
+                </a>
             </div>
         {% endif %}
     </div>

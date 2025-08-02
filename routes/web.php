@@ -52,8 +52,9 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/exams/{exam}', [StudentExamController::class, 'show'])->name('exams.student.show');
     
     Route::middleware('htmx.request:students.index')->group(function () {
-    Route::get('/exams/{exam}/show-overview', [StudentExamController::class, 'showExamOverview'])->name('exams.student.overview');
-    Route::get('/exams/{exam}/records', [ExamRecordController::class, 'index'])->name('exam_records.index');
+        Route::get('/exams/{exam}/show-overview', [StudentExamController::class, 'showExamOverview'])->name('exams.student.overview');
+        Route::get('/exams/{exam}/records', [ExamRecordController::class, 'index'])->name('exam_records.index');
+        Route::get('/exams/{exam}/question-links/{student_paper}', [StudentPaperController::class, 'loadQuestionLinks'])->name('exam_papers.questions');
     });
 
     Route::get('/exams/{exam}/records/{exam_record}', [ExamRecordController::class, 'show'])->name('exam_records.show');

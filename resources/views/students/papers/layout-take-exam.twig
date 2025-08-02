@@ -11,7 +11,7 @@
     <div class="flex flex-1 flex-col">
         <div    id="exam-content" 
                 class="flex flex-1 flex-col max-w-full max-h-fit gap-y-8 bg-white rounded-xl p-4 shadow-sm ring-1 ring-gray-950/5"
-                hx-get="{{ route('exam_papers.show', {student_paper:student_paper.student_paper}) }}"
+                hx-get="{{ route('exam_papers.show', {student_paper:student_paper}) }}"
                 hx-swap="innerHTML"
                 hx-trigger="load"
                 hx-target="this">
@@ -21,24 +21,16 @@
         {{ show_item('Exam', exam.name|title)}}
         {{ show_header('') }}
         {{ show_item('Duration', exam.duration ?: 'No Timer')}}
-        {{ show_item('Total Questions', student_paper.question_count )}}
+        {{ show_item('Total Questions', question_count )}}
         {{ show_header('') }}
         <div id="exam-paper-questions" class="flex flex-1 flex-col">
-            <ul class="max-h-64 overflow-y-auto w-full space-y-1">
-                {{ dump() }}
-                {% for question in student_paper.questions_in_array %}
-                <li class="flex justify-between p-1 group {{ student_paper.student_paper.current_position >= loop.index - 1   ? '' : 'hidden' }}">
-                    <button hx-patch="{{ route('student_answer.update', {student_paper : student_paper.student_paper, question:question} ) }}"
-                            hx-target="#exam-content"
-                            hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
-                            hx-include="#answer-form"
-                            hx-swap="innerHTML"
-                            hx-trigger="click throttle:1000ms"
-                            hx-vals='{"action":"back"}'
-                            type="button" 
-                            class="{{ student_paper.student_paper.current_position > loop.index - 1   ? 'text-gray-700' : 'text-gray-900' }}">{{ show_item(loop.index, question.question_type.value|replace({'_': ' '})|lower|capitalize, label_attributes:'group-hover:text-blue-900 duration', value_attributes:'group-hover:text-blue-900 duration group-hover:underline')}}</button>
-                </li>
-                {% endfor %}
+            <ul hx-get="{{ route('exam_papers.questions', { exam:exam, student_paper:student_paper} ) }}"
+                hx-target="this"
+                hx-swap="innerHTML"
+                hx-trigger="load"
+                id="question-links"
+                class="max-h-64 overflow-y-auto w-full space-y-1">
+                
             </ul>
         </div>
             {{ show_header('') }}
@@ -46,5 +38,12 @@
     </div>  
 
 </div>
+<script>
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+history.go(1); // Prevent back navigation
+};
+
+</script>
 
 {% endblock %}

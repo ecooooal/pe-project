@@ -84,6 +84,7 @@ class ExamRecordController extends Controller
         );
 
         $student_paper->update(['status'  => 'completed']);
+        
 
         return response('', 204)->header('HX-Redirect', route('exam_records.show', ['exam' => $exam, 'exam_record' => $exam_record]));
     }

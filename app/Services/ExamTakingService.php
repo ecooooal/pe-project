@@ -40,15 +40,8 @@ class ExamTakingService
             $exam_paper['last_seen_at'] = now();
         }
 
-        $question_count = count(json_decode($exam_paper->questions_order));
-        $questions = $exam->questions->whereIn('id', json_decode($exam_paper->questions_order))->keyBy('id');
-
-        $exam_paper_data = [
-            'student_paper' => $exam_paper,
-            'questions_in_array' => $questions,
-            'question_count' => $question_count,
-        ];
-        return $exam_paper_data;
+        
+        return $exam_paper;
     }
 
     public static function generateExamPaper(Exam $exam, User $user){
@@ -196,5 +189,21 @@ class ExamTakingService
 
         return $student_answer->$question_type_answer;
     }
+
+    public function orderedQuestions(StudentPaper $student_paper, Exam $exam)
+    {
+        $order = json_decode($student_paper->questions_order, true);
+        $questionsMap = $exam->questions->whereIn('id', $order)->keyBy('id');
+
+        return collect($order)->map(function ($id, $index) use ($questionsMap) {
+            $question = $questionsMap->get($id);
+            if ($question) {
+                $question->order_index = $index;
+                return $question;
+            }
+            return null;
+        })->filter()->values();
+    }
+
 }
 
