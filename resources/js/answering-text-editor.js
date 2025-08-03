@@ -11,11 +11,7 @@ import { history, historyKeymap } from '@codemirror/commands';
 import { placeholder } from "@codemirror/view";
 
     // Initialize Constant Variables
-    const initial_solution_div = document.getElementById("initial-solution-div");
-    const test_case_div = document.getElementById("test-case-div");
-    const select_form = document.getElementById('programming_language');
     const supported_languages = {};
-    const available_languages = ['c++', 'java', 'python'];
 
     let previous_language = null;
     let currentLanguage = null;
@@ -28,6 +24,7 @@ import { placeholder } from "@codemirror/view";
 
     function switchLanguage(language) {
         currentLanguage = language;
+        console.log(currentLanguage, language);
         if (!initial_solution_editor || !test_case_editor) return;
 
         let extension;
@@ -104,8 +101,8 @@ import { placeholder } from "@codemirror/view";
     function initializeEditors() {
         const initial_solution_div = document.getElementById("initial-solution-div");
         const test_case_div = document.getElementById("test-case-div");
-        const select_form = document.getElementById("programming_language");
-
+        const select_form = document.getElementById("answer[programming_language]");
+        console.log('run initialize editors');
         if (!initial_solution_div || !test_case_div || !select_form) {
             console.warn("Editor elements not found. Skipping initialization.");
             return;
@@ -120,24 +117,20 @@ import { placeholder } from "@codemirror/view";
 
 
     function initializeCodingQuestionPage() {
-        const select_form = document.getElementById("programming_language");
+        const select_form = document.getElementById("answer[programming_language]");
         if (!select_form) return;
 
         select_form.addEventListener('focus', () => {
         previous_language = select_form.value;
         });
 
-        const select = document.getElementById('programming_language');
+        const select = document.getElementById('answer[programming_language]');
         if (!select || select.dataset.initialized === "true") return;
-        console.log(window.question_supported_languages)
+        console.log('this is window.question_supported_languages', window.question_supported_languages)
         loadSupportedLanguages(window.question_supported_languages);
 
         switchLanguageFromEvent({ target: { value: select.value } });
         select.dataset.initialized = "true"; 
-    }
-
-    function getAnswerCode() {
-        document.getElementById('answer-input').value = initial_solution_editor.state.doc.toString();
     }
 
     function syncCodeMirrorToTextarea() {
@@ -149,17 +142,37 @@ import { placeholder } from "@codemirror/view";
         }
     }
 
+    document.body.addEventListener("htmx:configRequest", function (e) {
+        console.log('htmx:configRequest is run');
+        const container = e.detail.target.querySelector("#coding-question");
+        if (!container) return;
+        try {
+            const editor = initial_solution_editor;
+            const textarea = document.getElementById("answer-input");
+            console.log(editor.state.doc.toString());
 
 
-    document.body.addEventListener("htmx:afterSettle", function () {
-        console.log('run');
-        const container = document.getElementById("coding-question");
+            if (editor && textarea) {
+                textarea.value = editor.state.doc.toString();
+                e.detail.parameters["answer[code]"] = textarea.value;
+
+            }
+
+        } catch (e) {
+            console.error("htmx:configRequest failed", e);
+        }
+    });
+
+    document.body.addEventListener("htmx:afterSwap", function (e) {
+        console.log('htmx:afterSwap is run');
+        const container = e.detail.elt.querySelector("#coding-question");
         if (!container) return;
 
         try {
+
             const instruction = JSON.parse(container.dataset.instruction || '{}');
             const languageCodes = JSON.parse(container.dataset.languageCodes || '{}');
-            console.log(instruction, languageCodes);
+            console.log('This are the coding question type data',instruction, languageCodes);
             window.instruction = instruction;
             window.question_supported_languages = languageCodes;
 
@@ -170,26 +183,6 @@ import { placeholder } from "@codemirror/view";
         }
     });
 
-
-    document.addEventListener("DOMContentLoaded", () => {
-        console.log('run');
-        const container = document.getElementById("coding-question");
-        if (!container) return;
-
-        try {
-            const instruction = JSON.parse(container.dataset.instruction || '{}');
-            const languageCodes = JSON.parse(container.dataset.languageCodes || '{}');
-
-            window.instruction = instruction;
-            window.question_supported_languages = languageCodes;
-
-            initializeEditors(); // <-- Run here for page load
-        } catch (e) {
-            console.error("[DOM] Failed to parse editor data:", e);
-        }
-    });
-
 window.initializeCodingQuestionPage = initializeCodingQuestionPage;
 window.initializeEditors = initializeEditors; 
-window.getAnswerCode = getAnswerCode;
 window.syncCodeMirrorToTextarea = syncCodeMirrorToTextarea;

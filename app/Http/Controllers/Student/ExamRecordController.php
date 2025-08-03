@@ -30,12 +30,11 @@ class ExamRecordController extends Controller
     {
         // validate that the student_paper's author is the authenticated user
         $student_paper->update(['submitted_at' => now()]);
+
         $exam_id = $student_paper->exam->id;
         $exam = Exam::find($exam_id);
-        $attempt_count = ExamRecord::whereHas('studentPaper', function($query) use ($exam_id, $student_paper) {
-            $query->where('exam_id', $exam_id)
-                ->where('user_id', $student_paper->user_id);
-        })->count();
+
+        $attempt_count = session()->pull('current_attempt', 1);
 
         $subject_table = DB::table('student_answers')
         ->join('questions', 'student_answers.question_id', '=', 'questions.id')

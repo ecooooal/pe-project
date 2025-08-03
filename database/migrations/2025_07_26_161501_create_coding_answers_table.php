@@ -17,6 +17,11 @@ return new class extends Migration
             $table->foreignIdFor(StudentAnswer::class, 'student_answer_id')->constrained()->cascadeOnDelete();
             $table->string('answer_language'); 
             $table->string('answer_file_path');
+            $table->enum('status', [
+                'pending',
+                'checked',
+                'failed',
+            ])->default('pending')->index();
             $table->unsignedTinyInteger('answer_syntax_points')->default(0);
             $table->unsignedTinyInteger('answer_runtime_points')->default(0);
             $table->unsignedTinyInteger('answer_test_case_points')->default(0);

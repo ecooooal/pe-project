@@ -7,6 +7,7 @@ use App\Models\StudentAnswer;
 use App\Models\StudentPaper;
 use App\Models\User;
 use DB;
+use Storage;
 use Str;
 class ExamTakingService
 {
@@ -33,18 +34,17 @@ class ExamTakingService
     }
 
     public function checkUnsubmittedExamPaper(Exam $exam, User $user){
-        $exam_paper = $user->studentPapers()->where(['exam_id' => $exam->id, 'status' => 'in_progress'])->first();
+        $exam_paper = $user->studentPapers()->where(['exam_id' => $exam->id, 'status' => 'in_progress'])->first() ?? false;
         if (!$exam_paper){
-            return self::generateExamPaper($exam, $user);
+            $exam_paper = $this->generateExamPaper($exam, $user);
         } else {
             $exam_paper['last_seen_at'] = now();
         }
-
-        
         return $exam_paper;
+
     }
 
-    public static function generateExamPaper(Exam $exam, User $user){
+    public function generateExamPaper(Exam $exam, User $user){
         $exam->load('questions');
         // Prepare student paper information
         $shuffled_ids = self::applyKnuthShuffleToExam($exam);
@@ -69,12 +69,9 @@ class ExamTakingService
         $questions = self::getShuffledQuestionsInfo($exam, $shuffled_ids);
 
         $exam->unsetRelation('questions');
-        $exam_paper_data = [
-            'student_paper' => $student_paper,
-            'questions_in_array' => $questions,
-            'question_count' => $question_count,
-        ];
-        return $exam_paper_data;
+        $student_paper->questions_in_array = $questions;
+
+        return $student_paper;
     }
 
     // algorithm for shuffling the question list
@@ -104,18 +101,27 @@ class ExamTakingService
         }
         $questions = json_decode($student_paper->questions_order);
         $question = Question::find($questions[$student_paper->current_position]);
+
         // check if there are answers regarding this question and send it instead of new question
         $student_answer = $student_paper->studentAnswers()->where('question_id', $question->id)->first();
-        $question_type = $this->questionService->getQuestionTypeShow($question);
+        $question_type_data = $this->questionService->getQuestionTypeShow($question);
         
-        $question_type = self::filterQuestionTypeData($question, $question_type);
-        $filtered_question_type['choices'] = $question_type; 
-        if($student_answer->answered_at != null){
+        $question_type_data = self::filterQuestionTypeData($question, $question_type_data);
+        
+        $filtered_question_type['choices'] = $question_type_data; 
+        if($student_answer->is_answered){
             $question_type_answer = self::getAnswerType($student_answer, $question);
             if ($question_type_answer != null){
-                $filtered_question_type['student_answer'] = $question_type_answer;
+                
+                if ($question->question_type->value == 'coding'){
+                    $filtered_question_type['choices']['language_codes'][$question_type_answer['language']]['initial_solution'] = $question_type_answer['code'];
+                } else {
+                    $filtered_question_type['student_answer'] = $question_type_answer;
+                }
+
             } 
         }
+
         $question_data = [
             'question' => $question,
             'question_type_data' => $filtered_question_type
@@ -182,12 +188,27 @@ class ExamTakingService
             'identification' => $student_answer->load('identificationAnswer'),
             'ranking' => $student_answer->load('rankingAnswers'),
             'matching' => $student_answer->load('matchingAnswers'),
+            'coding' => $student_answer->load('codingAnswer'),
             default => throw new \InvalidArgumentException("Unknown question type: {$question->question_type->value}"),
         };
-        $suffix = in_array($question->question_type->value, ['ranking', 'matching']) ? 'Answers' : 'Answer';
-        $question_type_answer = Str::camel($question->question_type->value) . $suffix;
 
-        return $student_answer->$question_type_answer;
+        if ($question->question_type->value == 'coding'){
+            $coding_answer = $student_answer->codingAnswer ?? false;
+
+            if (!$coding_answer) {
+                return null;
+            }
+
+            $language = $coding_answer->answer_language;
+            $code = Storage::get($coding_answer->answer_file_path);
+            
+            return ['language' => $language, 'code' => $code];
+        } else {
+            $suffix = in_array($question->question_type->value, ['ranking', 'matching']) ? 'Answers' : 'Answer';
+            $question_type_answer = Str::camel($question->question_type->value) . $suffix;
+
+            return $student_answer->$question_type_answer;
+        }
     }
 
     public function orderedQuestions(StudentPaper $student_paper, Exam $exam)

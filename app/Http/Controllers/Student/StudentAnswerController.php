@@ -28,7 +28,8 @@ class StudentAnswerController extends Controller
             dd('yes');
         }   
         // update and check student answer here
-        StudentAnswerFactory::update($student_answer, request()->post());
+        $current_attempt = session('current_attempt', 1);
+        StudentAnswerFactory::update($student_answer, request()->post(), $current_attempt);
 
         $action = request()->input('action');
         // increment current position

@@ -1,6 +1,5 @@
 {% from 'components/core/show-header' import show_header %}
 {% from 'components/core/show-item' import show_item %}
-{{ vite('resources/js/answering-text-editor.js')|raw }}
 
 <div class="flex flex-col">
     <div class="flex-1 prose max-w-none">
@@ -20,6 +19,7 @@
                 hx-trigger="click throttle:500ms"
                 hx-vals='{"action":"back"}'
                 type="button" 
+                id="back"
                 class="flex gap-x-1 justify-center items-center p-2 bg-blue-900 duration-300 transition rounded-lg font-medium text-white hover:bg-blue-700 hover:text-gray-50 cursor-pointer">        
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
         <path fill-rule="evenodd" d="M12.207 2.232a.75.75 0 0 0 .025 1.06l4.146 3.958H6.375a5.375 5.375 0 0 0 0 10.75H9.25a.75.75 0 0 0 0-1.5H6.375a3.875 3.875 0 0 1 0-7.75h10.003l-4.146 3.957a.75.75 0 0 0 1.036 1.085l5.5-5.25a.75.75 0 0 0 0-1.085l-5.5-5.25a.75.75 0 0 0-1.06.025Z" clip-rule="evenodd" />
@@ -36,6 +36,7 @@
                 hx-trigger="click throttle:500ms"
                 hx-vals='{"action":"next"}'
                 type="button" 
+                id="next"
                 class="flex gap-x-1 justify-center items-center p-2 bg-blue-900 duration-300 transition rounded-lg font-medium text-white hover:bg-blue-700 hover:text-gray-50 cursor-pointer">
             Next
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">

@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\DB;
 
 class StudentAnswerFactory
 {
-    public static function update(StudentAnswer $student_answer, array $data)
+    public static function update(StudentAnswer $student_answer, array $data, int $attempt_count)
     {
-        DB::transaction(function () use ($student_answer, $data) {
+        DB::transaction(function () use ($student_answer, $data, $attempt_count) {
         // load question and question type
         $question_service = new QuestionService();
         $student_answer_service = new AnswerService();
@@ -37,13 +37,17 @@ class StudentAnswerFactory
                 break;
             case('matching'):
                 $update_student_answer = $student_answer_service->storeMatching($student_answer, $answer, $question_type, $question);
+                break;
+            case('coding'):
+                $update_student_answer = $student_answer_service->storeCoding($student_answer, $answer, $question, $attempt_count);
+                break;
         }
         $student_answer->update([
             'points' =>  $update_student_answer['total_points'],
-            'is_answered' => true,
+            'is_answered' => $answer ? true : false,
             'is_correct' =>  $update_student_answer['is_correct'],
-            'answered_at' => now()
-        ]);
+            'answered_at' => $answer ? now() : null
+            ]);
         });
     }
 }

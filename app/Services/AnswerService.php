@@ -2,6 +2,7 @@
 
 namespace App\Services;
 use App\Models\Course;
+use App\Models\Exam;
 use App\Models\StudentAnswer;
 use App\Models\Subject;
 use App\Models\Topic;
@@ -134,10 +135,33 @@ class AnswerService
         
         return ['total_points' => $this->total_points, 'is_correct' => $this->is_correct];
     }
-    public function storeCoding(Question $question, array $question_data, $coding_question_data, array $coding_question_language_data){
+    public function storeCoding(StudentAnswer $student_answer, $answer, $question, $attempt_count){
         // get language and code
         // save code in directory
         // 
+        $language = $answer['programming_language'];
+
+        $user = auth()->user();
+        $exam = $student_answer->studentPaper->exam;
+
+        $student_slug_name = Str::slug($user->first_name . ' ' . $user->last_name);
+        $question_slug_name = Str::slug($question['name']);
+        $folder = "codingAnswers/{$student_slug_name}/exam_{$exam->id}/{$question_slug_name}/";
+        $attempt_count_folder = "attempt_{$attempt_count}/";
+        $ext = self::getExtension($language);
+        $coding_answer = self::getClassName($answer['code'], $language);
+        $answer_file_path = "{$folder}{$attempt_count_folder}{$coding_answer}.{$ext}";
+
+        Storage::makeDirectory($folder);
+        Storage::put($answer_file_path, $answer['code']);
+        
+        $coding_answer = $student_answer->codingAnswer()->updateOrCreate([
+            'answer_language' => $language,
+            'answer_file_path' => $answer_file_path
+        ]);
+        // dispatch laravel job to check this answer code
+
+        return ['total_points' => $this->total_points, 'is_correct' => $this->is_correct];
     }
 
     private static function getClassName(string $code, string $language): string

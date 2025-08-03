@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Student;
 
 use App\Models\Exam;
+use App\Models\ExamRecord;
 use App\Models\StudentPaper;
 use App\Services\ExamService;
 use App\Services\ExamTakingService;
@@ -31,11 +32,17 @@ class StudentPaperController extends Controller
 
         // Check if the user has an existing exam paper that's not expired or submitted
         $student_paper = $this->examTakingService->checkUnsubmittedExamPaper($exam, $user);
-        $question_count = count(json_decode($student_paper->questions_order));
+
+        $exam_id = $exam->id;
+        $attempt_count = ExamRecord::whereHas('studentPaper', function($query) use ($exam_id, $student_paper) {
+            $query->where('exam_id', $exam_id)
+                ->where('user_id', $student_paper->user_id);
+        })->count();
+
+        session(['current_attempt' => $attempt_count + 1]);
 
         $data = [
-            'student_paper' => $student_paper,
-            'question_count' => $question_count,
+            'student_paper' => $student_paper,  
             'exam' => $exam
         ];
 

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->boolean('is_answered')->default(false)->index();
             $table->boolean('is_correct')->default(false)->index();
             $table->timestamp('answered_at')->nullable();
+            $table->unsignedInteger('duration_seconds')->nullable();
             $table->timestamps();
 
             $table->index(['student_paper_id', 'question_id']);
