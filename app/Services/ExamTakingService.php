@@ -110,7 +110,7 @@ class ExamTakingService
         
         $filtered_question_type['choices'] = $question_type_data; 
         if($student_answer->is_answered){
-            $question_type_answer = self::getAnswerType($student_answer, $question);
+            $question_type_answer = $this->getAnswerType($student_answer, $question);
             if ($question_type_answer != null){
                 
                 if ($question->question_type->value == 'coding'){
@@ -181,7 +181,7 @@ class ExamTakingService
         return $question_type;
     }
 
-    public static function getAnswerType(StudentAnswer $student_answer, Question $question){
+    public function getAnswerType(StudentAnswer $student_answer, Question $question){
         match ($question->question_type->value){
             'multiple_choice' => $student_answer->load('multipleChoiceAnswer'),
             'true_or_false' => $student_answer->load('trueOrFalseAnswer'),

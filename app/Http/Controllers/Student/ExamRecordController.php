@@ -7,6 +7,7 @@ use App\Models\ExamRecord;
 use App\Models\StudentAnswer;
 use App\Models\StudentPaper;
 use App\Services\ExamTakingService;
+use App\Services\QuestionService;
 use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -97,6 +98,7 @@ class ExamRecordController extends Controller
         $rows = [];
         foreach ($student_paper->studentAnswers as $i => $answer) {
             $question = $answer->question;
+            $question->load('multipleChoiceQuestions');
 
             $neededRelations = $student_paper->studentAnswers
                 ->map(fn($a) => $a->question->question_type->value)
@@ -108,22 +110,54 @@ class ExamRecordController extends Controller
             $student_paper->load(array_merge(['studentAnswers.question'], $neededRelations));
 
             // Load and get the specific answer
+            $question_service = new QuestionService();
+            $exam_taking_service = new ExamTakingService($question_service);
+
             if ($answer->is_answered){
-                $question_type_answer = ExamTakingService::getAnswerType($answer, $question);
+                $question_type_answer = $exam_taking_service->getAnswerType($answer, $question);
                 if ($question_type_answer != null){
-                    $yourAnswer = match ($question->question_type->value) {
-                                    'multiple_choice' => $question_type_answer?->answer ?? 'N/A',
-                                    'true_or_false' => $question_type_answer?->answer ? 'True' : 'False',
-                                    'identification' => $question_type_answer?->answer ?? 'N/A',
-                                    'ranking' => $question_type_answer ?? 'N/A',
-                                    'matching' => $question_type_answer->map(fn($a) => "{$a->first_item_answer} → {$a->secondd_item_answer}")->implode(', '),
-                                    default => 'Unsupported',
-                                };
+                    switch ($question->question_type->value) {
+                        case 'multiple_choice':
+                            $matched = $question->multipleChoiceQuestions->firstWhere('choice_key', $question_type_answer?->answer);
+                            $yourAnswer = $matched->item ?? 'N/A';
+                            break;
+                        case 'identification':
+                            $yourAnswer = $question_type_answer?->answer ?? 'N/A';
+                            break;
+
+                        case 'true_or_false':
+                            $yourAnswer = ($question_type_answer?->answer) ? 'True' : 'False';
+                            break;
+
+                        case 'ranking':
+                            $yourAnswer = $question_type_answer ?? 'N/A';
+                            break;
+
+                        case 'matching':
+                            $yourAnswer = $question_type_answer
+                                ? $question_type_answer->map(fn($a) => "{$a->first_item_answer} → {$a->secondd_item_answer}")->implode(', ')
+                                : 'N/A';
+                            break;
+                        case 'coding':
+                            $yourAnswer = $question_type_answer;
+
+                            if ($answer->codingAnswer) {
+                                $points = $answer->codingAnswer->only([
+                                    'answer_syntax_points',
+                                    'answer_runtime_points',
+                                    'answer_test_case_points'
+                                ]);
+
+                                $yourAnswer = array_merge($yourAnswer, $points);
+                            }
+                            break;
+                        default:
+                            $yourAnswer = 'Unsupported';
+                    }
                 }
             }
 
             $rows[] = [
-                's' => ExamTakingService::getAnswerType($answer, $question),
                 'number' => $i + 1,
                 'question' => $question->name,
                 'question_type' => $question->question_type->getName(),
@@ -133,7 +167,6 @@ class ExamRecordController extends Controller
                 'max_score' => $question->total_points,
                 'status' => ($answer->gained_points >= $question->points) ? 'Correct' : 'Incorrect',
                 'question_type_answer' => $question_type_answer ?? null,
-                'answer_test' => $answer
             ];
         }
 

@@ -15,7 +15,6 @@
         </svg>
     </a>    
 </div>
-
     <div class="flex flex-col max-w-full mx-8 my-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
             {{ show_header( exam.name|title ) }}
             <div class="flex gap-x-4">
@@ -98,12 +97,12 @@
                             {% if row.question_type|lower  in ['ranking', 'matching', 'coding'] %}
                             <tr>
                                     <td colspan="6">
-                                        <details>
+                                        <details class="bg-gray-100 px-4 py-2 rounded-2xl">
                                             <summary>
                                                 Details
                                             </summary>
-                                            <table class="inner-table">
                                                 {% if row.question_type|lower == 'ranking' %}
+                                                <table class="inner-table">
                                                     <thead>
                                                     <tr>
                                                     <th>Order</th>
@@ -122,27 +121,50 @@
                                                             </tr>
                                                         </tbody>
                                                     {% endfor %}
+                                                </table>
                                                 {% elseif row.question_type|lower == 'matching' %}
-                                                    <thead>
-                                                        <tr>
-                                                        <th>To match</th>
-                                                        <th>Your Answer</th>
-                                                        <th>Points</th>
-                                                        <th>Status</th>
-                                                        </tr>
-                                                    </thead>
-                                                    {% for matching_answer in row.question_type_answer %}
-                                                        <tbody>
+                                                    <table class="inner-table">
+                                                        <thead>
                                                             <tr>
-                                                                <td>{{ matching_answer.first_item_answer }}</td>
-                                                                <td>{{ matching_answer.second_item_answer }}</td>
-                                                                <td>{{ matching_answer.answer_points }}</td>
-                                                                <td>{{ matching_answer.answer_points > 0 ? '🟢' : '🟡' }}</td>
+                                                            <th>To match</th>
+                                                            <th>Your Answer</th>
+                                                            <th>Points</th>
+                                                            <th>Status</th>
                                                             </tr>
-                                                        </tbody>
-                                                    {% endfor %}
+                                                        </thead>
+                                                        {% for matching_answer in row.question_type_answer %}
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>{{ matching_answer.first_item_answer }}</td>
+                                                                    <td>{{ matching_answer.second_item_answer }}</td>
+                                                                    <td>{{ matching_answer.answer_points }}</td>
+                                                                    <td>{{ matching_answer.answer_points > 0 ? '🟢' : '🟡' }}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        {% endfor %}
+                                                    </table>
                                                 {% endif %}
-                                            </table>
+                                            {% if row.question_type|lower == 'coding' %}
+                                                <table class="inner-table m-0">
+                                                        <thead>
+                                                            <tr>
+                                                            <th>Language Used</th>
+                                                            <th>Syntax Points</th>
+                                                            <th>Runtime Points</th>
+                                                            <th>Test Case Points</th>
+                                                            </tr>
+                                                        </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>{{ row.your_answer.language|title }}</td>
+                                                                    <td>{{ row.your_answer.answer_syntax_points }}</td>
+                                                                    <td>{{ row.your_answer.answer_runtime_points }}</td>
+                                                                    <td>{{ row.your_answer.answer_test_case_points }}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                </table>
+                                                <pre class="bg-transparent border-2"><code class="language-{{ row.your_answer.language }}">{{ row.your_answer.code }}</code></pre>
+                                            {% endif %}
                                         </details>
                                     </td>
                                 </tr>
