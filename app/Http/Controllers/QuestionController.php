@@ -466,14 +466,19 @@ class QuestionController extends Controller
     }
 
     public function validateCompleteSolution(Request $request){
-        $complete_solution = $request->post('validate-complete-solution');
+        $code = $request->post('validate-complete-solution');
         $test_case = $request->post('validate-test-case');
+        $code_settings['action'] = $request->post('action');
+        $code_settings['syntax_points'] = $request->post('syntax_points') ?? 0;
+        $code_settings['runtime_points'] = $request->post('runtime_points') ?? 0;
+        $code_settings['test_case_points'] = $request->post('test_case_points') ?? 0;
 
-        if (empty($complete_solution) || empty($test_case)) {
+
+        if (empty($code) || empty($test_case)) {
             $api_data = ['error' => 'Complete solution and test case are both required.'];
         } else {
             $language = $request->post('language-to-validate');
-            $api_data = $this->questionService::validate($language, $complete_solution, $test_case);
+            $api_data = $this->questionService::validate($language, $code, $test_case, $code_settings);
         }
 
 
@@ -484,5 +489,19 @@ class QuestionController extends Controller
         
         return view('questions-types/validate-complete-solution', ['data'=> $data]);
     }
+
+    public function testCodingQuestion(Question $question){
+        $question_type_data = $this->questionService->getQuestionTypeShow($question);
+        $languages = [
+                        'java' => "Java",
+                        'c++' => "C++",
+                        'python' => "Python",
+                    ];
+        $isEdit = true;
+
+        return view('questions-types/coding-test', compact('question_type_data', 'languages', 'isEdit', 'question'));
+    }
+
+
 
 }

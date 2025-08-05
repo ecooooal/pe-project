@@ -306,7 +306,7 @@
                     <h2><strong>{{ question.name }}</strong></h2>
                 </div>
                 <div class="mt-2">
-                    <a href="#" class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold text-s">Test This Coding Question</a>
+                    <a href="{{ route('questions.coding.test', { question:question }) }}" class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold text-s">Test This Coding Question</a>
                 </div>
             </div>
         </div>

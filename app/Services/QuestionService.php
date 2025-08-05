@@ -97,14 +97,18 @@ class QuestionService
         }
     }
 
-    public static function validate(string $language, string $solution, string $test): array
+    public static function validate(string $language, string $code, string $test, $code_settings): array
     {
         switch ($language) {
             case 'java':
                 try {
-                    $response = Http::timeout(30)->post('http://java-api:8082/validate', [
-                        'completeSolution' => $solution,
-                        'testUnit' => $test
+                    $response = Http::timeout(30)->post('http://java-api:8090/execute', [
+                        'code' => $code,
+                        'testUnit' => $test,
+                        'request_action' => $code_settings['action'],
+                        'syntax_points' => $code_settings['syntax_points'],
+                        'runtime_points' => $code_settings['runtime_points'],
+                        'test_case_points' => $code_settings['test_case_points']
                     ]);
                     if ($response->successful()) {
                         $data = $response->json();
@@ -114,7 +118,7 @@ class QuestionService
                             foreach ($data['testResults'] as $testResult) {
                                 if (isset($testResult['methods']) && is_array($testResult['methods'])) {
                                     foreach ($testResult['methods'] as $method) {
-                                        if (isset($method['status']) && $method['status'] === 'FAILED') {
+                                        if (isset($method['status']) && $method['status'] !== 'PASSED') {
                                             $hasFailures = true;
                                             break 2;
                                         }

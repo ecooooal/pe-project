@@ -190,6 +190,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
 
         return view('questions-types/new-text-item', ['counter' => $item_count, 'is_matching' => $is_matching]);
      });
+    Route::get('/questions/{question}/coding-question-test', [QuestionController::class, 'testCodingQuestion'])->name(name: 'questions.coding.test');
 
     Route::get('/topics', [TopicController::class, 'index'])->name('topics.index');
     Route::get('/topics/create', [TopicController::class, 'create'])->name('topics.create');

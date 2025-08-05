@@ -9,6 +9,7 @@
         border-green-200 bg-green-50 text-green-800
     {% endif %} 
     flex flex-1 flex-col p-4 max-w-none my-2 border-4 rounded-xl ">
+
     <div class="flex items-center gap-x-2 p-4">
             {% if data.api_data.error or data.api_data.failures or data.api_data.success == false %}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-15 shrink-0 inline-block">
@@ -25,24 +26,60 @@
                 <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
                 </svg>
             {% endif %}
+            
+            <div class="flex flex-col py-1 gap-y-5 mr-4  items-start">
+                {% if data.post_data.action != 'validate' %}
+                <div class="flex items-center gap-x-4 pr-auto  ">
+                    <p class="text-xs font-bold font-mono text-gray-900">Syntax Points :</p>
+                    <span class="text-xs font-semibold font-mono text-gray-900">{{ data.api_data.points[0].syntax }}</span>
+                </div>
+                {% endif %}
+                {% if data.post_data.action == 'check' %}
+                <div class="flex items-center gap-x-4 pr-auto ">
+                    <p class="text-xs font-bold font-mono text-gray-900">Runtime Points :</p>
+                    <span class="text-xs font-semibold font-mono text-gray-900">{{ data.api_data.points[0].runtime }}</span>
+                </div>
+
+                <div class="flex items-center gap-x-4 pr-auto ">
+                    <p class="text-xs font-bold font-mono text-gray-900">Test Case Points :</p>
+                    <span class="text-xs font-semibold font-mono text-gray-900">{{ data.api_data.points[0].testcase }}</span>
+                </div>
+                {% endif %}
+            </div>
             <div class="flex flex-col overflow-x-auto">
-                <p class="font-bold text-md">{{ data.api_data.error ? 'API Error' : data.api_data.failures ? 'Validation Error' : data.api_data.success == false ? 'Test Case Error' : 'All Tests Passed, Solution is Validated'}}</p>
+                {% if data.post_data.action == 'compile' %}
+                    <p class="sticky top-0 left-0 font-bold text-lg">
+                        {{ data.api_data.error ? 'API Error' : data.api_data.failures ? 'Compilation Error' : data.api_data.success == false ? 'Test Case Error' : 'No Syntax Error, Compiled Success' }}
+                    </p>
+                {% elseif data.post_data.action == 'validate' %}
+                    <p class="sticky top-0 left-0 font-bold text-lg">
+                        {{ data.api_data.error ? 'API Error' : data.api_data.failures ? 'Compilation Error' : data.api_data.success == false ? 'Runtime/Test Case Error' : 'All Tests Passed, Solution is Validated' }}
+                    </p>
+                {% elseif data.post_data.action == 'check' %}
+                    <p class="sticky top-0 left-0 font-bold text-lg">
+                        {{ data.api_data.error ? 'API Error' : data.api_data.failures ? 'Compilation Error' : data.api_data.success == false ? 'Runtime/Test Case Error' : 'All Tests Passed, Points are sent' }}
+                    </p>
+                {% endif %}
+
                 {% if data.api_data.error %}
                     <p class="text-gray-700 font-semibold text-sm"> {{ data.api_data.error }}</p>
+                
                 {% elseif data.api_data.failures %}
+
                     {% for failure in data.api_data.failures %}
                         <p>
                             <pre class="text-gray-700 font-semibold text-xs">{{ failure }}</pre> 
                         </p>
                     {% endfor %}
+
                 {% else %}
                     <div class="flex space-x-4 my-2">
                     {% for class in data.api_data.testResults %}
                         {% for test in class.methods %}
-                            <div class="p-4 rounded-lg border {{ test.status == 'FAILED' ? 'border-yellow-400 bg-yellow-100' : 'border-green-400 bg-green-100' }}">
+                            <div class="p-4 rounded-lg border {{ test.status != 'PASSED' ? 'border-yellow-400 bg-yellow-100' : 'border-green-400 bg-green-100' }}">
                                 <div class="flex items-center justify-between mb-2">
-                                    <p class="font-bold text-sm flex items-center gap-x-1 {{ test.status == 'FAILED' ? 'text-yellow-600' : 'text-green-600' }}">
-                                        {% if test.status == 'FAILED' %}
+                                    <p class="font-bold text-sm flex items-center gap-x-1 {{ test.status != 'PASSED' ? 'text-yellow-600' : 'text-green-600' }}">
+                                        {% if test.status != 'PASSED' %}
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
                                         <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
                                         </svg>
@@ -54,15 +91,78 @@
                                         {% endif %}
                                         {{ test.status }}
                                     </p>
-                                    <p class="font-mono font-bold text-sm mx-2">{{ test.methodName }}</p>
+                                    <p class="font-mono font-bold text-sm mx-2 {{ test.status != 'PASSED' ? 'border-yellow-400 bg-yellow-100' : 'border-green-400 bg-green-100' }}">{{ test.methodName }}</p>
                                 </div>
-                                <pre class="whitespace-pre-wrap text-gray-700 text-xs">{{ test.message }}</pre>
+                                <pre class="whitespace-pre-wrap text-gray-700 text-xs">{{ test.status != 'PASSED' ? 'message : ' : '' }}{{ test.message }}</pre>
                             </div>
                         {% endfor %}
                     {% endfor %}
                     </div>
                 {% endif %}
             </div>   
+    </div>
+</div>
+<div id="debug-popover-div">
+    <!-- Button to toggle popover -->
+    <button popovertarget="debug-popover"
+            class="fixed bottom-6 right-6 z-50 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-5 rounded-xl shadow-lg transition duration-300">
+        💻 Debug Report
+    </button>
+
+    <div id="debug-popover"
+         popover="manual"
+         class="fixed top-2 right-2 h-[85vh] w-96 ml-auto bg-white border-2 border-gray-950 rounded-xl shadow-md p-4 overflow-y-auto overflow-hidden z-50 prose prose-xs">
+        <div class="flex items-center justify-between font-bold text-gray-900 ">
+            <h1>Debug Report</h1>
+            <h1><button popovertarget="debug-popover"
+                    popovertargetaction="hide"
+                    class="mt-1.5 cursor-pointer"
+                    onload="this.showPopover()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-10">
+            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
+            </svg>
+
+            </button></h1>
+        </div>
+        <div class="">
+            {% set groups = {} %}
+            {% for line in data.api_data.debug %}
+                {% set parts = line|split(':', 2) %}
+                {% set handler = parts[0]|trim %}
+                {% set message = parts[1]|default('')|trim %}
+
+                {% if groups[handler] is not defined %}
+                    {% set groups = groups|merge({ (handler): [] }) %}
+                {% endif %}
+                {% set groups = groups|merge({ (handler): groups[handler]|merge([message]) }) %}
+            {% endfor %}
+
+            {% for handler, messages in groups %}
+                <div class="border-t-10 pl-3 py-0.5 border-blue-500 bg-gray-100">
+                    <h3 class="font-bold text-lg text-blue-700">
+                        {% if handler starts with 'Save' %}
+                        💾
+                        {% elseif handler starts with 'Compile' %}
+                        🛠️
+                        {% elseif handler starts with 'RunTime' %}
+                        ⚙️
+                        {% elseif handler starts with 'Test' %}
+                        🧪
+                        {% elseif handler starts with 'method' %}
+                        🐞
+                        {% elseif handler starts with 'CodeResponse' %}
+                        📊
+                        {% endif %}
+                        {{ handler }}
+                    </h3>
+                    <ul class="mt-1 space-y-1 text-md font-mono text-gray-900">
+                        {% for msg in messages %}
+                            <li> {{ msg }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
 
