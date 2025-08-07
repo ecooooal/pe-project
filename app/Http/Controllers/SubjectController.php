@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Question;
 use App\Models\Subject;
 use App\Models\User;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Validator;
 
 class SubjectController extends Controller
 {
@@ -20,11 +22,12 @@ class SubjectController extends Controller
     }
     public function index(){
         $subject_courses = $this->userService->getSubjectsForUser(auth()->user())->paginate(10);
+        $subject_courses->load('course');
         $header = ['ID', 'Course', 'Name',  'Year Level', 'Date Created'];
         $rows = $subject_courses->map(function ($subject) {
             return [
                 'id' => $subject->id,
-                'course' => $subject->course->name,
+                'course' => $subject->course->abbreviation,
                 'name' => $subject->name,
                 'year_level' => $subject->year_level,
                 'Date Created' => Carbon::parse($subject->created_at)->format('m/d/Y')
@@ -41,8 +44,26 @@ class SubjectController extends Controller
     }
 
     public function show(Subject $subject){
-    
-        return view('subjects/show', ['subject' => $subject]);
+        $header = ['ID', 'Topic', 'Name', 'Type', 'Date Created'];
+        $questions = Question::with(['topic'])
+            ->whereIn('topic_id', $subject->topics->pluck('id'))
+            ->Paginate(5);
+
+        $rows = $questions->map(fn($question) => [
+            'id' => $question->id,
+            'topic' => $question->topic->name,
+            'name' => $question->name,
+            'type' => $question->question_type->name,
+            'Date Created' => Carbon::parse($question->created_at)->format('m/d/Y'),
+        ]);
+        $data = [
+            'headers' => $header,
+            'rows' => $rows,
+            'subject'=>$subject,
+            'questions' => $questions,
+        ];
+
+        return view('subjects/show', $data);
     }
 
     public function create(){
@@ -52,11 +73,19 @@ class SubjectController extends Controller
     }
 
     public function store(){
-        request()->validate([
+        $validator = Validator::make(request()->post(), [
             'name'    => ['required'],
             'course'     => ['required', 'integer'],
             'year_level' => ['required', 'integer', 'min:1', 'max:4']
         ]);
+
+        if ($validator->fails()) {
+            $courses = Course::all()->pluck('name', 'id');
+            return response()->view('subjects.create', [
+                'errors' => $validator->errors(),
+                'courses' => $courses,
+                'old' => request()->all()]);
+        }
 
         Subject::create([
             'name' => request('name'),
@@ -64,7 +93,7 @@ class SubjectController extends Controller
             'year_level' => request('year_level'),
         ]);
 
-        return redirect('/subjects');
+        return response('', 200)->header('HX-Redirect', route('subjects.index'));
     }
 
     public function edit(Subject $subject){

@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Topic;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class TopicController extends Controller
 {
@@ -20,14 +22,14 @@ class TopicController extends Controller
 
     public function index(){
         $topics = $this->userService->gettopicsForUser(auth()->user())->paginate(10);
-
+        $topics->load('subject', 'questions');
         $header = ['ID', 'Subject', 'Name', 'Question Count', 'Date Created'];
         $rows = $topics->map(function ($topic) {
             return [
                 'id' => $topic->id,
-                'course' => $topic->subject->name,
+                'subject' => $topic->subject->name,
                 'name' => $topic->name,
-                'year_level' => $topic->questions->count(),
+                'question count' => $topic->questions->count(),
                 'Date Created' => Carbon::parse($topic->created_at)->format('m/d/Y')
             ];
         });
@@ -42,9 +44,25 @@ class TopicController extends Controller
     }
 
     public function show(Topic $topic){
-        $topic->load( 'subject.course');
+        $header = ['ID', 'Name', 'Type', 'Date Created'];
+        $questions = Question::with(['topic'])
+            ->where('topic_id', $topic->id)
+            ->Paginate(5);
 
-        return view('topics/show', ['topic' => $topic]);
+        $rows = $questions->map(fn($question) => [
+                'id' => $question->id,
+                'name' => $question->name,
+                'type' => $question->question_type->name,
+                'Date Created' => Carbon::parse($question->created_at)->format('m/d/Y')
+        ]);
+        $data = [
+            'headers' => $header,
+            'rows' => $rows,
+            'topic'=>$topic,
+            'questions' => $questions
+        ];
+
+        return view('topics/show', $data);
     }
     public function create(){
         $subjects = $this->userService->getSubjectsForUser(auth()->user())->pluck('name', 'id');
@@ -53,17 +71,25 @@ class TopicController extends Controller
     }
 
     public function store(){
-        request()->validate([
+        $validator = Validator::make(request()->post(), [
             'name'    => ['required'],
-            'subject'     => ['required', 'integer'],
+            'subject' => ['required', 'integer', 'exists:subjects,id'],
         ]);
+
+        if ($validator->fails()) {
+            $subjects = $this->userService->getSubjectsForUser(auth()->user())->pluck('name', 'id');
+            return response()->view('topics.create', [
+                'errors' => $validator->errors(),
+                'subjects' => $subjects,
+                'old' => request()->all()]);
+        }
 
         Topic::create([
             'name' => request('name'),
             'subject_id' => request('subject'),
         ]);
 
-        return redirect('/topics');
+        return response('', 200)->header('HX-Redirect', route('topics.index'));
     }
     public function edit(Topic $topic){
         $subjects = Subject::whereIn('course_id', $topic->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
@@ -100,26 +126,5 @@ class TopicController extends Controller
 
         return redirect('/topics');
 
-    }
-
-    public function showQuestions(Topic $topic){
-        $topic->load('questions');
-
-        $header = ['ID', 'Name', 'Type', 'Date Created'];
-        $rows = $topic->questions->map(function ($question) {
-            return [
-                'id' => $question->id,
-                'name' => $question->name,
-                'type' => $question->question_type->name,
-                'Date Created' => Carbon::parse($question->created_at)->format('m/d/Y')
-            ];
-        });
-
-        $data = [
-            'headers' => $header,
-            'rows' => $rows,
-            'topic'=>$topic
-        ];
-        return view('topics/questions', $data);
     }
 }

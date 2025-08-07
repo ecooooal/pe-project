@@ -7,8 +7,13 @@ use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\Student\ExamRecordController;
+use App\Http\Controllers\Student\StudentAnswerController;
+use App\Http\Controllers\Student\StudentPaperController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
+use App\Http\Controllers\Student\ExamController as StudentExamController;
+use App\Http\Controllers\Student\StudentController;
 use App\Models\User;
 use App\Services\QuestionService;
 use Illuminate\Http\Request;
@@ -40,15 +45,32 @@ Route::group(['middleware' => ['can:view student']], function () {
 });
 
 Route::prefix('student')->middleware(['can:view student'])->group(function() {
-    Route::get('/', function () {
-        return view('students/student-home');
+    Route::get('/', [StudentController::class, 'index'])->name('students.index');
+    Route::redirect('/exams', '/student#exam-div');
+
+    Route::post('/exams', [StudentExamController::class, 'store'])->name('exams.student.store');
+    Route::get('/exams/{exam}', [StudentExamController::class, 'show'])->name('exams.student.show');
+    
+    Route::middleware('htmx.request:students.index')->group(function () {
+        Route::get('/exams/{exam}/show-overview', [StudentExamController::class, 'showExamOverview'])->name('exams.student.overview');
+        Route::get('/exams/{exam}/records', [ExamRecordController::class, 'index'])->name('exam_records.index');
+        Route::get('/exams/{exam}/question-links/{student_paper}', [StudentPaperController::class, 'loadQuestionLinks'])->name('exam_papers.questions');
     });
-    Route::get('/exams', function () {
-        return view('students/exams/index');
-    });
-    Route::get('/exams/exam.id', function () {
-        return view('students/exams/show');
-    });
+
+    Route::get('/exams/{exam}/records/{exam_record}', [ExamRecordController::class, 'show'])->name('exam_records.show');
+    Route::patch('/exams/{student_paper}/evaluate', [ExamRecordController::class, 'store'])->name('exam_records.store');
+
+    Route::get('/exams/{exam}/take', [StudentPaperController::class, 'takeExam'])->name('exam_papers.take');
+    Route::get('/student_papers/{student_paper}/question', [StudentPaperController::class, 'show'])->name('exam_papers.show');
+    Route::patch('/student_papers/{student_paper}/{question}', [StudentAnswerController::class, 'update'])->name('student_answer.update');
+
+
+
+
+
+
+
+    
     Route::get('/exams/exam.id/mcq-example', function () {
         return view('students/exams/mcq-example');
     });
@@ -126,69 +148,38 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     
     });
 
-    Route::get('/exams', [ExamController::class, 'index']);
+    Route::get('/exams', [ExamController::class, 'index'])->name('exams.index');
     Route::get('/exams/create', [ExamController::class, 'create'])->name('exams.create');
-    Route::post('/exams', [ExamController::class, 'store']);
+    Route::post('/exams', [ExamController::class, 'store'])->name('exams.store');
     Route::get('/exams/{exam}', [ExamController::class, 'show'])->name('exams.show');
-    Route::get('/exams/{exam}/edit', [ExamController::class, 'edit']);
-    Route::patch('/exams/{exam}', [ExamController::class, 'update']);
-    Route::delete('/exams/{exam}', [ExamController::class, 'destroy']);
+    Route::get('/exams/{exam}/edit', [ExamController::class, 'edit'])->name('exams.edit');
+    Route::patch('/exams/{exam}', [ExamController::class, 'update'])->name('exams.update');
+    Route::delete('/exams/{exam}', [ExamController::class, 'destroy'])->name('exams.destroy');
+
     Route::get('/exams/{exam}/builder', [ExamController::class, 'exam_builder_show']);
     Route::post('/exams/{exam}/builder/add-question/{question}',[ExamController::class, 'toggle_question'])->name('exam.toggleQuestion');
     Route::get('/exams/{exam}/builder/swap-algorithm',[ExamController::class, 'swap_partial_algorithm']);
     Route::get('/exams/{exam}/builder/build', [ExamController::class, 'build_exam']);
+    Route::patch('/exams/{exam}/publishExam', [ExamController::class, 'publishExam'])->name('exams.publish');;
     Route::get('/exams/{exam}/edit/generate_access_code', [ExamController::class, 'generateAccessCode']);
+    Route::post('/exams/{exam}/edit/generate_access_code', [ExamController::class, 'saveAccessCode']);
+    Route::get('/exams/{exam}/edit/get_access_codes', [ExamController::class, 'getAccessCode']);
     Route::get('/exams/builder/tabs', [ExamController::class, 'swap_tabs']);
 
-
-
-    Route::get('/questions', [QuestionController::class, 'index']);
+    Route::get('/questions', [QuestionController::class, 'index'])->name('questions.index');
     Route::get('/questions/create', [QuestionController::class, 'create'])->name('questions.create');
     Route::get('/questions/create/courses', [QuestionController::class, 'getSubjectsForCourses']);
     Route::get('/questions/create/subjects', [QuestionController::class, 'getTopicsForSubjects']);
     Route::get('/questions/create/coding-question', [QuestionController::class, 'createCodingQuestion']);
     Route::get('/questions/create/preview-markdown', [QuestionController::class, 'togglePreviewButton']);
     Route::post('/questions/create/preview-markdown', [QuestionController::class, 'previewMarkdown']);
-    Route::post('/questions', [QuestionController::class, 'store']);
+    Route::post('/questions', [QuestionController::class, 'store'])->name('questions.store');
     Route::get('/question_type_show/{question}', [QuestionController::class, 'question_type_show'])->name('question_type.show');
     Route::get('/questions/{question}', [QuestionController::class, 'show'])->name(name: 'questions.show');
-    Route::get('/questions/{question}/edit', [QuestionController::class, 'edit']);
-    Route::patch('/questions/{question}', [QuestionController::class, 'update']);
-    Route::delete('/questions/{question}', [QuestionController::class, 'destroy']);
+    Route::get('/questions/{question}/edit', [QuestionController::class, 'edit'])->name('questions.edit');
+    Route::patch('/questions/{question}', [QuestionController::class, 'update'])->name('questions.update');
+    Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
     Route::match(['get', 'post', 'patch'], '/questions/load/question-type', [QuestionController::class, 'loadQuestionType'])->name('question.types');
-    // Route::get('/questions/create/question-type', function (Request $request) {
-    //     $item_count = (int) $request->input('item_count', 4);
-    //     $type = $request->query('type'); 
-    //     $isEdit = filter_var($request->input('edit'), FILTER_VALIDATE_BOOLEAN);
-
-    //     if ($isEdit) {
-    //             $question = Question::findOrFail($request->input('question_id'));
-    //     }
-
-    //     switch ($type) {
-    //         case 'multiple_choice':
-    //             return view('questions-types/multiple-choice');
-            
-    //         case 'true_or_false':
-    //             return view('questions-types/true-false');
-            
-    //         case 'identification':
-    //             return view('questions-types/identification');
-
-    //         case 'ranking':
-    //             return view('questions-types/rank-order-process', compact('item_count'));
-            
-    //         case 'matching':
-    //             return view('questions-types/matching-items');
-
-    //         case 'coding':
-    //             return view('questions-types/coding');
-
-    //         default:
-    //             return '';
-    //         }
-    //     })->name('question.types');
-
     Route::get('/questions/create/add-item', function () {
         $counter = request('item_count', 4);
         $is_matching = request('is_matching', false);
@@ -199,34 +190,31 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
 
         return view('questions-types/new-text-item', ['counter' => $item_count, 'is_matching' => $is_matching]);
      });
+    Route::get('/questions/{question}/coding-question-test', [QuestionController::class, 'testCodingQuestion'])->name(name: 'questions.coding.test');
 
-    Route::get('/topics', [TopicController::class, 'index']);
-    Route::get('/topics/create', [TopicController::class, 'create']);
-    Route::post('/topics', [TopicController::class, 'store']);
+    Route::get('/topics', [TopicController::class, 'index'])->name('topics.index');
+    Route::get('/topics/create', [TopicController::class, 'create'])->name('topics.create');
+    Route::post('/topics', [TopicController::class, 'store'])->name('topics.store');
     Route::get('/topics/{topic}', [TopicController::class, 'show'])->name(name: 'topics.show');
-    Route::get('/topics/{topic}/edit', [TopicController::class, 'edit']);
-    Route::patch('/topics/{topic}', [TopicController::class, 'update']);
-    Route::delete('/topics/{topic}', [TopicController::class, 'destroy']);
-    Route::get('/topics/{topic}/questions', [TopicController::class, 'showQuestions']);
+    Route::get('/topics/{topic}/edit', [TopicController::class, 'edit'])->name('topics.edit');
+    Route::patch('/topics/{topic}', [TopicController::class, 'update'])->name('topics.update');
+    Route::delete('/topics/{topic}', [TopicController::class, 'destroy'])->name('topics.destroy');
 
-    Route::get('/subjects', [SubjectController::class, 'index']);
-    Route::get('/subjects/create', [SubjectController::class, 'create']);
-    Route::post('/subjects', [SubjectController::class, 'store']);
+    Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects.index');
+    Route::get('/subjects/create', [SubjectController::class, 'create'])->name('subjects.create');
+    Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.store');
     Route::get('/subjects/{subject}', [SubjectController::class, 'show'])->name('subjects.show');
-    Route::get('/subjects/{subject}/edit', [SubjectController::class, 'edit']);
-    Route::patch('/subjects/{subject}', [SubjectController::class, 'update']);
-    Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy']);
-    Route::get('/subjects/{subject}/questions', [SubjectController::class, 'showQuestions']);
+    Route::get('/subjects/{subject}/edit', [SubjectController::class, 'edit'])->name('subjects.edit');
+    Route::patch('/subjects/{subject}', [SubjectController::class, 'update'])->name('subjects.update');
+    Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
 
-    Route::get('/courses', [CourseController::class, 'index']);
-    Route::get('/courses/create', [CourseController::class, 'create']);
-    Route::post('/courses', [CourseController::class, 'store']);
+    Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
+    Route::get('/courses/create', [CourseController::class, 'create'])->name('courses.create');
+    Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
     Route::get('/courses/{course}', [CourseController::class, 'show'])->name('courses.show');
-    Route::get('/courses/{course}/edit', [CourseController::class, 'edit']);
-    Route::patch('/courses/{course}', [CourseController::class, 'update']);
-    Route::delete('/courses/{course}', [CourseController::class, 'destroy']);
-    Route::get('/courses/{course}/subjects', [CourseController::class, 'showSubjects']);
-
+    Route::get('/courses/{course}/edit', [CourseController::class, 'edit'])->name('courses.edit');
+    Route::patch('/courses/{course}', [CourseController::class, 'update'])->name('courses.update');
+    Route::delete('/courses/{course}', [CourseController::class, 'destroy'])->name('courses.destroy');
 
     Route::get('/reviewers', function(){
         return view('reviewers/index');
@@ -272,59 +260,5 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
  });
 
 Route::any('/test/send-data', function(Request $request) {
-        $post_data = $request->post();
-        $question_type = request('type');
-        $item_count = count(request()->input('items', []));
-
-        $rules = [
-            'topic' => ['required', 'exists:topics,id'],
-            'type' => ['required'],
-            'name' => ['required', 'string', 'unique:questions,name'],
-            'points' => ['required', 'integer', 'min:1'],
-            'subject' => ['required'],
-        ];
-
-        if ($question_type === 'coding') {
-            $rules['instruction'] = ['required'];
-            $rules['supported_languages'] = ['required', 'json', function ($attribute, $value, $fail) {
-                $decoded = json_decode($value, true);
-                if (empty($decoded)) {
-                    $fail('Coding question must have at least one programming language.');
-                }
-            }];
-            $instruction = $request->post('instruction');
-            $markdown = Str::of($instruction)->markdown(['html_input' => 'strip']) ?? '';
-            $supported = json_decode($request->post('supported_languages', '{}'), true);
-        }
-
-        $messages = [
-            'items.*.required' => 'This field is required.',
-            'supported_languages.required' => 'Coding question must have at least one programming language.',
-        ];
-
-        $validator = Validator::make(request()->all(), $rules, $messages);
-        if ($validator->fails()) {
-            if($question_type == 'coding'){
-                return view('components/core/coding-question-error', [
-                    'errors' => $validator->errors()
-                ]);
-            } else {
-                return redirect()->route('question.types', ['type' => $question_type, 'item_count' => $item_count])
-                ->withErrors($validator)
-                ->withInput();
-            }
-        }
-
-        $data = $validator->validated();
-
-        $post_data = [
-            'post' => $post_data,
-            'markdown' => $markdown,
-            'supported' => $supported,
-            'validation' => $data
-        ];
-
-        
-    return view('test-sent-data-page', ['data' => $post_data]);
-    // return response('', 200)->header('HX-Redirect', url('/questions'));
+        return;
 });

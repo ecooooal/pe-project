@@ -41,21 +41,11 @@
             <div class="flex justify-between">
                 <div class="flex flex-col gap-y-4">
                     {{ show_item('Name',  question.name  )}}
-                    <a href="/topics/{{ question.topic.id }}" class="hover:text-blue-900 hover:underline duration-150">{{ show_item('Topic', question.topic.name )}}</a>
+                    <a href="{{ route('topics.show', { topic:question.topic.id } ) }}" class="hover:text-blue-900 hover:underline duration-150">{{ show_item('Topic', question.topic.name )}}</a>
                     {{ show_item('Type',  question.question_type.value|replace({'_': ' '})|title )}}
                 </div>
                 <div class="flex flex-col mr-16 gap-y-4">
                     {{ show_item('Author', question.author.getFullName()  )}}
-                </div>
-            </div>
-        </div>  
-    </div>
-    <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
-        <div class="flex flex-col p-4 flex-1">
-            {{ show_header('Settings') }}
-            <div class="flex justify-between">
-                <div class="flex flex-col gap-y-4">
-                    {{ show_item('Points', question.points )}}
                 </div>
             </div>
         </div>  

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignIdFor(Question::class, 'question_id')->constrained()->cascadeOnDelete();
             $table->string('item');
             $table->integer('order');
+            $table->unsignedTinyInteger('item_points');
             $table->timestamps();
         });
     }

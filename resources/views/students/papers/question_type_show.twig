@@ -1,0 +1,272 @@
+{% import 'components/core/forms' as forms %}
+{% from 'components/core/show-header' import show_header %}
+
+{% if question.question_type.value == 'multiple_choice' %}
+    {% set values = {} %}
+
+    {% for choice in question_type_data.choices.choices %}
+        {% set values = values | merge({ (choice.choice_key): choice.item }) %}
+    {% endfor %}
+
+    {{ forms.form_field(
+        input: forms.radio(
+            name: 'answer',
+            values: values,
+            value: question_type_data.student_answer.answer|trim ?: '',
+            attributes: {
+                'class': 'accent-blue-900 w-6 h-6 rounded-full'
+            },
+            label_attributes: {
+                'class': 'flex items-center gap-2 py-4 pl-4 pr-8 m-1 min-h-16 bg-gray-50 rounded-lg border border-gray-100 cursor-pointer has-checked:bg-blue-900 has-checked:text-white has-checked:font-semibold'
+            }
+        ),
+        isColumn: true
+        ) 
+    }}
+{% endif %}
+
+{% if question.question_type.value == 'true_or_false' %}
+  {% set values = {
+        'true' : 'True',
+        'false' : 'False',
+    } %}
+
+    {{ forms.form_field(
+        input:forms.radio(
+            name:'answer',
+            values: values,
+            value: question_type_data.student_answer.answer|trim ?: '',
+            attributes:{    
+                'class':'min-w-6 min-h-6 rounded-full relative flex items-center justify-center',
+                },
+            label_attributes:{
+                'class':'flex items-center gap-2 py-4 pl-4 pr-8 m-1 min-h-16 bg-gray-50 rounded-lg border border-gray-100 cursor-pointer has-checked:bg-blue-900 has-checked:text-white has-checked:font-semibold',
+                }),
+        isColumn:true)
+    }}
+{% endif %}
+
+{% if question.question_type.value == 'identification' %}
+    {{ forms.form_field(
+        label:forms.label(
+            id:'answer', 
+            content:'Answer', 
+            attributes:{
+                'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900',}
+            ),
+        input:forms.text(
+            name:'answer',
+            value : question_type_data.student_answer.answer,
+            attributes:{
+                'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                'required':true}),
+        isColumn:true
+    )}}
+{% endif %}
+
+{% if question.question_type.value == 'ranking' %}
+    <div class="sortable bg-gray-50 p-4 rounded-lg">
+        {% for i in range(1, question_type_data.choices|length) %}
+            <div class="flex gap-x-4">
+            {{ forms.form_field(
+                label:forms.label(
+                    id: 'answer[]', 
+                    content:'☰', 
+                    attributes:{
+                        'class':'handle cursor-grab active:cursor-grabbing whitespace-nowrap text-xl font-bold text-blue-900'}
+                    ),
+                input:forms.text(
+                    name:'answer[]',
+                    value:  question_type_data.student_answer[i-1]['answer'] ?: question_type_data.choices[i-1]['solution'],
+                    attributes:{
+                        'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 font-semibold text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 cursor-default',
+                        'readonly':true
+                    }),
+                isReverse: true
+            )}}
+            </div>
+        {% endfor %}
+    </div>
+    <script>
+        htmx.onLoad(function(content) {
+            var sortables = content.querySelectorAll(".sortable");
+            for (var i = 0; i < sortables.length; i++) {
+            var sortable = sortables[i];
+            var sortableInstance = new Sortable(sortable, {
+                animation: 150,
+                ghostClass: 'blue-background-class',
+                handle: '.handle',
+                swap: true,
+                swapClass: 'swap-highlight',
+            });
+            
+            // Re-enable sorting on the `htmx:afterSwap` event
+            sortable.addEventListener("htmx:afterSwap", function() {
+                sortableInstance.option("disabled", false);
+            });
+            }
+        })
+    </script>
+{% endif %}
+
+{% if question.question_type.value == 'matching' %}
+   {% for i in range(1, question_type_data.choices|length) %}
+        <div class="flex justify-center bg-gray-50 p-4 gap-x-4 rounded-lg">
+            <div class="flex flex-col max-w-72">
+                {{ forms.form_field(
+                    label:forms.label(
+                        id: 'answer[' ~ (i) ~ '][left]', 
+                        content: question_type_data.student_answer[i-1]['first_item_answer'] ?: question_type_data.choices[i-1]['left'], 
+                        attributes:{
+                            'class':'w-fit text-pretty shrink-0 rounded-md cursor-default bg-white p-4 font-semibold text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:ring-0 sm:text-sm/6'}
+                        ),
+                    input:forms.text(
+                        name:'answer[' ~ (i) ~ '][left]',
+                        value: question_type_data.student_answer[i-1]['first_item_answer'] ?: question_type_data.choices[i-1]['left'],
+                        attributes:{
+                            'class':'hidden',
+                            'readonly': true
+                        })
+                )}}
+            </div>
+            <div class="flex flex-1 border-t-5 border-dotted border-gray-600 w-full my-auto"></div>
+            <div class="flex flex-1 sortable shrink-0">
+                {{ forms.form_field(
+                    label:forms.label(
+                        id: 'answer[' ~ (i) ~ '][right]', 
+                        content:'☰', 
+                        attributes:{
+                            'class':'handle cursor-grab active:cursor-grabbing whitespace-nowrap text-xl font-bold text-blue-900'}
+                        ),
+                    input:forms.text(
+                        name:'answer[' ~ (i) ~ '][right]',
+                        value:  question_type_data.student_answer[i-1]['second_item_answer'] ?: question_type_data.choices[i-1]['right'],
+                        attributes:{
+                            'class':'flex-1 w-fit rounded-md shrink-0 whitespace-nowrap text-center cursor-default bg-blue-900 px-3 py-4 font-semibold text-white outline-0 -outline-offset-0 focus:ring-0 sm:text-sm/6',
+                            'readonly': true
+                        }),
+                    isReverse: true
+                )}}
+            </div>   
+        </div>
+    {% endfor %}
+<script>
+    htmx.onLoad(function(content) {
+        var sortables = content.querySelectorAll(".sortable");
+        for (var i = 0; i < sortables.length; i++) {
+        var sortable = sortables[i];
+        var sortableInstance = new Sortable(sortable, {
+            animation: 150,
+            group: 'shared',
+            ghostClass: 'blue-background-class',
+            handle: '.handle',
+            swap: true,
+            swapClass: 'swap-highlight',
+            onEnd: function (evt) {
+                const swap_chosen = evt.item;
+                const to_swap = evt.swapItem;
+
+                if (!swap_chosen || !to_swap) return;
+
+                const swap_chosen_input = swap_chosen.querySelector('input');
+                const to_swap_input = to_swap.querySelector('input');
+                const swap_chosen_label = swap_chosen.querySelector('label');
+                const to_swap_label = to_swap.querySelector('label');
+
+                if (swap_chosen_input && to_swap_input && swap_chosen_label && to_swap_label) {
+                // Swap label text
+                [swap_chosen_label.textContent, to_swap_label.textContent] = [to_swap_label.textContent, swap_chosen_label.textContent];
+
+                // Swap name
+                [swap_chosen_input.name, to_swap_input.name] = [to_swap_input.name, swap_chosen_input.name];
+
+                // Swap id
+                [swap_chosen_input.id, to_swap_input.id] = [to_swap_input.id, swap_chosen_input.id];
+
+                // Update corresponding labels' for attribute
+                swap_chosen_label.htmlFor = swap_chosen_input.id;
+                to_swap_label.htmlFor = to_swap_input.id;
+                }
+            }
+        });
+        
+
+        // Re-enable sorting on the `htmx:afterSwap` event
+        sortable.addEventListener("htmx:afterSwap", function() {
+            sortableInstance.option("disabled", false);
+        });
+        }
+    })
+</script>
+{% endif %}
+
+{% if question.question_type.value == 'coding' %}
+<div id="coding-question"
+     data-instruction='{{ question_type_data.choices.instruction_raw|json_encode|e("html_attr") }}'
+     data-language-codes='{{ question_type_data.choices.language_codes|json_encode|e("html_attr") }}'
+     class="flex flex-col"
+    >
+        <textarea class="hidden" name="answer[code]" id="answer-input"></textarea>
+
+        <div class="flex md:flex-row max-w-full w-full">
+            <div class="flex flex-1 w-full md:w-1/2 flex-col rounded-xl shadow-sm ring-1 ring-gray-950/5">
+                <div class="flex flex-1 rounded-t-md">
+                    <div class="flex flex-col flex-1 w-full ">
+                        <div class="flex w-full bg-gray-800 p-2 rounded-t-md justify-between">
+                            <h1 class="text-gray-50 p-2 font-semibold text-lg">
+                                Instruction
+                            </h1>
+                        </div>
+                         <div class="flex-1 overflow-y-auto p-4 rounded-md border border-gray-200 prose prose-sm">
+                            <p>{{ question_type_data.choices.instruction|raw }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-1 w-full md:w-1/2  flex-col ml-8 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
+                <div class="flex flex-col flex-1 min-w-0 ">
+                    <div class="flex h-16 pb-4 justify-between">
+                        <div class="flex">
+                            {{ forms.form_field(
+                                label:forms.label(
+                                    id:'answer[programming_language]', 
+                                    content:'Programming Language', 
+                                    attributes:{
+                                        'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
+                                        ),
+                                input:forms.select(
+                                    name:'answer[programming_language]', 
+                                    values: question_type_data.choices.languages,
+                                    attributes:{
+                                        'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                        'hx-on:change':'switchLanguageFromEvent(event)',
+                                        'required':true
+                                    }
+                                )
+                            )}}
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col gap-y-4">
+                        <div class="flex flex-1 flex-col rounded-md">
+                            <div class="flex w-full bg-gray-800 p-2 rounded-t-md">
+                                <p class="bg-gray-800 text-gray-50 font-semibold p-4 text-sm">Initial Solution</p>
+                            </div>
+                        <div class="flex">
+                            <div id="initial-solution-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
+                        </div>
+                        </div>
+
+                        <div class="flex flex-1 flex-col rounded-md">
+                            <div class="flex w-full bg-gray-800 p-2 justify-between rounded-t-md">
+                                <p class="bg-gray-800 text-gray-50 font-semibold p-4 text-sm">Sample Test Case</p>
+                            </div>         
+                            <div class="flex">
+                                <div id="test-case-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
+                            </div>
+                        </div>
+                    </div>       
+                </div>
+            </div>
+        </div>  
+{% endif %}

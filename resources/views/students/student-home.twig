@@ -1,40 +1,95 @@
 {% from 'components/core/link-card' import link %}
 {% from 'components/core/show-header' import show_header %}
+{% import 'components/core/forms' as forms %}
 
 {% extends 'components/core/student-layout' %}
 
 {% block content %}
-    <div class="px-4 py-2 m-4 text-4xl font-bold">
-        <h1>Home Page</h1>
-    </div>
-<div class="flex flex-col max-w-full mx-8 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
-    <a href="/student/exams/">{{ show_header('My Exams') }}  </a>
-    <div class="flex flex-col mt-2 gap-y-4">
-        <div class="flex gap-x-4 justify-between text-sm">
-            <a href="/student/exams/exam.id/mcq-example" class="p-2 max-h-fit bg-orange-500 rounded-lg font-medium text-white hover:bg-orange-400 hover:text-gray-50 cursor-pointer">
-                MCQ Question
-            </a>
-            <a href="/student/exams/exam.id/torf-example" class="p-2 max-h-fit bg-orange-500 rounded-lg font-medium text-white hover:bg-orange-400 hover:text-gray-50 cursor-pointer">
-                T/F Question
-            </a>
-            <a href="/student/exams/exam.id/iden-example" class="p-2 max-h-fit bg-orange-500 rounded-lg font-medium text-white hover:bg-orange-400 hover:text-gray-50 cursor-pointer">
-                Identification Question
-            </a>
-            <a href="/student/exams/exam.id/rank-example" class="p-2 max-h-fit bg-orange-500 rounded-lg font-medium text-white hover:bg-orange-400 hover:text-gray-50 cursor-pointer">
-                Ranking Question
-            </a>
-            <a href="/student/exams/exam.id/match-example" class="p-2 max-h-fit bg-orange-500 rounded-lg font-medium text-white hover:bg-orange-400 hover:text-gray-50 cursor-pointer">
-                Matching Question
-            </a>
-            <a href="/student/exams/exam.id/coding-example" class="p-2 max-h-fit bg-orange-500 rounded-lg font-medium text-white hover:bg-orange-400 hover:text-gray-50 cursor-pointer">
-                Coding Question
-            </a>
+<div class="flex flex-col max-w-full m-8 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
+    <div class="flex justify-between p-2 border-b-1 border-spacing-2 border-gray-200">
+        <div class="flex text-3xl font-semibold text-blue-900">
+            Recent Exam Records
         </div>
-
-        <a href="/student/exams/exam.id/result" class="p-2 max-w-fit bg-blue-500 rounded-lg font-medium text-white hover:bg-blue-400 hover:text-gray-50 cursor-pointer">
-            Exam Result
-        </a>
     </div>
+    <div class="flex my-2 w-full p-4 gap-x-5 overflow-x-auto">
+    {% if exam_records is not empty %}
+        {% for record in exam_records %}
+            {% include 'components/student/exam-record-card-student' with { record: record }  %}
+        {% endfor %}
+    {% else %}
+        {% include 'components/student/placeholder-record-student' %}
+    {% endif %}
+    </div>
+    <span class="font-bold text-lg text-gray-700">*View other Exam records by visiting the corresponding exam</span>
 </div>
 
+<div class="flex flex-col max-w-full overflow-auto mx-8 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
+    <div id="exam-div" class="flex justify-between p-2 border-b-1 border-spacing-2 border-gray-200">
+        <div class="flex text-3xl font-semibold text-blue-900">
+            My Exam
+        </div>
+        <div class="flex">
+            <button type="button" popovertarget="add-exam-popover" class="bg-blue-900 text-gray-200 cursor-pointer hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold">Add Exam</button>
+        </div>
+    </div>
+    {% if enrolled_exams is not empty %}
+        <div class="flex flex-col p-4 gap-4 justify-center items-center">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {% for exam in enrolled_exams %}
+                    {% include 'components/student/exam-card-student' with { exam: exam } %}
+                {% endfor %}
+            </div>
+
+
+
+        </div>
+
+    {% else %}
+        {% include 'components/student/placeholder-exam-student' %}
+    {% endif %}
+    
+</div>
+
+    <div popover="manual"
+        class="backdrop:bg-gray-900/15 backdrop:backdrop-blur-bg-gray-900/25 transition-discrete m-auto ease-in-out transition-opacity rounded-xl w-96" 
+        id="add-exam-popover"
+        >
+        <form class="flex flex-col gap-y-2 p-4 mb-2">
+            {{ csrf_field() }}
+            <div class="flex max-w-full rounded-xl bg-white">
+                <div class="flex flex-col p-4 flex-1">  
+                    {{ show_header('Enter Access Code') }}
+                    <div class="flex gap-x-32 justify-between w-full">
+                        <div id="access-code-form" class="flex flex-col gap-y-4 w-full">
+                            {{ forms.form_field(
+                                label:forms.label(
+                                    id:'access-code', 
+                                    content:'Access code', 
+                                    attributes:{
+                                        'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
+                                ),
+                                input:forms.text(
+                                    name:'access-code', 
+                                    attributes:{
+                                        'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                        'required': true}
+                                ),
+                                isColumn: true
+                            )}}
+                            <div></div>
+                        </div>
+                    </div>
+                </div>  
+            </div>
+
+            <div class="flex gap-x-2 px-4">
+                <button hx-post="{{ route('exams.student.store') }}"
+                        hx-target="#access-code-form"
+                        hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
+                        hx-trigger="click throttle:5000ms"
+                        class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm">Enroll Exam</button>
+                <button type="button" popovertarget="add-exam-popover" popovertargetaction="hide" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</button>
+            </div>
+        </form>
+    </div>
 {% endblock %}

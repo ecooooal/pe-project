@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Exam;
+use App\Models\ExamAccessCode;
 use App\Models\Question;
 use App\Services\ExamService;
 use App\Services\UserService;
@@ -24,8 +25,9 @@ class ExamController extends Controller
 
     public function index(){
         $courseIds = $this->userService->getCoursesForUser(auth()->user())->pluck('id');
-        $exams = Exam::whereIn('course_id', $courseIds)->paginate(10);
-
+        $exams = Exam::with('course', 'questions') 
+                    ->whereIn('course_id', $courseIds)
+                    ->paginate(10);
         $header = ['ID', 'Name', 'Course', 'Questions', 'Status', 'is Published', 'Examination Date'];
         $rows = $exams->map(function ($exam) {
             return [
@@ -33,7 +35,7 @@ class ExamController extends Controller
                 'name' => $exam->name,
                 'course' => $exam->course->name,
                 'questions' => $exam->questions->count(),
-                'status' => $exam->questions()->sum('points') >= $exam->max_score ? 'Complete' : 'Incomplete',
+                'status' => $exam->questions()->sum('total_points') >= $exam->max_score ? 'Complete' : 'Incomplete',
                 'is_published' => $exam->is_published ? 'Yes' : 'No',
                 'examination date' => Carbon::parse($exam->examination_date)->format('m/d/Y')
             ];
@@ -50,6 +52,8 @@ class ExamController extends Controller
     }
 
     public function show(Exam $exam){
+        $exam->load('questions');
+
         return view('exams/show', ['exam' => $exam]);
     }
 
@@ -72,23 +76,27 @@ class ExamController extends Controller
             'max_score' => 'The max score field is required',
             'examination_date' => 'The examination date field must be a date after now.'
         ]);
-        $accessCode = strtoupper(implode('-', str_split(Str::random(8), 4)));
-        Exam::create([
+
+        $exam = Exam::create([
             'name' => request('name'),
             'course_id' => request('course_id'),
-            'access_code' => $accessCode,
             'max_score' => request('max_score'),
             'duration' => request('duration') ?? null,
             'retakes' => request('retakes') ?? null, 
             'examination_date' => request('examination_date'),
         ]);
 
+        $access_code = $this->examService->generateAccessCode();
+        $this->examService->saveAccessCode($exam, $access_code);
+
         return redirect('/exams');
     }
 
     public function edit(Exam $exam){
-        return view('exams/edit', ['exam'=>$exam]);
-
+        if ($exam->is_published) {
+            return back();
+        }
+            return view('exams/edit', ['exam'=>$exam]);
     }
 
     public function update(Exam $exam){
@@ -123,7 +131,7 @@ class ExamController extends Controller
         return redirect('/exams');
     }
 
-    public function exam_builder_show(Exam $exam){
+    public function exam_builder_show(Exam $exam){  
         $exam_course = $this->examService->getCourseForExam($exam);
         $exam_questions =  $this->examService->getQuestionsForExam($exam);
         $exam_topics = $this->examService->getTopicsForExam($exam);
@@ -200,15 +208,34 @@ class ExamController extends Controller
     }
 
     public function generateAccessCode(Exam $exam){
-        $accessCode = strtoupper(implode('-', str_split(Str::random(8), 4)));
-        $exam->update(['access_code' => $accessCode]);
-        return view('components/core/partials-exam-access-code', ['exam' => $exam]);
+        $access_code = $this->examService->generateAccessCode();
+        return view('components/core/partials-exam-access-code', ['exam' => $exam, 'access_code' => $access_code, 'generate' => true]);
+    }
+
+    public function getAccessCode(Exam $exam){
+        $access_codes = $this->examService->getAccessCodesForExam($exam);
+        return view('exams/get-access-codes', ['exam' => $exam ,'access_codes' => $access_codes]);
+    }
+
+    public function saveAccessCode(Exam $exam, Request $request){
+        $access_code = $request->post('code');
+        $is_success =$this->examService->saveAccessCode($exam, $access_code);
+        
+        if ($is_success !== true) {
+            return back()->withErrors(['access_code' => $is_success]);
+        }
+
+        return view('components/core/partials-exam-access-code', ['access_code' => $access_code, 'generate' => false]);
     }
 
     public function publishExam(Exam $exam){
-        // // validate this to look if there's an examination date
-        // $exam->update(['access_code' => $accessCode]);
-        // return view('components/core/partials-exam-access-code', ['exam' => $exam]);
+        $is_published = $this->examService->attemptToPublish($exam);
+        if (!$is_published){
+            return view('components/core/partials-exam-builder-publish-form-error', [
+                'error' => 'Sum of question points do not match the max score.'
+            ]);        
+        }
+        return response('', 200)->header('HX-Refresh', 'true');
     }
 
     public function swap_partial_algorithm(Exam $exam){

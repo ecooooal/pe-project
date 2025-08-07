@@ -8,7 +8,8 @@ class IdentificationQuestion extends Model
 {
     protected $fillable = [
         'question_id',
-        'solution'
+        'solution',
+        'points'
     ];
 
     public function question(){

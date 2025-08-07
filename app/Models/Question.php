@@ -16,7 +16,7 @@ class Question extends Model
         'question_type',
         'topic_id',
         'name',
-        'points'
+        'total_points'
     ];
 
     protected $casts = [
@@ -58,32 +58,15 @@ class Question extends Model
 
     public function getTypeModel()
     {                
-
-        switch ($this->question_type) {
-            case QuestionType::MultipleChoice:
-                $this->load('multipleChoiceQuestions');
-                return $this->multipleChoiceQuestions;
-                
-            case QuestionType::TrueOrFalse:
-                $this->load('trueOrFalseQuestion');
-                return $this->trueOrFalseQuestion;
-                
-            case QuestionType::Identification:
-                $this->load('identificationQuestion');
-                return $this->identificationQuestion;
-                
-            case QuestionType::Ranking:
-                $this->load('rankingQuestions');
-                return $this->rankingQuestions;
-                
-            case QuestionType::Matching:
-                $this->load('matchingQuestions');
-                return $this->matchingQuestions;
-
-            case QuestionType::Coding:
-                $this->load('codingQuestion.codingQuestionLanguages');
-                return $this->codingQuestion;
-        }
+        return match ($this->question_type) {
+            QuestionType::MultipleChoice => $this->multipleChoiceQuestions,
+            QuestionType::TrueOrFalse => $this->trueOrFalseQuestion,
+            QuestionType::Identification => $this->identificationQuestion,
+            QuestionType::Ranking => $this->rankingQuestions,
+            QuestionType::Matching => $this->matchingQuestions,
+            QuestionType::Coding => $this->codingQuestion,
+            default => null,
+        };
     }
     
 

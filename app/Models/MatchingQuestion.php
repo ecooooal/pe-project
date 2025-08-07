@@ -10,6 +10,7 @@ class MatchingQuestion extends Model
         'question_id',
         'first_item',
         'second_item',
+        'item_points'
     ];
 
     public function question(){

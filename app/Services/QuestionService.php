@@ -14,24 +14,27 @@ class QuestionService
         $question_type = $question->getTypeModel();
         switch ($question->question_type->value) {
             case 'multiple_choice':
-                $choices = $question_type->map(function ($choice) {
+                $choices['choices'] = $question_type->map(function ($choice) {
                     return [
                         'choice_key' => $choice->choice_key,
                         'item' => $choice->item,
-                        'is_correct' => $choice->is_correct,
+                        'is_solution' => $choice->is_solution,
                     ];
                 })->toArray();
+                $choices['points'] = $question->total_points;
                 return $choices;
 
             case 'true_or_false':
                 $choices = [
                     'solution' => $question_type->solution,
+                    'points' => $question->total_points
                 ];                
                 return $choices;
 
             case 'identification':
                 $choices = [
                     'solution' => $question_type->solution,
+                    'points' => $question->total_points
                 ];                
                 return $choices;
 
@@ -39,7 +42,8 @@ class QuestionService
                 $choices = $question_type->map(function ($choice) {
                     return [
                         'order' => $choice->order,
-                        'item' => $choice->item,
+                        'solution' => $choice->item,
+                        'item_points' => $choice->item_points
                     ];
                 })->toArray();
                 return $choices;
@@ -49,6 +53,8 @@ class QuestionService
                     return [
                         'left' => $choice->first_item,
                         'right' => $choice->second_item,
+                        'item_points' => $choice->item_points
+
                     ];
                 })->toArray();
                 return $choices;
@@ -58,9 +64,12 @@ class QuestionService
                                     'html_input' => 'strip',
                                 ]);
                 $instruction_raw = $question_type->instruction;
+                $syntax_points = $question_type->syntax_points;
+                $runtime_points = $question_type->runtime_points;
+                $test_case_points = $question_type->test_case_points;
+
                 $languages = $question_type->codingQuestionLanguages()->pluck('language');
                 $coding_languages = $question_type->codingQuestionLanguages;            
-
                 $language_codes = $coding_languages->mapWithKeys(function ($item) {
                     return [
                         $item->language => [
@@ -73,6 +82,9 @@ class QuestionService
 
                 $data = [
                     'instruction' => $instruction,
+                    'syntax_points' => $syntax_points,
+                    'runtime_points' => $runtime_points,
+                    'test_case_points' => $test_case_points,
                     'instruction_raw' =>  $instruction_raw,
                     'languages' => $languages,
                     'language_codes' =>$language_codes
@@ -85,14 +97,18 @@ class QuestionService
         }
     }
 
-    public static function validate(string $language, string $solution, string $test): array
+    public static function validate(string $language, string $code, string $test, $code_settings): array
     {
         switch ($language) {
             case 'java':
                 try {
-                    $response = Http::timeout(30)->post('http://java-api:8082/validate', [
-                        'completeSolution' => $solution,
-                        'testUnit' => $test
+                    $response = Http::timeout(30)->post('http://java-api:8090/execute', [
+                        'code' => $code,
+                        'testUnit' => $test,
+                        'request_action' => $code_settings['action'],
+                        'syntax_points' => $code_settings['syntax_points'],
+                        'runtime_points' => $code_settings['runtime_points'],
+                        'test_case_points' => $code_settings['test_case_points']
                     ]);
                     if ($response->successful()) {
                         $data = $response->json();
@@ -102,7 +118,7 @@ class QuestionService
                             foreach ($data['testResults'] as $testResult) {
                                 if (isset($testResult['methods']) && is_array($testResult['methods'])) {
                                     foreach ($testResult['methods'] as $method) {
-                                        if (isset($method['status']) && $method['status'] === 'FAILED') {
+                                        if (isset($method['status']) && $method['status'] !== 'PASSED') {
                                             $hasFailures = true;
                                             break 2;
                                         }

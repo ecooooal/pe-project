@@ -7,46 +7,38 @@
 {% extends 'components/core/student-layout' %}
 
 {% block content %}
-{{ breadcrumb() }}
-
+<div class="ml-8 my-4 max-w-fit">
+    <a   href="{{ route('students.index') }}" 
+            class="cursor-pointer text-gray-900 hover:text-blue-900 hover:underline">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
+        </svg>
+    </a>    
+</div>
 <div class="flex flex-1 flex-col gap-y-4">
     <div class="flex flex-col max-w-full mx-8 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
-            {{ show_header('Exam Name') }}  
-    </div>  
-
-    <div class="flex flex-1">
-        <div class="flex flex-col ml-8 gap-y-8">
-            <div class="prose p-4 w-full">
-                <h2>Exam Description</h2>
-                <p>This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...This exam description ...</p>
-                <h2>Exam Structure</h2>
-                <ul>
-                    <li class="font-semibold">Types of Question
-                        <ul>
-                            <li>Multiple Choice </li>
-                            <li>True or False</li>
-                            <li>Identification</li>
-                            <li>Ranking</li>
-                            <li>Matching</li>
-                            <li>Coding</li>
-                        </ul>
-                    </li>
-                </ul>
+            {{ show_header(exam.name|title) }}  
+            <div class="flex gap-x-4">
+                <button  
+                        hx-get="{{ route('exams.student.overview', { exam: exam }) }}" 
+                        hx-target="#exam-content"
+                        hx-trigger="load, click" 
+                        hx-swap="outerHTML"
+                        class="cursor-pointer hover:text-blue-900 hover:underline">
+                    Overview
+                </button>
+                <button 
+                        hx-get="{{ route('exam_records.index', { exam: exam }) }}" 
+                        hx-target="#exam-content"
+                        hx-swap="outerHTML"
+                        class="cursor-pointer hover:text-blue-900 hover:underline">
+                    Exam Records
+                </button>
             </div>
-            <div class="flex">
-                <a href="/student/exams/exam.id/mcq-example" class="p-2 max-h-fit bg-orange-500 rounded-lg font-medium text-white hover:bg-orange-400 hover:text-gray-50 cursor-pointer">Take Exam</a>
-            </div>
-        </div>
+    </div> 
 
-        <div class="flex flex-col ml-auto max-w-full max-h-fit justify-between gap-y-4 mr-8 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
-            {{ show_item('Course', 'Course name')}}
-            {{ show_item('Max Score', '00')}}
-            {{ show_item('Duration', '90 minutes')}}
-            {{ show_item('Examination Date', "Examination date") }}
-            {{ show_item('Retakes', 'Unlimited')}}
-            {{ show_item('Open?', 'False')}}
-        </div>   
-    </div>
+    <div id="exam-content"></div>
+
    
 </div>
 

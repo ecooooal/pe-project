@@ -13,7 +13,8 @@ class MultipleChoiceQuestion extends Model
         'question_id',
         'choice_key',
         'item',
-        'is_correct'
+        'is_solution',
+        'points'
     ];
 
     public function question(){

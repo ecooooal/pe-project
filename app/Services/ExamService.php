@@ -2,7 +2,13 @@
 
 namespace App\Services;
 use App\Models\Exam;
+use App\Models\ExamAccessCode;
+use App\Models\Question;
+use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Str;
 class ExamService
 {
     public function getCourseForExam(Exam $exam)
@@ -13,6 +19,47 @@ class ExamService
     public function getQuestionsForExam(Exam $exam)
     {
         return $exam->questions()->with('topic.subject')->get();
+    }
+
+    public function getAccessCodesForExam(Exam $exam)
+    {
+        return $exam->load('accessCodes')->accessCodes;
+    }
+
+     public function generateAccessCode(): string
+    {
+        do {
+            $access_code = strtoupper(implode('-', str_split(Str::random(8), 4)));
+        } while (ExamAccessCode::where('access_code', $access_code)->exists());
+
+        return $access_code;
+    }
+    public function saveAccessCode(Exam $exam, string $access_code): bool|string
+    {
+        try {
+            $exam->accessCodes()->create(['access_code' => $access_code]);
+            return true;
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return 'Code is already used. Please generate a new one.';
+            }
+            throw $e;
+        }
+    }
+
+    public function enrollAccessCode(User $user ,ExamAccessCode $examAccessCode)
+    {
+        $exam_id = $examAccessCode->exam_id;
+        $alreadyEnrolled = $user->exams()->where('exam_id', $exam_id)->exists();
+
+        if (! $alreadyEnrolled) {
+            $user->exams()->syncWithoutDetaching([
+                $exam_id => ['access_code' => $examAccessCode->access_code],
+            ]);
+            return true;
+        }
+        
+        return false;
     }
 
     public function getAvailableQuestionsForExam(Exam $exam)
@@ -71,7 +118,10 @@ class ExamService
 
 
     public function transformQuestionRows(Collection $questions)
-    {
+    {   
+        foreach ($questions as $question){
+            $question->load('topic.subject');
+        }
         return $questions->map(fn ($question) => [
             'id' => $question->id, 
             'name' => $question->name,
@@ -89,6 +139,9 @@ class ExamService
     {
         // Get all questions related to the exam’s course
         $course = $this->getCourseForExam($exam);
+        $course->load([
+            'subjects.topics.questions.topic.subject'
+        ]);
         $knapsack = [];
 
         // Check if course does exist   
@@ -137,7 +190,7 @@ class ExamService
                 // The 'best' is defined by criteria sent by user
                 $question->value = $criteria === 'value'
                     ? $question->coverage_score + 1
-                    : ($question->coverage_score + 1) / ($question->points ?: 1);
+                    : ($question->coverage_score + 1) / ($question->total_points ?: 1);
                 return $question;
             });
             // prepare data to represent set of questions to pick as Knapsack
@@ -150,7 +203,7 @@ class ExamService
                 return $question;
             });
 
-            $knapsack = $normalized_questions->map(fn($question) => ['id'=>$question->id, 'name'=>$question->name, 'value'=>$question->value, 'weight'=>$question->points]);
+            $knapsack = $normalized_questions->map(fn($question) => ['id'=>$question->id, 'name'=>$question->name, 'value'=>$question->value, 'weight'=>$question->total_points]);
         }
         \Log::debug('Knapsack prepared:', $knapsack->toArray());
         return $knapsack;
@@ -255,6 +308,23 @@ class ExamService
         return $data;
     }
 
-    // algorithm for shuffling the question list
+    public function attemptToPublish(Exam $exam)
+    {        
+        if (!$exam->is_published) {
+                $exam->load('questions');
+
+                $sum_of_points = $exam->questions->sum('total_points');
+
+                if ($sum_of_points !== $exam->max_score) {
+                    return false;
+                }
+
+                $exam->update(['is_published' => true]);
+            } else {
+                $exam->update(['is_published' => false]);
+            }
+
+            return true;
+    }
 }
 

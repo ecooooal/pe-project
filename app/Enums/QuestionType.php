@@ -13,12 +13,12 @@ enum QuestionType: string
 
     public function getName(): string {
         return match($this) {
-            self::MultipleChoice => 'Multiple Choice Question',
-            self::TrueOrFalse => 'True/False Question',
-            self::Identification => 'Identification Question',
-            self::Ranking => 'Ranking Question',
-            self::Matching => 'Matching Question',
-            self::Coding => 'Coding Question',
+            self::MultipleChoice => 'Multiple Choice',
+            self::TrueOrFalse => 'True/False',
+            self::Identification => 'Identification',
+            self::Ranking => 'Ranking',
+            self::Matching => 'Matching',
+            self::Coding => 'Coding',
         };
     }
 }

@@ -19,17 +19,33 @@ class Exam extends Model
         'duration',
         'retakes',
         'examination_date',
-        'published',
+        'is_published',
         'applied_algorithm'
     ];
 
     public function course() {
         return $this->belongsTo(Course::class);
     }
-    
+
+    public function accessCodes() {
+        return $this->hasMany(ExamAccessCode::class);
+    }
+
+    public function studentPapers() {
+        return $this->hasMany(StudentPaper::class);
+    }
+
     public function questions() {
         return $this->belongsToMany(Question::class)->withTimestamps();
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'exams_enrolled_users')
+                    ->withPivot('access_code')
+                    ->withTimestamps();
+    }
+
     public function createdBy(){
         return $this->belongsTo(User::class, 'created_by');
         }

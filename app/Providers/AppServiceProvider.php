@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -20,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Model::preventLazyLoading(!app()->isProduction());
         // Implicitly grant "Super-Admin" role all permission checks using can()
         Gate::before(function ($user, $ability) {
             if ($user->hasRole('Super-Admin')) {
