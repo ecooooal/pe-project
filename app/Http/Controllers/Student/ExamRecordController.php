@@ -143,6 +143,7 @@ class ExamRecordController extends Controller
 
                             if ($answer->codingAnswer) {
                                 $points = $answer->codingAnswer->only([
+                                    'status',
                                     'answer_syntax_points',
                                     'answer_runtime_points',
                                     'answer_test_case_points'

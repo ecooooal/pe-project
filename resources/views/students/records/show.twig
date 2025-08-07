@@ -146,6 +146,10 @@
                                                 {% endif %}
                                             {% if row.question_type|lower == 'coding' %}
                                                 <table class="inner-table m-0">
+                                                    {{ dump() }}
+                                                    {% if row.your_answer.status == 'pending' %}
+                                                        Your answer is currently being checked please wait...
+                                                    {% else %}
                                                         <thead>
                                                             <tr>
                                                             <th>Language Used</th>
@@ -162,6 +166,7 @@
                                                                     <td>{{ row.your_answer.answer_test_case_points }}</td>
                                                                 </tr>
                                                             </tbody>
+                                                    {% endif %}
                                                 </table>
                                                 <pre class="bg-transparent border-2"><code class="language-{{ row.your_answer.language }}">{{ row.your_answer.code }}</code></pre>
                                             {% endif %}
