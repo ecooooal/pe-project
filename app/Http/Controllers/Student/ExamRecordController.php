@@ -11,6 +11,8 @@ use App\Services\QuestionService;
 use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Redis;
+use Storage;
 use Str;
 
 class ExamRecordController extends Controller
@@ -29,6 +31,7 @@ class ExamRecordController extends Controller
 
     public function store(StudentPaper $student_paper)
     {
+        $user = auth()->user();
         // validate that the student_paper's author is the authenticated user
         $student_paper->update(['submitted_at' => now()]);
 
@@ -82,7 +85,9 @@ class ExamRecordController extends Controller
         ['exam_record_id', 'subject_id'],
         ['score_obtained', 'score', 'updated_at']
         );
+        
 
+        Self::storeCodeToJSON($user->id, $student_paper->id);
         $student_paper->update(['status'  => 'completed']);
         
 
@@ -180,5 +185,33 @@ class ExamRecordController extends Controller
         ];
 
         return view('students/records/show', $data);
+    }
+
+    private static function storeCodeToJSON($user_id, $student_paper_id){
+        $pattern = "user:$user_id:paper:$student_paper_id:language:*:answer:*:code";
+
+        $keys = Redis::keys($pattern); 
+        $values = Redis::mget($keys);
+        $data = [];
+        foreach ($keys as $index => $key) {
+            // Extract the language from the key
+            // Example key: user:1:paper:99:language:php:answer:43:code
+            preg_match('/language:([^:]+)/', $key, $matches);
+            $language = $matches[1] ?? null;
+                    
+            $data[] = [
+                'key'      => $key,
+                'language' => $language,
+                'code'     => $values[$index],
+            ];
+        }
+
+        $json = json_encode($data, JSON_PRETTY_PRINT);
+        $folder = "codeInJSON/";
+
+        $answer_file_path = "{$folder}user_{$user_id}:paper_{$student_paper_id}.json";
+        Storage::makeDirectory($folder);
+        Storage::put($answer_file_path, $json);
+
     }
 }

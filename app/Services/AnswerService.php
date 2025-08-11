@@ -7,7 +7,9 @@ use App\Models\StudentAnswer;
 use App\Models\Subject;
 use App\Models\Topic;
 use App\Models\Question;
+use Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Redis;
 use Storage;
 use Str;
 class AnswerService
@@ -27,7 +29,7 @@ class AnswerService
         $student_answer->multipleChoiceAnswer()->updateOrCreate(
              ['student_answer_id' => $student_answer->id],
              ['answer' => $answer]);
-        
+
         return ['total_points' => $this->total_points, 'is_correct' => $this->is_correct];
     }
     public function storeTrueOrFalse(StudentAnswer $student_answer, $answer, $question_type, $question){
@@ -156,8 +158,10 @@ class AnswerService
             'answer_language' => $language,
             'answer_file_path' => $answer_file_path
         ]);
-        // dispatch laravel job to check this answer code
-        // 
+        
+        $key = "user:$user->id:paper:$student_answer->student_paper_id:language:$language:answer:$student_answer->id:code";
+        Redis::setex($key, 3600, $answer['code']);
+
         return ['total_points' => $this->total_points, 'is_correct' => $this->is_correct];
     }
 
@@ -188,4 +192,19 @@ class AnswerService
             default => 'txt',
         };
     }
+
+    public function hasAnswerChanged($student_answer, $answer) {
+        $key = "paper:$student_answer->student_paper_id:student_answer_id:$student_answer->id";
+
+        $hash = md5(json_encode($answer));
+
+        $oldHash = Redis::get($key);
+
+        if (!$oldHash || $hash !== $oldHash) {
+            Redis::setex($key, 3600, $hash);
+            return true; 
+        }
+        return false;
+    }
+
 }
