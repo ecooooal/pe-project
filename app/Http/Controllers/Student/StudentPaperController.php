@@ -7,9 +7,11 @@ use App\Models\ExamRecord;
 use App\Models\StudentPaper;
 use App\Services\ExamService;
 use App\Services\ExamTakingService;
+use Cache;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class StudentPaperController extends Controller
 {
@@ -43,7 +45,7 @@ class StudentPaperController extends Controller
 
         $data = [
             'student_paper' => $student_paper,  
-            'exam' => $exam
+            'exam' => $exam,
         ];
 
         return view( 'students/papers/layout-take-exam', $data);

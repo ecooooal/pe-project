@@ -136,9 +136,6 @@ class AnswerService
         return ['total_points' => $this->total_points, 'is_correct' => $this->is_correct];
     }
     public function storeCoding(StudentAnswer $student_answer, $answer, $question, $attempt_count){
-        // get language and code
-        // save code in directory
-        // 
         $language = $answer['programming_language'];
 
         $user = auth()->user();
@@ -160,7 +157,7 @@ class AnswerService
             'answer_file_path' => $answer_file_path
         ]);
         // dispatch laravel job to check this answer code
-
+        // 
         return ['total_points' => $this->total_points, 'is_correct' => $this->is_correct];
     }
 
