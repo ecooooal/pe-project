@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Student;
 
+use App\Models\CodingAnswer;
 use App\Models\Exam;
 use App\Models\ExamRecord;
 use App\Models\StudentAnswer;
 use App\Models\StudentPaper;
 use App\Services\ExamTakingService;
 use App\Services\QuestionService;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -144,18 +146,7 @@ class ExamRecordController extends Controller
                                 : 'N/A';
                             break;
                         case 'coding':
-                            $yourAnswer = $question_type_answer;
-
-                            if ($answer->codingAnswer) {
-                                $points = $answer->codingAnswer->only([
-                                    'status',
-                                    'answer_syntax_points',
-                                    'answer_runtime_points',
-                                    'answer_test_case_points'
-                                ]);
-
-                                $yourAnswer = array_merge($yourAnswer, $points);
-                            }
+                            $yourAnswer = $answer->codingAnswer;
                             break;
                         default:
                             $yourAnswer = 'Unsupported';
@@ -187,31 +178,59 @@ class ExamRecordController extends Controller
         return view('students/records/show', $data);
     }
 
+    public function showCodingResult(CodingAnswer $codingAnswer){
+        $data['success'] = $codingAnswer->is_code_success;
+        $data['test_results'] = json_decode($codingAnswer->test_results);
+        $data['failures'] = json_decode($codingAnswer->failures);
+        $data['syntax_points'] = $codingAnswer->answer_syntax_points;
+        $data['runtime_points'] = $codingAnswer->answer_runtime_points;
+        $data['test_case_points'] = $codingAnswer->answer_test_case_points;
+
+        return view('students/records/get-coding-result', ['data' => $data]);
+    }
+
     private static function storeCodeToJSON($user_id, $student_paper_id){
         $pattern = "user:$user_id:paper:$student_paper_id:language:*:answer:*:code";
+        $student_paper_date = StudentPaper::find($student_paper_id)->submitted_at;
+        $student_paper_submitted_at_unix = (String) Carbon::parse($student_paper_date)->timestamp;
+        $key = $student_paper_submitted_at_unix . '-' . $user_id;
 
         $keys = Redis::keys($pattern); 
         $values = Redis::mget($keys);
         $data = [];
+
         foreach ($keys as $index => $key) {
-            // Extract the language from the key
-            // Example key: user:1:paper:99:language:php:answer:43:code
+
             preg_match('/language:([^:]+)/', $key, $matches);
             $language = $matches[1] ?? null;
-                    
+
+            preg_match('/answer:(\d+)/', $key, $answer_matches);
+            $answer_id = isset($answer_matches[1]) ? (int)$answer_matches[1] : null;
+
+            preg_match('/coding_answer:(\d+)/', $key, $coding_answer_matches);
+            $coding_answer_id = isset($coding_answer_matches[1]) ? (int)$coding_answer_matches[1] : null;
+
+            $hashData = Redis::hgetall($key);
+
             $data[] = [
-                'key'      => $key,
-                'language' => $language,
-                'code'     => $values[$index],
+                'answer_id' => $answer_id,
+                'coding_answer_id'     => $coding_answer_id,
+                'language'      => $language,
+                'data'          => $hashData,
             ];
         }
 
-        $json = json_encode($data, JSON_PRETTY_PRINT);
+        $json_pretty_print = json_encode($data, JSON_PRETTY_PRINT);
+        $json = json_encode($data);
+
         $folder = "codeInJSON/";
 
         $answer_file_path = "{$folder}user_{$user_id}:paper_{$student_paper_id}.json";
+
         Storage::makeDirectory($folder);
-        Storage::put($answer_file_path, $json);
+        Storage::put($answer_file_path, $json_pretty_print);
+        
+        Redis::XADD("code_checker", '*', ["data" => $json]);
 
     }
 }

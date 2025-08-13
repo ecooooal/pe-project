@@ -20,4 +20,8 @@ class CodingQuestion extends Model
     public function codingQuestionLanguages(){
         return $this->hasMany(CodingQuestionLanguage::class);
     }
+
+    public function getSpecificLanguage(string $language){
+        return $this->codingQuestionLanguages->where('language', $language)->first();
+    }
 }

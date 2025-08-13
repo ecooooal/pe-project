@@ -25,6 +25,9 @@ return new class extends Migration
             $table->unsignedTinyInteger('answer_syntax_points')->default(0);
             $table->unsignedTinyInteger('answer_runtime_points')->default(0);
             $table->unsignedTinyInteger('answer_test_case_points')->default(0);
+            $table->boolean('is_code_success')->nullable();
+            $table->jsonb('test_results')->nullable();
+            $table->jsonb('failures')->nullable();
             $table->timestamps();
         });
     }

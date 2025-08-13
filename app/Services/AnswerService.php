@@ -159,8 +159,21 @@ class AnswerService
             'answer_file_path' => $answer_file_path
         ]);
         
-        $key = "user:$user->id:paper:$student_answer->student_paper_id:language:$language:answer:$student_answer->id:code";
-        Redis::setex($key, 3600, $answer['code']);
+        $key = "user:$user->id:paper:$student_answer->student_paper_id:language:$language:answer:$student_answer->id:coding_answer:$coding_answer->id:code";
+        $question = Question::find($student_answer->question_id);
+        $question_type = $question->getTypeModel();
+        $test_case = $question_type->getSpecificLanguage($language);
+
+        $data = [
+            'code' => $answer['code'],
+            'testUnit' => $test_case->getTestCase(),
+            'syntax_points' => $question_type->syntax_points,
+            'runtime_points' => $question_type->runtime_points,
+            'test_case_points' => $question_type->test_case_points
+        ];
+        
+        Redis::hmset($key, $data);
+        Redis::expire($key, 3600);
 
         return ['total_points' => $this->total_points, 'is_correct' => $this->is_correct];
     }
@@ -174,7 +187,7 @@ class AnswerService
         ];
 
         $pattern = $patterns[strtolower($language)] ?? '/\bclass\s+(\w+)/';
-        $class_name = 'tmp';
+        $class_name = 'noClassName';
 
         if (preg_match($pattern, $code, $matches)) {
             $class_name = $matches[1];

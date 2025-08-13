@@ -160,6 +160,24 @@ services:
     networks:
       - laravel-development
 
+  fastapi:
+    image: fastapi
+    ports:
+      - "8085:80"
+    depends_on:
+      - redis
+    volumes:
+      - /home/echo/PythonSSE:/code/app
+    networks:
+      - laravel-development
+    environment:
+      - REDIS_HOST=redis
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=postgres
+      - DB_PORT=5432
+
   # RUN API WITH FOR SANDBOXING
   # docker run \
   # --rm \

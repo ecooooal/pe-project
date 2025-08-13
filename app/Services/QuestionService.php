@@ -112,22 +112,6 @@ class QuestionService
                     ]);
                     if ($response->successful()) {
                         $data = $response->json();
-                        $hasFailures = false;
-
-                        if (isset($data['testResults']) && is_array($data['testResults'])) {
-                            foreach ($data['testResults'] as $testResult) {
-                                if (isset($testResult['methods']) && is_array($testResult['methods'])) {
-                                    foreach ($testResult['methods'] as $method) {
-                                        if (isset($method['status']) && $method['status'] !== 'PASSED') {
-                                            $hasFailures = true;
-                                            break 2;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        $data['success'] = !$hasFailures;
                         return $data;
                     }
                     return ['success' => false, 'error' => 'API returned error'];

@@ -36,7 +36,7 @@
             </div>
 </div> 
 
-<div id="exam-content" class="flex flex-1 flex-col gap-y-4 mx-8 bg-white rounded-xl shadow-sm ring-1 ring-gray-950/5">
+<div id="exam-content" class="flex flex-1 flex-col max-w-full gap-y-4 mx-8 bg-white rounded-xl shadow-sm ring-1 ring-gray-950/5">
     <div class="flex flex-1 p-4 bg-blue-900 text-white font-bold text-lg rounded-xl justify-between">
         Attempt #{{ exam_record.attempt }}
         <button hx-get="{{ route('exam_records.index', { exam: exam }) }}" 
@@ -46,14 +46,12 @@
             X
         </button>
     </div>
-    <div class="flex p-4 gap-x-4">
-
-
+    <div class="flex p-4 gap-x-4 max-w-full">
         <div class="flex flex-col gap-y-8 w-full">
             {{ show_header('Exam Results')}}
 
-            <div class="flex flex-1 flex-col prose max-w-none gap-y-4">
-                <div class="bg-gray-100 px-4 rounded-2xl text-gray-800">            
+            <div class="flex flex-col prose gap-y-4 p-4 min-w-full">
+                <div class="bg-gray-100 px-4 rounded-2xl text-gray-800 ">            
                     <table>
                         <thead>
                         <tr>
@@ -73,7 +71,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="ring-2 ring-gray-900/20 px-4 rounded-2xl text-gray-800">            
+                <div class="overflow-x-auto max-w-full ring-2 ring-gray-900/20 px-4 rounded-2xl text-gray-800">            
                     <table>
                         <thead>
                         <tr>
@@ -96,9 +94,9 @@
                             </tr>
                             {% if row.question_type|lower  in ['ranking', 'matching', 'coding'] %}
                             <tr>
-                                    <td colspan="6">
-                                        <details class="bg-gray-100 px-4 py-2 rounded-2xl">
-                                            <summary>
+                                    <td colspan="6" class="max-w-96">
+                                        <details class="bg-gray-100 px-4 py-2 rounded-2xl overflow-x-auto w-full">
+                                            <summary class="py-2">
                                                 Details
                                             </summary>
                                                 {% if row.question_type|lower == 'ranking' %}
@@ -145,11 +143,17 @@
                                                     </table>
                                                 {% endif %}
                                             {% if row.question_type|lower == 'coding' %}
-                                                <table class="inner-table m-0">
-                                                    {{ dump() }}
+                                                <table class="inner-table m-0 ">
                                                     {% if row.your_answer.status == 'pending' %}
                                                         Your answer is currently being checked please wait...
                                                     {% else %}
+                                                    <div 
+                                                        hx-get="{{ route('exam_records.coding_answer_result', { coding_answer:row.your_answer} ) }}"
+                                                        hx-trigger="load"
+                                                        hx-swap="outerHTML"
+                                                        hx-select="#validate-div">
+
+                                                    </div>
                                                         <thead>
                                                             <tr>
                                                             <th>Language Used</th>
@@ -160,7 +164,7 @@
                                                         </thead>
                                                             <tbody>
                                                                 <tr>
-                                                                    <td>{{ row.your_answer.language|title }}</td>
+                                                                    <td>{{ row.question_type_answer.language|capitalize }}</td>
                                                                     <td>{{ row.your_answer.answer_syntax_points }}</td>
                                                                     <td>{{ row.your_answer.answer_runtime_points }}</td>
                                                                     <td>{{ row.your_answer.answer_test_case_points }}</td>
@@ -168,7 +172,7 @@
                                                             </tbody>
                                                     {% endif %}
                                                 </table>
-                                                <pre class="bg-transparent border-2"><code class="language-{{ row.your_answer.language }}">{{ row.your_answer.code }}</code></pre>
+                                                <pre class="bg-transparent border-2 overflow-x-auto"><span class="text-sm font-bold text-gray-900">{{ row.question_type_answer.language|capitalize }}</span><code class="language-{{ row.question_type_answer.language }}">{{ row.question_type_answer.code }}</code></pre>
                                             {% endif %}
                                         </details>
                                     </td>
@@ -177,8 +181,7 @@
                         {% endfor %}
                         </tr>
                     </table>
-            </div>
-
+                </div>
             </div>
             <div class="flex flex-col rounded-2xl gap-y-4 text-gray-800">            
                 {{ show_header('Reviewers Recommendation')}}
