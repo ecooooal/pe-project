@@ -42,6 +42,7 @@ class ExamRecordController extends Controller
 
         $attempt_count = session()->pull('current_attempt', 1);
 
+        // AGGREGATE student points by subjects, get subject id, subject name, sum of student points for that subject, sum of obtainable points for subject
         $subject_table = DB::table('student_answers')
         ->join('questions', 'student_answers.question_id', '=', 'questions.id')
         ->join('topics', 'questions.topic_id', '=', 'topics.id')
@@ -179,14 +180,35 @@ class ExamRecordController extends Controller
     }
 
     public function showCodingResult(CodingAnswer $codingAnswer){
-        $data['success'] = $codingAnswer->is_code_success;
-        $data['test_results'] = json_decode($codingAnswer->test_results);
-        $data['failures'] = json_decode($codingAnswer->failures);
-        $data['syntax_points'] = $codingAnswer->answer_syntax_points;
-        $data['runtime_points'] = $codingAnswer->answer_runtime_points;
-        $data['test_case_points'] = $codingAnswer->answer_test_case_points;
+        $coding_answer_status = Redis::hget('checked_code', $codingAnswer->id);
+        $data['status'] = $coding_answer_status;    
+        if ($coding_answer_status == 'checked'){
+            $data['code_answer'] = $codingAnswer;
+            $data['success'] = $codingAnswer->is_code_success;
+            $data['test_results'] = json_decode($codingAnswer->test_results);
+            $data['failures'] = json_decode($codingAnswer->failures);
+            $data['syntax_points'] = $codingAnswer->answer_syntax_points;
+            $data['runtime_points'] = $codingAnswer->answer_runtime_points;
+            $data['test_case_points'] = $codingAnswer->answer_test_case_points;
+            $data['number'] = request()->input('number');
+            $data['question'] = request()->input('question');
+            $data['score'] = $codingAnswer->answer_syntax_points + $codingAnswer->answer_runtime_points + $codingAnswer->answer_test_case_points;
+            $data['max_score'] = request()->input('max_score');
 
-        return view('students/records/get-coding-result', ['data' => $data]);
+            return view('students/records/get-coding-result', ['data' => $data]);
+        } else {
+            return response('', 212);
+        }
+    }
+
+    public function showUpdatedScore(ExamRecord $examRecord){
+        if ($examRecord->status != 'in_progress'){
+            $examRecord->load('subjects');
+            $examRecord['max_score'] = request()->input('max_score');
+            return view('students/records/get-updated-score', ['exam_record' => $examRecord]);
+        } else {
+            return response('', 212);
+        }
     }
 
     private static function storeCodeToJSON($user_id, $student_paper_id){
@@ -201,8 +223,11 @@ class ExamRecordController extends Controller
 
         foreach ($keys as $index => $key) {
 
-            preg_match('/language:([^:]+)/', $key, $matches);
-            $language = $matches[1] ?? null;
+            preg_match('/paper:([^:]+)/', $key, $student_paper_matches);
+            $student_paper_id = (int)$student_paper_matches[1] ?? null;
+
+            preg_match('/language:([^:]+)/', $key, $language_matches);
+            $language = $language_matches[1] ?? null;
 
             preg_match('/answer:(\d+)/', $key, $answer_matches);
             $answer_id = isset($answer_matches[1]) ? (int)$answer_matches[1] : null;
@@ -213,6 +238,7 @@ class ExamRecordController extends Controller
             $hashData = Redis::hgetall($key);
 
             $data[] = [
+                'student_paper_id' => $student_paper_id,
                 'answer_id' => $answer_id,
                 'coding_answer_id'     => $coding_answer_id,
                 'language'      => $language,

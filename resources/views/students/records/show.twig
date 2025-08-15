@@ -51,7 +51,18 @@
             {{ show_header('Exam Results')}}
 
             <div class="flex flex-col prose gap-y-4 p-4 min-w-full">
-                <div class="bg-gray-100 px-4 rounded-2xl text-gray-800 ">            
+                <div class="bg-gray-100 px-4 rounded-2xl text-gray-800 "
+                    {% if exam_record.status == 'in_progress' %}
+                    id="subjects"
+                    hx-get="{{ route('exam_records.show_updated_score', { exam_record:exam_record, max_score:exam.max_score} ) }}"
+                    hx-trigger="load, every 6s"
+                    hx-swap="outerHTML"
+                    hx-target="this"
+                    hx-select="#subjects"
+                    hx-select-oob="#exam_record_info"
+                    {% endif %}
+                >            
+                {{ dump(exam_record.status )}}
                     <table>
                         <thead>
                         <tr>
@@ -84,7 +95,7 @@
                         </tr>
                         </thead>
                         {% for row in rows %}
-                            <tr>
+                            <tr id="row-{{ row.number }}">
                                 <td>{{ row.number }}</td>
                                 <td>{{ row.question_type }}</td>
                                 <td>{{ row.question }}</td>
@@ -94,12 +105,12 @@
                             </tr>
                             {% if row.question_type|lower  in ['ranking', 'matching', 'coding'] %}
                             <tr>
-                                    <td colspan="6" class="max-w-96">
-                                        <details class="bg-gray-100 px-4 py-2 rounded-2xl overflow-x-auto w-full">
-                                            <summary class="py-2">
-                                                Details
-                                            </summary>
-                                                {% if row.question_type|lower == 'ranking' %}
+                                <td colspan="6" class="max-w-96">
+                                    <details class="bg-gray-100 px-4 py-2 rounded-2xl overflow-x-auto w-full">
+                                        <summary class="py-2">
+                                            Details
+                                        </summary>
+                                            {% if row.question_type|lower == 'ranking' %}
                                                 <table class="inner-table">
                                                     <thead>
                                                     <tr>
@@ -120,63 +131,60 @@
                                                         </tbody>
                                                     {% endfor %}
                                                 </table>
-                                                {% elseif row.question_type|lower == 'matching' %}
-                                                    <table class="inner-table">
-                                                        <thead>
+                                            {% elseif row.question_type|lower == 'matching' %}
+                                                <table class="inner-table">
+                                                    <thead>
+                                                        <tr>
+                                                        <th>To match</th>
+                                                        <th>Your Answer</th>
+                                                        <th>Points</th>
+                                                        <th>Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    {% for matching_answer in row.question_type_answer %}
+                                                        <tbody>
                                                             <tr>
-                                                            <th>To match</th>
-                                                            <th>Your Answer</th>
-                                                            <th>Points</th>
-                                                            <th>Status</th>
+                                                                <td>{{ matching_answer.first_item_answer }}</td>
+                                                                <td>{{ matching_answer.second_item_answer }}</td>
+                                                                <td>{{ matching_answer.answer_points }}</td>
+                                                                <td>{{ matching_answer.answer_points > 0 ? '🟢' : '🟡' }}</td>
                                                             </tr>
-                                                        </thead>
-                                                        {% for matching_answer in row.question_type_answer %}
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>{{ matching_answer.first_item_answer }}</td>
-                                                                    <td>{{ matching_answer.second_item_answer }}</td>
-                                                                    <td>{{ matching_answer.answer_points }}</td>
-                                                                    <td>{{ matching_answer.answer_points > 0 ? '🟢' : '🟡' }}</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        {% endfor %}
-                                                    </table>
-                                                {% endif %}
-                                            {% if row.question_type|lower == 'coding' %}
-                                                <table class="inner-table m-0 ">
-                                                    {% if row.your_answer.status == 'pending' %}
-                                                        Your answer is currently being checked please wait...
-                                                    {% else %}
-                                                    <div 
-                                                        hx-get="{{ route('exam_records.coding_answer_result', { coding_answer:row.your_answer} ) }}"
-                                                        hx-trigger="load"
-                                                        hx-swap="outerHTML"
-                                                        hx-select="#validate-div">
-
-                                                    </div>
-                                                        <thead>
-                                                            <tr>
-                                                            <th>Language Used</th>
-                                                            <th>Syntax Points</th>
-                                                            <th>Runtime Points</th>
-                                                            <th>Test Case Points</th>
-                                                            </tr>
-                                                        </thead>
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>{{ row.question_type_answer.language|capitalize }}</td>
-                                                                    <td>{{ row.your_answer.answer_syntax_points }}</td>
-                                                                    <td>{{ row.your_answer.answer_runtime_points }}</td>
-                                                                    <td>{{ row.your_answer.answer_test_case_points }}</td>
-                                                                </tr>
-                                                            </tbody>
-                                                    {% endif %}
+                                                        </tbody>
+                                                    {% endfor %}
                                                 </table>
+                                            {% elseif row.question_type|lower == 'coding' %}
+                                                <table id="coding-{{ row.number }}-table">
+                                                    <thead>
+                                                        <tr>
+                                                        <th>Syntax Points</th>
+                                                        <th>Runtime Points</th>
+                                                        <th>Test Case Points</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Waiting for Result...</td>
+                                                            <td>Waiting for Result...</td>
+                                                            <td>Waiting for Result...</td>
+                                                        </tr>
+                                                    </tbody> 
+                                                </table>
+
+                                                <div 
+                                                    hx-get="{{ route('exam_records.coding_answer_result', { coding_answer:row.your_answer, number:row.number, question:row.question, max_score :row.max_score} ) }}"
+                                                    hx-trigger="load, every 10s"
+                                                    hx-swap="outerHTML"
+                                                    hx-target="this"
+                                                    hx-select="#coding-{{ row.number }}-div"
+                                                    hx-select-oob="#row-{{ row.number }}, #coding-{{ row.number }}-table">
+                                                    Currently Checking your Code...
+                                                </div>
+                                                
                                                 <pre class="bg-transparent border-2 overflow-x-auto"><span class="text-sm font-bold text-gray-900">{{ row.question_type_answer.language|capitalize }}</span><code class="language-{{ row.question_type_answer.language }}">{{ row.question_type_answer.code }}</code></pre>
                                             {% endif %}
-                                        </details>
-                                    </td>
-                                </tr>
+                                    </details>
+                                </td>
+                            </tr>
                             {% endif %}
                         {% endfor %}
                         </tr>
@@ -262,23 +270,16 @@
 
 
         <div class="flex flex-col max-h-fit min-w-fit gap-y-2">
-            <div class="flex flex-col justify-between gap-y-4 rounded-xl bg-gray-10 p-4 shadow-sm ring-1 ring-gray-950/5">
+            <div class="flex flex-col justify-between gap-y-4 rounded-xl bg-gray-10 p-4 shadow-sm ring-1 ring-gray-950/5"
+                {% if exam_record.status == 'in_progress' %}
+                id="exam_record_info"
+                {% endif %}
+            >
                 {{ show_item('Attempt #', exam_record.attempt)}}
                 {{ show_item('Score', exam_record.total_score ~ '/' ~ exam.max_score )}}
                 {{ show_item('Time Taken', exam_record.time_taken ~ ' minutes')}}
                 {{ show_item('Date Taken', exam_record.date_taken|date("m/d/Y"))}}
                 {{ show_item('Status', exam_record.status) }}
-            </div> 
-            <div class="flex flex-col prose rounded-xl bg-gray-10 p-4 shadow-sm ring-1 ring-gray-950/5">
-                <h4>Exam Structure</h4>
-                    <ul>
-                        <li>Multiple Choice :  20/25</li>
-                        <li>True or False : 10/10</li>
-                        <li>Identification : 5/10</li>
-                        <li>Ranking : 10/15</li>
-                        <li>Matching : 12/15</li>
-                        <li>Coding : 25/30</li>
-                    </ul>
             </div> 
             <div class="flex flex-col gap-y-2 w-full">
                 <a href="#" class="flex p-2 max-h-fit w-full bg-orange-900 rounded-lg font-medium text-white hover:bg-orange-700 hover:text-gray-50 cursor-pointer justify-center">
@@ -300,4 +301,13 @@
     </div>
 
 </div>
+
+<script>
+  document.body.addEventListener('htmx:beforeSwap', function(event) {
+    if (event.detail.xhr.status === 212) {
+      event.preventDefault();
+      console.log('Swap prevented due to 212 No Content response.');
+    }
+  });
+</script>
 {% endblock %}

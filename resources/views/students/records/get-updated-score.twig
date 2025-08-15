@@ -1,0 +1,30 @@
+{% from 'components/core/show-item' import show_item %}
+
+<div id="subjects" class="bg-gray-100 px-4 rounded-2xl text-gray-800 "\>            
+    <table>
+        <thead>
+        <tr>
+            <th>Subject</th>
+            <th>Max Score</th>
+            <th>Score Obtained</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for subject in exam_record.subjects %}
+            <tr>
+                <td>{{ subject.subject_name }}</td>
+                <td>{{ subject.score }}</td>
+                <td>{{ subject.score_obtained }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="exam_record_info" class="flex flex-col justify-between gap-y-4 rounded-xl bg-gray-10 p-4 shadow-sm ring-1 ring-gray-950/5">
+    {{ show_item('Attempt #', exam_record.attempt)}}
+    {{ show_item('Score', exam_record.total_score ~ '/' ~ exam_record.max_score )}}
+    {{ show_item('Time Taken', exam_record.time_taken ~ ' minutes')}}
+    {{ show_item('Date Taken', exam_record.date_taken|date("m/d/Y"))}}
+    {{ show_item('Status', exam_record.status) }}
+</div> 
