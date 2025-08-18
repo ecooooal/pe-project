@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Exam;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\Request;
@@ -25,5 +26,16 @@ class LandingPageController extends Controller
 
 
         return view('faculty-home', $data);
+    }
+
+    public function examReportShow(){
+        $exam = Exam::count();
+
+        return view('components/graphs/homepage-exam', ['exam' =>$exam]);
+    }
+    public function courseReportShow(){
+        $exam = Exam::count();
+
+        return view('components/graphs/homepage-course', ['exam' =>$exam]);
     }
 }

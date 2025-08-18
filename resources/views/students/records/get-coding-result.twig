@@ -21,8 +21,8 @@
                     </svg>
                 {% endif %}
                     <div class="max-w-16 text-wrap">
-                        <p class="font-bold text-sm">
-                            {{ data.failures ? 'Compilation Error' : data.success == false ? 'Runtime/Test Case Error' : 'All Tests Passed' }}
+                        <p class="font-bold text-sm text-balance">
+                            {{ data.failures ? 'Code had Compilation Error' : data.success == false ? 'Code had Runtime/Test Case Error' : 'All Tests Passed' }}
                         </p>                    
                     </div>
             </div>

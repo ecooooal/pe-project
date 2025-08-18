@@ -1,0 +1,118 @@
+    <div id="homepage-course-report" 
+         class="flex flex-col max-w-full mx-4 p-4 gap-4">
+         <div class="flex justify-between">
+            <div class="flex flex-col gap-y-5">
+                <div class="flex p-4 bg-white rounded-2xl shadow-lg justify-center">
+                    <span class="text-8xl font-bold text-gray-900">
+                        Exams
+                    </span>
+                </div>
+                <div class="flex gap-x-4">
+                    <div class="flex flex-col h-fit w-32 p-2 gap-y-2 bg-white rounded-2xl shadow-lg">
+                    <span class="text-5xl font-bold text-blue-900 self-center">
+                        {{ exam }}
+                    </span>
+                    <span class="text-xs text-blue-400 font-mono font-semibold self-end mt-auto">Count</span>
+                    </div>
+                    <div class="flex flex-col h-fit w-32 p-2 gap-y-2 bg-white rounded-2xl shadow-lg">
+                        <span class="text-5xl font-bold text-green-900 self-center">
+                            {{ exam }}
+                        </span>
+                        <span class="text-xs text-green-400 font-mono font-semibold self-end mt-auto">Published</span>
+                    </div>
+                    <div class="flex flex-col h-fit w-32 p-2 gap-y-2 bg-white rounded-2xl shadow-lg">
+                        <span class="text-5xl font-bold text-orange-900 self-center">
+                            {{ exam }}
+                        </span>
+                        <span class="text-xs text-orange-400 font-mono font-semibold self-end mt-auto">Unpublished</span>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+         
+
+        <div class="w-full p-4 bg-white rounded-2xl  shadow-lg">
+            <div id="course-graph" class="w-full"></div>
+        </div>
+
+
+    </div>
+
+<script>
+    let count = 3;
+    const question_values = [];
+    const courses_values = [];
+    const values = [];
+
+    for (let i = 0; i < count; i++) {
+        values.push(1 + Math.random() * 20);
+        question_values.push(1 + Math.random() * 20);
+        courses_values.push(1 + Math.random() * 20);
+
+    }   
+    let questions = {
+        name:'Exams by Questions',
+        x: ['Exam A', 'Exam B', 'Exam C'],
+        y: question_values,
+        hovertemplate:  '<b>No. of Questions</b>: %{y}' +
+                        '<br><b>Exam</b> : %{x}<br><extra></extra>',
+        type: 'bar',
+        orientation: 'v',
+        opacity:0.7
+    };
+    let courses = {
+        name:'Exams by Courses',
+        x: ['Course A', 'Course B', 'Course C'],
+        y: courses_values,
+        hovertemplate:  '<b>No. of Exams</b>: %{y}' +
+                        '<br><b>Course</b> : %{x}<br><extra></extra>',
+        type: 'bar',
+        orientation: 'v',
+        opacity:0.7
+    };
+    var data = [questions,courses];
+    
+    var layout = {
+        showlegend: true, 
+        title: {
+            text: "Exam Composition Report",
+            font: {
+                size: 32,
+                color: '#101828'
+            }
+        },            
+        height: 400,
+        autosize: true,
+        margin: { l: 40, r:10, t: 60, b: 40 },
+        bargap: 0.15,
+        barcornerradius: 6,
+         xaxis: {
+            tickfont: {
+                size: 14,
+                color: 'rgb(107, 107, 107)'
+            }},
+        yaxis: {
+            tickfont: {
+                size: 14,
+                color: 'rgb(107, 107, 107)'
+                }
+        },
+        legend: {
+            x: 1.0,
+            y: 1.0,
+            xanchor: 'right',
+            bgcolor: 'rgba(255, 255, 255, 0)',
+            bordercolor: 'rgba(255, 255, 255, 0)'
+        },
+    };
+
+    Plotly.newPlot('course-graph', data, layout, { responsive: true })
+        .then(() => {
+            Plotly.Plots.resize('course-graph');  // ✅ force remeasure
+        });
+
+    window.addEventListener("resize", () => {
+    Plotly.Plots.resize("course-graph");   // ✅ keep it fluid on window resize
+    });
+</script>

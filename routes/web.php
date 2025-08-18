@@ -111,7 +111,7 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
 
 
 Route::prefix('')->middleware(['can:view faculty'])->group(function () { 
-    Route::get('/faculty', [LandingPageController::class, 'facultyShow']);
+    Route::get('/faculty', [LandingPageController::class, 'facultyShow'])->name('faculty.index');
 
     Route::group(['middleware' => ['can:view access control']], function () { 
         Route::get('/admins', [AccessControlController::class, 'redirect']);
@@ -239,6 +239,11 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
 
     Route::get('/reports', function(){
         return view('reports');
+    });
+
+    Route::middleware('htmx.request:faculty.index')->group(function () {
+        Route::get('/homepage/report/exam', [LandingPageController::class, 'examReportShow'])->name('graphs.homepage.exam');
+        Route::get('/homepage/report/course', [LandingPageController::class, 'courseReportShow'])->name('graphs.homepage.course');
     });
 
     Route::get('/notifications', function(){
