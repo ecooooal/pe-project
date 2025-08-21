@@ -29,6 +29,12 @@ class LandingPageController extends Controller
         return view('faculty-home', $data);
     }
 
+    public function systemReportShow(){
+        $exam = Exam::count();
+
+        return view('components/graphs/homepage-system', ['exam' =>$exam]);
+    }
+
     public function examReportShow(){
         $exam = Exam::count();
 
