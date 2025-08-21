@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use App\Models\Exam;
 use App\Models\User;
 use App\Services\UserService;
@@ -34,8 +35,13 @@ class LandingPageController extends Controller
         return view('components/graphs/homepage-exam', ['exam' =>$exam]);
     }
     public function courseReportShow(){
+        $user = auth()->user();
+        $user_courses = Course::find($user->getCourseIds());
+        $courses_abbv = $user_courses->mapWithKeys(function ($course) {
+            return [$course->id => $course->abbreviation];
+        });
         $exam = Exam::count();
 
-        return view('components/graphs/homepage-course', ['exam' =>$exam]);
+        return view('components/graphs/homepage-course', ['exam' =>$exam, 'courses' => $courses_abbv]);
     }
 }
