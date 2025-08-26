@@ -1,5 +1,9 @@
 <div id="homepage-exam-report" 
         class="flex max-w-full mx-4 p-4 gap-2 bg-white rounded-2xl shadow-md">
+        <div id="question_exams_data" data-questions="{{ question_exams }}" class="hidden"></div>
+        <div id="exam_courses_data" data-exams="{{ exam_courses }}" class="hidden"></div>
+        <div id="examination_date_data" data-examinations="{{ examination_dates }}" class="hidden"></div>
+        
         <div class="flex justify-between">
             <div class="flex flex-col gap-y-2">
                 <div class="flex justify-start">
@@ -12,21 +16,21 @@
                 <div class="flex  gap-x-1">
                     <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
                     <span class="text-2xl font-bold text-gray-900 self-center">
-                        {{ exam }}
+                        {{ count }}
                     </span>
                     <span class="text-xs text-gray-400 font-mono font-semibold self-center mt-auto">Count</span>
                     </div>
                     <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
                         <span class="text-2xl font-bold text-green-900 self-center">
-                            {{ exam }}
+                            {{ published_count }}
                         </span>
-                        <span class="text-xs text-green-400 font-mono font-semibold self-center mt-auto">Published</span>
+                        <span class="text-xs text-blue-900/70 font-mono font-semibold self-center mt-auto">Published</span>
                     </div>
                     <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
                         <span class="text-2xl font-bold text-orange-900 self-center">
-                            {{ exam }}
+                            {{ unpublished_count }}
                         </span>
-                        <span class="text-xs text-orange-400 font-mono font-semibold self-center mt-auto">Unpublished</span>
+                        <span class="text-xs text-orange-700/70 font-mono font-semibold self-center mt-auto">Unpublished</span>
                     </div>
                 </div>
 
@@ -52,38 +56,53 @@
     if (exam_graph){
         // Instantiate necessary variables.
         // exam by question values and exam by courses values
-        // Dummy data
-        const exam_question_values = [0];
-        const exam_courses_values = [];
-        const exam_question_labels = [""];
-        const exam_courses_labels = [];
+        
+        const question_exams_raw_data = document.getElementById('question_exams_data');
+        const exam_courses_raw_data = document.getElementById('exam_courses_data');
 
-        for (let i = 0; i < 40; i++) {
-            exam_question_values.push(Math.round(1 + Math.random() * 49));
-            exam_question_labels.push('Exam ' + i);
-        }   
-        for (let i = 0; i < 10; i++) {
-            exam_courses_values.push(Math.round(1 + Math.random() * 10));
-            exam_courses_labels.push('Course ' + i);
-        }   
+        const questions = JSON.parse(question_exams_raw_data.dataset.questions);
+        const exams = JSON.parse(exam_courses_raw_data.dataset.exams);
 
-        let exam_courses_data = exam_courses_labels.map((label, i) => ({ label: label, value: exam_courses_values[i] }));
+        const exam_question_values = questions.map(q => q['question_count']);
+        const exam_question_labels = questions.map(q => q.id);
+        const exam_question_text = questions.map(q =>
+            `<b>Name</b>: ${q["name"]}<br>` +
+            `<b>Published?</b>: ${q["is_published"]}<br>` +
+            `<b>Exam Date</b>: ${q["examination_date"]}<br>`
+        );
+        const exam_question_colors = questions.map(d => d.is_published ? 'rgb(49,130,189)' : 'rgb(195,140,60)');
+
+        const exam_courses_values =  exams.map(e => e['exam_count']);
+        const exam_courses_labels =  exams.map(e => e.id);
+        const exam_courses_text = exams.map(q =>
+            `<b>Name</b>: ${q["name"]}<br>` +
+            `<b>Abbreviation</b>: ${q["abbreviation"]}<br>`
+        );
+
         let exam_questions_data = exam_question_labels.map((label, i) => ({ label: label, value: exam_question_values[i] }));
-        exam_courses_data.sort((a, b) => a.value - b.value);
         exam_questions_data.sort((a, b) => a.value - b.value);
 
-        
+        let exam_courses_data = exam_courses_labels.map((label, i) => ({ label: label, value: exam_courses_values[i] }));
+        exam_courses_data.sort((a, b) => a.value - b.value);
+
         // Build traces for the two graphs
         let exam_questions = {
             name:'Exams by Questions',
             x: exam_questions_data.map(d => d.label),
             y: exam_questions_data.map(d => d.value),
+            text: exam_question_text,
+            textposition: 'none', 
+            hoverinfo: 'text',
             hovertemplate:  '<b>No. of Questions</b>: %{y}' +
-                            '<br><b>Exam</b> : %{x}<br><extra></extra>',
+                            '<br>%{text}<br><extra></extra>',
+                            
+            hoverlabel: {
+                font: { color: 'white' }      // hover text color
+            },
             width:0.8,
             type: 'bar',
             marker: {
-                color: 'rgb(49,130,189)',
+                color: exam_question_colors,
                 opacity:0.7
             }
         };
@@ -91,8 +110,11 @@
             name:'Exams by Courses',
             x: exam_courses_data.map(d => d.label),
             y: exam_courses_data.map(d => d.value),
-            hovertemplate:  '<b>No. of Exams</b>: %{y}' +
-                            '<br><b>Course</b> : %{x}<br><extra></extra>',
+            text: exam_courses_text,
+            textposition: 'none', 
+            hoverinfo: 'text',
+            hovertemplate:  '<b>No. of exams</b>: %{y}' +
+                            '<br>%{text}<br><extra></extra>',
             width: 0.7,
             xaxis: 'x2',
             yaxis: 'y2',
@@ -197,51 +219,62 @@
         });
 
     }
+    
+    const examination_dates_raw_data = document.getElementById('examination_date_data');
+    const dates_json = JSON.parse(examination_dates_raw_data.dataset.examinations); // ← this is an object
 
+    const exams = Object.entries(dates_json).map(([date, data]) => ({
+        date,
+        count: data.count,
+        names: data.names
+    }));
 
-    let exams = [
-    { date: "2025-01-06", count: 2 },
-    { date: "2025-01-10", count: 1 },
-    { date: "2025-01-12", count: 5 }
-  ];
-
-  let year = 2025, month = 0; // January
-  let firstDay = new Date(year, month, 1).getDay(); // 0=Sun, ... 6=Sat
-  let daysInMonth = new Date(year, month + 1, 0).getDate();
+    console.log(exams);
+    let year = 2025, month = 0; // January
+    let firstDay = new Date(year, month, 1).getDay(); // 0=Sun, ... 6=Sat
+    let daysInMonth = new Date(year, month + 1, 0).getDate();
 
   // Map exams to dates
-  let examMap = Object.fromEntries(exams.map(e => [e.date, e.count]));
+    let examMap = Object.fromEntries(
+    exams.map(e => [e.date, { count: e.count, names: e.names }])
+    );
+    console.log(examMap);
 
-  let calendar = document.getElementById("calendar");
+    let calendar = document.getElementById("calendar");
 
-  // Utility for heatmap colors
-  function bgClass(count) {
+    // Utility for heatmap colors
+    function bgClass(count) {
     if (count === 0) return "bg-gray-50";
     if (count === 1) return "bg-blue-300 text-white";
     if (count === 2) return "bg-blue-500 text-white";
     return "bg-blue-900 text-white"; // 3 or more
-  }
+    }
 
-  // Empty cells before the first day
-  for (let i = 0; i < firstDay; i++) {
-    let empty_cell = document.createElement("empty_cell");
-    empty_cell.className = "aspect-square";
-    calendar.appendChild(empty_cell);
-  }
+    // Empty cells before the first day
+    for (let i = 0; i < firstDay; i++) {
+        let empty_cell = document.createElement("div");
+        empty_cell.className = "aspect-square";
+        calendar.appendChild(empty_cell);
+    }
 
-  // Calendar days
-  for (let day = 1; day <= daysInMonth; day++) {
-    let date = new Date(year, month, day).toISOString().slice(0, 10);
-    let count = examMap[date] ?? 0;
+    // Calendar days
+    for (let day = 1; day <= daysInMonth; day++) {
+        let date = new Date(year, month, day).toISOString().slice(0, 10);
+        let exam_date = examMap[date] ?? {count:0, names:[]};
+        let count = exam_date.count;
+        let names = exam_date.names;
+        console.log(exam_date, count, names)
 
-    let caledar_day_cell = document.createElement("caledar_day_cell");
-    caledar_day_cell.className = `aspect-square flex flex-col items-center justify-center rounded ${bgClass(count)} cursor-pointer hover:ring-2 hover:ring-blue-500 transition`;
-    caledar_day_cell.title = `${day} Jan: ${count} exam(s)`;
+        let calendar_day_cell = document.createElement("div");
+        calendar_day_cell.className = `aspect-square flex flex-col items-center justify-center rounded ${bgClass(count)} cursor-pointer hover:ring-2 hover:ring-blue-500 transition`;
+        calendar_day_cell.title = count != 0 
+        ? `Jan: ${day} \nNo. of exams: ${count} \nNames:\n- ${names.join('\n- ')}` 
+        : 'No exam this day.';
 
-    caledar_day_cell.innerHTML = `
-      <span class="text-sm font-medium">${day}</span>
-    `;
+        calendar_day_cell.innerHTML = `
+        <span class="text-sm font-medium">${day}</span>
+        `;
 
-    calendar.appendChild(caledar_day_cell);
-  }
+        calendar.appendChild(calendar_day_cell);
+    }
 </script>
