@@ -20,169 +20,141 @@
                     'class':'w-24 cursor-pointer block rounded-md bg-white px-3 py-1 text-base font-bold text-blue-900 focus:outline-none placeholder:text-gray-400',
                     'placeholder':'Select a Course',
                     'required':true,
+                    'hx-get' : route('graphs.homepage.specific.course'),
+                    'hx-target': '#course-counts',
+                    'hx-swap':'outerHTML',
+                    'hx-trigger':'load, change'
                 }
             ),
         )}}
     </div>   
-    <div class="flex flex-1 justify-between">
+    <div id="specific-course-data" class="flex flex-1 justify-between">
         <div class="flex flex-col gap-y-2">
-            <div class="flex  gap-x-1">
-                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                <span class="text-2xl font-bold text-gray-900 self-center">
-                    80
-                </span>
-                <span class="text-xs text-gray-400 font-mono font-semibold self-center mt-auto">Question Count</span>
-                </div>
-                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                    <span class="text-2xl font-bold text-green-900 self-center">
-                        15
-                    </span>
-                    <span class="text-xs text-green-400 font-mono font-semibold self-center mt-auto">Subject Count</span>
-                </div>
-                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                    <span class="text-2xl font-bold text-orange-900 self-center">
-                        40
-                    </span>
-                    <span class="text-xs text-orange-400 font-mono font-semibold self-center mt-auto">Topic Count</span>
-                </div>
+            <div id="course-counts">
             </div>
-            <div class="flex  gap-x-1">
-                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                <span class="text-2xl font-bold text-gray-900 self-center">
-                    5
-                </span>
-                <span class="text-xs text-gray-400 font-mono font-semibold self-center mt-auto">Exam Count</span>
-                </div>
-                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                    <span class="text-2xl font-bold text-green-900 self-center">
-                        15
-                    </span>
-                    <span class="text-xs text-green-400 font-mono font-semibold self-center mt-auto">Unused Questions</span>
-                </div>
-                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                    <span class="text-2xl font-bold text-orange-900 self-center">
-                        22
-                    </span>
-                    <span class="text-xs text-orange-400 font-mono font-semibold self-center mt-auto">Reused Questions</span>
-                </div>
-            </div>
+
             <div class="h-full w-full">
-                <div id="questions-per-subject-graph" class="w-full"></div>
+                <div id="questions-type-graph" class="w-full"></div>
             </div>
         </div>
-  
+
         
         <div class="flex flex-1 flex-col w-full ">
             <div class="w-full pl-4">
                 <div id="course-graph" class="w-full"></div>
             </div>
         </div>
+
     </div>
 </div>
 <script>
-        // Check if exam-graph id is present
-    let course_graph = document.getElementById('course-graph');
-    if (course_graph){
+function renderCourseGraph() {
+    const course_graph = document.getElementById('course-graph');
+    console.log(course_graph);
+    if (!course_graph) return;
 
-        // Instantiate necessary variables.
-        // exam by question values and exam by courses values
-        // Dummy data
-        const subject_questions_values = [];
-        const subject_questions_labels = [];
-        const topic_questions_values = [];
-        const topic_questions_labels = [];
-        const question_exams_values = [];
-        const question_exams_labels = [];
-        const questionTypes = ['MCQ', 'Identification', 'True/False', 'Ranking', 'Matching', 'Coding'];
-        let question_types_data = questionTypes.map(type => ({
-            type,
-            count: Math.floor(Math.random() * 81) + 20  // Random between 20 and 100
-        }));
-        console.log(question_types_data.map(d => d.count));
-        for (let i = 0; i < 10; i++) {
-            subject_questions_values.push(Math.round(1 + Math.random() * 49));
-            subject_questions_labels.push('Subject ' + i);
-        }   
-        for (let i = 0; i < 20; i++) {
-            topic_questions_values.push(Math.round(1 + Math.random() * 10));
-            topic_questions_labels.push('Topic ' + i);
-            question_exams_values.push(Math.round(1 + Math.random() * 10));
-            question_exams_labels.push('Question ' + i);
-        }   
+    const subject_raw_data = document.getElementById('subject_graph_data');
+    const topic_raw_data = document.getElementById('topic_graph_data');
+    const question_type_raw_data = document.getElementById('question_type_graph_data');
+    const reused_question_raw_data = document.getElementById('reused_question_graph_data');
 
-        let topic_questions_data = topic_questions_labels.map((label, i) => ({ label: label, value: topic_questions_values[i] }));
-        let subject_questions_data = subject_questions_labels.map((label, i) => ({ label: label, value: subject_questions_values[i] }));
-        let question_exams_data = question_exams_labels.map((label, i) => ({ label: label, value: question_exams_values[i] }));
+    const subjects = JSON.parse(subject_raw_data.dataset.questions || '[]');
+    const topics = JSON.parse(topic_raw_data.dataset.questions || '[]');
+    const types = JSON.parse(question_type_raw_data.dataset.questions || '[]');
+    const reused = JSON.parse(reused_question_raw_data.dataset.questions || '[]');
 
-        topic_questions_data.sort((a, b) => a.value - b.value);
-        subject_questions_data.sort((a, b) => a.value - b.value);
-        question_exams_data.sort((a, b) => a.value - b.value);
+    const subject_graph_text = subjects.map(q =>
+        `<b>Name</b>: ${q["name"]}<br>`
+    );
 
-        
-        // Build traces for the two graphs
-        let subject_questions = {
-            name:'Questions by Subject',
-            x: subject_questions_data.map(d => d.label),
-            y: subject_questions_data.map(d => d.value),
-            hovertemplate:  '<b>No. of Questions</b>: %{y}' +
-                            '<br><b>Subject</b> : %{x}<br><extra></extra>',
-            width: 0.8,
-            type: 'bar',
-            marker: {
-                color: 'rgb(49,130,189)',
-                opacity:0.7
-            }
-        };
-        let topic_questions = {
-            name:'Questions by topic',
-            x: topic_questions_data.map(d => d.label),
-            y: topic_questions_data.map(d => d.value),
-            hovertemplate:  '<b>No. of Questions</b>: %{y}' +
-                            '<br><b>Topic</b> : %{x}<br><extra></extra>',
-            width: 0.7,
-            xaxis: 'x2',
-            yaxis: 'y2',
-            type: 'bar',
-            marker: {
-                color: 'rgb(49,130,189)',
-                opacity:0.7
-            }
-        };
-        let question_exams = {
-            name:'Questions in exams',
-            x: question_exams_data.map(d => d.label),
-            y: question_exams_data.map(d => d.value),
-            hovertemplate:  '<b>No. of exams</b>: %{y}' +
-                            '<br><b>Question</b> : %{x}<br><extra></extra>',
-            width: 0.7,
-            xaxis: 'x3',
-            yaxis: 'y3',
-            type: 'bar',
-            marker: {
-                color: 'rgb(49,130,189)',
-                opacity:0.7
-            }
-        };
-        let question_types = {
-            name:'Questions Types',
-            x: question_types_data.map(d => d.type),
-            y: question_types_data.map(d => d.count),
-            hovertemplate:  '<b>No. of questions</b>: %{y}' +
-                            '<br><b>Question Type</b> : %{x}<br><extra></extra>',
-            width: 0.7,
-            type: 'bar',
-            text:question_types_data.map(d => d.count),
-            textposition: 'auto', 
-            marker: {
-                color: 'rgb(49,130,189)',
-                opacity:0.7
-            }
-        };
-        // Insert traces and build layout for graph
-        var subject_and_topic_data = [subject_questions,topic_questions,question_exams];
-        var question_type_data = [question_types];
+    const topic_graph_text = topics.map(q =>
+        `<b>Name</b>: ${q["name"]}<br>`
+    );
 
-        var course_graph_layout = {
+    const reused_graph_text = reused.map(q =>
+        `<b>Id</b>: ${q["id"]}<br>` +
+        `<b>Name</b>: ${q["name"]}<br>` +
+        `<b>Type</b>: ${q["question_type"]}<br>`
+    );
+    
+    // Plotly traces
+    let subject_graph = {
+        name:'Questions by Subject',
+        x: subjects.map(s => s.name),
+        y: subjects.map(s => s.question_count),
+        text: subject_graph_text,
+        textposition: 'none', 
+        hoverinfo: 'text',
+        hovertemplate:  '<b>No. of Questions</b>: %{y}' +
+                        '<br>%{text}<br><extra></extra>',   
+        hoverlabel: {
+            font: { color: 'white' }      // hover text color
+        },
+        width: 0.8,
+        type: 'bar',
+        marker: {
+            color: 'rgb(49,130,189)',
+            opacity:0.7
+        }
+    };
+
+    let topic_graph = {
+        name:'Questions by topic',
+        x: topics.map(d => d.name),
+        y: topics.map(d => d.question_count),
+        text: topic_graph_text,
+        textposition: 'none', 
+        hoverinfo: 'text',
+        hovertemplate:  '<b>No. of Questions</b>: %{y}' +
+                        '<br>%{text}<br><extra></extra>',   
+        hoverlabel: {
+            font: { color: 'white' }      // hover text color
+        },
+        width: 0.7,
+        xaxis: 'x2',
+        yaxis: 'y2',
+        type: 'bar',
+        marker: {
+            color: 'rgb(49,130,189)',
+            opacity:0.7
+        }
+    };
+
+    const question_exams = {
+        name:'Questions in Exams',
+        x: reused.map(d => d.name),
+        y: reused.map(d => d.reused_count),
+        xaxis: 'x3',
+        yaxis: 'y3',
+        type: 'bar',
+        text: reused_graph_text,
+        textposition: 'none', 
+        hoverinfo: 'text',
+        hovertemplate:  '<b>Reused Count</b>: %{y}' +
+                        '<br>%{text}<br><extra></extra>',   
+        hoverlabel: {
+            font: { color: 'white' }      // hover text color
+        },
+        width: 0.7,
+        marker: { color: 'rgb(49,130,189)', opacity: 0.7 }
+    };
+
+    const question_types = {
+        name: 'Question Types',
+        x: types.map(d => d.name),
+        y: types.map(d => d.question_count),
+        type: 'bar',
+        text: types.map(d => d.question_count),
+        textposition: 'auto',
+        hovertemplate:  '<b>No. of Questions</b>: %{y}<br>' +
+                        '<b>Type</b>: %{x}<br><extra></extra>',
+        marker: { color: 'rgb(49,130,189)', opacity: 0.7 }
+    };
+
+    const subject_and_topic_data = [subject_graph, topic_graph, question_exams];
+    const question_type_data = [question_types];
+
+    var course_graph_layout = {
             grid: {    
                 rows: 2,
                 columns: 2,
@@ -261,7 +233,7 @@
             xaxis3: { 
                 domain: [0.0, 1.0],
                 title: {
-                    text: 'Questions',
+                    text: 'Reused Questions',
                     font: {
                         size: 12,
                         color: '#7f7f7f'
@@ -292,48 +264,55 @@
         
         };
 
-        var questions_per_subject_graph_layout = {
-            showlegend: false, 
-            title: {
-                text: "Questions per Type",
-                font: {
-                    size: 16,
-                    color: "#4B5563", 
-                    family: "Arial Black, sans-serif" 
-                },
-                x: 0.5,           // center horizontally
-                xanchor: 'center', 
-                y: 0.95,          // slightly down from top
-                yanchor: 'top'
-            },            
-            height: 225,
-            autosize: true,
-            margin: { l: 35, r:10, t: 30, b: 80 },
-            
-            xaxis: {     
-                tickangle: -45,    
-                tickfont: {
-                    size: 14,
-                    color: 'rgb(107, 107, 107)'
-                },
-                showticklabels: true,
+    var questions_per_subject_graph_layout = {
+        showlegend: false, 
+        title: {
+            text: "Questions per Type",
+            font: {
+                size: 16,
+                color: "#4B5563", 
+                family: "Arial Black, sans-serif" 
             },
-            yaxis: {      
-                tickfont: {
-                    size: 14,
-                    color: 'rgb(107, 107, 107)'
-                    }
+            x: 0.5,           // center horizontally
+            xanchor: 'center', 
+            y: 0.95,          // slightly down from top
+            yanchor: 'top'
+        },            
+        height: 225,
+        autosize: true,
+        margin: { l: 35, r:10, t: 30, b: 80 },
+        
+        xaxis: {     
+            tickangle: -45,    
+            tickfont: {
+                size: 12,
+                color: 'rgb(107, 107, 107)'
             },
-        };
+            showticklabels: true,
+        },
+        yaxis: {      
+            tickfont: {
+                size: 14,
+                color: 'rgb(107, 107, 107)'
+                }
+        },
+    };
 
-        // Render the graph and then resize it 
-        Plotly.newPlot('course-graph', subject_and_topic_data, course_graph_layout, { responsive: true })
-            .then(() => {
-                Plotly.Plots.resize('course-graph');  
-            });
-        Plotly.newPlot('questions-per-subject-graph', question_type_data, questions_per_subject_graph_layout, { responsive: true })
-            .then(() => {
-                Plotly.Plots.resize('questions-per-subject-graph');  
-            });
+    // Render both graphs
+    Plotly.react('course-graph', subject_and_topic_data, course_graph_layout, { responsive: true })
+        .then(() => {
+            Plotly.Plots.resize('course-graph');  
+        });
+    Plotly.react('questions-type-graph', question_type_data, questions_per_subject_graph_layout, { responsive: true })
+        .then(() => {
+            Plotly.Plots.resize('questions-type-graph');  
+        });
+}
+document.addEventListener('DOMContentLoaded', renderCourseGraph);
+
+document.body.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target.closest('#course-counts')) {
+        renderCourseGraph();
     }
+});
 </script>

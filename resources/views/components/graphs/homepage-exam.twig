@@ -94,8 +94,7 @@
             textposition: 'none', 
             hoverinfo: 'text',
             hovertemplate:  '<b>No. of Questions</b>: %{y}' +
-                            '<br>%{text}<br><extra></extra>',
-                            
+                            '<br>%{text}<br><extra></extra>',   
             hoverlabel: {
                 font: { color: 'white' }      // hover text color
             },
@@ -229,7 +228,6 @@
         names: data.names
     }));
 
-    console.log(exams);
     let year = 2025, month = 0; // January
     let firstDay = new Date(year, month, 1).getDay(); // 0=Sun, ... 6=Sat
     let daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -238,7 +236,6 @@
     let examMap = Object.fromEntries(
     exams.map(e => [e.date, { count: e.count, names: e.names }])
     );
-    console.log(examMap);
 
     let calendar = document.getElementById("calendar");
 
@@ -263,7 +260,6 @@
         let exam_date = examMap[date] ?? {count:0, names:[]};
         let count = exam_date.count;
         let names = exam_date.names;
-        console.log(exam_date, count, names)
 
         let calendar_day_cell = document.createElement("div");
         calendar_day_cell.className = `aspect-square flex flex-col items-center justify-center rounded ${bgClass(count)} cursor-pointer hover:ring-2 hover:ring-blue-500 transition`;

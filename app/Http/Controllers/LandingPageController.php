@@ -99,8 +99,70 @@ class LandingPageController extends Controller
         $courses_abbv = $user_courses->mapWithKeys(function ($course) {
             return [$course->id => $course->abbreviation];
         });
-        $exam = Exam::count();
 
-        return view('components/graphs/homepage-course', ['exam' =>$exam, 'courses' => $courses_abbv]);
+        return view('components/graphs/homepage-course', ['courses' => $courses_abbv]);
+    }
+
+    public function specificCourseReportShow(Request $request){
+        $course_id = $request->query('course');
+        $course_dashboard_data = Http::timeout(30)
+            ->get("http://fastapi:80/api/dashboard/load-course/{$course_id}")
+            ->json();
+
+        $subject_graph_data = collect($course_dashboard_data['subject_table'])->map(function ($row) {
+            return [
+                'id'   => $row[0],
+                'name' => $row[1],
+                'question_count' => $row[2]
+            ];
+        })->values()->toJson();
+
+        $topic_graph_data = collect($course_dashboard_data['topic_table'])->map(function ($row) {
+            return [
+                'id'   => $row[0],
+                'name' => $row[1],
+                'question_count' => $row[2]
+            ];
+        })->values()->toJson();
+
+        $relabel_type = [
+            'multiple_choice' => 'MCQ',
+            'true_or_false'   => 'T/F',
+            'identification'  => 'Identification',
+            'ranking'         => 'Ranking',
+            'matching'        => 'Matching',
+            'coding'          => 'Coding',
+        ];
+
+        $question_type_graph_data = collect($course_dashboard_data['question_type_table'])->map(function ($row) use ($relabel_type) {
+            return [
+                'name'  => $relabel_type[$row[0]] ?? ucfirst(str_replace('_', ' ', $row[2])),
+                'question_count' => $row[1],
+            ];
+        })->values()->toJson();
+
+        $reused_question_graph_data = collect($course_dashboard_data['reused_questions'])->map(function ($row) use ($relabel_type) {
+            return [
+                'id'             => $row[0],
+                'name'           => $row[1],
+                'question_type'  => $relabel_type[$row[2]] ?? ucfirst(str_replace('_', ' ', $row[2])),
+                'reused_count'   => $row[3],
+            ];
+        })->values()->toJson();
+
+        $course = [
+            'question_count' => $course_dashboard_data['question_count'],
+            'subject_count' => $course_dashboard_data['subject_count'],
+            'topic_count' => $course_dashboard_data['topic_count'],
+            'exam_count' => $course_dashboard_data['exam_count'],
+            'unused_question_count' => $course_dashboard_data['unused_question_count'],
+            'reused_question_count' => $course_dashboard_data['reused_question_count'],
+            'subject_graph_data' => $subject_graph_data,
+            'topic_graph_data' => $topic_graph_data,
+            'question_type_graph_data' => $question_type_graph_data,
+            'reused_question_graph_data' => $reused_question_graph_data
+        ];
+
+        return view('components/graphs/homepage-specific-course', $course);
     }
 }
