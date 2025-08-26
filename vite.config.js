@@ -19,7 +19,13 @@ export default defineConfig({
     },
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js','resources/js/text-editor.js','resources/js/edit-coding-text-editor.js', 'resources/js/answering-text-editor.js'],
+            input: [
+                'resources/css/app.css', 
+                'resources/js/app.js',
+                'resources/js/text-editor.js',
+                'resources/js/edit-coding-text-editor.js', 
+                'resources/js/answering-text-editor.js'
+            ],
             refresh: true,
         }),
         tailwindcss(),

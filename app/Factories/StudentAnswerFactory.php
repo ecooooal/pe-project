@@ -52,9 +52,7 @@ class StudentAnswerFactory
                 ]);
             });
             
-            var_dump("Answer was changed");
         } else {
-            var_dump("Answer was not changed");
         }
     }
 }
