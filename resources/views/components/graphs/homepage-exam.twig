@@ -62,34 +62,25 @@
 
         const questions = JSON.parse(question_exams_raw_data.dataset.questions);
         const exams = JSON.parse(exam_courses_raw_data.dataset.exams);
-
-        const exam_question_values = questions.map(q => q['question_count']);
-        const exam_question_labels = questions.map(q => q.id);
+        console.log(questions);
         const exam_question_text = questions.map(q =>
+            `<b>Id</b>: ${q["id"]}<br>` +
             `<b>Name</b>: ${q["name"]}<br>` +
             `<b>Published?</b>: ${q["is_published"]}<br>` +
             `<b>Exam Date</b>: ${q["examination_date"]}<br>`
         );
         const exam_question_colors = questions.map(d => d.is_published ? 'rgb(49,130,189)' : 'rgb(195,140,60)');
 
-        const exam_courses_values =  exams.map(e => e['exam_count']);
-        const exam_courses_labels =  exams.map(e => e.id);
         const exam_courses_text = exams.map(q =>
             `<b>Name</b>: ${q["name"]}<br>` +
             `<b>Abbreviation</b>: ${q["abbreviation"]}<br>`
         );
 
-        let exam_questions_data = exam_question_labels.map((label, i) => ({ label: label, value: exam_question_values[i] }));
-        exam_questions_data.sort((a, b) => a.value - b.value);
-
-        let exam_courses_data = exam_courses_labels.map((label, i) => ({ label: label, value: exam_courses_values[i] }));
-        exam_courses_data.sort((a, b) => a.value - b.value);
-
         // Build traces for the two graphs
         let exam_questions = {
             name:'Exams by Questions',
-            x: exam_questions_data.map(d => d.label),
-            y: exam_questions_data.map(d => d.value),
+            x: questions.map(q => q['name']),
+            y: questions.map(q => q['question_count']),
             text: exam_question_text,
             textposition: 'none', 
             hoverinfo: 'text',
@@ -107,8 +98,8 @@
         };
         let exam_courses = {
             name:'Exams by Courses',
-            x: exam_courses_data.map(d => d.label),
-            y: exam_courses_data.map(d => d.value),
+            x: exams.map(e => e['abbreviation']),
+            y: exams.map(e => e['exam_count']),
             text: exam_courses_text,
             textposition: 'none', 
             hoverinfo: 'text',
@@ -228,7 +219,7 @@
         names: data.names
     }));
 
-    let year = 2025, month = 0; // January
+    let year = 2025, month = 7; // January
     let firstDay = new Date(year, month, 1).getDay(); // 0=Sun, ... 6=Sat
     let daysInMonth = new Date(year, month + 1, 0).getDate();
 
@@ -236,7 +227,6 @@
     let examMap = Object.fromEntries(
     exams.map(e => [e.date, { count: e.count, names: e.names }])
     );
-
     let calendar = document.getElementById("calendar");
 
     // Utility for heatmap colors
@@ -256,7 +246,7 @@
 
     // Calendar days
     for (let day = 1; day <= daysInMonth; day++) {
-        let date = new Date(year, month, day).toISOString().slice(0, 10);
+        let date = formatDateLocal(new Date(year, month, day));
         let exam_date = examMap[date] ?? {count:0, names:[]};
         let count = exam_date.count;
         let names = exam_date.names;
@@ -272,5 +262,11 @@
         `;
 
         calendar.appendChild(calendar_day_cell);
+    }
+    function formatDateLocal(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
     }
 </script>

@@ -1,0 +1,30 @@
+<div id="timer" data-left="{{ ttl }}" class="hidden"></div>
+<p>Next refresh in: <span id="countdown"></span></p>
+
+<script>
+    const timerDiv = document.getElementById('timer');
+
+    let remainingSeconds = Number(timerDiv.getAttribute('data-left'));
+
+    function formatTime(seconds) {
+        const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const s = String(seconds % 60).padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    function updateCountdown() {
+        const display = document.getElementById('countdown'); // updated here
+        if (remainingSeconds > 0) {
+            display.textContent = formatTime(remainingSeconds);
+            remainingSeconds--;
+        } else {
+            display.textContent = "🔄 Refreshing soon...";
+        }
+    }
+
+    // Initial render
+    updateCountdown();
+
+    // Tick every second
+    setInterval(updateCountdown, 1000);
+</script>

@@ -246,6 +246,9 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
         Route::get('/homepage/report/course', [LandingPageController::class, 'courseReportShow'])->name('graphs.homepage.course');
         Route::get('/homepage/report/specific-course', [LandingPageController::class, 'specificCourseReportShow'])->name('graphs.homepage.specific.course');
         Route::get('/homepage/report/system', [LandingPageController::class, 'systemReportShow'])->name('graphs.homepage.system');
+        Route::get('/homepage/report/refresh', [LandingPageController::class, 'refreshDashboard'])->name('graphs.homepage.refresh');
+        Route::get('/homepage/report/timer', [LandingPageController::class, 'getTimer'])->name('graphs.homepage.timer');
+
     });
 
     Route::get('/notifications', function(){

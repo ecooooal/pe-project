@@ -9,6 +9,7 @@ use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Redis;
 
 class LandingPageController extends Controller
 {
@@ -20,12 +21,12 @@ class LandingPageController extends Controller
     }
 
     public function facultyShow(){
-        $course = $this->userService->getCoursesForUser(auth()->user());
-        $exam = $this->userService->getExamsForUser(auth()->user())->count();
-        $data = [
-            'course' => $course,
-            'exam' => $exam
-        ];
+        $ttl = Redis::ttl('dashboard:refresh_timer');
+        
+        // fallback if key doesn't exist
+        $ttl = max(0, $ttl);
+
+        $data = ['ttl' => $ttl];
 
 
         return view('faculty-home', $data);
@@ -71,7 +72,7 @@ class LandingPageController extends Controller
                 'examination_date' => $formatted_date,
                 'question_count' => $row[4]
             ];
-        })->values()->toJson();
+        })->toJson();
 
         $exam_courses = collect($exam_dashboard_data['exam_courses'])->map(function ($row) {
             return [
@@ -80,7 +81,8 @@ class LandingPageController extends Controller
                 'abbreviation' => $row[2],
                 'exam_count' => $row[3]
             ];
-        })->values()->toJson();
+        })->toJson();
+
         $exam = [
             'count' => $exam_dashboard_data['exam_count'],
             'published_count' => $exam_dashboard_data['published_count'],
@@ -115,7 +117,7 @@ class LandingPageController extends Controller
                 'name' => $row[1],
                 'question_count' => $row[2]
             ];
-        })->values()->toJson();
+        })->toJson();
 
         $topic_graph_data = collect($course_dashboard_data['topic_table'])->map(function ($row) {
             return [
@@ -123,7 +125,7 @@ class LandingPageController extends Controller
                 'name' => $row[1],
                 'question_count' => $row[2]
             ];
-        })->values()->toJson();
+        })->toJson();
 
         $relabel_type = [
             'multiple_choice' => 'MCQ',
@@ -139,7 +141,7 @@ class LandingPageController extends Controller
                 'name'  => $relabel_type[$row[0]] ?? ucfirst(str_replace('_', ' ', $row[2])),
                 'question_count' => $row[1],
             ];
-        })->values()->toJson();
+        })->toJson();
 
         $reused_question_graph_data = collect($course_dashboard_data['reused_questions'])->map(function ($row) use ($relabel_type) {
             return [
@@ -148,7 +150,7 @@ class LandingPageController extends Controller
                 'question_type'  => $relabel_type[$row[2]] ?? ucfirst(str_replace('_', ' ', $row[2])),
                 'reused_count'   => $row[3],
             ];
-        })->values()->toJson();
+        })->toJson();
 
         $course = [
             'question_count' => $course_dashboard_data['question_count'],
@@ -164,5 +166,20 @@ class LandingPageController extends Controller
         ];
 
         return view('components/graphs/homepage-specific-course', $course);
+    }
+
+    public function refreshDashboard(){
+        Http::timeout(30)->get("http://fastapi:80/api/dashboard/refresh");
+
+        return response('', 200)->header('HX-Refresh', 'true');
+    }
+
+    public function getTimer(){
+        $ttl = Redis::ttl('dashboard:refresh_timer');
+
+        // fallback if key doesn't exist
+        $ttl = max(0, $ttl);
+
+        return view('components/graphs/homepage-dashboard-timer', compact('ttl'));
     }
 }
