@@ -228,6 +228,19 @@ class ExamController extends Controller
         return view('components/core/partials-exam-access-code', ['access_code' => $access_code, 'generate' => false]);
     }
 
+    public function destroyAccessCode(Exam $exam, Request $request)
+    {
+        $access_code = $request->input('code'); 
+        $deleted = $exam->accessCodes()
+                ->where('access_code', $access_code)
+                ->delete();
+        if (!$deleted) {
+            return back()->withErrors(['access_code' => 'Code not found']);
+        }
+        
+        return response()->noContent();
+    }
+
     public function publishExam(Exam $exam){
         $is_published = $this->examService->attemptToPublish($exam);
         if (!$is_published){

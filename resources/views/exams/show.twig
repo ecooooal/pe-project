@@ -53,7 +53,7 @@
                             <span class="font-medium">Access Codes :</span>
                             <input  type="button" 
                                     class="hover:font-medium underline cursor-pointer"
-                                    popovertarget="create-course-popover" 
+                                    popovertarget="access-code-popover" 
                                     value="View Access Codes">
                         </div>
                         {{ show_item('Author', exam.createdBy.getFullName()) }}
@@ -90,12 +90,12 @@
         </div>
     </div>
 
-    <!-- <div popover="manual"
-        class="backdrop:bg-gray-900/15  m-auto ease-in-out transition-opacity rounded-xl w-96" 
-        id="create-course-popover"
+    <div popover="manual"
+        class="backdrop:bg-gray-900/15  htmx-animate m-auto rounded-xl w-96" 
+        id="access-code-popover"
         >
             <button type="button"
-                    popovertarget="create-course-popover" 
+                    popovertarget="access-code-popover" 
                     popovertargetaction="hide" 
                     class="absolute top-2 right-2 p-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6 cursor-pointer text-gray-900">
@@ -104,9 +104,9 @@
 
             </button>
 
-            <div class="flex flex-col p-8 max-w-full rounded-xl bg-white">
+            <div class="flex flex-col p-10 max-w-full rounded-xl bg-white">
                                 <div class="flex w-full justify-center gap-x-2 bg-white p-4 rounded border-1 border-gray-900/10">
-                                    <div class="m-auto">
+                                    <div class="flex flex-1 justify-center items-center">
                                         {{ forms.label(
                                                 id:'code', 
                                                 content:'Access Code', 
@@ -126,8 +126,8 @@
                                     
                                     <button 
                                             type="button"
-                                            hx-get="/exams/{{ exam.id }}/edit/generate_access_code" hx-target="#code" hx-select-oob="#save-access-code-button" hx-swap="outerHTML transition:true" hx-trigger="revealed, click"
-                                            class="cursor-pointer bg-blue-900 text-xs text-white p-2 font-semibold rounded hover:bg-blue-700 duration-300">
+                                            hx-get="{{ route('accesscodes.generate', { exam: exam } )}}" hx-target="#code" hx-select-oob="#save-access-code-button" hx-swap="outerHTML transition:true" hx-trigger="load, click"
+                                            class="cursor-pointer bg-blue-900 text-xs ml-auto text-white p-2 font-semibold rounded hover:bg-blue-700 duration-300">
                                             Generate
                                     </button>
                                 </div>
@@ -135,20 +135,19 @@
                             <table class="w-full table-auto">
                                 <thead class="bg-blue-900 text-left sticky top-0">
                                     <tr class="text-center">
-                                        <th class="px-4 py-2 text-white font-bold">Access Codes</th>
+                                        <th class="px-4 py-2 text-white font-bold w-[90%]">Access Codes</th>
+                                        <th class="px-4 py-2 text-white font-bold w-[10%]">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody  hx-get="/exams/{{ exam.id }}/edit/get_access_codes"
+                                <tbody  hx-get="{{ route('accesscodes.get', { exam: exam } )}}"
                                         hx-trigger="load"
                                         hx-swap="outerHTML"
                                         hx-target="this"
-                                        
-                                    >
-                                        <tr
-                                            class="border-t text-center hover:bg-blue-50">
-                                            <td 
-                                                class="px-4 py-2 font-mono cursor-pointer select-all">
-                                                access-code
+                                        class="min-w-24">
+                                        <tr>
+                                            <td class="px-4 py-2 w-[90%]">ABC123</td>
+                                            <td class="px-4 py-2 w-[10%]">
+                                                <button class="bg-blue-500 text-white px-2 py-1 rounded">Edit</button>
                                             </td>
                                         </tr>
                                 </tbody>
@@ -156,5 +155,23 @@
                 </div>
             </div>
 
-    </div> -->
+    </div>
+<script>
+document.body.addEventListener('htmx:beforeSwap', function(event) {
+    const el = event.target;
+    if (el.tagName === 'TR') {
+        el.classList.add('fade-out');
+        event.detail.shouldSwap = false;
+        setTimeout(() => el.remove(), 1000); 
+    }
+});
+</script>
+
+<style>
+tr.fade-out td {
+    opacity: 0;
+    transition: opacity 1s ease-out;
+}
+</style>
+
     {% endblock %}

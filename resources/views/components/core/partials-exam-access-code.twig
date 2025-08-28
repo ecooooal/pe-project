@@ -10,19 +10,19 @@
 <button 
     id="save-access-code-button"
     type="button" 
-    hx-post="/exams/{{ exam.id }}/edit/generate_access_code" hx-select-oob="#save-access-code-button" hx-target="#code" hx-swap="outerHTML transition:true" hx-include="#code"
+    hx-post="{{ route('accesscodes.save', { exam: exam } )}}" hx-select-oob="#save-access-code-button" hx-target="#code" hx-swap="outerHTML transition:true" hx-include="#code"
     hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
     class="cursor-pointer bg-green-900 text-xs text-white p-2 rounded hover:bg-green-700 transition">
     Save
 </button>
 {% else %}
-<span id="code" class="font mono text-green-900 font-semibold text-xs p-2">
+<span id="code" class="font-mono text-green-900 font-semibold text-sm animate-bounce p-2">
     {% if errors.has('access_code') %}
     <p class="text-red-500 text-sm">
         {{ errors.first('access_code') }}
     </p>
     {% else %}
-    {{ access_code }} SAVED
+    {{ access_code }} ✅<br><span class="text-xs text-gray-900 animate-bounce">👇 hover table </span>
     {% endif %}
 </span>
 <button id="save-access-code-button" type="button" class="hidden" disabled></button>
