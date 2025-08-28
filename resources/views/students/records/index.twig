@@ -1,7 +1,4 @@
-<div id="exam-content" class="flex flex-1 flex-col gap-y-4 mx-8 ">
-        <div class="w-32 h-32 flex items-center justify-center border border-gray-300 bg-white shadow-md rounded-lg animate-zoomin">
-      zoomin
-    </div>
+<div class="htmx-animate flex flex-1 flex-col gap-y-4 mx-8 ">
     {% if exam_records is not empty %}
     {% for record in exam_records %}
     <div class="flex flex-1">
@@ -45,11 +42,6 @@
         </details>
     </div>
     {% endfor %}
-        <div class="transform rounded-xl h-40 w-40 sm:h-64 sm:w-64 bg-white shadow-xl transition duration-300 hover:scale-105">
-      <div class="flex h-full justify-center items-center">
-        <span class="font-bold text-gray-500">Scale</span>
-      </div>
-    </div>
     {% else %}
     <div class="flex flex-1">
         <details class="flex flex-1 flex-col bg-white rounded-xl shadow-sm ring-1 ring-gray-950/5">

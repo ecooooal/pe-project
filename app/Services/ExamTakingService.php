@@ -27,9 +27,9 @@ class ExamTakingService
             dd('Not published');
         }
         // check examination date
-        if ($exam->examination_date){
-            dd('date');
-        }
+        // if ($exam->examination_date){
+            
+        // }
         return true;
     }
 

@@ -23,14 +23,15 @@
                         hx-get="{{ route('exams.student.overview', { exam: exam }) }}" 
                         hx-target="#exam-content"
                         hx-trigger="load, click" 
-                        hx-swap="outerHTML"
+                        hx-swap="innerHTML"
                         class="cursor-pointer hover:text-blue-900 hover:underline  transition duration-300">
                     Overview
                 </button>
                 <button 
                         hx-get="{{ route('exam_records.index', { exam: exam }) }}" 
                         hx-target="#exam-content"
-                        hx-swap="outerHTML"
+                        hx-trigger="click" 
+                        hx-swap="innerHTML"
                         class="cursor-pointer hover:text-blue-900 hover:underline transition duration-300">
                     Exam Records
                 </button>

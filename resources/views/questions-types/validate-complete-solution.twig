@@ -1,4 +1,4 @@
-<div id="validate-div" class=" 
+<div id="validate-div" class=" htmx-animate
     {% if data.api_data.error %}
         border-red-200 bg-red-50 text-red-800
     {% elseif data.api_data.failures %}
@@ -10,7 +10,6 @@
     {% endif %} 
     flex flex-1 flex-col p-4 max-w-none my-2 border-4 rounded-xl ">
     <div class="flex items-center gap-x-2 p-4">
-        {{dump()}}
             {% if data.api_data.error or data.api_data.failures or data.api_data.success == false %}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-15 shrink-0 inline-block">
                 <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
@@ -115,7 +114,9 @@
          class="fixed top-2 right-2 h-[85vh] w-96 ml-auto bg-white border-2 border-gray-950 rounded-xl shadow-md p-4 overflow-y-auto overflow-hidden z-50 prose prose-xs">
         <div class="flex items-center justify-between font-bold text-gray-900 ">
             <h1>Debug Report</h1>
-            <h1><button popovertarget="debug-popover"
+            <h1><button 
+                    type="button"
+                    popovertarget="debug-popover"
                     popovertargetaction="hide"
                     class="mt-1.5 cursor-pointer"
                     onload="this.showPopover()">
