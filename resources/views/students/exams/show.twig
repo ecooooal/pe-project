@@ -24,14 +24,14 @@
                         hx-target="#exam-content"
                         hx-trigger="load, click" 
                         hx-swap="outerHTML"
-                        class="cursor-pointer hover:text-blue-900 hover:underline">
+                        class="cursor-pointer hover:text-blue-900 hover:underline  transition duration-300">
                     Overview
                 </button>
                 <button 
                         hx-get="{{ route('exam_records.index', { exam: exam }) }}" 
                         hx-target="#exam-content"
                         hx-swap="outerHTML"
-                        class="cursor-pointer hover:text-blue-900 hover:underline">
+                        class="cursor-pointer hover:text-blue-900 hover:underline transition duration-300">
                     Exam Records
                 </button>
             </div>
