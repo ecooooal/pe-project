@@ -2,11 +2,12 @@
         hx-trigger="mouseenter throttle:10s"
         hx-target="this"
         hx-swap="outerHTML"
-        hx-sync="#save-access-code-button">
+        hx-sync="#save-access-code-button"
+        id="access-code-body">
 {% for code in access_codes %}
     <tr id="{{ code.access_code }}-row" class="border-t border-gray-900/10 text-center ">
         <td 
-            class="w-[90%] px-4 py-2 font-mono cursor-pointer select-all hover:bg-blue-50">
+            class="copyable w-[90%] px-4 py-2 font-mono cursor-pointer select-all hover:bg-blue-50">
             {{ code.access_code }}
         </td>
         <td 
@@ -24,4 +25,33 @@
         </td>
     </tr>
 {% endfor %}
+
 </tbody>
+<script>
+document.querySelector("#access-code-body").addEventListener("click", function (e) {
+    const access_code_cell = e.target.closest("td.copyable");
+    if (!access_code_cell) return;
+
+        const text_to_copy = access_code_cell.textContent.trim();
+        navigator.clipboard.writeText(text_to_copy).then(() => {
+        Toast.show({
+            status: "Copied",
+            message: text_to_copy,
+            type: "success"
+    });
+    }).catch(err => {
+        console.error("Copy failed:", err);
+        Toast.show({
+            status: "Error",
+            message: "Failed to copy text",
+            type: "error"
+        });
+    });
+    });
+
+
+
+</script>
+
+
+

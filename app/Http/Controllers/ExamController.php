@@ -222,10 +222,27 @@ class ExamController extends Controller
         $is_success =$this->examService->saveAccessCode($exam, $access_code);
         
         if ($is_success !== true) {
+            session()->flash('toast', json_encode([
+                'status' => 'Error!',
+                'message' => 'Access Code Not Saved',
+                'type' => 'error'
+            ]));
             return back()->withErrors(['access_code' => $is_success]);
+            
         }
 
-        return view('components/core/partials-exam-access-code', ['access_code' => $access_code, 'generate' => false]);
+        $toast =  json_encode([
+            'status' => 'Created!',
+            'message' => 'Access Code Saved',
+            'type' => 'success'
+        ]);
+
+
+        return view('components/core/partials-exam-access-code', 
+        ['access_code' => $access_code, 
+                'generate' => false, 
+                'toast' => $toast
+        ]);
     }
 
     public function destroyAccessCode(Exam $exam, Request $request)
@@ -248,6 +265,13 @@ class ExamController extends Controller
                 'error' => 'Sum of question points do not match the max score.'
             ]);        
         }
+        
+        session()->flash('toast', json_encode([
+            'status' => 'Published!',
+            'message' => 'Exam: ' . $exam->name . ' is now published',
+            'type' => 'success'
+        ]));
+
         return response('', 200)->header('HX-Refresh', 'true');
     }
 

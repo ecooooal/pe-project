@@ -8,6 +8,7 @@ use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class CourseController extends Controller
 {
@@ -65,21 +66,30 @@ class CourseController extends Controller
     }
 
     public function store(){
-        $validator = Validator::make(request()->post(), [
-            'name'    => ['required'],
-            'abbreviation' => ['required']
+        $data = request()->post();
+        $data['abbreviation'] = strtoupper($data['abbreviation']);
+
+        $validator = Validator::make($data, [
+            'name'    => ['required', 'unique:courses,name'],
+            'abbreviation' => ['required', 'unique:courses,abbreviation']
         ]);
 
         if ($validator->fails()) {
             return response()->view('courses.create', [
                 'errors' => $validator->errors(),
-                'old' => request()->all()]);
+                'old' => $data]);
         }
 
-        Course::create([
-            'name' => request('name'),
-            'abbreviation' => request('abbreviation')
+        $course = Course::create([
+            'name' => $data['name'],
+            'abbreviation' => $data['abbreviation']
         ]);
+
+        session()->flash('toast', json_encode([
+            'status' => 'Created!',
+            'message' => 'Course: ' . $course->name,
+            'type' => 'success'
+        ]));
 
         return response('', 200)->header('HX-Redirect', route('courses.index'));
     }
@@ -93,15 +103,32 @@ class CourseController extends Controller
     }
 
     public function update(Course $course){
+        $data = request()->all();
+        $data['abbreviation'] = strtoupper($data['abbreviation']);
+        request()->merge($data);
+
         request()->validate([
-            'name'    => ['required'],
-            'abbreviation' => ['required']        
-        ]); 
-        
-        $course->update([
-            'name' => request('name'),
-            'abbreviation' => request('abbreviation')        
+            'name' => [
+                'required',
+                Rule::unique('courses', 'name')->ignore($course->id),
+            ],
+            'abbreviation' => [
+                'required',
+                Rule::unique('courses', 'abbreviation')->ignore($course->id),
+            ],
         ]);
+
+
+        $course->update([
+            'name' => $data['name'],
+            'abbreviation' => $data['abbreviation']   
+        ]);
+
+        session()->flash('toast', json_encode([
+            'status' => 'Updated!',
+            'message' => 'Course: ' . $course->name,
+            'type' => 'info'
+        ]));
 
         return redirect()->route('courses.show', $course);
     }
@@ -112,6 +139,11 @@ class CourseController extends Controller
         if ($course->subjects()->exists()) {
             return back()->with('error', 'You cannot delete a course that has subjects.');
         }
+        session()->flash('toast', json_encode([
+            'status' => 'Destroyed!',
+            'message' => 'Course: ' . $course->name,
+            'type' => 'warning'
+        ]));
 
         $course->delete();
 

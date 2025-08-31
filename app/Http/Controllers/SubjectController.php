@@ -87,11 +87,17 @@ class SubjectController extends Controller
                 'old' => request()->all()]);
         }
 
-        Subject::create([
+        $subject = Subject::create([
             'name' => request('name'),
             'course_id' => request('course'),
             'year_level' => request('year_level'),
         ]);
+
+        session()->flash('toast', json_encode([
+            'status' => 'Created!',
+            'message' => 'Subject: ' . $subject->name,
+            'type' => 'success'
+        ]));
 
         return response('', 200)->header('HX-Redirect', route('subjects.index'));
     }
@@ -116,6 +122,13 @@ class SubjectController extends Controller
             'name' => request('name'),
             'year_level' => request('year_level'),
         ]);
+
+        
+        session()->flash('toast', json_encode([
+            'status' => 'Updated!',
+            'message' => 'Subject: ' . $subject->name,
+            'type' => 'info'
+        ]));
 
         return redirect()->route('subjects.show', $subject);
     }

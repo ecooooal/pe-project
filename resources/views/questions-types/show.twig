@@ -4,7 +4,7 @@
 {% set values = {} %}
 {% set solution = null %}
 
-<div id="MultipleChoice-content" class="flex flex-1 flex-col max-w-full gap-y-8">
+<div id="MultipleChoice-content" class="htmx-animate flex flex-1 flex-col max-w-full gap-y-8">
     {% for choice in question_type_data.choices %}
         {% set values = values | merge({ (choice.choice_key): choice.item }) %}
         {% if choice.is_solution %}
@@ -47,7 +47,7 @@
     </div>
 </div>
 
-<div id="TrueOrFalse-content" class="flex flex-1 flex-col max-w-full gap-y-8">
+<div id="TrueOrFalse-content" class="htmx-animate flex flex-1 flex-col max-w-full gap-y-8">
     {% set values = {
         'true' : 'True',
         'false' : 'False',
@@ -85,7 +85,7 @@
     </div>  
 </div>
 
-<div id="Identification-content" class="flex flex-1 flex-col max-w-full gap-y-8">
+<div id="Identification-content" class="htmx-animate flex flex-1 flex-col max-w-full gap-y-8">
     {% set solution = question_type_data.solution %}
     <div class="flex flex-col flex-1">
         {{ show_header('Settings') }}
@@ -121,7 +121,7 @@
     </div>  
 </div>
 
-<div id="Ranking-content" class="flex flex-1 flex-col max-w-full gap-y-8">
+<div id="Ranking-content" class="htmx-animate flex flex-1 flex-col max-w-full gap-y-8">
     <div class="flex flex-col flex-1">
         {{ show_header('Settings') }}
         <div class="flex gap-x-8">
@@ -180,7 +180,7 @@
     </script>
 </div>
 
-<div id="Matching-content" class="flex flex-1 flex-col max-w-full gap-y-8">
+<div id="Matching-content" class="htmx-animate flex flex-1 flex-col max-w-full gap-y-8">
     <div class="flex flex-col flex-1">
         {{ show_header('Settings') }}
         <div class="flex gap-x-8">
@@ -286,7 +286,7 @@
 </script>
 </div>
   
-<div id="Coding-content">
+<div id="Coding-content" class="htmx-animate">
     <script>hljs.highlightAll();</script>
     <div class="flex flex-1 flex-col max-w-full gap-y-8">
         <div class="flex flex-col flex-1">

@@ -26,4 +26,12 @@
     {% endif %}
 </span>
 <button id="save-access-code-button" type="button" class="hidden" disabled></button>
+
+{% if toast is defined %}
+  <script>
+    var toast_data = JSON.parse("{{ toast|e('js') }}");
+    window.Toast.show(toast_data);
+  </script>
+{% endif %}
+
 {% endif %}
