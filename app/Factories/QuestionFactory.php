@@ -85,6 +85,11 @@ class QuestionFactory
             $previous_question_type = $question->question_type->value;
             $question_type_service = new QuestionTypeService();
 
+            $question_tags = [
+                'question_level' => $data['question_level'],
+                'optional_tags' => $data['optional_tags']
+            ];
+
             if ($data['type'] == 'coding'){
                 $question_type_service->updateCoding($question, $data);
             } else {
@@ -108,6 +113,27 @@ class QuestionFactory
                 'name' => $data['name'],
                 'total_points' => $data['points']
             ]);
+
+            $question_level = Tag::firstOrCreate(['name' => $question_tags['question_level']]);
+            $question_level_tag = [$question_level->id => ['type' => 'required']];
+            $optional_tags_sync = [];
+
+            if (!empty($question_tags['optional_tags'])) {
+                foreach ($question_tags['optional_tags'] as $tagName) {
+                    $tag = Tag::firstOrCreate(['name' => $tagName]);
+                    $optional_tags_sync[$tag->id] = ['type' => 'optional'];
+                }
+            }
+
+            $question->tags()->wherePivot('type', 'required')->detach();
+            $question->tags()->attach($question_level_tag);
+
+            $question->tags()->wherePivot('type', 'optional')->detach();
+
+            if (!empty($optional_tags_sync)) {
+                $question->tags()->attach($optional_tags_sync);
+            }
+
         });
     }
 

@@ -96,9 +96,50 @@
                                     isColumn:true 
                                 )}}
                                 <div id="name-form-error" class="flex gap-x-4 justify-between"></div>
+                                </div>
+                                                        <div>
+                                <span class="whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']">Question Level</span>
+                                {% set values = {
+                                    'remember' : '🧠 Remember', 
+                                    'understand' : '📖 Understand',
+                                    'apply' : '🛠️ Apply', 
+                                    'analyze' : '🧩 Analyze',
+                                    'evaluate' : '📝 Evaluate', 
+                                    'create' : '🎨 Create'
+                                } %}
+
+                                {{ forms.form_field(
+                                    input: forms.radio(
+                                        name: 'question_level',
+                                        values: values,
+                                        value:level,
+                                        attributes: {
+                                            'class': 'opacity-0  -ml-[1rem]',
+                                            'required' : true
+                                        },
+                                        label_attributes: {
+                                            'class': 'flex items-center  gap-1 px-2 py-1 min-w-fit bg-gray-100 rounded-full cursor-pointer has-checked:bg-blue-100 has-checked:text-blue-900 has-checked:font-semibold text-xs'
+                                        }))
+                                }}
+                                <div id="question-level-form-error" class="flex gap-x-4 justify-between"></div>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <div class="flex justify-left items-center gap-x-2">
+                                    <label  for="tag-input"
+                                            class="whitespace-nowrap text-sm/6 font-medium text-gray-900 ">
+                                        Optional tags:
+                                    </label>                        
+                                    <input  type="text" 
+                                            id="tag-input" 
+                                            placeholder="Type tag and press Enter"
+                                            class="rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                                </div>
+                                <div id="tags-container" data-initial-tags="{{ optional_tags|json_encode|e('html_attr') }}"></div>
+
+                                <input type="hidden" name="optional_tags" id="optional-tags" />
                             </div>
                         </div>
-                        <div class="flex flex-1/2 flex-col gap-y-4 w-full">
+                        <div class="flex flex-1/2 flex-col gap-y-4 w-full"  hx-sync="this:queue">
                             {{ forms.form_field(
                                 label:forms.label(
                                     id:'subject', 
@@ -179,4 +220,71 @@
         {{ method_field('DELETE') }}
     </form>
 </div>
+<script>
+    const input = document.getElementById("tag-input");
+    const container = document.getElementById("tags-container");
+    const tagsHiddenInput = document.getElementById('optional-tags');
+    const initial_tags = JSON.parse(container.dataset.initialTags);
+    const tags = new Set(initial_tags);  
+    tags.forEach(tag => addTag(tag));
+    updateHiddenInput();
+
+    input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        const tag = input.value.trim();
+        if (tag && !tags.has(tag)) {
+        addTag(tag);
+        tags.add(tag);
+        updateHiddenInput();
+        }
+        input.value = "";
+    }
+    });
+
+    function addTag(tag) {
+    const tagEl = document.createElement("span");
+    tagEl.className = `
+    inline-flex 
+    items-center 
+    gap-1
+    pl-2 pr-1 
+    min-w-fit 
+    bg-blue-100 
+    rounded-full 
+    text-blue-900 
+    font-semibold 
+    text-xs 
+    select-none
+    mr-1 my-1
+    `;
+
+    tagEl.textContent = tag;
+
+    const closeBtn = document.createElement("button");
+    closeBtn.innerHTML = "&times;";
+    closeBtn.className = `
+    text-blue-900
+    text-sm 
+    font-bold 
+    cursor-pointer 
+    bg-transparent 
+    border-none
+    `;
+
+
+    closeBtn.addEventListener("click", () => {
+        container.removeChild(tagEl);
+        tags.delete(tag);
+        updateHiddenInput();
+    });
+
+    tagEl.appendChild(closeBtn);
+        container.appendChild(tagEl);
+    }
+
+    function updateHiddenInput() {
+    tagsHiddenInput.value = Array.from(tags).join(',');
+  }
+</script>
 {% endblock %}

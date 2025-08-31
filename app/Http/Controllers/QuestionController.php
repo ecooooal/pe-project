@@ -220,6 +220,10 @@ class QuestionController extends Controller
         return redirect('/questions');    
     }
     public function edit(Question $question){
+        $question->load([
+            'questionLevel',
+            'optionalTags',
+        ]);        
         if ($question->question_type->value == 'coding'){
             $data = [
             'question' => $question
@@ -235,6 +239,8 @@ class QuestionController extends Controller
             ];
             $data = [
                 'question' => $question, 
+                'level' => $level = $question->questionLevel()->first()->name ?? 'none',
+                'optional_tags' => $optional_tags = $question->getOptionalTagsArray(),
                 'subjects' => $subjects,
                 'question_types' => $question_types
             ];
@@ -254,6 +260,7 @@ class QuestionController extends Controller
             'type' => ['required'],
             'name' => ['required', 'string', Rule::unique('questions', 'name')->ignore($question->id)->whereNull('deleted_at'),],
             'subject' => ['required'],
+            'question_level' => ['required', 'in:remember,understand,apply,analyze,evaluate,create', 'string']
         ];
 
        switch ($question_type) {
@@ -325,6 +332,9 @@ class QuestionController extends Controller
         }
 
         $data = $validator->validated();
+        $optional_tags_raw = request()->input('optional_tags');
+        $optional_tags = array_filter(array_unique(array_map('trim', explode(',', $optional_tags_raw))));
+        $data['optional_tags'] = $optional_tags;
 
         if ($question_type == 'coding'){
             $syntax_points = request()->input('syntax_points', 0);
