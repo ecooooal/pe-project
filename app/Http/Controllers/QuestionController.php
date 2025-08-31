@@ -110,6 +110,7 @@ class QuestionController extends Controller
             'type' => ['required'],
             'name' => ['required', 'string', 'unique:questions,name'],
             'subject' => ['required'],
+            'question_level' => ['required', 'in:remember,understand,apply,analyze,evaluate,create', 'string']
         ];
         switch ($question_type) {
             case('coding'):
@@ -181,6 +182,10 @@ class QuestionController extends Controller
       
         $data = $validator->validated();
 
+        $optional_tags_raw = request()->input('optional_tags');
+        $optional_tags = array_filter(array_unique(array_map('trim', explode(',', $optional_tags_raw))));
+        $data['optional_tags'] = $optional_tags;
+
         if ($question_type == 'coding'){
             $syntax_points = request()->input('syntax_points', 0);
             $runtime_points = request()->input('runtime_points', 0);
@@ -199,7 +204,7 @@ class QuestionController extends Controller
         }
         
         QuestionFactory::create($data);
-        
+
         if (request()->header('HX-Request')) {
             return response('', 200)->header('HX-Redirect', url('/questions'));
         }

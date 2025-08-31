@@ -36,6 +36,23 @@ class Question extends Model
         return $this->belongsToMany(Exam::class)->withTimestamps();
     }
 
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'taggable')
+                    ->withPivot('type')
+                    ->withTimestamps();
+    }
+
+    public function requiredTags()
+    {
+        return $this->tags()->wherePivot('type', 'required');
+    }
+
+    public function optionalTags()
+    {
+        return $this->tags()->wherePivot('type', 'optional');
+    }
+
     public function multipleChoiceQuestions(){
         return $this->hasMany(MultipleChoiceQuestion::class);
     }

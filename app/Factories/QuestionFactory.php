@@ -3,6 +3,7 @@
 namespace App\Factories;
 
 use App\Models\Question;
+use App\Models\Tag;
 use App\Services\QuestionTypeService;
 use Illuminate\Support\Facades\DB;
 
@@ -17,8 +18,13 @@ class QuestionFactory
             'total_points' => $data['points'],
             'name' => $data['name']
         ];   
+
+        $question_tags = [
+            'question_level' => $data['question_level'],
+            'optional_tags' => $data['optional_tags']
+        ];
        
-        DB::transaction(function () use ($question_data, $data) {
+        DB::transaction(function () use ($question_data, $question_tags, $data) {
             $question = Question::create($question_data);
             $question_type_service = new QuestionTypeService();
             if ($question_data['question_type'] == 'coding'){
@@ -47,7 +53,25 @@ class QuestionFactory
                     default => throw new \InvalidArgumentException("Unknown question type: {$question_data['question_type']}"),
                 };
             }
+
+            $tag = Tag::firstOrCreate(['name' => $question_tags['question_level']]);
+
+            if (!empty($question_tags['optional_tags'])) {
+                $optional_tags = [];
+
+                foreach ($question_tags['optional_tags'] as $tags) {
+                    $tag = Tag::firstOrCreate(['name' => $tags]);
+
+                    $optional_tags[$tag->id] = ['type' => 'optional'];
+                }
+
+                if (!empty($optional_tags)) {
+                    $question->tags()->attach($optional_tags);
+                }
+            }
         });
+
+
     }
 
     public static function update(Question $question, array $data)
