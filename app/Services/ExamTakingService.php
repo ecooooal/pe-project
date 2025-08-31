@@ -43,6 +43,14 @@ class ExamTakingService
         return $exam_paper;
 
     }
+    public function checkBooleanUnsubmittedExamPaper(Exam $exam, User $user){
+        $exam_paper = $user->studentPapers()->where(['exam_id' => $exam->id, 'status' => 'in_progress'])->first() ?? false;
+        if (!$exam_paper){
+            return false;
+        } else {
+            return true;
+        }
+    }
 
     public function generateExamPaper(Exam $exam, User $user){
         $exam->load('questions');

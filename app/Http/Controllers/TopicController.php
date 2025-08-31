@@ -9,6 +9,7 @@ use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class TopicController extends Controller
 {
@@ -72,7 +73,7 @@ class TopicController extends Controller
 
     public function store(){
         $validator = Validator::make(request()->post(), [
-            'name'    => ['required'],
+            'name'    => ['required', 'unique:topics,name'],
             'subject' => ['required', 'integer', 'exists:subjects,id'],
         ]);
 
@@ -84,10 +85,16 @@ class TopicController extends Controller
                 'old' => request()->all()]);
         }
 
-        Topic::create([
+        $topic = Topic::create([
             'name' => request('name'),
             'subject_id' => request('subject'),
         ]);
+
+        session()->flash('toast', json_encode([
+            'status' => 'Created!',
+            'message' => 'Topic: ' . $topic->name,
+            'type' => 'success'
+        ]));
 
         return response('', 200)->header('HX-Redirect', route('topics.index'));
     }
@@ -107,7 +114,7 @@ class TopicController extends Controller
 
 
         request()->validate([
-            'name'    => ['required'],
+            'name'    => ['required', Rule::unique('topics', 'name')->ignore($topic->id)],
             'subject'     => ['required', 'integer'],
         ]);
 
@@ -115,12 +122,27 @@ class TopicController extends Controller
             'name' => request('name'),
             'subject_id' => request('subject'),
         ]);
+    
+        session()->flash('toast', json_encode([
+            'status' => 'Updated!',
+            'message' => 'Topic: ' . $topic->name,
+            'type' => 'info'
+        ]));
 
         return redirect()->route('topics.show', $topic);
     }
     public function destroy(Topic $topic){
 
         $this->authorize('delete', $topic);
+
+        if ($topic->questions()->exists()) {
+            return back()->with('error', 'You cannot delete a topic that has questions.');
+        }
+        session()->flash('toast', json_encode([
+            'status' => 'Destroyed!',
+            'message' => 'Topic: ' . $topic->name,
+            'type' => 'warning'
+        ]));
 
         $topic->delete();
 

@@ -217,6 +217,7 @@ class QuestionController extends Controller
             return response('', 200)->header('HX-Redirect', url('/questions'));
         }
 
+
         return redirect('/questions');    
     }
     public function edit(Question $question){
@@ -366,6 +367,16 @@ class QuestionController extends Controller
     public function destroy(Question $question){
 
         $this->authorize('delete', $question);
+
+        if ($question->exams()->exists()) {
+            return back()->with('error', 'You cannot delete a question that is in exam.');
+        }
+
+        session()->flash('toast', json_encode([
+            'status' => 'Destroyed!',
+            'message' => 'Question: ' . $question->name,
+            'type' => 'warning'
+        ]));
 
         $question->delete();
 

@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Validator;
 
 class SubjectController extends Controller
@@ -74,7 +75,7 @@ class SubjectController extends Controller
 
     public function store(){
         $validator = Validator::make(request()->post(), [
-            'name'    => ['required'],
+            'name'    => ['required', 'unique:subjects,name'],
             'course'     => ['required', 'integer'],
             'year_level' => ['required', 'integer', 'min:1', 'max:4']
         ]);
@@ -115,7 +116,7 @@ class SubjectController extends Controller
 
     public function update(Subject $subject){
         request()->validate([
-            'name'    => ['required'],
+            'name'    => ['required', Rule::unique('subjects', 'name')->ignore($subject->id)],
             'year_level' => ['required', 'integer', 'min:1', 'max:4']
         ]); 
         $subject->update([
@@ -139,6 +140,12 @@ class SubjectController extends Controller
         if ($subject->topics()->exists()) {
             return back()->with('error', 'You cannot delete a subject that has topics.');
         }
+
+        session()->flash('toast', json_encode([
+            'status' => 'Destroyed!',
+            'message' => 'Subject: ' . $subject->name,
+            'type' => 'warning'
+        ]));
 
         $subject->delete();
 

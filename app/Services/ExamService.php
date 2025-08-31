@@ -320,8 +320,18 @@ class ExamService
                 }
 
                 $exam->update(['is_published' => true]);
+                session()->flash('toast', json_encode([
+                    'status' => 'Published',
+                    'message' => 'Exam: ' . $exam->name . ' is now published',
+                    'type' => 'info'
+                ]));
             } else {
                 $exam->update(['is_published' => false]);
+                session()->flash('toast', json_encode([
+                    'status' => 'Unpublished!',
+                    'message' => 'Exam: ' . $exam->name . ' is now unpublished',
+                    'type' => 'info'
+                ]));
             }
 
             return true;

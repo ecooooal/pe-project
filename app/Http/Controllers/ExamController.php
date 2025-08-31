@@ -89,6 +89,12 @@ class ExamController extends Controller
         $access_code = $this->examService->generateAccessCode();
         $this->examService->saveAccessCode($exam, $access_code);
 
+        session()->flash('toast', json_encode([
+            'status' => 'Created!',
+            'message' => 'Exam: ' . $exam->name,
+            'type' => 'success'
+        ]));
+
         return redirect('/exams');
     }
 
@@ -118,6 +124,12 @@ class ExamController extends Controller
             'retakes' => request('retakes') ?? null, 
             'examination_date' => request('examination_date') ?? null,
         ]);
+
+        session()->flash('toast', json_encode([
+            'status' => 'Updated!',
+            'message' => 'Exam: ' . $exam->name,
+            'type' => 'info'
+        ]));
         return redirect()->route('exams.show', $exam);
 
     }
@@ -125,6 +137,16 @@ class ExamController extends Controller
     public function destroy(Exam $exam){
         
         $this->authorize('delete', $exam);
+
+        if ($exam->is_published) {
+            return back()->with('error', 'You cannot delete an exam that is currently published.');
+        }
+
+        session()->flash('toast', json_encode([
+            'status' => 'Destroyed!',
+            'message' => 'Exam: ' . $exam->name,
+            'type' => 'warning'
+        ]));
 
         $exam->delete();
 
@@ -265,12 +287,6 @@ class ExamController extends Controller
                 'error' => 'Sum of question points do not match the max score.'
             ]);        
         }
-        
-        session()->flash('toast', json_encode([
-            'status' => 'Published!',
-            'message' => 'Exam: ' . $exam->name . ' is now published',
-            'type' => 'success'
-        ]));
 
         return response('', 200)->header('HX-Refresh', 'true');
     }

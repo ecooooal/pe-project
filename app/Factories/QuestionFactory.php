@@ -74,6 +74,11 @@ class QuestionFactory
                     $question->tags()->attach($optional_tags);
                 }
             }
+            session()->flash('toast', json_encode([
+                'status' => 'Created!',
+                'message' => 'Question: ' . $question->name,
+                'type' => 'success'
+            ]));
         });
 
 
@@ -133,6 +138,12 @@ class QuestionFactory
             if (!empty($optional_tags_sync)) {
                 $question->tags()->attach($optional_tags_sync);
             }
+
+            session()->flash('toast', json_encode([
+                'status' => 'Updated!',
+                'message' => 'Question: ' . $question->name,
+                'type' => 'info'
+            ]));
 
         });
     }

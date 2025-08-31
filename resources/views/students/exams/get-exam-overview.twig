@@ -7,9 +7,16 @@
                     hx-get="{{ route('exam_papers.take', { exam:exam } ) }}" 
                     hx-target="body"
                     hx-push-url=false
-                    class="ml-4 p-2 max-h-fit bg-orange-500 rounded-lg font-medium text-white hover:bg-orange-400 hover:text-gray-50 cursor-pointer">
-                    Take Exam
+                    class="ml-4 p-2 max-h-fit {{ has_unsubmitted_paper ? 'bg-green-500 hover:bg-green-400' : 'bg-orange-500 hover:bg-orange-400' }} rounded-lg font-medium text-white hover:text-gray-50 cursor-pointer">
+                    {{ has_unsubmitted_paper ? 'Resume Exam' : 'Take Exam' }}
                 </a>
+            </div>
+        {% else %}
+            <div class="flex">
+                <button type="button"
+                    class="ml-4 p-2 max-h-fit bg-red-500 hover:bg-red-400 rounded-lg font-medium text-white hover:text-gray-50 pointer-event-none select-none">
+                    Exam is on Maintenance
+                </button>
             </div>
         {% endif %}
     </div>
@@ -20,7 +27,7 @@
             {{ show_item('Duration', exam.duration ?: 'No Timer')}}
             {{ show_item('Examination Date', exam.examination_date ?: 'Anytime') }}
             {{ show_item('Retakes', exam.retakes ?: 'Unlimited')}}
-            {{ show_item('Status', exam.is_published ? 'Can be taken' : 'On Maintenance', value_attributes:exam.is_published ? 'text-green-600 font-semibold' : 'text-orange-600 font-semibold')}}
+            {{ show_item('Status', exam.is_published ? 'Can be taken' : 'On Maintenance', value_attributes:exam.is_published ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold')}}
         </div> 
         <div class="flex flex-col prose prose-sm rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
             <h4>Exam Structure</h4>
