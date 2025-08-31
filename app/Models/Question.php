@@ -43,14 +43,35 @@ class Question extends Model
                     ->withTimestamps();
     }
 
-    public function requiredTags()
+    public function questionLevel()
     {
         return $this->tags()->wherePivot('type', 'required');
     }
-
+    
     public function optionalTags()
     {
         return $this->tags()->wherePivot('type', 'optional');
+    }
+
+    public function getOptionalTagsArray()
+    {
+        return $this->optionalTags->pluck('name')->toArray();
+    }
+    public function bloomTagLabel(): string
+    {
+        $level = $this->questionLevel()->first()->name ?? 'none';
+
+        $mapping = [
+            'remember' => '🧠 Remember',
+            'understand' => '📖 Understand',
+            'apply' => '🛠️ Apply',
+            'analyze' => '🧩 Analyze',
+            'evaluate' => '📝 Evaluate',
+            'create' => '🎨 Create',
+            'none' => '❌ No Level'
+        ];
+
+        return $mapping[strtolower($level)] ?? ucfirst($level);
     }
 
     public function multipleChoiceQuestions(){

@@ -54,7 +54,12 @@ class QuestionFactory
                 };
             }
 
-            $tag = Tag::firstOrCreate(['name' => $question_tags['question_level']]);
+            $question_level = Tag::firstOrCreate(['name' => $question_tags['question_level']]);
+
+            // Detach any existing required tag (if enforcing only one)
+            // $question->tags()->wherePivot('type', 'required')->detach();
+
+            $question->tags()->attach($question_level->id, ['type' => 'required']);
 
             if (!empty($question_tags['optional_tags'])) {
                 $optional_tags = [];

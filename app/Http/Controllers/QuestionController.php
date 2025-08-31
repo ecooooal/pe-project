@@ -54,9 +54,17 @@ class QuestionController extends Controller
     }
 
     public function show(Question $question){
-        $question->load('topic.subject.course');
+        $question->load([
+            'questionLevel',
+            'optionalTags',
+            'topic.subject.course'
+        ]);
+        $question_level =  $question->bloomTagLabel();
+        $optional_tags = $question->getOptionalTagsArray();
         $data = [
-            'question' => $question
+            'question' => $question,
+            'question_level' => $question_level,
+            'optional_tags' => $optional_tags
         ];
         return view('questions/show', $data);
     }
