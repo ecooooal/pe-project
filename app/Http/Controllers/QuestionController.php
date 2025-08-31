@@ -226,7 +226,7 @@ class QuestionController extends Controller
         ]);        
         if ($question->question_type->value == 'coding'){
             $data = [
-            'question' => $question
+            'question' => $question,
             ];
         } else {
             $subjects = Subject::whereIn('course_id', $question->topic->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
@@ -239,8 +239,8 @@ class QuestionController extends Controller
             ];
             $data = [
                 'question' => $question, 
-                'level' => $level = $question->questionLevel()->first()->name ?? 'none',
-                'optional_tags' => $optional_tags = $question->getOptionalTagsArray(),
+                'level' => $question->questionLevel()->first()->name ?? 'none',
+                'optional_tags' => $question->getOptionalTagsArray(),
                 'subjects' => $subjects,
                 'question_types' => $question_types
             ];
@@ -442,6 +442,8 @@ class QuestionController extends Controller
                         'c++' => "C++",
                         'python' => "Python",
                     ];
+                $level = $question->questionLevel()->first()->name ?? 'none';
+                $optional_tags = $question->getOptionalTagsArray();
             }
             
         }
@@ -468,7 +470,7 @@ class QuestionController extends Controller
                 : compact('itemCount','isEdit')),
 
             'coding' => view('questions-types/coding', $isEdit 
-                ? compact('question_type_data', 'isEdit', 'subjects', 'question', 'programming_languages') 
+                ? compact('question_type_data', 'isEdit', 'subjects', 'question', 'programming_languages', 'level', 'optional_tags') 
                 : compact('isEdit')),
         };
 

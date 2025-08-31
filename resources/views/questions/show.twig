@@ -14,7 +14,7 @@
         <span class="pl-2 text-xs text-gray-400 font-semi">Course : {{ question.topic.subject.course.abbreviation }}</span>
         <span class="pl-2 text-xs text-gray-400 font-semi">ID : {{ question.id }}</span>
         {% if optional_tags is not empty %}
-            <div class="flex pl-1 gap-0.5">
+            <div class="flex flex-wrap w-full pl-1 gap-0.5">
                     {% for tag in optional_tags %}
                     <span class=" inline-flex items-center px-2 py-0.5 min-w-fit  bg-blue-100 rounded-full text-blue-900 font-semibold text-xs select-none"> 
                     {{ tag }}

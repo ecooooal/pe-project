@@ -220,6 +220,7 @@
         {{ method_field('DELETE') }}
     </form>
 </div>
+{% if question.question_type.value != 'coding' %}
 <script>
     const input = document.getElementById("tag-input");
     const container = document.getElementById("tags-container");
@@ -287,4 +288,5 @@
     tagsHiddenInput.value = Array.from(tags).join(',');
   }
 </script>
+{% endif %}
 {% endblock %}
