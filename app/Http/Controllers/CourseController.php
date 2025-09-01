@@ -20,9 +20,9 @@ class CourseController extends Controller
         $this->userService = $userService;
     }
     public function index(){
-        $course_courses = Course::all();
+        $courses = Course::with('subjects')->get();
         $header = ['ID', 'Name', 'Date Created'];
-        $rows = $course_courses->map(function ($course) {
+        $rows = $courses->map(function ($course) {
             return [
                 'id' => $course->id,
                 'name' => $course->name,
@@ -33,30 +33,31 @@ class CourseController extends Controller
         $data = [
             'headers' => $header,
             'rows' => $rows,
-            'courses' => $course_courses
+            'courses' => $courses
         ];
 
         return view('courses/index', $data);
     }
 
     public function show(Course $course){
+        $subject_count = $course->subjects()->count();
         $header = ['ID', 'Name', 'Year Level', 'Date Created'];
-        $subjects = Subject::with(['course'])
-            ->where('course_id', $course->id)
-            ->Paginate(10);
+        $subjects = $course->subjects()->paginate(10);
 
-        $rows = $subjects->map(fn($subject) => [
-                'id' => $subject->id,
-                'name' => $subject->name,
-                'type' => $subject->year_level,
-                'Date Created' => Carbon::parse($subject->created_at)->format('m/d/Y')
+
+        $rows = collect($subjects->items())->map(fn($subject) => [
+            'id' => $subject->id,
+            'name' => $subject->name,
+            'type' => $subject->year_level,
+            'Date Created' => $subject->created_at->format('m/d/Y'),
         ]);
 
         $data = [
             'headers' => $header,
             'rows' => $rows,
             'course'=>$course,
-            'subjects' => $subjects
+            'subjects' => $subjects,
+            'subject_count' => $subject_count
         ];
         return view('courses/show', $data);
     }
@@ -139,6 +140,7 @@ class CourseController extends Controller
         if ($course->subjects()->exists()) {
             return back()->with('error', 'You cannot delete a course that has subjects.');
         }
+
         session()->flash('toast', json_encode([
             'status' => 'Destroyed!',
             'message' => 'Course: ' . $course->name,

@@ -42,7 +42,7 @@
             <div class="flex justify-between">
                 <div class="flex flex-col gap-y-4">
                     {{ show_item('Course', course.name) }}
-                    {{ show_item('Current No. of Subjects', course.subjects.count() )}}
+                    {{ show_item('Current No. of Subjects', subject_count  )}}
                 </div>
                 <div class="flex flex-col mr-16 gap-y-4">
                     {{ show_item('Author', course.createdBy.getFullName() )}}

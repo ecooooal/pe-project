@@ -98,16 +98,22 @@ class TopicController extends Controller
 
         return response('', 200)->header('HX-Redirect', route('topics.index'));
     }
-    public function edit(Topic $topic){
-        $subjects = Subject::whereIn('course_id', $topic->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
+    public function edit(Topic $topic)
+    {
+        // Get the course IDs that the current topic's subject belongs to
+        $courseIds = $topic->subject->courses->pluck('id');
 
-        $data = [
-            'topic' => $topic, 
+        // Get all subjects linked to those courses (via pivot table)
+        $subjects = Subject::whereHas('courses', function ($query) use ($courseIds) {
+            $query->whereIn('courses.id', $courseIds);
+        })->pluck('name', 'id');
+
+        return view('topics.edit', [
+            'topic' => $topic,
             'subjects' => $subjects
-        ];
-    
-        return view('topics/edit', $data);
+        ]);
     }
+
 
     public function update(Topic $topic){
         $this->authorize('update', $topic);

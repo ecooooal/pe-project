@@ -23,12 +23,12 @@ class SubjectController extends Controller
     }
     public function index(){
         $subject_courses = $this->userService->getSubjectsForUser(auth()->user())->paginate(10);
-        $subject_courses->load('course');
+        $subject_courses->load('courses');
         $header = ['ID', 'Course', 'Name',  'Year Level', 'Date Created'];
         $rows = $subject_courses->map(function ($subject) {
             return [
                 'id' => $subject->id,
-                'course' => $subject->course->abbreviation,
+                'course' => $subject->course,
                 'name' => $subject->name,
                 'year_level' => $subject->year_level,
                 'Date Created' => Carbon::parse($subject->created_at)->format('m/d/Y')
@@ -45,6 +45,7 @@ class SubjectController extends Controller
     }
 
     public function show(Subject $subject){
+        $subject->load('courses');
         $header = ['ID', 'Topic', 'Name', 'Type', 'Date Created'];
         $questions = Question::with(['topic'])
             ->whereIn('topic_id', $subject->topics->pluck('id'))
@@ -74,27 +75,30 @@ class SubjectController extends Controller
     }
 
     public function store(){
-        dd(request()->post());
 
         $validator = Validator::make(request()->post(), [
             'name'    => ['required', 'unique:subjects,name'],
-            'course'     => ['required', 'integer'],
+            'courses' => 'required|array',
+            'courses.*' => 'exists:courses,id',
             'year_level' => ['required', 'integer', 'min:1', 'max:4']
         ]);
 
         if ($validator->fails()) {
-            $courses = Course::all()->pluck('name', 'id');
+            $courses = Course::select(['abbreviation', 'id'])->get();
             return response()->view('subjects.create', [
                 'errors' => $validator->errors(),
                 'courses' => $courses,
                 'old' => request()->all()]);
         }
 
+        $validated = $validator->validate();
+
         $subject = Subject::create([
             'name' => request('name'),
-            'course_id' => request('course'),
             'year_level' => request('year_level'),
         ]);
+
+        $subject->courses()->attach($validated['courses']);
 
         session()->flash('toast', json_encode([
             'status' => 'Created!',

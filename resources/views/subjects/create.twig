@@ -1,7 +1,7 @@
 {% from 'components/core/breadcrumbs' import breadcrumb %}
 {% from 'components/core/show-header' import show_header %}
 {% import 'components/core/forms' as forms %}
-<form hx-post="{{ route('subjects.store') }}" class="flex flex-col gap-y-2 p-4 mb-2">
+<form id="subject-form" hx-post="{{ route('subjects.store') }}" class="flex flex-col gap-y-2 p-4 mb-2">
     {{ csrf_field() }}
     <div class="flex max-w-full p-4 rounded-xl bg-white">
         <div class="flex flex-col flex-1">
@@ -45,8 +45,8 @@
                                     </ul>
                                 </div>
                                 </div>
-                            <div id="tags-container" class="flex flex-wrap gap-1 p-1 "></div>
-                            <input type="hidden" name="courses" id="courses-id" />
+                            <div id="course-container" class="flex flex-wrap gap-1 p-1 "></div>
+                            <input type="hidden" name="courses[]" id="courses-id" />
                         </div>
                     {{ forms.form_field(
                         label:forms.label(
@@ -95,12 +95,12 @@
     </div>
 </form>
 <script>
-  const container = document.getElementById("tags-container");
-  const tagsHiddenInput = document.getElementById('courses-id');
-  const tags = new Set();
+  var container = document.getElementById("course-container");
+  var tagsHiddenInput = document.getElementById('courses-id');
+  var tags = new Set();
 
-  const toggleBtn = document.getElementById("toggle-course-list");
-  const courseList = document.getElementById("course-list");
+  var toggleBtn = document.getElementById("toggle-course-list");
+  var courseList = document.getElementById("course-list");
 
   toggleBtn.addEventListener("click", () => {
     courseList.classList.toggle("hidden");
@@ -113,7 +113,7 @@
   });
 
   // Handle course selection
-  const courseButtons = document.querySelectorAll(".course-btn");
+  var courseButtons = document.querySelectorAll(".course-btn");
 
   courseButtons.forEach(button => {
     button.addEventListener("click", () => {
@@ -167,7 +167,14 @@
   }
 
   function updateHiddenInput() {
-    tagsHiddenInput.value = Array.from(tags).join(',');
+    document.querySelectorAll('input[name="courses[]"]').forEach(el => el.remove());
+    Array.from(tags).forEach(tagId => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "courses[]";
+        input.value = tagId;
+        document.getElementById("subject-form").appendChild(input); 
+    });
   }
 </script>
 

@@ -57,7 +57,7 @@ class QuestionController extends Controller
         $question->load([
             'questionLevel',
             'optionalTags',
-            'topic.subject.course'
+            'topic.subject.courses'
         ]);
         $question_level =  $question->bloomTagLabel();
         $optional_tags = $question->getOptionalTagsArray();
@@ -224,13 +224,20 @@ class QuestionController extends Controller
         $question->load([
             'questionLevel',
             'optionalTags',
+            'topic.subject.courses'
         ]);        
+        $is_in_exam = $question->exams()->exists();
         if ($question->question_type->value == 'coding'){
             $data = [
             'question' => $question,
             ];
         } else {
-            $subjects = Subject::whereIn('course_id', $question->topic->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
+            $course_id = $question->topic->subject->courses->pluck('id');
+            $subjects = Subject::whereHas('courses', function ($query) use ($course_id) {
+                $query->whereIn('courses.id', $course_id);
+            })->pluck('name', 'id');            
+
+
             $question_types = [
                 'multiple_choice' => 'Multiple Choice',
                 'true_or_false'=> 'True or False',
@@ -243,7 +250,8 @@ class QuestionController extends Controller
                 'level' => $question->questionLevel()->first()->name ?? 'none',
                 'optional_tags' => $question->getOptionalTagsArray(),
                 'subjects' => $subjects,
-                'question_types' => $question_types
+                'question_types' => $question_types,
+                'is_in_exam' => $is_in_exam
             ];
         }
     
@@ -252,17 +260,27 @@ class QuestionController extends Controller
 
     public function update(Question $question){
         $this->authorize('update', $question);
+        $is_in_exam = $question->exams()->exists();
 
         $question_type = request('type');
         $item_count = count(request()->input('items', []));
 
-        $rules = [
-            'topic' => ['required', 'exists:topics,id'],
-            'type' => ['required'],
-            'name' => ['required', 'string', Rule::unique('questions', 'name')->ignore($question->id)->whereNull('deleted_at'),],
-            'subject' => ['required'],
-            'question_level' => ['required', 'in:remember,understand,apply,analyze,evaluate,create', 'string']
-        ];
+        if ($is_in_exam){
+            $rules = [
+                'type' => ['required'],
+                'name' => ['required', 'string', Rule::unique('questions', 'name')->ignore($question->id)->whereNull('deleted_at'),],
+                'question_level' => ['required', 'in:remember,understand,apply,analyze,evaluate,create', 'string']
+            ];
+        } else {
+            $rules = [
+                'topic' => ['required', 'exists:topics,id'],
+                'type' => ['required'],
+                'name' => ['required', 'string', Rule::unique('questions', 'name')->ignore($question->id)->whereNull('deleted_at'),],
+                'subject' => ['required'],
+                'question_level' => ['required', 'in:remember,understand,apply,analyze,evaluate,create', 'string']
+            ];
+        }
+
 
        switch ($question_type) {
             case('coding'):
@@ -333,6 +351,13 @@ class QuestionController extends Controller
         }
 
         $data = $validator->validated();
+
+        if($is_in_exam){
+            $question->load('topic.subject');
+            $data['subject'] = $question->topic->subject->id;
+            $data['topic'] = $question->topic->id;
+        }
+
         $optional_tags_raw = request()->input('optional_tags');
         $optional_tags = array_filter(array_unique(array_map('trim', explode(',', $optional_tags_raw))));
         $data['optional_tags'] = $optional_tags;
@@ -385,35 +410,55 @@ class QuestionController extends Controller
     }
 
     public function getSubjectsForCourses(Request $request){
-        $courseId = $request->input('course');
-        
-        $course = $this->userService->getCourseById($courseId);
-        $subjects = $course->subjects->pluck('name', 'id');
-        $subjects = $subjects->isEmpty() ? null : $subjects;
+    $courseId = $request->input('course');
 
-        if(empty($subjects)){
-            return view('/components/core/partials-subject', ['subjects' => [""=>"No Subjects Available"]]);
-        }   
-
-        return view('/components/core/partials-subject', ['subjects' => $subjects]);    
+    if (empty($courseId)) {
+        return view('/components/core/partials-subject', [
+            'subjects' => ["" => "No Course Selected"]
+        ]);
     }
-    public function getTopicsForSubjects(Request $request){
+
+    $course = $this->userService->getCourseById($courseId);
+
+    if (!$course || $course->subjects->isEmpty()) {
+        return view('/components/core/partials-subject', [
+            'subjects' => ["" => "No Subjects Available"]
+        ]);
+    }
+
+    $subjects = $course->subjects->pluck('name', 'id');
+
+    return view('/components/core/partials-subject', [
+        'subjects' => $subjects
+    ]);   
+    }
+    public function getTopicsForSubjects(Request $request)
+    {
         $subject_id = $request->input('subject');
-        $topic_id= $request->input('topic_id') ?? 1;
-        if(empty($subject_id)){
-            return view('/components/core/partial-topic', ['topics' => [""=>"No Topics Available"]]);    
-        }   
+        $selected_topic_id = $request->input('topic_id');
+
+        if (empty($subject_id)) {
+            return view('/components/core/partial-topic', [
+                'topics' => ["" => "No Topics Available"]
+            ]);
+        }
 
         $subject = $this->userService->getSubjectById($subject_id);
 
+        if (!$subject || $subject->topics->isEmpty()) {
+            return view('/components/core/partial-topic', [
+                'topics' => ["" => "No Topics Available"]
+            ]);
+        }
+
         $topics = $subject->topics->pluck('name', 'id');
 
-        if(empty($topics)){
-            return view('/components/core/partial-topic', ['topics' => ["No Topics Available"]]);    
-        }   
-
-        return view('/components/core/partial-topic', ['topics' => $topics, 'topic_id' => $topic_id]);    
+        return view('/components/core/partial-topic', [
+            'topics' => $topics,
+            'topic_id' => $selected_topic_id
+        ]);
     }
+
 
     public function question_type_show(Question $question){
         $question_type_data = $this->questionService->getQuestionTypeShow($question);
@@ -447,7 +492,7 @@ class QuestionController extends Controller
             $question = Question::findOrFail($questionId);
             $question_type_data = $this->questionService->getQuestionTypeShow($question);
             if ($type == 'coding'){
-                $subjects = Subject::whereIn('course_id', $question->topic->subject->course()->get()->pluck('id'))->get()->pluck('name', 'id');
+                $subjects = Subject::whereIn('course_id', $question->topic->subject->courses()->get()->pluck('id'))->get()->pluck('name', 'id');
                 $programming_languages = [
                         'java' => "Java",
                         'c++' => "C++",
