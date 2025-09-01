@@ -45,6 +45,9 @@ class TopicController extends Controller
     }
 
     public function show(Topic $topic){
+        $questions_are_in_exams = $topic->questions->contains(function ($question) {
+            return $question->exams()->exists();
+        });    
         $header = ['ID', 'Name', 'Type', 'Date Created'];
         $questions = Question::with(['topic'])
             ->where('topic_id', $topic->id)
@@ -60,7 +63,8 @@ class TopicController extends Controller
             'headers' => $header,
             'rows' => $rows,
             'topic'=>$topic,
-            'questions' => $questions
+            'questions' => $questions,
+            'questions_are_in_exams' => $questions_are_in_exams
         ];
 
         return view('topics/show', $data);
@@ -100,17 +104,19 @@ class TopicController extends Controller
     }
     public function edit(Topic $topic)
     {
-        // Get the course IDs that the current topic's subject belongs to
         $courseIds = $topic->subject->courses->pluck('id');
+        $questions_are_in_exams = $topic->questions->contains(function ($question) {
+            return $question->exams()->exists();
+        });        
 
-        // Get all subjects linked to those courses (via pivot table)
         $subjects = Subject::whereHas('courses', function ($query) use ($courseIds) {
             $query->whereIn('courses.id', $courseIds);
         })->pluck('name', 'id');
 
         return view('topics.edit', [
             'topic' => $topic,
-            'subjects' => $subjects
+            'subjects' => $subjects,
+            'questions_are_in_exams' => $questions_are_in_exams
         ]);
     }
 

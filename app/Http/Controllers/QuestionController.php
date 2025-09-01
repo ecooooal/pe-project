@@ -61,10 +61,12 @@ class QuestionController extends Controller
         ]);
         $question_level =  $question->bloomTagLabel();
         $optional_tags = $question->getOptionalTagsArray();
+        $is_in_exam = $question->exams()->exists();
         $data = [
             'question' => $question,
             'question_level' => $question_level,
-            'optional_tags' => $optional_tags
+            'optional_tags' => $optional_tags,
+            'is_in_exam' => $is_in_exam
         ];
         return view('questions/show', $data);
     }

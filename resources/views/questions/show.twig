@@ -22,13 +22,18 @@
         <span class="pl-2 text-xs text-gray-400 font-semibold">Subject : {{ question.topic.subject.name }}</span>
         <span class="pl-2 text-xs text-gray-400 font-semibold">ID : {{ question.id }}</span>
         {% if optional_tags is not empty %}
-            <div class="flex flex-wrap w-full pl-1 gap-0.5">
-                    {% for tag in optional_tags %}
-                    <span class=" inline-flex items-center px-2 py-0.5 min-w-fit  bg-blue-100 rounded-full text-blue-900 font-semibold text-xs select-none"> 
-                    {{ tag }}
-                    </span>
-                    {% endfor %}
-            </div>
+        <div class="flex flex-wrap w-full pl-1 gap-0.5">
+                {% for tag in optional_tags %}
+                <span class=" inline-flex items-center px-2 py-0.5 min-w-fit  bg-blue-100 rounded-full text-blue-900 font-semibold text-xs select-none"> 
+                {{ tag }}
+                </span>
+                {% endfor %}
+        </div>
+        {% endif %}
+        {% if is_in_exam %}
+        <span class="ml-1 mt-1 inline-flex items-center px-2 py-1 max-w-fit  bg-green-100 rounded-full text-green-900 font-semibold text-xs select-none"> 
+        ✔ Currently In Exam/s
+        </span>        
         {% endif %}
     </div>
 </div>
