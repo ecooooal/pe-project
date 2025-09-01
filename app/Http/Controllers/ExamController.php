@@ -30,7 +30,7 @@ class ExamController extends Controller
                 $query->whereIn('courses.id', $courseIds);
             })
             ->paginate(10);
-        $header = ['ID', 'Name', 'Course', 'Questions', 'Status', 'is Published', 'Examination Date'];
+        $header = ['Name', 'Course', 'Questions', 'Status', 'is Published', 'Examination Date'];
         $rows = $exams->map(function ($exam) {
             return [
                 'id' => $exam->id,
@@ -167,7 +167,7 @@ class ExamController extends Controller
         $exam_question_types = $this->examService->getQuestionTypeCounts($exam);
 
         $available_questions = $this->examService->getAvailableQuestionsForExam($exam);
-        $questions_header = ['ID', 'Name', 'Subject', 'Topic', 'Type'];
+        $questions_header = ['Name', 'Subject', 'Topic', 'Type', 'Points'];
         $exam_questions_rows = $this->examService->transformQuestionRows($exam_questions);
         $available_questions_rows = $this->examService->transformQuestionRows($available_questions);
         $data = [
@@ -199,7 +199,7 @@ class ExamController extends Controller
         $exam_question_types = $this->examService->getQuestionTypeCounts($exam);
 
         $available_questions = $this->examService->getAvailableQuestionsForExam($exam);
-        $questions_header = ['ID', 'Name', 'Subject', 'Topic', 'Type'];
+        $questions_header = ['Name', 'Subject', 'Topic', 'Type', 'Points'];
         $exam_questions_rows = $this->examService->transformQuestionRows($exam_questions);
         $available_questions_rows = $this->examService->transformQuestionRows($available_questions);
 

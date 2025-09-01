@@ -24,7 +24,7 @@ class TopicController extends Controller
     public function index(){
         $topics = $this->userService->gettopicsForUser(auth()->user())->paginate(10);
         $topics->load('subject', 'questions');
-        $header = ['ID', 'Subject', 'Name', 'Question Count', 'Date Created'];
+        $header = ['Subject', 'Name', 'Question Count', 'Date Created'];
         $rows = $topics->map(function ($topic) {
             return [
                 'id' => $topic->id,
@@ -48,7 +48,7 @@ class TopicController extends Controller
         $questions_are_in_exams = $topic->questions->contains(function ($question) {
             return $question->exams()->exists();
         });    
-        $header = ['ID', 'Name', 'Type', 'Date Created'];
+        $header = ['Name', 'Type', 'Date Created'];
         $questions = Question::with(['topic'])
             ->where('topic_id', $topic->id)
             ->Paginate(5);

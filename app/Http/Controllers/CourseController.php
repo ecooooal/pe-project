@@ -21,7 +21,7 @@ class CourseController extends Controller
     }
     public function index(){
         $courses = Course::with('subjects')->get();
-        $header = ['ID', 'Name', 'Date Created'];
+        $header = ['Name', 'Date Created'];
         $rows = $courses->map(function ($course) {
             return [
                 'id' => $course->id,
@@ -41,7 +41,7 @@ class CourseController extends Controller
 
     public function show(Course $course){
         $subject_count = $course->subjects()->count();
-        $header = ['ID', 'Name', 'Year Level', 'Date Created'];
+        $header = ['Name', 'Year Level', 'Date Created'];
         $subjects = $course->subjects()->paginate(10);
 
 

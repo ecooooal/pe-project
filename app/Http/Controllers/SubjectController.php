@@ -24,7 +24,7 @@ class SubjectController extends Controller
     public function index(){
         $subject_courses = $this->userService->getSubjectsForUser(auth()->user())->paginate(10);
         $subject_courses->load('courses');
-        $header = ['ID', 'Course', 'Name',  'Year Level', 'Date Created'];
+        $header = ['Course', 'Name',  'Year Level', 'Date Created'];
         $rows = $subject_courses->map(function ($subject) {
             return [
                 'id' => $subject->id,
@@ -46,7 +46,7 @@ class SubjectController extends Controller
 
     public function show(Subject $subject){
         $subject->load('courses');
-        $header = ['ID', 'Topic', 'Name', 'Type', 'Date Created'];
+        $header = ['Topic', 'Name', 'Type', 'Date Created'];
         $questions = Question::with(['topic'])
             ->whereIn('topic_id', $subject->topics->pluck('id'))
             ->Paginate(5);
@@ -161,7 +161,7 @@ class SubjectController extends Controller
 
     public function showQuestions(Subject $subject){
         $subject->load('topics.questions');
-        $header = ['ID', 'Topic', 'Name', 'Type', 'Author', 'Date Created'];
+        $header = ['Topic', 'Name', 'Type', 'Author', 'Date Created'];
         $rows = $subject->topics->flatMap(function ($topics) {
             return $topics->questions;
         })->map(fn($question) => [

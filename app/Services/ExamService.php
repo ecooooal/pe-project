@@ -69,10 +69,10 @@ class ExamService
         $exam_questions = $exam->questions()->pluck('question_id');
 
         $available_questions = $exam_courses->flatMap(function ($course) {
-            return $course->subjects->flatMap(function ($subject) {
-                return $subject->topics->flatMap->questions;
-            });
-        });
+                return $course->subjects->flatMap(function ($subject) {
+                    return $subject->topics->flatMap->questions;
+                });
+            })->unique('id')->values();
 
     return $available_questions->whereNotIn('id', $exam_questions)->values();
     }
@@ -125,11 +125,12 @@ class ExamService
             $question->load('topic.subject');
         }
         return $questions->map(fn ($question) => [
-            'id' => $question->id, 
             'name' => $question->name,
             'subject' => $question->topic->subject->name,
             'topic' => $question->topic->name,
-            'type' => $question->question_type->name
+            'type' => $question->question_type->name,
+            'points' => $question->total_points, 
+            'id' => $question->id
         ]);
     }
 
@@ -140,19 +141,22 @@ class ExamService
     public function assignValuesToQuestionsForKnapsack(Exam $exam, $subject_weight, $criteria)
     {
         // Get all questions related to the exam’s course
-        $course = $this->getCourseForExam($exam);
-        $course->load([
+        $courses = $this->getCourseForExam($exam);
+        $courses->load([
             'subjects.topics.questions.topic.subject'
         ]);
         $knapsack = [];
 
         // Check if course does exist   
-        if ($course) {
+        if ($courses) {
             $topic_weight = 1 - $subject_weight;
 
-            $questions = $course->subjects->flatMap(function ($subject) {
-                                            return $subject->topics->flatMap->questions;
-                                        });
+            $questions = $courses->flatMap(function ($course) {
+                return $course->subjects->flatMap(function ($subject) {
+                    return $subject->topics->flatMap->questions;
+                });
+            })->unique('id')->values();
+
 
             // Count questions per subject and topic
             $questions_in_subjects = $questions->groupBy(fn($question) => $question->topic->subject->id)

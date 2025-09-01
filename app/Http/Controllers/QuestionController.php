@@ -31,7 +31,7 @@ class QuestionController extends Controller
     public function index(){
         $questions = $this->userService->getQuestionsForUser(auth()->user())->paginate(10);
         $questions->load('author'); 
-        $header = ['ID', 'Name', 'Subject', 'Topic', 'Type', 'Author', 'Date Created'];
+        $header = ['Name', 'Subject', 'Topic', 'Type', 'Author', 'Date Created'];
         $rows = $questions->map(function ($question) {
             return [
                 'id' => $question->id,

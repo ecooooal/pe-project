@@ -15,9 +15,11 @@
             {% for row in rows %}
                 <tr class="hover:bg-gray-50">
                     {% for cell in row %}
+                        {% if cell != row.id %}
                         <td class="p-4 border-b border-gray-300 max-w-xs text-sm {{ cell == 'Incomplete' ? 'text-red-600' : (cell == 'Complete' ? 'text-green-600' : '') }} ">
                             <span class="block truncate">{{ cell }}</span>
                         </td>
+                        {% endif %}
                     {% endfor %}
                     {% if actions %}
                         <td class="p-4 max-w-48  border-b border-gray-300">
