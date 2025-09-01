@@ -11,7 +11,7 @@
 </div>
 
 <div class="flex flex-1 flex-col mx-16">
-    <form action="{{ route('exams.store') }}" method="POST" class="flex flex-col gap-y-4">
+    <form id="exam-form" action="{{ route('exams.store') }}" method="POST" class="flex flex-col gap-y-4">
         {{ csrf_field() }}
         <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
             <div class="flex flex-col p-4 flex-1">
@@ -55,7 +55,7 @@
                                 </div>
                                 </div>
                             <div id="tags-container" class="flex flex-wrap gap-1 p-1 "></div>
-                            <input type="hidden" name="courses" id="courses-id" />
+                            <input type="hidden" name="courses[]" id="courses-id" />
                         </div>
                     </div>
                     <div class="flex flex-1/2 flex-col gap-y-4 w-full">
@@ -245,7 +245,16 @@
   }
 
   function updateHiddenInput() {
-    tagsHiddenInput.value = Array.from(tags).join(',');
+    document.querySelectorAll('input[name="courses[]"]').forEach(el => el.remove());
+
+    // Create new inputs
+    Array.from(tags).forEach(tagId => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "courses[]";
+        input.value = tagId;
+        document.getElementById("exam-form").appendChild(input); // Replace with your actual form ID
+    });
   }
 </script>
 {% endblock %}

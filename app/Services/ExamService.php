@@ -13,7 +13,7 @@ class ExamService
 {
     public function getCourseForExam(Exam $exam)
     {
-        return $exam->course()->with('subjects.topics.questions')->first();
+        return $exam->courses()->with('subjects.topics.questions')->get();
     }
 
     public function getQuestionsForExam(Exam $exam)
@@ -64,15 +64,17 @@ class ExamService
 
     public function getAvailableQuestionsForExam(Exam $exam)
     {
-        $exam_course = $this->getCourseForExam($exam); 
+        $exam_courses = $this->getCourseForExam($exam); 
 
         $exam_questions = $exam->questions()->pluck('question_id');
 
-        $available_questions = $exam_course->subjects->flatMap(function ($subject) {
-            return $subject->topics->flatMap->questions;
+        $available_questions = $exam_courses->flatMap(function ($course) {
+            return $course->subjects->flatMap(function ($subject) {
+                return $subject->topics->flatMap->questions;
+            });
         });
 
-        return $available_questions->whereNotIn('id', $exam_questions);
+    return $available_questions->whereNotIn('id', $exam_questions)->values();
     }
 
     public function getTopicsForExam(Exam $exam){

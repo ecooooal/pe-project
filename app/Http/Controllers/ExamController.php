@@ -25,15 +25,17 @@ class ExamController extends Controller
 
     public function index(){
         $courseIds = $this->userService->getCoursesForUser(auth()->user())->pluck('id');
-        $exams = Exam::with('course', 'questions') 
-                    ->whereIn('course_id', $courseIds)
-                    ->paginate(10);
+        $exams = Exam::with(['courses', 'questions'])
+            ->whereHas('courses', function ($query) use ($courseIds) {
+                $query->whereIn('courses.id', $courseIds);
+            })
+            ->paginate(10);
         $header = ['ID', 'Name', 'Course', 'Questions', 'Status', 'is Published', 'Examination Date'];
         $rows = $exams->map(function ($exam) {
             return [
                 'id' => $exam->id,
                 'name' => $exam->name,
-                'course' => $exam->course->name,
+                'course' => $exam->course,
                 'questions' => $exam->questions->count(),
                 'status' => $exam->questions()->sum('total_points') >= $exam->max_score ? 'Complete' : 'Incomplete',
                 'is_published' => $exam->is_published ? 'Yes' : 'No',
@@ -52,7 +54,7 @@ class ExamController extends Controller
     }
 
     public function show(Exam $exam){
-        $exam->load('questions');
+        $exam->load(['questions','courses']);
 
         return view('exams/show', ['exam' => $exam]);
     }
@@ -64,29 +66,31 @@ class ExamController extends Controller
     }
 
     public function store(){
-        dd(request()->post());
 
-        request()->validate([
+        $validated = request()->validate([
             'name' => 'required|string|max:255',
-            'course_id' => 'required|exists:courses,id',
+            'courses' => 'required|array',
+            'courses.*' => 'exists:courses,id',
             'max_score' => 'required|integer|gte:1',
             'duration' => 'nullable|integer|min:1',
             'retakes' => 'nullable|integer|min:1',
             'examination_date' => 'nullable|date|after:now',
         ], [
-            'course_id' => 'The course field is required.',
+            'courses' => 'The course field is required.',
+            'courses.*' => 'Invalid Course',
             'max_score' => 'The max score field is required',
             'examination_date' => 'The examination date field must be a date after now.'
         ]);
 
         $exam = Exam::create([
             'name' => request('name'),
-            'course_id' => request('course_id'),
             'max_score' => request('max_score'),
             'duration' => request('duration') ?? null,
             'retakes' => request('retakes') ?? null, 
             'examination_date' => request('examination_date'),
         ]);
+
+        $exam->courses()->attach($validated['courses']);
 
         $access_code = $this->examService->generateAccessCode();
         $this->examService->saveAccessCode($exam, $access_code);

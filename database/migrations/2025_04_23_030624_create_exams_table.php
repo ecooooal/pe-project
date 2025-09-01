@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('exams', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignIdFor(Course::class, 'course_id')->constrained()->onDelete('set null');;
             $table->integer('max_score');
             $table->integer('duration')->nullable();
             $table->integer('retakes')->nullable();

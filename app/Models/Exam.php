@@ -23,8 +23,9 @@ class Exam extends Model
         'applied_algorithm'
     ];
 
-    public function course() {
-        return $this->belongsTo(Course::class);
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class);
     }
 
     public function accessCodes() {

@@ -17,8 +17,9 @@ class Subject extends Model
         'course_id'
     ];
 
-    public function course(){
-        return $this->belongsTo(Course::class);
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class);
     }
 
     public function topics(){

@@ -152,10 +152,10 @@ class FakeDataSeeder extends Seeder
         foreach ($this->subjects_with_topics as $subjectData) {
             $subject = Subject::firstOrCreate([
                 'name' => $subjectData['name'],
-                'course_id' => 1,
                 'year_level' => 1,
             ]);
-
+            $subject->courses()->attach([1, 2, 3]);
+            
             foreach ($subjectData['topics'] as $topicData) {
                 $topic = Topic::firstOrCreate([
                     'name' => $topicData['name'],
