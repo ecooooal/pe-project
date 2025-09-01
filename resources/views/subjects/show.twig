@@ -40,7 +40,14 @@
             {{ show_header('Details') }}
             <div class="flex justify-between">
                 <div class="flex flex-col gap-y-4">
-                    {{ show_item('Course', subject.course.name) }}
+                    <div class="flex flex-wrap w-3/4 gap-1">
+                        <p class="text-medium font-medium"> Course/s : </p>
+                        {% for tag in range(0,10) %}
+                            <span class=" inline-flex items-center px-2 py-0.5 min-w-fit  bg-blue-100 rounded-full text-blue-900 font-semibold text-xs select-none"> 
+                            BSCS
+                            </span>
+                        {% endfor %}
+                    </div>
                     {{ show_item('Year Level', subject.year_level) }}
                     {{ show_item('Current No. of Topics', subject.topics.count() )}}
                 </div>

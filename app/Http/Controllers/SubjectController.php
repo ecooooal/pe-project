@@ -68,12 +68,14 @@ class SubjectController extends Controller
     }
 
     public function create(){
-        $courses = Course::all()->pluck('name', 'id');
+        $courses = Course::select(['abbreviation', 'id'])->get();
 
         return view('subjects/create', ['courses' => $courses]);
     }
 
     public function store(){
+        dd(request()->post());
+
         $validator = Validator::make(request()->post(), [
             'name'    => ['required', 'unique:subjects,name'],
             'course'     => ['required', 'integer'],

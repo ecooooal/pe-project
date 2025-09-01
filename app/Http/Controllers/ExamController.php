@@ -58,12 +58,14 @@ class ExamController extends Controller
     }
 
     public function create(){
-        $courses = Course::all()->pluck('name', 'id');
+        $courses = Course::select(['abbreviation', 'id'])->get();
         return view('exams/create', ['courses' => $courses]);
 
     }
 
     public function store(){
+        dd(request()->post());
+
         request()->validate([
             'name' => 'required|string|max:255',
             'course_id' => 'required|exists:courses,id',
