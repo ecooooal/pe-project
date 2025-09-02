@@ -62,7 +62,6 @@
 
         const questions = JSON.parse(question_exams_raw_data.dataset.questions);
         const exams = JSON.parse(exam_courses_raw_data.dataset.exams);
-        console.log(questions);
         const exam_question_text = questions.map(q =>
             `<b>Id</b>: ${q["id"]}<br>` +
             `<b>Name</b>: ${q["name"]}<br>` +
@@ -92,6 +91,7 @@
             width:0.8,
             type: 'bar',
             marker: {
+                line: { width: 2, color: '#333'},
                 color: exam_question_colors,
                 opacity:0.7
             }
@@ -110,6 +110,7 @@
             yaxis: 'y2',
             type: 'bar',
             marker: {
+                line: { width: 2, color: '#333'},
                 color: 'rgb(49,130,189)',
                 opacity:0.7
             }
@@ -212,14 +213,14 @@
     
     const examination_dates_raw_data = document.getElementById('examination_date_data');
     const dates_json = JSON.parse(examination_dates_raw_data.dataset.examinations); // ← this is an object
-
+    console.log(examination_dates_raw_data);
     const exams = Object.entries(dates_json).map(([date, data]) => ({
         date,
         count: data.count,
         names: data.names
     }));
 
-    let year = 2025, month = 7; // January
+    let year = 2025, month = 8; // January
     let firstDay = new Date(year, month, 1).getDay(); // 0=Sun, ... 6=Sat
     let daysInMonth = new Date(year, month + 1, 0).getDate();
 

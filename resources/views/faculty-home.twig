@@ -66,15 +66,15 @@
 document.body.addEventListener('htmx:configRequest', (evt) => {
     // Show loader, hide default icon
     const btn = evt.target;
-    btn.querySelector('#refresh-icon').classList.add('hidden');
-    btn.querySelector('#svg-loader').classList.remove('hidden');
+    btn.querySelector('#refresh-icon')?.classList.add('hidden');
+    btn.querySelector('#svg-loader')?.classList.remove('hidden');
 });
 
 document.body.addEventListener('htmx:afterRequest', (evt) => {
     // Hide loader, show default icon
     const btn = evt.target;
-    btn.querySelector('#refresh-icon').classList.remove('hidden');
-    btn.querySelector('#svg-loader').classList.add('hidden');
+    btn.querySelector('#refresh-icon')?.classList.remove('hidden');
+    btn.querySelector('#svg-loader')?.classList.add('hidden');
 });
 </script>
 {% endblock %}

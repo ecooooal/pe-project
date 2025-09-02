@@ -56,13 +56,12 @@ function renderCourseGraph() {
     const subject_raw_data = document.getElementById('subject_graph_data');
     const topic_raw_data = document.getElementById('topic_graph_data');
     const question_type_raw_data = document.getElementById('question_type_graph_data');
-    const reused_question_raw_data = document.getElementById('reused_question_graph_data');
+    const question_stats_raw_data = document.getElementById('reused_question_graph_data');
 
     const subjects = JSON.parse(subject_raw_data.dataset.questions || '[]');
     const topics = JSON.parse(topic_raw_data.dataset.questions || '[]');
     const types = JSON.parse(question_type_raw_data.dataset.questions || '[]');
-    const reused = JSON.parse(reused_question_raw_data.dataset.questions || '[]');
-
+    const question_stats = JSON.parse(question_stats_raw_data.dataset.questions || '[]');
     const subject_graph_text = subjects.map(q =>
         `<b>Name</b>: ${q["name"]}<br>`
     );
@@ -71,12 +70,58 @@ function renderCourseGraph() {
         `<b>Name</b>: ${q["name"]}<br>`
     );
 
-    const reused_graph_text = reused.map(q =>
-        `<b>Id</b>: ${q["id"]}<br>` +
+    // Mapping for colors and symbols, this is for question graph
+    const question_status_color_by_status = {
+        used: 'rgb(49, 130, 189)', 
+        reused: 'rgb(195,140,60)', 
+        unused: 'rgb(153, 27, 30)'
+    };
+
+    const question_shape_by_type = {
+      'T/F': 'triangle',
+      'MCQ': 'circle',
+      'Identification': 'square',
+      'Ranking': 'hourglass',
+      'Matching': 'bowtie',
+      'Coding' : 'arrow-bar-right'
+    };
+
+    // separate question data by level
+    const question_level_separator = {};
+    question_stats.forEach(q => {
+    question_level_separator[q.level] = (question_level_separator[q.level] || 0) + 1;
+    });
+
+    // sort each level by question count
+    const sorted_question_levels = Object.entries(question_level_separator)
+      .sort((a, b) => b[1] - a[1])
+      .map(entry => entry[0]);
+
+    // Step 3: Group questions by level
+    const grouped = {};
+    sorted_question_levels.forEach(level => grouped[level] = []);
+    question_stats.forEach(q => grouped[q.level].push(q));
+
+    // Step 4: Build plot data
+    const question_stats_x = [],  
+    question_stats_y = [],  
+    question_stats_marker_colors = [], 
+    question_stats_marker_symbols = [], 
+    question_stats_texts = [];
+
+    for (const level of sorted_question_levels) {
+      const group = grouped[level];
+      group.forEach((q, i) => {
+        question_stats_x.push(level);
+        question_stats_y.push(i); 
+        question_stats_marker_colors.push(question_status_color_by_status[q.status]);
+        question_stats_marker_symbols.push(question_shape_by_type[q.question_type] || 'circle');
+        question_stats_texts.push(`<b>Status</b>: ${q["status"]}<br>` +
         `<b>Name</b>: ${q["name"]}<br>` +
-        `<b>Type</b>: ${q["question_type"]}<br>`
-    );
-    
+        `<b>Type</b>: ${q["question_type"]}<br>`);
+      });
+    }
+
     // Plotly traces
     let subject_graph = {
         name:'Questions by Subject',
@@ -93,6 +138,7 @@ function renderCourseGraph() {
         width: 0.8,
         type: 'bar',
         marker: {
+            line: { width: 2, color: '#333'},
             color: 'rgb(49,130,189)',
             opacity:0.7
         }
@@ -115,28 +161,33 @@ function renderCourseGraph() {
         yaxis: 'y2',
         type: 'bar',
         marker: {
+            line: { width: 2, color: '#333'},
             color: 'rgb(49,130,189)',
             opacity:0.7
         }
     };
 
-    const question_exams = {
-        name:'Questions in Exams',
-        x: reused.map(d => d.name),
-        y: reused.map(d => d.reused_count),
+    const question_stats_graph = {
+        name:'Questions Stats',
+        x: question_stats_x,
+        y: question_stats_y,
         xaxis: 'x3',
         yaxis: 'y3',
-        type: 'bar',
-        text: reused_graph_text,
-        textposition: 'none', 
+        type: 'scatter',
+        mode: 'markers',
+        text: question_stats_texts,
         hoverinfo: 'text',
-        hovertemplate:  '<b>Reused Count</b>: %{y}' +
-                        '<br>%{text}<br><extra></extra>',   
+        hovertemplate: '%{text}<extra></extra>',   
         hoverlabel: {
             font: { color: 'white' }      // hover text color
         },
-        width: 0.7,
-        marker: { color: 'rgb(49,130,189)', opacity: 0.7 }
+        width: 1,
+        marker: { 
+            color: question_stats_marker_colors,
+            symbol: question_stats_marker_symbols,
+            line: { width: 2, color: '#333'},
+            size: 13,
+            opacity: 0.7 }
     };
 
     const question_types = {
@@ -148,10 +199,12 @@ function renderCourseGraph() {
         textposition: 'auto',
         hovertemplate:  '<b>No. of Questions</b>: %{y}<br>' +
                         '<b>Type</b>: %{x}<br><extra></extra>',
-        marker: { color: 'rgb(49,130,189)', opacity: 0.7 }
+        marker: { 
+            line: { width: 2, color: '#333'},
+            color: 'rgb(49,130,189)', opacity: 0.7 }
     };
 
-    const subject_and_topic_data = [subject_graph, topic_graph, question_exams];
+    const subject_and_topic_data = [subject_graph, topic_graph, question_stats_graph];
     const question_type_data = [question_types];
 
     var course_graph_layout = {
@@ -179,6 +232,7 @@ function renderCourseGraph() {
             margin: { l: 40, r:10, t: 60, b: 40 },
             
             xaxis: {
+                type: 'category', 
                 title: {
                     text: 'Subjects',
                     font: {
@@ -233,32 +287,29 @@ function renderCourseGraph() {
             xaxis3: { 
                 domain: [0.0, 1.0],
                 title: {
-                    text: 'Reused Questions',
+                    text: 'Questions Stats',
                     font: {
                         size: 12,
                         color: '#7f7f7f'
                     }
                 },   
-                tickfont: {
-                    size: 10,
-                    color: 'rgb(107, 107, 107)'
-                },
-                showticklabels: false,
+                type: 'category',
+                categoryorder: 'array',
+                categoryarray: ['remember', 'understand', 'apply', 'analyze', 'evaluate', 'create'],
                 anchor: 'y3',
-                
+                showgrid: false
+
             },
             yaxis3: {        
                 title: {
-                    text: 'No. of Exams',
+                    text: 'Questions',
                     font: {
                         size: 12,
                         color: '#7f7f7f'
                     }
-                },   
-                tickfont: {
-                    size: 14,
-                    color: 'rgb(107, 107, 107)'
-                    },
+                },  
+                showticklabels: false,
+                zeroline: false,
                 anchor: 'x3',
             },
         
