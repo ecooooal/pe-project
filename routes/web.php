@@ -6,6 +6,7 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\Student\ExamRecordController;
 use App\Http\Controllers\Student\StudentAnswerController;
@@ -235,10 +236,9 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
         return view('reviewers/questions');
     });
 
-    Route::get('/reports', function(){
-        return view('reports');
-    });
-
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/show', [ReportController::class, 'show'])->name('reports.show');
+    
     Route::middleware('htmx.request:faculty.index')->group(function () {
         // Faculty Homepage
         Route::get('/homepage/report/exam', [LandingPageController::class, 'examReportShow'])->name('graphs.homepage.exam');

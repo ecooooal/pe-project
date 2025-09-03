@@ -2,7 +2,7 @@
     {% if exam_records is not empty %}
     {% for record in exam_records %}
     <div class="flex flex-1">
-        <details class="flex flex-1 flex-col bg-white rounded-xl shadow-sm ring-1 ring-gray-950/5">
+        <details class="details-animated w-full bg-white rounded-xl shadow-sm ring-1 ring-gray-950/5">
             <summary class="flex flex-1 p-4 bg-white rounded-xl justify-between hover:bg-blue-900 group duration-300">
                 <span class="text-blue-900 text-xl font-bold group-hover:text-white">Record #{{ record.attempt }}
                     <span class="text-xs text-slate-600 font-semibold group-hover:text-gray-400"> Total Score : {{ record.total_score }}pts</span>

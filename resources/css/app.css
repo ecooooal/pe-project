@@ -60,6 +60,22 @@
         opacity: 0;
         transform: scale(0.95);
     }
+
+    .details-animated::details-content {
+        interpolate-size: allow-keywords;
+        block-size: 0;
+        opacity: 0;
+        content-visibility: hidden;
+        transition: block-size .8s ease, opacity 0s, content-visibility .8s;
+        transition-behavior: allow-discrete;
+    }
+
+    .details-animated[open]::details-content {
+        block-size: auto;
+        opacity: 1;
+        content-visibility: visible;
+        transition: block-size .8s ease, opacity .3s ease 0.8s;
+    }
 }
 
 @theme {
