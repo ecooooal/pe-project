@@ -30,4 +30,7 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    optimizeDeps: {
+    include: ['plotly.js-dist-min']
+    }
 });

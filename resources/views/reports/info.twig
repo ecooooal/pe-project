@@ -1,0 +1,460 @@
+{% from 'components/core/show-nav-item' import show_nav_item %}
+{% from 'components/core/breadcrumbs' import breadcrumb %}
+{% from 'components/core/show-header' import show_header %}
+{% from 'components/core/show-item' import show_item %}
+
+{% extends 'components/core/faculty-layout' %}
+
+{% block content %}
+
+{{ breadcrumb() }}
+<div class="flex justify-between mx-4 px-4">
+    <div class="flex flex-col">
+    <h1 class="font-bold text-4xl">Report: Exam Name</h1>
+
+        <div class="flex flex-wrap items-center w-full pl-2 gap-0.5">
+                <span class="text-xs text-gray-400 font-semibold">Course/s : </span>
+                {% for course in range(0,3) %}
+                <span class=" inline-flex items-center px-2 py-0.5 min-w-fit  bg-blue-100 rounded-full text-blue-900 font-semibold text-xs select-none"> 
+                    BSCPE
+                </span>
+                {% endfor %}
+        </div>  
+    </div>
+
+  
+</div>
+<div class="flex flex-1 flex-col gap-y-4">
+    <div class="flex max-w-full gap-x-4 overflow-x-auto mx-auto rounded-xl bg-white p-2 shadow-sm ring-1 ring-gray-950/5 ">
+        {{ show_nav_item('/reports/show', 
+                        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
+                            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                            <path fill-rule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z" clip-rule="evenodd" />
+                        </svg>',
+                        'Show') }}
+        {{ show_nav_item('/reports/info', 
+                        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
+                            <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
+                        </svg>',
+                        'Info') }}
+        {{ show_nav_item('/reports/'~question.id~'/discussion', 
+                        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" fill="currentColor" class="size-5">
+                            <path d="M80 160c0-35.3 28.7-64 64-64l32 0c35.3 0 64 28.7 64 64l0 3.6c0 21.8-11.1 42.1-29.4 53.8l-42.2 27.1c-25.2 16.2-40.4 44.1-40.4 74l0 1.4c0 17.7 14.3 32 32 32s32-14.3 32-32l0-1.4c0-8.2 4.2-15.8 11-20.2l42.2-27.1c36.6-23.6 58.8-64.1 58.8-107.7l0-3.6c0-70.7-57.3-128-128-128l-32 0C73.3 32 16 89.3 16 160c0 17.7 14.3 32 32 32s32-14.3 32-32zm80 320a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"/>
+                        </svg>',
+                        'Export Data') }}
+    </div>
+
+    <div class="flex flex-col gap-2 max-w-full h-fit p-4 mx-8 rounded-xl bg-gray-100 shadow-sm ring-1 ring-gray-950/5">
+        <span class="text-3xl font-bold text-gray-800">Context for This Report</span>
+        <div class="flex w-full h-fit p-2 gap-y-2">
+            <div class="flex flex-col gap-4">
+                <span class="pl-4 text-sm font-semibold text-gray-800">
+                • This Exam have : (for each blooms level : + 'level') <br>
+                • Assumes a maximum of 50 students for accuracy <br>
+                • Inferential Statistics require and only for two groups <br>
+                • Primary Metric : Raw Exam Scores <br>
+                • Secondary Metric : Exam Scores Grouped By Bloom's Taxonomy Level <br>
+                • Secondary Metric : Exam Scores Translated into Level's Score <br>
+                • Secondary Metric : Exam Score and Level's Score Grouped by Subjects
+                </span>
+            </div>
+            <div class="flex flex-col ml-auto">
+                <span class="text-md font-bold text-gray-800">Aims to Answer:</span>
+                <span class="pl-4 text-sm font-semibold text-gray-800">
+                    •  How does the performance vary across each bloom's taxonomy level from each course? <br>
+                    •  Are there any outliers in the dataset that significantly affect the performance of each course? <br>
+                    •  How is the performance distributed across COI students visually? <br>
+                    •  What is the distribution of scores across different topics covered in the exam from each COI course? <br>
+                    •  Are there any clusters of students from their respective courses with similar performance levels? <br>
+                </span>               
+            </div>
+        </div>
+        <div class="flex flex-col w-full gap-y-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5 ">
+            <div  class="flex flex-col w-full">
+                <p class="text-3xl font-bold text-gray-800">Exploratory Data Analysis</p>
+                <div class="flex w-full h-fit p-2 gap-y-2">
+                    <div class="flex flex-col gap-4">
+                        <span class="text-2xl font-bold text-gray-900 self-center">
+                            0
+                        </span>
+                        <span class="text-xs text-gray-400 font-mono font-semibold self-center mt-auto">Missing Values</span>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2 p-1">
+                    <div class="flex gap-4">
+                        <div id="exam-histogram" class="w-full h-72">
+
+                        </div>
+                        <div id="exam-boxplot" class="w-full h-72">
+
+                        </div>
+                    </div>
+                <div class="flex flex-col w-full">
+                    <span class="text-md font-bold text-gray-800">Aims to Answer:</span>
+                    <span class="pl-4 text-sm font-semibold text-gray-800">
+                        •  How does the performance vary across each bloom's taxonomy level from each course? <br>
+                        •  Are there any outliers in the dataset that significantly affect the performance of each course? <br>
+                    </span>               
+                </div>
+                </div>
+            </div>
+            <div  class="flex flex-col w-full">
+                <p class="text-3xl font-bold text-gray-800">Descriptive Statistics</p>
+                <div>
+                    <div class="flex  gap-x-1">
+                    <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+                        <span class="text-2xl font-bold text-gray-900 self-center">
+                            0
+                        </span>
+                        <span class="text-xs text-gray-400 font-mono font-semibold self-center mt-auto">Mean</span>
+                    </div>
+                    <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+                        <span class="text-2xl font-bold text-green-900 self-center">
+                            0
+                        </span>
+                        <span class="text-xs text-green-400 font-mono font-semibold self-center mt-auto">Median</span>
+                    </div>
+                    <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+                        <span class="text-2xl font-bold text-orange-900 self-center">
+                            0
+                        </span>
+                        <span class="text-xs text-orange-400 font-mono font-semibold self-center mt-auto">Mode</span>
+                    </div>
+                </div>
+                <div class="flex  gap-x-1">
+                    <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+                    <span class="text-2xl font-bold text-gray-900 self-center">
+                        0
+                    </span>
+                    <span class="text-xs text-gray-400 font-mono font-semibold self-center mt-auto">Standard <br> Deviation</span>
+                    </div>
+                    <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+                        <span class="text-2xl font-bold text-orange-900 self-center">
+                            0
+                        </span>
+                        <span class="text-xs text-orange-700/70 font-mono font-semibold self-center mt-auto">Variance</span>
+                    </div>
+                    <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+                        <span class="text-2xl font-bold text-orange-900 self-center">
+                            0-100
+                        </span>
+                        <span class="text-xs text-orange-700/70 font-mono font-semibold self-center mt-auto">Range</span>
+                    </div>
+                </div>            
+            </div>
+                <div class="flex flex-col gap-2 p-1">
+                    <div class="flex gap-4">
+                        <div  class="w-full h-72">
+
+                        </div>
+                        <div  class="w-full h-72">
+
+                        </div>
+                    </div>
+                <div class="flex flex-col w-full">
+                    <span class="text-md font-bold text-gray-800">Aims to Answer:</span>
+                    <span class="pl-4 text-sm font-semibold text-gray-800">
+                        •  How does the performance vary across each bloom's taxonomy level from each course? <br>
+                        •  Are there any outliers in the dataset that significantly affect the performance of each course? <br>
+                    </span>               
+                </div>
+                </div>
+            </div>
+            <div  class="flex flex-col w-full">
+                <p class="text-3xl font-bold text-gray-800">Data Visualization</p>
+                <div class="flex flex-col gap-2 p-1">
+                    <div class="w-full">
+                        <div id="exam-heatmap" class="w-full">
+
+                        </div>
+                    </div>
+                <div class="flex flex-col w-full">
+                    <span class="text-md font-bold text-gray-800">Aims to Answer:</span>
+                    <span class="pl-4 text-sm font-semibold text-gray-800">
+                    •  How is the performance distributed across COI students visually? <br>
+                    •  What is the distribution of scores across different topics covered in the exam from each COI course? <br>
+                    •  Are there any clusters of students from their respective courses with similar performance levels? <br>
+                    </span>               
+                </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const target = document.getElementById('exam-histogram');
+    if (target) {
+        renderHistogram(target);
+    }
+});
+
+function renderHistogram(el) {
+    let numQuestions = 50;
+    let numStudents = 30; 
+    let minScore = 0;
+
+    let allScores = [];
+    let maxScorePerQuestion =  Array.from({ length: numQuestions }, () => Math.floor(Math.random() * 30) + 1);
+    for (let s = 0; s < numStudents; s++) {
+        for (let q = 0; q < numQuestions; q++) {
+            // Random score between 0 and the max for this question
+            let score = Math.floor(Math.random() * (maxScorePerQuestion[q] + 1));
+            
+            // Normalize to percentage
+            let normalizedScore = Math.round((score / maxScorePerQuestion[q]) * 100);
+
+            allScores.push(normalizedScore);
+        }
+    }
+
+
+    // Trace for histogram
+    let histogram_trace = {
+      x: allScores,
+      type: 'histogram',
+      xbins: { size: 5 },
+        marker: {
+            line: { width: 2, color: '#333'},
+            color: 'rgb(49,130,189)',
+            opacity:0.7
+        },
+      opacity: 0.75
+    };
+
+    let histogram_layout = {
+      title: {
+        text: "Histogram of Exam Scores",
+        font: { size: 16, color: "#4B5563", family: "Arial Black, sans-serif" },
+        x: 0.5,
+        xanchor: 'center',
+        y: 0.95,
+        yanchor: 'top'
+      },
+
+      height: 400,
+      autosize: true,
+      margin: { l: 40, r: 10, t: 60, b: 40 },
+      xaxis: {
+        title: { text: 'Exam Score', font: { size: 12, color: '#7f7f7f' } },
+        tickfont: { size: 12, color: 'rgb(107, 107, 107)' },
+        range: [-10, 120]
+      },
+      yaxis: {
+        title: { text: 'Frequency', font: { size: 12, color: '#7f7f7f' } },
+        tickfont: { size: 12, color: 'rgb(107, 107, 107)' }
+      }
+    };
+
+    Plotly.newPlot('exam-histogram', [histogram_trace], histogram_layout).then(() => {
+            Plotly.Plots.resize('exam-histogram');  
+        });
+
+
+let rawScores = [];
+let taxonomyScores = { 
+    "Remember": [], 
+    "Understand": [], 
+    "Apply": [], 
+    "Analyze": [], 
+    "Evaluate": [], 
+    "Create": [] 
+};
+
+// Generate scores
+for (let s = 0; s < numStudents; s++) {
+    for (let q = 0; q < numQuestions; q++) {
+        let score = Math.floor(Math.random() * (maxScorePerQuestion[q] + 1));
+        let normalizedScore = Math.round((score / maxScorePerQuestion[q]) * 100);
+
+        rawScores.push(normalizedScore);
+
+        let level;
+        if (q < 5) level = "Remember";
+        else if (q < 15) level = "Understand";
+        else if (q < 25) level = "Apply";
+        else if (q < 35) level = "Analyze";
+        else if (q < 40) level = "Evaluate";
+        else level = "Create";
+
+        taxonomyScores[level].push(normalizedScore);
+    }
+}
+let boxplot_rawTrace = {
+    y: rawScores,
+    type: 'box',
+    orientation: 'v',
+    boxpoints: 'outliers', 
+    name: 'Raw Exam',
+    marker: { color: 'rgb(49,130,189)' }
+};
+
+let boxplot_taxonomyTraces = Object.keys(taxonomyScores).map((level, i) => ({
+    y: taxonomyScores[level].map(s => s), 
+    type: 'box',
+    orientation: 'v',
+    boxpoints: 'outliers',
+    name: level,
+    marker: { color: `rgb(${50 + i*50},${130 - i*20},${180 - i*40})` }
+}));
+
+let boxplot_data = [boxplot_rawTrace, ...boxplot_taxonomyTraces];
+
+let boxplot_layout = {
+    showlegend: false,
+    title: {
+        text: "Looking for Outliers",
+        font: { size: 16, color: "#4B5563", family: "Arial Black, sans-serif" },
+        x: 0.5,
+        xanchor: 'center'
+    },
+    xaxis: {
+        type: 'category',
+        tickangle: -30,    
+        tickfont: {
+            size: 10,
+            color: 'rgb(107, 107, 107)'
+        },
+    },
+    yaxis: { 
+    title: {
+        text: 'No. of Questions',
+        font: {
+            size: 12,
+            color: '#7f7f7f'
+            }
+        },  
+        range: [-10, 120] 
+        },
+      height: 400,
+      autosize: true,
+      margin: { l: 40, r: 10, t: 60, b: 40 },
+};
+
+    Plotly.newPlot('exam-boxplot', boxplot_data, boxplot_layout).then(() => {
+            Plotly.Plots.resize('exam-boxplot'); 
+        });
+function makeQuestions(level, count) {
+  let arr = [];
+  for (let i = 1; i <= count; i++) {
+    arr.push({
+      test: ["Quiz", "Midterm", "Final"][Math.floor(Math.random()*3)],
+      type: ["MCQ", "Short", "Essay", "Project"][Math.floor(Math.random()*4)],
+      raw: Math.floor(Math.random() * 31),            // 0–30
+      bloom: Math.round((Math.random())*100)/100,     // 0–1
+      topic: "Topic " + (Math.floor(Math.random()*10)+1),
+      subject: ["Math","Science","History","English","Philosophy","Art","Engineering"][Math.floor(Math.random()*7)],
+      bloomLevel: level
+    });
+  }
+  return arr;
+}
+
+var questions = {
+  "Remember":   makeQuestions("Remember", 10),
+  "Understand": makeQuestions("Understand", 10),
+  "Apply":      makeQuestions("Apply", 8),
+  "Analyze":    makeQuestions("Analyze", 8),
+  "Evaluate":   makeQuestions("Evaluate", 7),
+  "Create":     makeQuestions("Create", 7)
+};
+
+// Build one trace per taxonomy with ascending raw order
+var traces = Object.keys(questions).map(level => {
+  let qData = questions[level].sort((a, b) => a.raw - b.raw);
+
+  return {
+    y: Array(qData.length).fill(level),
+    x: Array(qData.length).fill(1),
+    type: 'bar',
+    orientation: 'h',
+    marker: {
+                        line: { width: 2, color: '#333'},
+      color: qData.map(q => q.raw),
+      colorscale: [
+  ['0.0', 'rgb(49, 130, 189)'],
+  ['0.1', 'rgb(63, 131, 176)'],
+  ['0.2', 'rgb(78, 132, 163)'],
+  ['0.3', 'rgb(92, 133, 150)'],
+  ['0.4', 'rgb(107, 134, 137)'],
+  ['0.5', 'rgb(122, 135, 124)'],
+  ['0.6', 'rgb(136, 136, 111)'],
+  ['0.7', 'rgb(151, 137, 98)'],
+  ['0.8', 'rgb(165, 138, 85)'],
+  ['0.9', 'rgb(180, 139, 72)'],
+  ['1.0', 'rgb(195, 140, 60)']
+], opacity: .9,
+      cmin: 0,
+      cmax: 30,
+      colorbar: { title: 'Raw Score (0–30)' }
+    },
+    customdata: qData.map(q => [q.test, q.type, q.raw, q.bloom, q.topic, q.subject]),
+    hovertemplate:
+      "Question text: %{customdata[0]}<br>" +
+      "Question type: %{customdata[1]}<br>" +
+      "Raw points: %{customdata[2]}<br>" +
+      "Bloom's score: %{customdata[3]}<br>" +
+      "Question topic: %{customdata[4]}<br>" +
+      "Question subject: %{customdata[5]}<extra></extra>",
+                  hoverlabel: {
+                font: { color: 'white' }      // hover text color
+            },
+    showlegend: false
+  };
+});
+
+var layout = {
+  barmode: 'stack',
+      title: {
+        text: "Performance Distribution by Question Levels",
+        font: { size: 16, color: "#4B5563", family: "Arial Black, sans-serif" },
+        x: 0.5,
+        xanchor: 'center'
+    },
+  width: 900,
+  height: 400,
+  xaxis: {  showgrid: false, zeroline: false, 
+        title: {
+        text: 'No. of Questions',
+        font: {
+            size: 12,
+            color: '#7f7f7f'
+            }
+        }, },
+  yaxis: { 
+            tickfont: {
+            size: 10,
+            color: 'rgb(107, 107, 107)'
+        },
+    categoryorder: "array",
+    categoryarray: ["Remember","Understand","Apply","Analyze","Evaluate","Create"],
+  },
+    autosize: true,
+      margin: { l: 70, r: 10, t: 60, b: 150 },
+      annotations: [
+    {
+      text: "Exam Scores",
+      xref: "paper",
+      yref: "paper",
+      x: 1.05,       // align with colorbar (to the right of plot)
+      y: 0,      // below the plot area
+      showarrow: false,
+      textangle: 0, // rotate text
+      font: {
+            size: 10,
+            color: 'rgb(107, 107, 107)'
+      },
+      xanchor: "center",
+      yanchor: "top"
+    }
+  ]
+};
+
+Plotly.newPlot('exam-heatmap', traces, layout);
+
+
+}
+</script>
+{% endblock %}
+

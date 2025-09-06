@@ -1,7 +1,8 @@
 import './bootstrap';
 import htmx from 'htmx.org';
-import Plotly from 'plotly.js-dist';
+import Plotly from 'plotly.js-dist-min'
 import Toast from './toast.js';
+window.global ||= window;
 
 window.htmx = htmx;
 

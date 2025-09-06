@@ -15,4 +15,9 @@ class ReportController extends Controller
         return view('reports/show');
 
     }
+
+    public function info(){
+        return view('reports/info');
+
+    }
 }
