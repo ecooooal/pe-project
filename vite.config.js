@@ -24,7 +24,8 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/js/text-editor.js',
                 'resources/js/edit-coding-text-editor.js', 
-                'resources/js/answering-text-editor.js'
+                'resources/js/answering-text-editor.js',
+                'resources/js/exam-reports-plots.js'
             ],
             refresh: true,
         }),
