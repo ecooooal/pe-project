@@ -122,9 +122,9 @@
                             </div>
                 </details>
                 <div class="flex w-full gap-2">
-                    <div class="flex relative justify-center items-center w-full p-4 gap-0.5 bg-blue-100 rounded-lg">
+                    <div class="flex relative justify-center items-center w-full p-4 gap-0.5 border-1 border-gray-100 shadow-sm rounded-lg">
                         <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                            <span class="text-2xl font-bold text-gray-900 self-center">
+                            <span class="text-2xl font-bold text-gray-800 self-center">
                                 {{ students_count }}
                             </span> 
                             <span class="flex text-xs text-gray-500 font-mono font-semibold gap-0.5 items-center mt-auto">
@@ -173,7 +173,7 @@
                             Key Variables
                         </span> 
                     </div>
-                    <div class="flex relative justify-center  items-center w-full p-4 gap-0.5 bg-red-100 rounded-lg">
+                    <div class="flex relative justify-center  items-center w-full p-4 gap-0.5 shadow-sm bg-red-100 rounded-lg">
                         <div class="flex flex-col h-fit w-24 p-1">
                             <span class="text-2xl font-bold text-gray-900 self-center">
                                 {{ missing_values }}
@@ -215,184 +215,162 @@
             <div  class="flex flex-col w-full gap-y-1">
                 <p class="text-3xl font-bold text-gray-800">Descriptive Statistics</p>
                 
-                <div class="grid grid-cols-2 grid-rows-1 gap-1">
-
-                    <div class="grid  grid-cols-1 grid-rows-2  bg-blue-100 p-1 rounded-lg">
-                        <div class="flex flex-col relative justify-center items-center w-full p-4 gap-0.5">
-                            <div class="flex m-1 gap-x-1">
-                                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                                    <span class="text-2xl font-bold text-gray-900 self-center">
-                                        {{ mean }}
+                <div class="flex w-full gap-1">
+                    <div class="flex p-4 gap-x-2">
+                        <div class="flex flex-col justify-between">
+                            <div class="flex items-center h-20 w-35 p-3 border-gray-100 border-1 rounded-lg shadow-md gap-2">
+                                <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+                                    🧠
+                                </div>
+                                
+                                <div class="flex flex-col justify-center">
+                                    <span class="text-xl font-extrabold font-mono text-blue-900">
+                                    80%
                                     </span>
-                                    <span class="text-xs text-gray-500 font-mono font-semibold self-center mt-auto">
-                                        (μ) Mean
+                                    <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+                                    Remember <br> (10) items
                                     </span>
                                 </div>
-                                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                                    <span class="text-2xl font-bold text-green-900 self-center">
-                                        {{ median }}
+                            </div>
+                            <div class="flex items-center h-20 w-35 p-3 border-gray-100 border-1 rounded-lg shadow-md gap-2">
+                                <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+                                    📖
+                                </div>
+                                
+                                <div class="flex flex-col justify-center">
+                                    <span class="text-xl font-extrabold font-mono text-blue-900">
+                                    60%
                                     </span>
-                                    <span class="text-xs text-green-400 font-mono font-semibold self-center mt-auto">
-                                       (Md) Median
+                                    <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+                                    Understand <br> (10) items
                                     </span>
                                 </div>
-                                <div class="flex flex-col h-fit w-fit p-1 gap-y-2">
-                                    <span class="flex text-balance max-w-32 text-2xl font-bold text-orange-900 self-center">
+                            </div>
+                            <div class="flex items-center h-20 w-35 p-3 border-gray-100 border-1 rounded-lg shadow-md gap-2">
+                                <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+                                    🛠️
+                                </div>
+                                
+                                <div class="flex flex-col justify-center">
+                                    <span class="text-xl font-extrabold font-mono text-blue-900">
+                                    66%
+                                    </span>
+                                    <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+                                    Apply <br> (10) items
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col justify-between">
+                            <div class="flex items-center h-20 w-35 p-3 border-gray-100 border-1 rounded-lg shadow-md gap-2">
+                                <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+                                    🧩
+                                </div>
+                                
+                                <div class="flex flex-col justify-center">
+                                    <span class="text-xl font-extrabold font-mono text-blue-900">
+                                    55%
+                                    </span>
+                                    <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+                                    Analyze <br> (10) items
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex items-center h-20 w-35 p-3 border-gray-100 border-1 rounded-lg shadow-md gap-2">
+                                <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+                                    📝
+                                </div>
+                                
+                                <div class="flex flex-col justify-center">
+                                    <span class="text-xl font-extrabold font-mono text-blue-900">
+                                    76%
+                                    </span>
+                                    <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+                                    Evaluate <br> (10) items
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex items-center h-20 w-35 p-3 border-gray-100 border-1 rounded-lg shadow-md gap-2">
+                                <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+                                    🎨
+                                </div>
+                                
+                                <div class="flex flex-col justify-center">
+                                    <span class="text-xl font-extrabold font-mono text-blue-900">
+                                    50%
+                                    </span>
+                                    <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+                                    Create <br> (10) items
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center items-center w-full p-4 gap-0.5">
+                            <div class="w-72 py-2 px-4 bg-blue-50 rounded-lg shadow-lg">
+                                <h3 class="text-lg font-bold mb-3 text-gray-800">Exam Summary</h3>
+                                <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-gray-700">
+                                    <dt class="font-semibold">Mean</dt><dd>{{ mean }}</dd>
+                                    <dt class="font-semibold">Median</dt><dd>{{ median }}</dd>
+                                    <dt class="font-semibold">Mode</dt><dd>                                        
                                         {% for m in mode %}
                                             {{ m ?: 0 }}
-                                        {% if loop.last == false  %}|{% endif%}
+                                            {% if loop.last == false  %}|{% endif%}
                                         {% endfor %}
-                                    </span>
-                                    <span class="text-xs text-orange-400 font-mono font-semibold self-center mt-auto">
-                                        (Mo) Mode
-                                    </span>
-                                </div>
+                                    </dd>
+                                    <dt class="font-semibold">Standard Dev.</dt><dd>{{ std_dev }}</dd>
+                                    <dt class="font-semibold border-blue-900 border-t-2">Range</dt><dd>{{ range }}</dd>
+                                    <dt class="font-semibold">Min</dt><dd>{{ min }}</dd>
+                                    <dt class="font-semibold">Max</dt><dd>{{ max }}</dd>
+                                </dl>
+                            </div>
+                    </div>
+                    <div class="flex flex-col justify-between items-center w-full p-4 gap-y-2">
+                        <div class="flex items-center h-fit w-72 p-3 border border-gray-100 rounded-lg shadow-md gap-2">
+                            <div class="flex items-center justify-center w-8 h-8 text-green-900 text-2xl font-bold">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-9">
+                                <path fill-rule="evenodd" d="M2 3.75A.75.75 0 0 1 2.75 3h11.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 3.75ZM2 7.5a.75.75 0 0 1 .75-.75h6.365a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 7.5ZM14 7a.75.75 0 0 1 .55.24l3.25 3.5a.75.75 0 1 1-1.1 1.02l-1.95-2.1v6.59a.75.75 0 0 1-1.5 0V9.66l-1.95 2.1a.75.75 0 1 1-1.1-1.02l3.25-3.5A.75.75 0 0 1 14 7ZM2 11.25a.75.75 0 0 1 .75-.75H7A.75.75 0 0 1 7 12H2.75a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />
+                                </svg>
 
                             </div>
-                            <div class="flex  gap-x-1">
-                                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                                <span class="text-2xl font-bold text-gray-900 self-center">
-                                    {{ std_dev }}
-                                </span>
-                                <span class="text-xs text-gray-500 font-mono font-semibold self-center mt-auto">
-                                   (σ) Stand. <br> Deviation
-                                </span>
-                                </div>
-                                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                                    <span class="text-2xl font-bold text-orange-900 self-center">
-                                        {{ min }}
-                                    </span>
-                                    <span class="text-xs text-orange-700/70 font-mono font-semibold self-center mt-auto">
-                                        Min
-                                    </span>
-                                </div>
-                                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                                    <span class="text-2xl font-bold text-orange-900 self-center">
-                                        {{ max }}
-                                    </span>
-                                    <span class="text-xs text-orange-700/70 font-mono font-semibold self-center mt-auto">
-                                        Max
-                                    </span>
-                                </div>
-                                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                                    <span class="text-2xl font-bold text-orange-900 self-center">
-                                        {{ range }}
-                                    </span>
-                                    <span class="text-xs text-orange-700/70 font-mono font-semibold self-center mt-auto">
-                                        Range
-                                    </span>
-                                </div>
 
-                            </div>                           
-                            <span class="absolute top-1 left-2 text-lg text-gray-800 font-semibold">
-                                Exam Scores
-                            </span>             
-                        </div>
-                        <div class="flex relative justify-center col-span-2 items-center w-full p-4 gap-0.5">
-                            <div class="flex flex-col h-fit w-full p-1 gap-y-2 border-r-2 border-gray-900">
-                                {% for key, value in subjects_three_min %}
-                                    <p class="flex text-xs gap-x-2 text-gray-900 self-start">
-                                        <span class="font-bold"> {{ key }}  :</span> <span  class="font-semibold"> {{ value }}</span>
-                                    </p>
-                                {% endfor %}
-                                <span class="text-base text-gray-600 font-mono font-semibold self-center mt-auto">Top Three Minimum</span>
-                            </div>
-                            <div class="flex flex-col h-fit w-full p-1 gap-y-2">
+                            <div class="flex flex-col justify-center">
                                 {% for key, value in subjects_three_max %}
-                                    <p class="flex text-xs gap-x-2 text-gray-900 self-start">
-                                        <span class="font-bold"> {{ key }}  :</span> <span  class="font-semibold"> {{ value }}</span>
-                                    </p>
+                                <div class="grid grid-cols-[minmax(0,auto)_minmax(0,1fr)] text-xs gap-x-2 px-2 py-1 text-gray-800">
+                                    <span class="font-bold break-words">{{ key }}:</span>
+                                    <span class="font-semibold text-right">{{ value }}</span>
+                                </div>
                                 {% endfor %}
-                                    <span class="text-base text-gray-600 font-mono font-semibold self-center mt-auto">Top Three Maximum</span>
+
+                                <span class="text-sm text-green-600 font-semibold self-start mt-2">
+                                Highest Performing Subject
+                                </span>
                             </div>
-                            <span class="absolute top-1 left-2 text-md text-gray-800 font-semibold">
-                                Subjects
-                            </span>             
+                        </div>
+                        <div class="flex items-center h-fit w-72 p-3 border border-gray-100 rounded-lg shadow-md gap-2">
+                            <div class="flex items-center justify-center w-8 h-8 text-red-900 text-2xl font-bold">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-9">
+                                <path fill-rule="evenodd" d="M2.25 4.5A.75.75 0 0 1 3 3.75h14.25a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1-.75-.75Zm0 4.5A.75.75 0 0 1 3 8.25h9.75a.75.75 0 0 1 0 1.5H3A.75.75 0 0 1 2.25 9Zm15-.75A.75.75 0 0 1 18 9v10.19l2.47-2.47a.75.75 0 1 1 1.06 1.06l-3.75 3.75a.75.75 0 0 1-1.06 0l-3.75-3.75a.75.75 0 1 1 1.06-1.06l2.47 2.47V9a.75.75 0 0 1 .75-.75Zm-15 5.25a.75.75 0 0 1 .75-.75h9.75a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />
+                                </svg>
+
+                            </div>
+
+                            <div class="flex flex-col justify-center">
+                                {% for key, value in subjects_three_min %}
+                                <div class="grid grid-cols-[minmax(0,auto)_minmax(0,1fr)] text-xs gap-x-2 px-2 py-1 text-gray-800">
+                                    <span class="font-bold break-words">{{ key }}:</span>
+                                    <span class="font-semibold text-right">{{ value }}</span>
+                                </div>
+                                {% endfor %}
+
+                                <span class="text-sm text-red-600 font-semibold self-start mt-2">
+                                Lowest Performing Subject
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="col-start-2 grid  grid-cols-1 grid-rows-2 gap-1 bg-orange-100 p-1 rounded-lg ">
-                        <div class="flex flex-col relative justify-center items-center w-full p-4 gap-0.5">
-                            <div class="flex  gap-x-1">
-                                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                                    <span class="text-2xl font-bold text-gray-900 self-center">
-                                        80%
-                                    </span>
-                                    <span class="text-xs text-gray-500 font-mono font-semibold self-center mt-auto">
-                                        Remember<br>(15) items
-                                    </span>
-                                </div>
-                                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                                    <span class="text-2xl font-bold text-green-900 self-center">
-                                        60%
-                                    </span>
-                                    <span class="text-xs text-green-400 font-mono font-semibold self-center mt-auto">
-                                        Understanding<br>(12) items
-                                    </span>
-                                </div>
-                                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                                    <span class="text-2xl font-bold text-orange-900 self-center">
-                                        80%
-                                    </span>
-                                    <span class="text-xs text-orange-400 font-mono font-semibold self-center mt-auto">
-                                        Apply<br>(10) items
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="flex  gap-x-1">
-                                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                                <span class="text-2xl font-bold text-gray-900 self-center">
-                                    50%
-                                </span>
-                                <span class="text-xs text-gray-500 font-mono font-semibold self-center mt-auto">
-                                    Analyze<br>(9) items
-                                </span>
-                                </div>
-                                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                                    <span class="text-2xl font-bold text-orange-900 self-center">
-                                        40%
-                                    </span>
-                                    <span class="text-xs text-orange-700/70 font-mono font-semibold self-center mt-auto">
-                                        Evaluate<br>(5) items
-                                    </span>
-                                </div>
-                                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
-                                    <span class="text-2xl font-bold text-orange-900 self-center">
-                                        50%
-                                    </span>
-                                    <span class="text-xs text-orange-700/70 font-mono font-semibold self-center mt-auto">
-                                        Create<br>(4) items
-                                    </span>
-                                </div>
-                            </div>   
-                            <span class="absolute top-1 left-2 text-lg text-gray-800 font-semibold">
-                                Level Scores
-                            </span>           
-                        </div>
-                        <div class="flex relative justify-center col-span-2 items-center w-full p-4 gap-0.5">
-                            <div class="flex flex-col h-fit w-full p-1 gap-y-2 border-r-2 border-gray-900">
-                                {% for key, value in subjects_three_min %}
-                                    <p class="flex text-xs gap-x-2 text-gray-900 self-start">
-                                        <span class="font-bold"> {{ key }}  :</span> <span  class="font-semibold"> {{ value }}</span>
-                                    </p>
-                                {% endfor %}
-                                <span class="text-base text-gray-600 font-mono font-semibold self-center mt-auto">Top Three Minimum</span>
-                            </div>
-                            <div class="flex flex-col h-fit w-full p-1 gap-y-2">
-                                {% for key, value in subjects_three_max %}
-                                    <p class="flex text-xs gap-x-2 text-gray-900 self-start">
-                                        <span class="font-bold"> {{ key }}  :</span> <span  class="font-semibold"> {{ value }}</span>
-                                    </p>
-                                {% endfor %}
-                                    <span class="text-base text-gray-600 font-mono font-semibold self-center mt-auto">Top Three Maximum</span>
-                            </div>
-                            <span class="absolute top-1 left-2 text-md text-gray-800 font-semibold">
-                                Subjects
-                            </span>             
-                        </div>
-                    </div>
-
                 </div>
+                
             </div>
             <div  class="flex flex-col w-full">
                 <p class="text-3xl font-bold text-gray-800">Exploratory Data Analysis</p>
@@ -401,14 +379,15 @@
                         <div id="exam-histogram" class="w-full"></div>
                         <div id="exam-boxplot" class="w-full"></div>
                     </div>
-                    <div class="w-full">
-                        <div id="exam-subjects-topics" class="w-full h-72 bg-gray-100 text-2xl text-gray-800">Explore The Dataset by Subjects and Topics</div>
+                    <div class="flex gap-4 w-full">
+                        <div id="exam-subjects" class="w-full"></div>
+                        <div id="exam-topics" class="w-full"></div>
                     </div>
                     <div class="w-full">
                         <div id="exam-compare-group" class="w-full"></div>
                     </div>
                     <div class="w-full">
-                        <div id="exam-type-group-normalize" class="w-full h-72 bg-gray-100 text-2xl text-gray-800">Explore The Dataset by Distribution of Aggregated Scores of Bloom's Level for Each Types</div>
+                        <div id="exam-type-group-normalize" class="w-full"></div>
                     </div>
                     <div class="flex justify-center w-full">
                         <div id="exam-heatmap"></div>

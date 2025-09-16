@@ -40,7 +40,7 @@ Route::get('/test', function () {
 
 Route::post('/login', [SessionController::class, 'authenticate']);
 Route::post('/logout', [SessionController::class, 'logout'])->middleware(['auth']);;
-Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution']);
+Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution'])->name('validate.coding.question');
 
 Route::group(['middleware' => ['can:view student']], function () { 
 });

@@ -63,7 +63,8 @@ class ExamTakingService
             'exam_id' => $exam->id,
             'user_id' => $user->id,
             'questions_order' => json_encode($shuffled_ids),
-            'question_count' => $question_count
+            'question_count' => $question_count,
+            'current_position' => 0
         ]);
 
         foreach($shuffled_ids as $id){

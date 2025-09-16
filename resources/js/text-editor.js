@@ -30,6 +30,43 @@ import { placeholder } from "@codemirror/view";
 
     // Initialize States for Code Editors
     const instruction_state = EditorState.create({
+        doc:`## Instruction for Creating Coding Question 
+
+1. ✅ **Problem Summary** — A one- or two-sentence overview of what the user is supposed to do.
+2. ✅ **Detailed Instructions** — Explain what the function should do, how it should behave, and any important constraints or edge cases.
+3. ✅ **Examples** — Provide input/output examples using code blocks to make it easy to read and copy.
+4. ✅ **Language-Specific Details** — If the function name or behavior is specific in one language, explain it clearly.
+5. ✅ **Formatting with Markdown** — Use headers, lists, bold, italics, and code formatting to make the instruction visually clear.
+
+---
+
+#### Title: Convert String to Lowercase
+
+### Description
+
+Write a function that takes a string as input and returns the same string in all lowercase letters.
+
+### Function Signature (Java)
+
+\`\`\`java
+public static String exampleJavaMethod(String input)
+\`\`\`
+
+### Examples
+
+\`\`\`java
+exampleJavaMethod("Hello World") ➞ "hello world"
+exampleJavaMethod("CODEWARS") ➞ "codewars"
+exampleJavaMethod("123ABC!") ➞ "123abc!"
+\`\`\`
+
+### Notes
+
+* The input string may contain letters, numbers, and special characters.
+* Only alphabetic characters will be changed to lowercase.
+* You may use built-in string methods.
+---
+`,
         extensions: [
             placeholder("Type your Instructions here"),
             markdown(),            
@@ -43,17 +80,16 @@ import { placeholder } from "@codemirror/view";
             EditorView.theme({
               "&": {
                 backgroundColor: "#ffffff",
-                border: "1px solid #e0e0e0",
                 fontFamily: "sans-serif",
                 fontSize: "14px",
               },
               ".cm-content": {
-                minHeight: "16rem",
-                padding: "1rem"
+                maxHeight: "28rem",
+                padding: "1rem",
               },
               ".cm-scroller": {
                 minHeight: "16rem",
-                maxHeight:"24rem",
+                maxHeight:"28rem",
                 width: "100%",
                 height: "100%",   
                 overflow: "auto"
@@ -123,22 +159,53 @@ import { placeholder } from "@codemirror/view";
                 let placeholder_solution = placeholder(`Insert complete solution here`);
                 let placeholder_initial = placeholder(`This Code will be given to students.`);
                 let placeholder_test = placeholder(`Insert test case here`);
-                let doc_test = "";
-            
+                let test_case_scaffold = "";
+                let complete_solution_scaffold = "";
+                let initial_solution_scaffold = "";
                 switch (language) {
                     case 'java':
                         languageExtension = java();
-                        doc_test = 
-`import org.junit.jupiter.api.Test;
+                        complete_solution_scaffold = `// Below are working example of a java code complete solution
+public class ExampleJavaCompleteSolution {
+// This method takes a string, converts it to lowercase, and returns it
+    public static String exampleJavaMethod(String input) {
+        return input.toLowerCase();
+    }
+}
+`;
+                        initial_solution_scaffold = `public class ExampleJavaCompleteSolution {
+    public static String exampleJavaMethod(String input) {
+        // Initial Solution should only return pass
+        return pass;
+    }
+}
+`;
+                        test_case_scaffold = `import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 // Java uses JUnit5 for testing
+// Below are working example for java test cases
+public class ExampleJavaCompleteSolutionTest {
 
-class <YourClass+Test> {     
     @Test
-    void <YourTestCaseName> {
+    void upperCaseShouldBeLowercased() {
+        String result = ExampleJavaCompleteSolution.exampleJavaMethod("HELLO WORLD");
+        assertEquals("hello world", result); // This should pass
     }
-}`;
+
+    @Test
+    void mixedCaseShouldBeLowercased() {
+        String result = ExampleJavaCompleteSolution.exampleJavaMethod("HeLLo WoRLd");
+        assertEquals("hello world", result); // This should also pass
+    }
+
+    @Test
+    void alreadyLowercaseShouldRemainSame() {
+        String result = ExampleJavaCompleteSolution.exampleJavaMethod("hello world");
+        assertEquals("hello world", result); // This ensures no change if already lowercase
+    }
+}
+`;
                         break;
                     case 'python':
                         languageExtension = python();
@@ -152,13 +219,15 @@ class <YourClass+Test> {
                 }
 
             const new_solution_state = EditorState.create({
+                doc: complete_solution_scaffold,
                 extensions: [basicSetup, languageExtension, placeholder_solution, onChangeListener],
             });
             const new_initial_solution_state = EditorState.create({
+                doc: initial_solution_scaffold,
                 extensions: [basicSetup, languageExtension, placeholder_initial, onChangeListener],
             });
             const new_test_case_state = EditorState.create({
-                doc: doc_test,
+                doc: test_case_scaffold,
                 extensions: [basicSetup, languageExtension, placeholder_test, onChangeListener],
             });
             
@@ -218,9 +287,25 @@ class <YourClass+Test> {
     }
 
     function validateLanguageCompleteSolution(){
+        console.log("Preparing form...");
+        const syntax = document.querySelector('#points-forms input[name="syntax_points"]')?.value;
+        const runtime = document.querySelector('#points-forms input[name="runtime_points"]')?.value;
+        const testCase = document.querySelector('#points-forms input[name="test_case_points"]')?.value;
+        const syntax_deduction = document.querySelector('#points-deduction-forms input[name="syntax_points_deduction"]')?.value;
+        const runtime_deduction = document.querySelector('#points-deduction-forms input[name="runtime_points_deduction"]')?.value;
+        const testCase_deduction = document.querySelector('#points-deduction-forms input[name="test_case_points_deduction"]')?.value;
+         
+        document.getElementById('validate_syntax_points_hidden').value = syntax;
+        document.getElementById('validate_runtime_points_hidden').value = runtime;
+        document.getElementById('validate_test_case_points_hidden').value = testCase;
+        document.getElementById('validate_syntax_points_deduction_hidden').value = syntax_deduction;
+        document.getElementById('validate_runtime_points_deduction_hidden').value = runtime_deduction;
+        document.getElementById('validate_test_case_points_deduction_hidden').value = testCase_deduction;
+        
         document.getElementById('validate-complete-solution-input').value = solution_editor.state.doc.toString();
         document.getElementById('validate-test-case-input').value = test_case_editor.state.doc.toString();
         document.getElementById('language_to_validate-input').value = select_form.value;
+        return true;
     }
 
     function getInstructionCode() {
@@ -316,8 +401,13 @@ class <YourClass+Test> {
             }, 1000); // 1 second cooldown
           }, 0);
       }
-      
+
+    document.addEventListener('htmx:beforeRequest', function () {
+        document.querySelectorAll('#button-actions button').forEach(btn => btn.disabled = true);
+    });
+
     document.body.addEventListener('htmx:afterRequest', function () {
+        document.querySelectorAll('#button-actions button').forEach(btn => btn.disabled = false);
         const input = document.getElementById('language-validation-status');
         if (input) {
             const language = input.dataset.language;

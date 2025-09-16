@@ -142,6 +142,13 @@ import { placeholder } from "@codemirror/view";
         }
     }
 
+    function testStudentCode(){
+        const select_form = document.getElementById('answer[programming_language]');
+        document.getElementById('student-code-test-input').value = initial_solution_editor.state.doc.toString();
+        document.getElementById('language-to-validate-input').value = select_form.value;
+        return true;
+    }
+
     document.body.addEventListener("htmx:configRequest", function (e) {
         console.log('htmx:configRequest is run');
         const container = e.detail.target.querySelector("#coding-question");
@@ -182,7 +189,18 @@ import { placeholder } from "@codemirror/view";
             console.error("[HTMX] Failed to parse editor data:", e);
         }
     });
+    document.addEventListener('htmx:beforeRequest', function () {
+        const btn = document.getElementById('test-code-button');
+        if (btn) btn.disabled = true;
+    });
+
+    document.addEventListener('htmx:afterRequest', function () {
+        const btn = document.getElementById('test-code-button');
+        if (btn) btn.disabled = false;
+    });
 
 window.initializeCodingQuestionPage = initializeCodingQuestionPage;
 window.initializeEditors = initializeEditors; 
 window.syncCodeMirrorToTextarea = syncCodeMirrorToTextarea;
+window.testStudentCode = testStudentCode;
+

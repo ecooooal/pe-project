@@ -3,12 +3,12 @@
         border-red-200 bg-red-50 text-red-800
     {% elseif data.api_data.failures %}
         border-orange-200 bg-orange-50 text-orange-800
-    {% elseif data.api_data.success == false and data.post_data.action != 'compile' %}
+    {% elseif data.api_data.success == false and data.post_data.action != 'compile' and data.post_data.action != 'test_student_code' %}
         border-yellow-200 bg-yellow-50 text-yellow-800
     {% else %}
         border-green-200 bg-green-50 text-green-800
     {% endif %} 
-    flex flex-1 flex-col p-4 max-w-none my-2 border-4 rounded-xl ">
+    flex flex-col max-w-none  border-4 rounded-xl my-2">
     <div class="flex items-center gap-x-2 p-4">
             {% if data.api_data.error or data.api_data.failures or data.api_data.success == false %}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-15 shrink-0 inline-block">
@@ -27,13 +27,12 @@
             {% endif %}
             
             <div class="flex flex-col py-1 gap-y-5 mr-4  items-start">
-                {% if data.post_data.action != 'validate' %}
-                <div class="flex items-center gap-x-4 pr-auto  ">
+                {% if data.post_data.action == 'check' %}
+                    <div class="flex items-center gap-x-4 pr-auto ">
                     <p class="text-xs font-bold font-mono text-gray-900">Syntax Points :</p>
                     <span class="text-xs font-semibold font-mono text-gray-900">{{ data.api_data.points[0].syntax }}</span>
                 </div>
-                {% endif %}
-                {% if data.post_data.action == 'check' %}
+
                 <div class="flex items-center gap-x-4 pr-auto ">
                     <p class="text-xs font-bold font-mono text-gray-900">Runtime Points :</p>
                     <span class="text-xs font-semibold font-mono text-gray-900">{{ data.api_data.points[0].runtime }}</span>
@@ -46,8 +45,8 @@
                 {% endif %}
             </div>
             <div class="flex flex-col overflow-x-auto">
-                {% if data.post_data.action == 'compile' %}
-                    <p class="sticky top-0 left-0 font-bold text-lg">
+                {% if data.post_data.action == 'compile' or data.post_data.action == 'test_student_code' %}
+                    <p class="{{ data.api_data.failures ? 'sticky top-0 left-0' : 'self-center' }} font-bold text-lg">
                         {{ data.api_data.error ? 'API Error' : data.api_data.failures ? 'Compilation Error' : 'No Syntax Error, Compiled Success' }}
                     </p>
                 {% elseif data.post_data.action == 'validate' %}
@@ -102,16 +101,15 @@
     </div>
 </div>
 <div id="debug-popover-div">
-    <!-- Button to toggle popover -->
     <button type="button"
             popovertarget="debug-popover"
-            class="fixed bottom-6 right-6 z-50 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-5 rounded-xl shadow-lg transition duration-300">
+            class="fixed bottom-3 right-6 z-49 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-5 rounded-xl shadow-lg transition duration-300">
         💻 Debug Report
     </button>
 
     <div id="debug-popover"
          popover="manual"
-         class="fixed top-2 right-2 h-[85vh] w-96 ml-auto bg-white border-2 border-gray-950 rounded-xl shadow-md p-4 overflow-y-auto overflow-hidden z-50 prose prose-xs">
+         class="fixed top-2 right-2 h-[85vh] w-[85vh] ml-auto bg-white border-2 border-gray-950 rounded-xl shadow-md p-4 overflow-y-auto overflow-hidden z-50 prose prose-xs">
         <div class="flex items-center justify-between font-bold text-gray-900 ">
             <h1>Debug Report</h1>
             <h1><button 

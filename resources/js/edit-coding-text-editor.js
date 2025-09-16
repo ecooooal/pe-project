@@ -220,10 +220,33 @@ class <YourClass+Test> {
         document.getElementById('test-input').value = test_case_editor.state.doc.toString();
     }
 
-    function validateLanguageCompleteSolution(){
+    function validateLanguageCompleteSolution(isTesting = false){
+        console.log("Preparing form...");
+        const syntax = document.querySelector('#points-forms input[name="syntax_points"]')?.value;
+        const runtime = document.querySelector('#points-forms input[name="runtime_points"]')?.value;
+        const testCase = document.querySelector('#points-forms input[name="test_case_points"]')?.value;
+        const syntax_deduction = document.querySelector('#points-deduction-forms input[name="syntax_points_deduction"]')?.value;
+        const runtime_deduction = document.querySelector('#points-deduction-forms input[name="runtime_points_deduction"]')?.value;
+        const testCase_deduction = document.querySelector('#points-deduction-forms input[name="test_case_points_deduction"]')?.value;
+        
+        if (isTesting){
+            document.getElementById('validate_syntax_points_hidden').value = syntax;
+            document.getElementById('validate_runtime_points_hidden').value = runtime;
+            document.getElementById('validate_test_case_points_hidden').value = testCase;
+            if (syntax_deduction){
+                document.getElementById('validate_syntax_points_deduction_hidden').value = syntax_deduction;
+            }
+            if (runtime_deduction){ 
+                document.getElementById('validate_runtime_points_deduction_hidden').value = runtime_deduction;
+            }
+            if (testCase_deduction){ 
+                document.getElementById('validate_test_case_points_deduction_hidden').value = testCase_deduction;
+            }
+        }
         document.getElementById('validate-complete-solution-input').value = solution_editor.state.doc.toString();
         document.getElementById('validate-test-case-input').value = test_case_editor.state.doc.toString();
         document.getElementById('language_to_validate-input').value = select_form.value;
+        return true;
     }
 
     function getInstructionCode() {
@@ -338,8 +361,14 @@ class <YourClass+Test> {
             }, 1000); // 1 second cooldown
           }, 0);
       }
-      
+
+    document.addEventListener('htmx:beforeRequest', function () {
+        document.querySelectorAll('#button-actions button').forEach(btn => btn.disabled = true);
+    });
+
     document.body.addEventListener('htmx:afterRequest', function () {
+        document.querySelectorAll('#button-actions button').forEach(btn => btn.disabled = false);
+
         const input = document.getElementById('language-validation-status');
         if (input) {
             const language = input.dataset.language;

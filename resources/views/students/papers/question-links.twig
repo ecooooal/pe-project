@@ -10,6 +10,27 @@
         hx-trigger="click throttle:1000ms"
         hx-vals='{ "action": "jump", "index": {{ question.order_index }} }'
         type="button" 
-        class="{{ student_paper.student_paper.current_position > loop.index - 1   ? 'text-gray-700' : 'text-gray-900' }}">{{ show_item(loop.index, question.question_type.value|replace({'_': ' '})|lower|capitalize, label_attributes:'group-hover:text-blue-900 duration', value_attributes:'group-hover:text-blue-900 duration group-hover:underline')}}</button>
+        class="question-button text-gray-700">
+        {{ show_item(loop.index, question.question_type.value|replace({'_': ' '})|lower|capitalize, label_attributes:'group-hover:text-blue-900 duration-150', value_attributes:'group-hover:text-blue-900 duration-150 group-active:underline cursor-pointer')}}
+    </button>
 </li>
 {% endfor %}
+
+<script>
+document.body.addEventListener('htmx:afterRequest', function(evt) {
+  const clickedBtn = evt.detail.elt;
+
+  if (clickedBtn && clickedBtn.classList.contains('question-button')) {
+    // Remove active styles and enable all buttons
+    document.querySelectorAll('.question-button').forEach(b => {
+      b.classList.remove('text-blue-900', 'font-bold', 'pointer-events-none', 'opacity-50');
+      b.disabled = false;
+    });
+
+    // Apply active styles and disable the clicked button
+    clickedBtn.classList.add('text-blue-900', 'font-bold', 'pointer-events-none', 'opacity-50');
+    clickedBtn.disabled = true;
+  }
+});
+</script>
+

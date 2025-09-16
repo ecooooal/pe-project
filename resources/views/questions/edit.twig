@@ -299,12 +299,14 @@
     text-xs 
     select-none
     mr-1 my-1
+    add-tag-animation
     `;
 
     tagEl.textContent = tag;
 
     const closeBtn = document.createElement("button");
     closeBtn.innerHTML = "&times;";
+    closeBtn.type = "button"; 
     closeBtn.className = `
     text-blue-900
     text-sm 
@@ -316,9 +318,13 @@
 
 
     closeBtn.addEventListener("click", () => {
-        container.removeChild(tagEl);
-        tags.delete(tag);
-        updateHiddenInput();
+        tagEl.classList.add("delete-tag-animation");
+        
+        tagEl.addEventListener("animationend", () => {
+            container.removeChild(tagEl);
+            tags.delete(tag);
+            updateHiddenInput();
+        });
     });
 
     tagEl.appendChild(closeBtn);

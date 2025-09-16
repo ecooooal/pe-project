@@ -8,8 +8,8 @@
     {% else %}
         border-green-200 bg-green-50 text-green-800
     {% endif %} 
-    px-4 border-4 rounded-xl max-h-34 w-full overflow-hidden">
-    <div class="flex items-center gap-x-4">
+    flex flex-col max-w-none p-4 border-4 rounded-xl my-2">
+    <div class="flex items-center gap-x-8 h-48">
             <div class="flex justify-center items-center gap-x-2">
                 {% if data.failures or data.success == false %}
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-15 shrink-0 inline-block">
@@ -34,7 +34,7 @@
                         <pre class="text-gray-50 font-semibold text-xs">{{ failure }}</pre> 
                     {% endfor %}
                 {% else %}
-                    <div class="flex max-h-28 space-x-4 my-2">
+                    <div class="flex max-h-[10rem] space-x-4 my-2">
                     {% for class in data.test_results %}
                         {% for test in class.methods %}
                             <div class="p-4 rounded-lg border {{ test.status != 'PASSED' ? 'border-yellow-400 bg-yellow-100' : 'border-green-400 bg-green-100' }}">

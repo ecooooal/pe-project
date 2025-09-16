@@ -110,6 +110,7 @@ class QuestionService
                         'runtime_points' => $code_settings['runtime_points'],
                         'test_case_points' => $code_settings['test_case_points']
                     ]);
+                    
                     if ($response->successful()) {
                         $data = $response->json();
                         return $data;

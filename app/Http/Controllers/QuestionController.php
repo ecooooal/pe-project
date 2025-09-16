@@ -494,7 +494,10 @@ class QuestionController extends Controller
             $question = Question::findOrFail($questionId);
             $question_type_data = $this->questionService->getQuestionTypeShow($question);
             if ($type == 'coding'){
-                $subjects = Subject::whereIn('course_id', $question->topic->subject->courses()->get()->pluck('id'))->get()->pluck('name', 'id');
+                $course_id = $question->topic->subject->courses->pluck('id');
+                $subjects = Subject::whereHas('courses', function ($query) use ($course_id) {
+                    $query->whereIn('courses.id', $course_id);
+                })->pluck('name', 'id');            
                 $programming_languages = [
                         'java' => "Java",
                         'c++' => "C++",
@@ -549,18 +552,36 @@ class QuestionController extends Controller
     }
 
     public function validateCompleteSolution(Request $request){
-        $code = $request->post('validate-complete-solution');
-        $test_case = $request->post('validate-test-case');
         $code_settings['action'] = $request->post('action');
-        $code_settings['syntax_points'] = $request->post('syntax_points') ?? 0;
-        $code_settings['runtime_points'] = $request->post('runtime_points') ?? 0;
-        $code_settings['test_case_points'] = $request->post('test_case_points') ?? 0;
+        $language = $request->post('language-to-validate');
 
+        if ($code_settings['action'] == 'test_student_code') {
+            $code_settings['action'] = 'compile';
+            $code = $request->post('student-code-test');
 
+            $question_id = $request->post('test_coding_question_id');
+            $question = Question::find($question_id);
+            $question_type = $question->getTypeModel();
+
+            $test_case = $question_type->getSpecificLanguage($language)->getTestCase();
+            
+            $code_settings['syntax_points'] = 0;
+            $code_settings['runtime_points'] = 0;
+            $code_settings['test_case_points'] = 0;
+
+        } else {
+            $code = $request->post('validate-complete-solution');
+            $test_case = $request->post('validate-test-case');
+            $code_settings['syntax_points'] = $request->post('validate_syntax_points') ?? 0;
+            $code_settings['runtime_points'] = $request->post('validate_runtime_points') ?? 0;
+            $code_settings['test_case_points'] = $request->post('validate_test_case_points') ?? 0;
+            $code_settings['syntax_points_deduction'] = $request->post('validate_syntax_points_deduction') ?? 1;
+            $code_settings['runtime_points_deduction'] = $request->post('validate_runtime_points_deduction') ?? 1;
+            $code_settings['test_case_points_deduction'] = $request->post('validate_test_case_points_deduction') ?? 1;
+        }
         if (empty($code) || empty($test_case)) {
             $api_data = ['error' => 'Complete solution and test case are both required.'];
         } else {
-            $language = $request->post('language-to-validate');
             $api_data = $this->questionService::validate($language, $code, $test_case, $code_settings);
         }
 
