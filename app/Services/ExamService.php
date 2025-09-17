@@ -6,6 +6,7 @@ use App\Models\ExamAccessCode;
 use App\Models\Question;
 use App\Models\User;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Str;
@@ -120,20 +121,49 @@ class ExamService
 
 
     public function transformQuestionRows(Collection $questions)
-    {   
-        foreach ($questions as $question){
+    {
+        // Eager-load relationships
+        foreach ($questions as $question) {
             $question->load('topic.subject');
         }
-        return $questions->map(fn ($question) => [
+
+        // Flatten and transform the question data
+        $transformed = $questions->map(fn ($question) => [
             'name' => $question->name,
             'subject' => $question->topic->subject->name,
             'topic' => $question->topic->name,
             'type' => $question->question_type->name,
-            'points' => $question->total_points, 
+            'points' => $question->total_points,
             'id' => $question->id
         ]);
-    }
 
+        // Group by subject
+        $grouped = $transformed
+            ->groupBy('subject')
+            ->map(function ($questionsBySubject) {
+
+                $topics = $questionsBySubject
+                    ->groupBy('topic')
+                    ->map(function ($questionsByTopic) {
+                        return [
+                            'total_score' => $questionsByTopic->sum('points'),
+                            'question_count' => $questionsByTopic->count(),
+                            'questions' => $questionsByTopic
+                                ->map(fn ($q) => Arr::except($q, ['subject', 'topic']))
+                                ->values()
+                        ];
+                    });
+
+                return [
+                    'topics' => $topics,
+                    'total_score' => $questionsBySubject->sum('points'),
+                    'question_count' => $questionsBySubject->count(),
+                ];
+            });
+
+
+        return $grouped;
+    }
 
 
 

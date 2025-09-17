@@ -47,8 +47,14 @@ class QuestionController extends Controller
         $data = [
             'headers' => $header,
             'rows' => $rows,
-            'questions' => $questions
+            'questions' => $questions,
+            'url' => 'questions'
         ];
+
+        if (request()->hasHeader('HX-Request')) {
+            // Return only the partial view for HTMX
+            return view('components/core/index-table', $data);
+        }
 
         return view('questions/index', $data);
     }

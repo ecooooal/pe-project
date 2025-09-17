@@ -46,7 +46,8 @@ class ExamController extends Controller
         $data = [
             'headers' => $header,
             'rows' => $rows,
-            'exams' => $exams
+            'exams' => $exams,
+            'url' => 'exams'
         ];
 
         return view('exams/index', $data);
@@ -167,7 +168,7 @@ class ExamController extends Controller
         $exam_question_types = $this->examService->getQuestionTypeCounts($exam);
 
         $available_questions = $this->examService->getAvailableQuestionsForExam($exam);
-        $questions_header = ['Name', 'Subject', 'Topic', 'Type', 'Points'];
+        $questions_header = ['Name', 'Type', 'Points'];
         $exam_questions_rows = $this->examService->transformQuestionRows($exam_questions);
         $available_questions_rows = $this->examService->transformQuestionRows($available_questions);
         $data = [
@@ -199,7 +200,7 @@ class ExamController extends Controller
         $exam_question_types = $this->examService->getQuestionTypeCounts($exam);
 
         $available_questions = $this->examService->getAvailableQuestionsForExam($exam);
-        $questions_header = ['Name', 'Subject', 'Topic', 'Type', 'Points'];
+        $questions_header = ['Name', 'Type', 'Points'];
         $exam_questions_rows = $this->examService->transformQuestionRows($exam_questions);
         $available_questions_rows = $this->examService->transformQuestionRows($available_questions);
 

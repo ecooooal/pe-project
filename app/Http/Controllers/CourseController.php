@@ -33,7 +33,8 @@ class CourseController extends Controller
         $data = [
             'headers' => $header,
             'rows' => $rows,
-            'courses' => $courses
+            'courses' => $courses,
+            'url' => 'courses'
         ];
 
         return view('courses/index', $data);
@@ -57,7 +58,7 @@ class CourseController extends Controller
             'rows' => $rows,
             'course'=>$course,
             'subjects' => $subjects,
-            'subject_count' => $subject_count
+            'subject_count' => $subject_count,
         ];
         return view('courses/show', $data);
     }

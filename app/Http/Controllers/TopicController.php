@@ -38,7 +38,8 @@ class TopicController extends Controller
         $data = [
             'headers' => $header,
             'rows' => $rows,
-            'topics' => $topics
+            'topics' => $topics,
+            'url' => 'topics'
         ];
 
         return view('topics/index', $data);

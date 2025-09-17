@@ -194,10 +194,32 @@ import { placeholder } from "@codemirror/view";
         if (btn) btn.disabled = true;
     });
 
-    document.addEventListener('htmx:afterRequest', function () {
+    document.body.addEventListener('htmx:configRequest', function(evt) {
+        document.querySelectorAll('.question-button').forEach(b => {
+            b.disabled = true;
+            b.classList.add('opacity-50', 'pointer-events-none');
+        });
+    });
+
+    document.addEventListener('htmx:afterRequest', function (evt) {
         const btn = document.getElementById('test-code-button');
         if (btn) btn.disabled = false;
+
+        const clickedBtn = evt.detail.elt;
+
+        // Enable and reset all buttons first
+        document.querySelectorAll('.question-button').forEach(b => {
+            b.disabled = false;
+            b.classList.remove('text-blue-900', 'font-bold', 'pointer-events-none', 'opacity-50');
+        });
+
+        // Then disable and style the clicked button only
+        if (clickedBtn && clickedBtn.classList.contains('question-button')) {
+            clickedBtn.classList.add('text-blue-900', 'font-bold', 'pointer-events-none');
+            clickedBtn.disabled = true;
+        }
     });
+
 
 window.initializeCodingQuestionPage = initializeCodingQuestionPage;
 window.initializeEditors = initializeEditors; 

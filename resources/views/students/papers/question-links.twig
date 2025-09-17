@@ -16,21 +16,4 @@
 </li>
 {% endfor %}
 
-<script>
-document.body.addEventListener('htmx:afterRequest', function(evt) {
-  const clickedBtn = evt.detail.elt;
-
-  if (clickedBtn && clickedBtn.classList.contains('question-button')) {
-    // Remove active styles and enable all buttons
-    document.querySelectorAll('.question-button').forEach(b => {
-      b.classList.remove('text-blue-900', 'font-bold', 'pointer-events-none', 'opacity-50');
-      b.disabled = false;
-    });
-
-    // Apply active styles and disable the clicked button
-    clickedBtn.classList.add('text-blue-900', 'font-bold', 'pointer-events-none', 'opacity-50');
-    clickedBtn.disabled = true;
-  }
-});
-</script>
 

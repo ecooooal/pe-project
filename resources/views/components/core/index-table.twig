@@ -1,4 +1,4 @@
-{% macro table(headers, rows, header_attributes, row_attributes, url, actions = true, openAction = true, authorized = false, forAdmin = false, forAdding = false, forRemoving = false, exam_id) %}
+{% macro table(headers, rows, header_attributes, row_attributes, url, actions = true, openAction = true, authorized = false, forAdmin = false, exam_id) %}
     <table class="table-auto min-w-max w-full text-left bg-white border-t border-gray-300 rounded-t-2xl">
         <thead>
             <tr>
@@ -12,9 +12,10 @@
             </tr>
         </thead>
         <tbody>
+            
             {% for row in rows %}
-                <tr class="hover:bg-gray-50">
-                    {% for cell in row %}
+                <tr class="hover:bg-gray-100 transition duration-150"
+>                    {% for cell in row %}
                         {% if cell != row.id %}
                         <td class="p-4 border-b border-gray-300 max-w-xs text-sm {{ cell == 'Incomplete' ? 'text-red-600' : (cell == 'Complete' ? 'text-green-600' : '') }} ">
                             <span class="block truncate">{{ cell }}</span>
@@ -22,9 +23,15 @@
                         {% endif %}
                     {% endfor %}
                     {% if actions %}
-                        <td class="p-4 max-w-48  border-b border-gray-300">
+                        <td class="flex p-4 max-w-48  border-b border-gray-300">
                             {% if openAction %}
-                                 <a href="/{{ url }}/{{ row.id }}" class="text-blue-900 text-sm font-medium hover:underline">Open</a>
+                                 <a href="/{{ url }}/{{ row.id }}" class="text-blue-900 text-sm font-medium hover:underline">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                                    <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+                                    <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clip-rule="evenodd" />
+                                    </svg>
+
+                                </a>
                             {% endif %}
                             {% if forAdmin %}
                                 <button 
@@ -32,26 +39,10 @@
                                     hx-get="/admins/{{ url }}/{{ row.id }}"
                                     hx-swap="innerHTML transition:true" 
                                     hx-target="#access-control-content" >
-                                    See
-                                </button>
-                            {% endif %}
-                                
-                            {% if forAdding %}
-                                <button 
-                                    id="fade-me-out"
-                                    type="button"
-                                    hx-post="/exams/{{ exam_id }}/builder/add-question/{{ row.id }}"
-                                    hx-target="closest tr"
-                                    hx-swap="delete transition:true"
-                                    hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
-                                    hx-select-oob="#question-count-field, #subject-field, #topic-field, #type-field, #exam-question-field, #available-question-field, #score-count-field"
-                                    class="text-blue-900 text-sm font-medium hover:underline"
-                                    >
-                                    {% if not forRemoving %}
-                                        Add
-                                    {% else %}
-                                        Remove
-                                    {% endif %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                                        <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+                                        <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clip-rule="evenodd" />
+                                        </svg>
                                 </button>
                             {% endif %}
                             {% if authorized %}
@@ -66,4 +57,131 @@
     </table>
 {% endmacro %}
 
+{% macro exam_questions_table(headers, rows, header_attributes, row_attributes, url, actions = true, openAction = true, forAvailableQuestions = false, forAdding = false, forRemoving = false, exam_id) %}
+{% for subject_name, subject in rows %}  
+    <details class="details-animated w-full bg-white shadow-sm ring-1 ring-gray-950/5" 
+            id="{{ forAvailableQuestions ? 'available-' : 'contain-'}}subject-{{ subject_name }}">
+                <summary class="flex flex-1 p-4 justify-between bg-blue-900 group duration-300  cursor-pointer">
+                    <span class="text-xl font-bold text-white">{{ subject_name }}</span>
+                    <span class="text-xs font-semibold text-gray-100"> 
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                        <path d="M21 6.375c0 2.692-4.03 4.875-9 4.875S3 9.067 3 6.375 7.03 1.5 12 1.5s9 2.183 9 4.875Z" />
+                        <path d="M12 12.75c2.685 0 5.19-.586 7.078-1.609a8.283 8.283 0 0 0 1.897-1.384c.016.121.025.244.025.368C21 12.817 16.97 15 12 15s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.285 8.285 0 0 0 1.897 1.384C6.809 12.164 9.315 12.75 12 12.75Z" />
+                        <path d="M12 16.5c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 0 0 1.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 0 0 1.897 1.384C6.809 15.914 9.315 16.5 12 16.5Z" />
+                        <path d="M12 20.25c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 0 0 1.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 0 0 1.897 1.384C6.809 19.664 9.315 20.25 12 20.25Z" />
+                        </svg>
 
+                            {{ subject.total_score }}pts
+                    </span>
+                </summary>
+                {% for topic_name, topic in subject.topics %}
+                <details class="overflow-x-auto w-full bg-white border-b-1 border-gray-500" 
+                        id="{{ forAvailableQuestions ? 'available-' : 'contain-'}}topic-{{ topic_name }}">
+                        <summary class="flex flex-1 px-4 py-2 justify-between bg-orange-900 cursor-pointer ">
+                            <span class="text-lg font-bold text-white">{{ topic_name }}</span>
+                            <p class="flex flex-col text-xs justify-center items-center font-semibold text-gray-100"> 
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                                <path fill-rule="evenodd" d="M10 1c3.866 0 7 1.79 7 4s-3.134 4-7 4-7-1.79-7-4 3.134-4 7-4Zm5.694 8.13c.464-.264.91-.583 1.306-.952V10c0 2.21-3.134 4-7 4s-7-1.79-7-4V8.178c.396.37.842.688 1.306.953C5.838 10.006 7.854 10.5 10 10.5s4.162-.494 5.694-1.37ZM3 13.179V15c0 2.21 3.134 4 7 4s7-1.79 7-4v-1.822c-.396.37-.842.688-1.306.953-1.532.875-3.548 1.369-5.694 1.369s-4.162-.494-5.694-1.37A7.009 7.009 0 0 1 3 13.179Z" clip-rule="evenodd" />
+                                </svg>
+                                <span>
+                                    {{ topic.total_score }}pts
+                                </span>
+                            </p>
+                        </summary>
+                        <table class="table-auto min-w-max w-full text-left bg-white border-t border-gray-300 rounded-t-2xl">
+                            <thead>
+                                <tr>
+                                    {% for header in headers %}
+                                        <th class="px-4 py-2 font-bold border-b border-gray-300 text-sm bg-gray-100 text-blue-900">{{ header }}</th>
+                                    {% endfor %}
+                                    {% if actions %}
+                                        <th class="px-4 py-2 font-bold border-b border-gray-300 text-sm bg-gray-100 text-blue-900 ml-auto">Actions</th>
+                                    {% endif %}
+
+                                </tr>
+                            </thead>
+                                <tbody>
+                                    {% for question in topic.questions %}         
+                                        <tr class="hover:bg-gray-100 transition duration-150"> 
+                                                {% for cell in question %}
+                                                    {% if cell != question.id %}
+                                                    <td class="p-4 border-b border-gray-300 max-w-xs text-sm {{ cell == 'Incomplete' ? 'text-red-600' : (cell == 'Complete' ? 'text-green-600' : '') }} ">
+                                                        <span class="block truncate">{{ cell }}</span>
+                                                    </td>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% if actions %}
+                                                    <td class="flex p-4 max-w-48  border-b border-gray-300">
+                                                        {% if openAction %}
+                                                            <a href="/{{ url }}/{{ question.id }}" class="text-blue-900 text-sm font-medium hover:underline">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-7">
+                                                                <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+                                                                <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clip-rule="evenodd" />
+                                                                </svg>
+
+                                                            </a>
+                                                        {% endif %}
+                                                        {% if forAdding %}
+                                                            <button 
+                                                                type="button"
+                                                                hx-post="/exams/{{ exam_id }}/builder/add-question/{{ question.id }}"
+                                                                hx-target="this"
+                                                                hx-swap="delete"
+                                                                hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
+                                                                hx-select-oob="#question-count-field, #subject-field, #topic-field, #type-field, #exam-question-field, #available-question-field, #score-count-field"
+                                                                class="toggle-button  {{ forRemoving == true ? 'text-red-800 hover:text-red-800/90 active:text-red-900' : 'text-blue-800 hover:text-blue-800/90 active:text-blue-900' }} cursor-pointer"
+                                                                >
+                                                                {% if not forRemoving %}
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-7">
+                                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-11.25a.75.75 0 0 0-1.5 0v2.5h-2.5a.75.75 0 0 0 0 1.5h2.5v2.5a.75.75 0 0 0 1.5 0v-2.5h2.5a.75.75 0 0 0 0-1.5h-2.5v-2.5Z" clip-rule="evenodd" />
+                                                                    </svg>
+                                                                {% else %}
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-7">
+                                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM6.75 9.25a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5h-6.5Z" clip-rule="evenodd" />
+                                                                    </svg>
+                                                                {% endif %}
+                                                            </button>
+                                                        {% endif %}
+                                                    </td>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tr>
+                                </tbody>
+                        </table>
+                </details>
+                {% endfor %}
+        </details>
+
+{% endfor %}
+
+<script>
+document.body.addEventListener('htmx:configRequest', (evt) => {
+    document.querySelectorAll('.toggle-button').forEach(b => {
+        b.disabled = true;
+        b.classList.add('opacity-50', 'pointer-events-none');
+        const btn = evt.target;
+        const row = btn.closest('tr');
+        row.classList.add('delete-tag-animation', 'opacity-50', 'pointer-events-none');
+    });
+});
+document.addEventListener('htmx:afterRequest', function (evt) {
+    document.querySelectorAll('.toggle-button').forEach(b => {
+        b.disabled = false;
+        b.classList.remove('pointer-events-none', 'opacity-50');
+    });
+});
+</script>
+{% endmacro %}
+
+<div id="pagination-div" class="mx-4 p-4">
+    <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-t border-gray-300 rounded-t-2xl">
+        <h1>Filter here</h1>
+    </div>
+    <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
+        {{ _self.table(headers:headers, rows:rows, url:url) }}
+
+    </div>
+    <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300 rounded-b-2xl">
+        {{ questions.onEachSide(3).links() }}
+    </div>
+</div>

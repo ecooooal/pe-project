@@ -113,7 +113,7 @@ function renderCourseGraph() {
       const group = grouped[level];
       group.forEach((q, i) => {
         question_stats_x.push(level);
-        question_stats_y.push(i); 
+        question_stats_y.push(i+1); 
         question_stats_marker_colors.push(question_status_color_by_status[q.status]);
         question_stats_marker_symbols.push(question_shape_by_type[q.question_type] || 'circle');
         question_stats_texts.push(`<b>Status</b>: ${q["status"]}<br>` +
@@ -169,8 +169,8 @@ function renderCourseGraph() {
 
     const question_stats_graph = {
         name:'Questions Stats',
-        x: question_stats_x,
-        y: question_stats_y,
+        y: question_stats_x,
+        x: question_stats_y,
         xaxis: 'x3',
         yaxis: 'y3',
         type: 'scatter',
@@ -181,13 +181,13 @@ function renderCourseGraph() {
         hoverlabel: {
             font: { color: 'white' }      // hover text color
         },
-        width: 1,
         marker: { 
             color: question_stats_marker_colors,
             symbol: question_stats_marker_symbols,
             line: { width: 2, color: '#333'},
-            size: 13,
-            opacity: 0.7 }
+            size: 14,
+            opacity: 0.7 },
+        offset: 90
     };
 
     const question_types = {
@@ -229,7 +229,7 @@ function renderCourseGraph() {
             },            
             height: 400,
             autosize: true,
-            margin: { l: 40, r:10, t: 60, b: 40 },
+            margin: { l: 80, r:10, t: 60, b: 40 },
             
             xaxis: {
                 type: 'category', 
@@ -283,23 +283,25 @@ function renderCourseGraph() {
                     }
             },
 
-            xaxis3: { 
-                domain: [0.0, 1.0],
-                title: {
-                    text: 'Questions Stats',
-                    font: {
-                        size: 12,
-                        color: '#7f7f7f'
-                    }
-                },   
+            yaxis3: {
+                categorygap: 0,
                 type: 'category',
                 categoryorder: 'array',
-                categoryarray: ['remember', 'understand', 'apply', 'analyze', 'evaluate', 'create'],
+                categoryarray: ["create", "evaluate", "analyze", "apply", "understand", "remember"],
                 anchor: 'y3',
-                showgrid: false
-
+                showgrid: false,
+                
+                tickangle: 0,
+                tickfont: {
+                    xanchor: 'left', // Align the text of the labels to the left
+                    size: 12,
+                    color: 'rgb(107, 107, 107)'
+                }
             },
-            yaxis3: {        
+            xaxis3: {     
+            range: [0.5, question_stats_y.length - 1],
+                domain: [0.0, 1.0],
+                dtick:1,
                 title: {
                     text: 'Questions',
                     font: {
@@ -307,9 +309,8 @@ function renderCourseGraph() {
                         color: '#7f7f7f'
                     }
                 },  
-                showticklabels: false,
-                zeroline: false,
                 anchor: 'x3',
+                zeroline: false
             },
         
         };

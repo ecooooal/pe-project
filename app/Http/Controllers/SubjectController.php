@@ -38,7 +38,8 @@ class SubjectController extends Controller
         $data = [
             'headers' => $header,
             'rows' => $rows,
-            'subjects' => $subject_courses
+            'subjects' => $subject_courses,
+            'url' => 'subjects'
         ];
 
         return view('subjects/index', $data);
