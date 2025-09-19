@@ -33,6 +33,9 @@ class QuestionFactory
                                     'syntax_points' => $data['syntax_points'],
                                     'runtime_points' => $data['runtime_points'],
                                     'test_case_points' => $data['test_case_points'],
+                                    'syntax_points_deduction' => $data['syntax_points_deduction'],
+                                    'runtime_points_deduction' => $data['runtime_points_deduction'],
+                                    'test_case_points_deduction' => $data['test_case_points_deduction'],
                                 ];
                             $coding_question_language_data = json_decode($data['supported_languages'], true);
                             $question_type_service->storeCoding(

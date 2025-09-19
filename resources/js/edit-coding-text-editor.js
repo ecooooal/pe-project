@@ -6,6 +6,7 @@ import {python} from "@codemirror/lang-python"
 import { java } from "@codemirror/lang-java";
 import {cpp} from "@codemirror/lang-cpp"
 import {markdown} from "@codemirror/lang-markdown"
+import {indentWithTab} from "@codemirror/commands"
 import { lineNumbers } from "@codemirror/view"
 import { history, historyKeymap } from '@codemirror/commands';
 import { placeholder } from "@codemirror/view";
@@ -37,7 +38,8 @@ import { placeholder } from "@codemirror/view";
             history(),                      
             keymap.of([
               ...defaultKeymap,
-              ...historyKeymap               
+              ...historyKeymap,
+              indentWithTab           
             ]),
             EditorView.lineWrapping,
 
@@ -68,7 +70,7 @@ import { placeholder } from "@codemirror/view";
     });
 
     function createEditor(parent) {
-        const state = EditorState.create({ extensions: [basicSetup] });
+        const state = EditorState.create({ extensions: [basicSetup, keymap.of([indentWithTab])] });
         return new EditorView({ state, parent });
       }
 
@@ -153,14 +155,14 @@ class <YourClass+Test> {
                 }
 
             const new_solution_state = EditorState.create({
-                extensions: [basicSetup, languageExtension, placeholder_solution, onChangeListener],
+                extensions: [basicSetup, keymap.of([indentWithTab]), languageExtension, placeholder_solution, onChangeListener],
             });
             const new_initial_solution_state = EditorState.create({
-                extensions: [basicSetup, languageExtension, placeholder_initial, onChangeListener],
+                extensions: [basicSetup, keymap.of([indentWithTab]), languageExtension, placeholder_initial, onChangeListener],
             });
             const new_test_case_state = EditorState.create({
                 doc: doc_test,
-                extensions: [basicSetup, languageExtension, placeholder_test, onChangeListener],
+                extensions: [basicSetup, keymap.of([indentWithTab]), languageExtension, placeholder_test, onChangeListener],
             });
             
             solution_editor.setState(new_solution_state);
@@ -228,21 +230,15 @@ class <YourClass+Test> {
         const syntax_deduction = document.querySelector('#points-deduction-forms input[name="syntax_points_deduction"]')?.value;
         const runtime_deduction = document.querySelector('#points-deduction-forms input[name="runtime_points_deduction"]')?.value;
         const testCase_deduction = document.querySelector('#points-deduction-forms input[name="test_case_points_deduction"]')?.value;
+        document.getElementById('validate_syntax_points_hidden').value = syntax;
+        document.getElementById('validate_runtime_points_hidden').value = runtime;
+        document.getElementById('validate_test_case_points_hidden').value = testCase;
+
+        document.getElementById('validate_syntax_points_deduction_hidden').value = syntax_deduction;
+        document.getElementById('validate_runtime_points_deduction_hidden').value = runtime_deduction;
+        document.getElementById('validate_test_case_points_deduction_hidden').value = testCase_deduction;
         
-        if (isTesting){
-            document.getElementById('validate_syntax_points_hidden').value = syntax;
-            document.getElementById('validate_runtime_points_hidden').value = runtime;
-            document.getElementById('validate_test_case_points_hidden').value = testCase;
-            if (syntax_deduction){
-                document.getElementById('validate_syntax_points_deduction_hidden').value = syntax_deduction;
-            }
-            if (runtime_deduction){ 
-                document.getElementById('validate_runtime_points_deduction_hidden').value = runtime_deduction;
-            }
-            if (testCase_deduction){ 
-                document.getElementById('validate_test_case_points_deduction_hidden').value = testCase_deduction;
-            }
-        }
+        
         document.getElementById('validate-complete-solution-input').value = solution_editor.state.doc.toString();
         document.getElementById('validate-test-case-input').value = test_case_editor.state.doc.toString();
         document.getElementById('language_to_validate-input').value = select_form.value;
@@ -264,7 +260,8 @@ class <YourClass+Test> {
                     history(),                       
                     keymap.of([ 
                         ...defaultKeymap,
-                        ...historyKeymap               
+                        ...historyKeymap,
+                        indentWithTab            
                     ]),
                     EditorView.lineWrapping,
 
@@ -423,15 +420,15 @@ class <YourClass+Test> {
 
             const complete_solution_state = EditorState.create({
                 doc: values.complete_solution || "",
-                extensions: [basicSetup, extension, onChangeListener]
+                extensions: [basicSetup, keymap.of([indentWithTab]), extension, onChangeListener]
             });
             const initial_solution_state = EditorState.create({
                 doc: values.initial_solution || "",
-                extensions: [basicSetup, extension, onChangeListener]
+                extensions: [basicSetup, keymap.of([indentWithTab]), extension, onChangeListener]
             });
             const test_case_state = EditorState.create({
                 doc: values.test_case || "",
-                extensions: [basicSetup, extension, onChangeListener]
+                extensions: [basicSetup, keymap.of([indentWithTab]), extension, onChangeListener]
             });
 
             supported_languages[language] = {

@@ -30,12 +30,11 @@ class ExamController extends Controller
                 $query->whereIn('courses.id', $courseIds);
             })
             ->paginate(10);
-        $header = ['Name', 'Course', 'Questions', 'Status', 'is Published', 'Examination Date'];
+        $header = ['Name', 'Questions', 'Status', 'is Published', 'Examination Date'];
         $rows = $exams->map(function ($exam) {
             return [
                 'id' => $exam->id,
                 'name' => $exam->name,
-                'course' => $exam->course,
                 'questions' => $exam->questions->count(),
                 'status' => $exam->questions()->sum('total_points') >= $exam->max_score ? 'Complete' : 'Incomplete',
                 'is_published' => $exam->is_published ? 'Yes' : 'No',
@@ -61,7 +60,7 @@ class ExamController extends Controller
     }
 
     public function create(){
-        $courses = Course::select(['abbreviation', 'id'])->get();
+        $courses =$this->userService->getCoursesForUser(auth()->user()); 
         return view('exams/create', ['courses' => $courses]);
 
     }
@@ -70,12 +69,13 @@ class ExamController extends Controller
 
         $validated = request()->validate([
             'name' => 'required|string|max:255',
-            'courses' => 'required|array',
-            'courses.*' => 'exists:courses,id',
+            'courses' => 'required|array|min:1',
+            'courses.*' => 'exists:courses,id|required|string|distinct',
             'max_score' => 'required|integer|gte:1',
             'duration' => 'nullable|integer|min:1',
             'retakes' => 'nullable|integer|min:1',
             'examination_date' => 'nullable|date|after:now',
+            'passing_score' => 'required|integer|gte:1|max:100'
         ], [
             'courses' => 'The course field is required.',
             'courses.*' => 'Invalid Course',
@@ -89,6 +89,7 @@ class ExamController extends Controller
             'duration' => request('duration') ?? null,
             'retakes' => request('retakes') ?? null, 
             'examination_date' => request('examination_date'),
+            'passing_score' => request('passing_score')
         ]);
 
         $exam->courses()->attach($validated['courses']);
@@ -119,18 +120,20 @@ class ExamController extends Controller
             'duration' => 'nullable|integer|min:1',
             'retakes' => 'nullable|integer|min:1',
             'examination_date' => 'nullable|date|after:now',
+            'passing_score' => 'required|integer|gte:1|max:100'
         ], [
             'max_score' => 'The max score field is required',
             'examination_date' => 'The examination date field must be a date after now.'
         ]);
 
-        $exam->update([
-            'name' => request('name'),
-            'max_score' => request('max_score'),
-            'duration' => request('duration') ?? null,
-            'retakes' => request('retakes') ?? null, 
-            'examination_date' => request('examination_date') ?? null,
-        ]);
+            $exam->update([
+                'name' => request('name'),
+                'max_score' => request('max_score'),
+                'duration' => request('duration') ?? null,
+                'retakes' => request('retakes') ?? null, 
+                'examination_date' => request('examination_date') ?? null,
+                'passing_score' => request('passing_score')
+            ]);
 
         session()->flash('toast', json_encode([
             'status' => 'Updated!',

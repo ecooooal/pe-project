@@ -31,7 +31,7 @@ class QuestionController extends Controller
     public function index(){
         $questions = $this->userService->getQuestionsForUser(auth()->user())->paginate(10);
         $questions->load('author'); 
-        $header = ['Name', 'Subject', 'Topic', 'Type', 'Author', 'Date Created'];
+        $header = ['Name', 'Subject', 'Topic', 'Type', 'Author'];
         $rows = $questions->map(function ($question) {
             return [
                 'id' => $question->id,
@@ -39,8 +39,7 @@ class QuestionController extends Controller
                 'subject' => $question->topic->subject->name,
                 'topic' => $question->topic->name,
                 'type' => $question->question_type->name,
-                'author' => $question->author->getFullName() ?? "No Author",
-                'Date Created' => Carbon::parse($question->created_at)->format('m/d/Y')
+                'author' => $question->author->getFullName() ?? "No Author"
             ];
         });
 
@@ -130,9 +129,12 @@ class QuestionController extends Controller
         ];
         switch ($question_type) {
             case('coding'):
-                    $rules['syntax_points'] = ['required', 'integer', 'min:1'];
-                    $rules['runtime_points'] = ['required', 'integer', 'min:1'];
-                    $rules['test_case_points'] = ['required', 'integer', 'min:1'];
+                    $rules['syntax_points'] = ['required', 'integer', 'min:1', 'max:10'];
+                    $rules['runtime_points'] = ['required', 'integer', 'min:1', 'max:10'];
+                    $rules['test_case_points'] = ['required', 'integer', 'min:1', 'max:10'];
+                    $rules['syntax_points_deduction'] = ['required', 'integer', 'min:1', 'max:10'];
+                    $rules['runtime_points_deduction'] = ['required', 'integer', 'min:1', 'max:10'];
+                    $rules['test_case_points_deduction'] = ['required', 'integer', 'min:1', 'max:10'];
                     $rules['instruction'] = ['required'];
                     $rules['supported_languages'] = ['required', 'json', function ($attribute, $value, $fail) {
                         $decoded = json_decode($value, true);
@@ -140,15 +142,14 @@ class QuestionController extends Controller
                             $fail('Coding question must have at least one programming language.');
                         }
                     }];
-                    $instruction = request()->post('instruction');
-                    $markdown = Str::of($instruction)->markdown(['html_input' => 'strip']) ?? '';
-                    $supported = json_decode(request()->post('supported_languages', '{}'), true);
                     $messages = [
                         'supported_languages.required' => 'Coding question must have at least one programming language.',
                         'syntax_points.required' => 'Syntax Points is required.',
                         'runtime_points.required' => 'Run Time Points is required.',
                         'test_case_points.required' => 'Test Case Points is required.',
-
+                        'syntax_points_deduction.required' => 'Syntax Points deduction is required.',
+                        'runtime_points_deduction.required' => 'Run Time Points deduction is required.',
+                        'test_case_points_deduction.required' => 'Test Case Points deduction is required.',
                     ];
                 break;
             case('matching') :
@@ -218,7 +219,6 @@ class QuestionController extends Controller
             }
             $data['points'] = $totalPoints;
         }
-        
         QuestionFactory::create($data);
 
         if (request()->header('HX-Request')) {
@@ -295,6 +295,9 @@ class QuestionController extends Controller
                     $rules['syntax_points'] = ['required', 'integer', 'min:1'];
                     $rules['runtime_points'] = ['required', 'integer', 'min:1'];
                     $rules['test_case_points'] = ['required', 'integer', 'min:1'];
+                    $rules['syntax_points_deduction'] = ['required', 'integer', 'min:1', 'max:10'];
+                    $rules['runtime_points_deduction'] = ['required', 'integer', 'min:1', 'max:10'];
+                    $rules['test_case_points_deduction'] = ['required', 'integer', 'min:1', 'max:10'];
                     $rules['instruction'] = ['required'];
                     $rules['supported_languages'] = ['required', 'json', function ($attribute, $value, $fail) {
                         $decoded = json_decode($value, true);
@@ -310,6 +313,9 @@ class QuestionController extends Controller
                         'syntax_points.required' => 'Syntax Points is required.',
                         'runtime_points.required' => 'Run Time Points is required.',
                         'test_case_points.required' => 'Test Case Points is required.',
+                        'syntax_points_deduction.required' => 'Syntax Points deduction is required.',
+                        'runtime_points_deduction.required' => 'Run Time Points deduction is required.',
+                        'test_case_points_deduction.required' => 'Test Case Points deduction is required.',
 
                     ];
                 break;
@@ -574,6 +580,9 @@ class QuestionController extends Controller
             $code_settings['syntax_points'] = 0;
             $code_settings['runtime_points'] = 0;
             $code_settings['test_case_points'] = 0;
+            $code_settings['syntax_points_deduction'] =  1;
+            $code_settings['runtime_points_deduction'] = 1;
+            $code_settings['test_case_points_deduction'] = 1;
 
         } else {
             $code = $request->post('validate-complete-solution');

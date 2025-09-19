@@ -209,9 +209,15 @@
             <div class="flex justify-between items-center w-full h-16 p-8 bg-blue-900 border-x border-t border-gray-300 rounded-t-2xl">
                 <h1 class="text-2xl font-medium text-gray-50">Exam Questions </h1>
             </div>
+            {% if exam_questions_rows.count != 0 %}
             <div class="overflow-auto max-w-full scroll-smooth rounded-b-2xl border-x border-y border-gray-300">
                 {{ exam_questions_table(questions_header, exam_questions_rows, url:'questions', forAdding:can('update exams') and not exam.is_published ? true : false, openAction:true, exam_id:exam.id, forRemoving:can('update exams') and not exam.is_published ? true : false, actions:true) }}
             </div>
+            {% else %}
+            <div class="flex justify-between items-center w-full h-16 p-8 bg-white rounded-2xl">
+                <h1 class="text-2xl font-medium text-gray-800">No Exam Questions Yet</h1>
+            </div>
+            {% endif %}
         </div>
         {% if can('update exams') %}
 

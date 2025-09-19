@@ -17,6 +17,7 @@ class Exam extends Model
         'access_code',
         'max_score',
         'duration',
+        'passing_score',
         'retakes',
         'examination_date',
         'is_published',

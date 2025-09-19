@@ -1,12 +1,11 @@
 import { EditorState } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
-import { defaultKeymap } from "@codemirror/commands";
+import { defaultKeymap, indentWithTab } from "@codemirror/commands";
 import { basicSetup } from "codemirror";
 import {python} from "@codemirror/lang-python"
 import { java } from "@codemirror/lang-java";
 import {cpp} from "@codemirror/lang-cpp"
 import {markdown} from "@codemirror/lang-markdown"
-import { lineNumbers } from "@codemirror/view"
 import { history, historyKeymap } from '@codemirror/commands';
 import { placeholder } from "@codemirror/view";
 
@@ -73,7 +72,8 @@ exampleJavaMethod("123ABC!") ➞ "123abc!"
             history(),                      
             keymap.of([
               ...defaultKeymap,
-              ...historyKeymap               
+              ...historyKeymap,
+              indentWithTab               
             ]),
             EditorView.lineWrapping,
 
@@ -220,15 +220,15 @@ public class ExampleJavaCompleteSolutionTest {
 
             const new_solution_state = EditorState.create({
                 doc: complete_solution_scaffold,
-                extensions: [basicSetup, languageExtension, placeholder_solution, onChangeListener],
+                extensions: [basicSetup, keymap.of([indentWithTab]), languageExtension, placeholder_solution, onChangeListener],
             });
             const new_initial_solution_state = EditorState.create({
                 doc: initial_solution_scaffold,
-                extensions: [basicSetup, languageExtension, placeholder_initial, onChangeListener],
+                extensions: [basicSetup, keymap.of([indentWithTab]), languageExtension, placeholder_initial, onChangeListener],
             });
             const new_test_case_state = EditorState.create({
                 doc: test_case_scaffold,
-                extensions: [basicSetup, languageExtension, placeholder_test, onChangeListener],
+                extensions: [basicSetup, keymap.of([indentWithTab]), languageExtension, placeholder_test, onChangeListener],
             });
             
             solution_editor.setState(new_solution_state);

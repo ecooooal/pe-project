@@ -21,12 +21,11 @@ class CourseController extends Controller
     }
     public function index(){
         $courses = Course::with('subjects')->get();
-        $header = ['Name', 'Date Created'];
+        $header = ['Name'];
         $rows = $courses->map(function ($course) {
             return [
                 'id' => $course->id,
-                'name' => $course->name,
-                'Date Created' => Carbon::parse($course->created_at)->format('m/d/Y')
+                'name' => $course->name
             ];  
         });
 

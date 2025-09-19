@@ -75,6 +75,7 @@
                 <div class="flex justify-between">
                     <div class="flex flex-col gap-y-4">
                         {{ show_item('Max Score', exam.max_score)}}
+                        {{ show_item('Passing Score (%)', exam.passing_score ~ '% = ' ~ exam.max_score * (exam.passing_score / 100) ~ 'pts' ) }}
                         {{ show_item('Examination Date', exam.examination_date ?? "No Examination Date") }}
                         {{ show_item('Duration (in minutes)', exam.duration ?: 'Unlimited Duration')}}
                         {{ show_item('Retakes', exam.retakes ?: 'Unlimited Retakes')}}

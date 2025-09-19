@@ -24,14 +24,12 @@ class SubjectController extends Controller
     public function index(){
         $subject_courses = $this->userService->getSubjectsForUser(auth()->user())->paginate(10);
         $subject_courses->load('courses');
-        $header = ['Course', 'Name',  'Year Level', 'Date Created'];
+        $header = ['Name',  'Year Level'];
         $rows = $subject_courses->map(function ($subject) {
             return [
                 'id' => $subject->id,
-                'course' => $subject->course,
                 'name' => $subject->name,
-                'year_level' => $subject->year_level,
-                'Date Created' => Carbon::parse($subject->created_at)->format('m/d/Y')
+                'year_level' => $subject->year_level
             ];
         });
 
@@ -70,7 +68,7 @@ class SubjectController extends Controller
     }
 
     public function create(){
-        $courses = Course::select(['abbreviation', 'id'])->get();
+        $courses = $this->userService->getCoursesForUser(auth()->user());
 
         return view('subjects/create', ['courses' => $courses]);
     }

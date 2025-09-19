@@ -24,14 +24,13 @@ class TopicController extends Controller
     public function index(){
         $topics = $this->userService->gettopicsForUser(auth()->user())->paginate(10);
         $topics->load('subject', 'questions');
-        $header = ['Subject', 'Name', 'Question Count', 'Date Created'];
+        $header = ['Subject', 'Name', 'Question Count'];
         $rows = $topics->map(function ($topic) {
             return [
                 'id' => $topic->id,
                 'subject' => $topic->subject->name,
                 'name' => $topic->name,
-                'question count' => $topic->questions->count(),
-                'Date Created' => Carbon::parse($topic->created_at)->format('m/d/Y')
+                'question count' => $topic->questions->count()
             ];
         });
 

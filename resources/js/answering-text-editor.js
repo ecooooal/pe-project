@@ -1,14 +1,10 @@
 import { EditorState } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
-import { defaultKeymap } from "@codemirror/commands";
 import { basicSetup } from "codemirror";
 import {python} from "@codemirror/lang-python"
 import { java } from "@codemirror/lang-java";
 import {cpp} from "@codemirror/lang-cpp"
-import {markdown} from "@codemirror/lang-markdown"
-import { lineNumbers } from "@codemirror/view"
-import { history, historyKeymap } from '@codemirror/commands';
-import { placeholder } from "@codemirror/view";
+import {indentWithTab} from "@codemirror/commands"
 
     // Initialize Constant Variables
     const supported_languages = {};
@@ -67,7 +63,7 @@ import { placeholder } from "@codemirror/view";
 
             const initial_solution_state = EditorState.create({
                 doc: values.initial_solution || "",
-                extensions: [basicSetup, extension]
+                extensions: [basicSetup, keymap.of([indentWithTab]), extension]
             });
             const test_case_state = EditorState.create({
                 doc: values.test_case || "",

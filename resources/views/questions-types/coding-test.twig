@@ -18,13 +18,13 @@
                     <div class="flex flex-col flex-1">
                         {{ forms.form_field(
                             label:forms.label(
-                                id:'validate_syntax_points', 
-                                content:'Syntax/Compiling Points', 
+                                id:'syntax_points', 
+                                content:'🟢 Syntax/Compiling Points', 
                                 attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
                                 ),
                             input:forms.number(
-                                name:'validate_syntax_points', 
+                                name:'syntax_points', 
                                 value : isEdit ? question_type_data.syntax_points : '',
                                 attributes:{
                                     'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
@@ -39,13 +39,13 @@
                     <div class="flex flex-col flex-1">
                            {{ forms.form_field(
                             label:forms.label(
-                                id:'validate_runtime_points', 
-                                content:'Runtime Points', 
+                                id:'runtime_points', 
+                                content:'🟢 Runtime Points', 
                                 attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
                                 ),
                             input:forms.number(
-                                name:'validate_runtime_points', 
+                                name:'runtime_points', 
                                 value : isEdit ? question_type_data.runtime_points : '',
                                 attributes:{
                                     'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
@@ -60,13 +60,13 @@
                     <div class="flex flex-col flex-1">
                          {{ forms.form_field(
                             label:forms.label(
-                                id:'validate_test_case_points', 
-                                content:'Test Case Points', 
+                                id:'test_case_points', 
+                                content:'🟢 Test Case Points', 
                                 attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
                                 ),
                             input:forms.number(
-                                name:'validate_test_case_points', 
+                                name:'test_case_points', 
                                 value : isEdit ? question_type_data.test_case_points : '',
                                 attributes:{
                                     'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
@@ -83,14 +83,14 @@
                     <div class="flex flex-col flex-1">
                         {{ forms.form_field(
                             label:forms.label(
-                                id:'validate_syntax_points_deduction', 
-                                content:'Syntax/Compiling Points Deduction Per Error', 
+                                id:'syntax_points_deduction', 
+                                content:'🔴 Syntax/Compiling Points Deduction Per Error', 
                                 attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
                                 ),
                             input:forms.number(
-                                name:'validate_syntax_points_deduction', 
-                                value : isEdit ? question_type_data.syntax_points_deduction : '',
+                                name:'syntax_points_deduction', 
+                                value : isEdit ? question_type_data.syntax_points_deduction_per_error : '',
                                 attributes:{
                                     'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'required': true,
@@ -104,14 +104,14 @@
                     <div class="flex flex-col flex-1">
                            {{ forms.form_field(
                             label:forms.label(
-                                id:'validate_runtime_points_deduction', 
-                                content:'Runtime Points Deduction Per Error', 
+                                id:'runtime_points_deduction', 
+                                content: '🔴 Runtime Points Deduction Per Error', 
                                 attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
                                 ),
                             input:forms.number(
-                                name:'validate_runtime_points_deduction', 
-                                value : isEdit ? question_type_data.runtime_points_deduction : '',
+                                name:'runtime_points_deduction', 
+                                value : isEdit ? question_type_data.runtime_points_deduction_per_error : '',
                                 attributes:{
                                     'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'required': true,
@@ -125,14 +125,14 @@
                     <div class="flex flex-col flex-1">
                          {{ forms.form_field(
                             label:forms.label(
-                                id:'validate_test_case_points_deduction', 
-                                content:'Test Case Points Deduction Per Error', 
+                                id:'test_case_points_deduction', 
+                                content:'🔴 Test Case Points Deduction Per Error', 
                                 attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
                                 ),
                             input:forms.number(
-                                name:'validate_test_case_points_deduction', 
-                                value : isEdit ? question_type_data.test_case_points_deduction : '',
+                                name:'test_case_points_deduction', 
+                                value : isEdit ? question_type_data.test_case_points_deduction_per_error : '',
                                 attributes:{
                                     'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                     'required': true,
@@ -201,6 +201,14 @@
                         {{ csrf_field() }}
 
                         <!-- Hidden Fields -->
+                        <input type="hidden" name="validate_syntax_points" id="validate_syntax_points_hidden">
+                        <input type="hidden" name="validate_runtime_points" id="validate_runtime_points_hidden">
+                        <input type="hidden" name="validate_test_case_points" id="validate_test_case_points_hidden">
+
+                        <input type="hidden" name="validate_syntax_points_deduction" id="validate_syntax_points_deduction_hidden">
+                        <input type="hidden" name="validate_runtime_points_deduction" id="validate_runtime_points_deduction_hidden">
+                        <input type="hidden" name="validate_test_case_points_deduction" id="validate_test_case_points_deduction_hidden">
+
                         <textarea class="hidden" name="validate-complete-solution" id="validate-complete-solution-input"></textarea>
                         <textarea class="hidden" name="validate-test-case" id="validate-test-case-input"></textarea>
                         <input type="text" class="hidden" name="language-to-validate" id="language_to_validate-input">

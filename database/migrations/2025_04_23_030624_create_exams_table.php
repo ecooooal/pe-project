@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('max_score');
             $table->integer('duration')->nullable();
+            $table->unsignedTinyInteger('passing_score')->default(50); 
             $table->integer('retakes')->nullable();
             $table->dateTime('examination_date')->nullable();
             $table->boolean('is_published',)->default(false);
