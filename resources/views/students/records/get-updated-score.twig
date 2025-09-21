@@ -22,11 +22,15 @@
 </div>
 
 <div id="exam_record_info" class="htmx-animate flex flex-col justify-between gap-y-4 rounded-xl bg-gray-10 p-4 shadow-sm ring-1 ring-gray-950/5">
-    {{ show_item('Attempt #', exam_record.attempt)}}
-    {{ show_item('Score', exam_record.total_score ~ '/' ~ exam_record.max_score )}}
+    <div id="student-score-donut-graph" 
+        class="h-[200px] w-[200px]"
+        data-student-score-status="{{ exam_record.status }}" 
+        data-student-score="{{ exam_record.total_score }}"
+        data-exam-max-score = "{{ exam_record.max_score }}">
+    </div>
+    {{ show_item('Status', exam_record.status) }}
     {{ show_item('Time Taken', exam_record.time_taken ~ ' minutes')}}
     {{ show_item('Date Taken', exam_record.date_taken|date("m/d/Y"))}}
-    {{ show_item('Status', exam_record.status) }}
     <div class="flex flex-col gap-y-2 w-full">
         <a href="#" class="flex p-2 max-h-fit w-full bg-orange-900 rounded-lg font-medium text-white hover:bg-orange-700 hover:text-gray-50 cursor-pointer justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
@@ -43,4 +47,54 @@
             Email me this record
         </a>
     </div>
+    <script>
+        student_data_div = document.getElementById('student-score-donut-graph');
+        if (student_data_div) {
+        student_score = student_data_div.dataset.studentScore;
+        exam_max_score = student_data_div.dataset.examMaxScore;
+         student_score_status = student_data_div.dataset.studentScoreStatus;
+        student_score_status_message = student_score_status == 'perfect_score' ? 'Perfect' : student_score_status == 'pass' ? 'Pass' : 'Review';
+        const remaining = exam_max_score - student_score;
+        const marker_color = student_score_status == 'perfect_score' ? '#FFD700' : student_score_status == 'pass' ? 'rgb(44, 160, 44)' : 'rgb(255, 127, 14)';
+
+        const student_score_donut_data = [{
+            type: 'pie',
+            values: [student_score, remaining],
+            labels: [`${student_score} pts`, ''],            
+            hole: 0.6,
+            text: [`${student_score} pts`, ''],   
+            textinfo: 'text',                        
+            hoverinfo: 'none',      
+            direction: 'counterclockwise',
+            sort: false,
+            marker: {
+                line: { width: 2, color: '#333'},
+                colors: [marker_color, 'rgb(220, 220, 220)'], 
+                opacity: 0.7  
+            },
+            textposition: 'inside',
+            showlegend: false
+        }];
+
+        const student_score_donut_layout = {
+            title: 'Score Breakdown',
+            showlegend: false,
+            annotations: [
+                {
+                    font: {
+                        size: 18
+                    },
+                    showarrow: false,
+                    text: `${student_score_status_message}`,
+                    x: 0.5,
+                    y: 0.5
+                }
+            ],
+            autosize: true,
+            margin: { l: 5, r:5, t: 5, b: 5 },
+        };
+        Plotly.newPlot('student-score-donut-graph', student_score_donut_data, student_score_donut_layout, {displayModeBar: false});
+    }
+</script>
 </div> 
+

@@ -100,7 +100,7 @@
                                     <td>{{ row.question }}</td>
                                     <td class="text-xs">{{ row.is_answered ? row.question_type|lower not in ['ranking', 'matching', 'coding'] ? row.your_answer|title : '📝 see details' : 'No answer' }}</td>
                                     <td>{{ row.score }}/{{ row.max_score }}</td>
-                                    <td class="{{ row.question_type|lower == 'coding' ? 'animate-bounce' : '' }}">{{ row.question_type|lower == 'coding' ? '⚪' :row.score == row.max_score ? '🟢' : row.score > 0 and row.max_score != row.score ? '🟡' : '🔴'}}</td>
+                                    <td class="{{ row.question_type|lower == 'coding' and row.is_answer == true ? 'animate-bounce' : '' }}">{{ row.question_type|lower == 'coding' and row.is_answer == true ? '⚪' :row.score == row.max_score ? '🟢' : row.score > 0 and row.max_score != row.score ? '🟡' : '🔴'}}</td>
                                 </tr>
                                 {% if row.question_type|lower  in ['ranking', 'matching', 'coding'] %}
                                 <tr>
@@ -161,26 +161,34 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            {% if row.is_answered %}
                                                             <tr>
                                                                 <td>Waiting for Result...</td>
                                                                 <td>Waiting for Result...</td>
                                                                 <td>Waiting for Result...</td>
                                                             </tr>
+                                                            {% endif %}
+                                                            <tr>
+                                                                <td>No answer</td>
+                                                                <td>No answer</td>
+                                                                <td>No answer</td>
+                                                            </tr>
                                                         </tbody> 
                                                     </table>
-
-                                                    <div 
-                                                        hx-get="{{ route('exam_records.coding_answer_result', { coding_answer:row.your_answer, number:row.number, question:row.question, max_score :row.max_score} ) }}"
-                                                        hx-trigger="load, every 8s"
-                                                        hx-swap="outerHTML"
-                                                        hx-target="this"
-                                                        hx-select="#coding-{{ row.number }}-div"
-                                                        hx-select-oob="#row-{{ row.number }}, #coding-{{ row.number }}-table"
-                                                        class="flex flex-1 justify-center items-center">
-                                                        <span class="animate-bounce font-bold font-mono text-xl text-gray-900">Currently Checking your Code...</span>
-                                                    </div>
-                                                    
-                                                    <pre class="bg-transparent border-2 overflow-x-auto"><span class="text-sm font-bold text-gray-900">{{ row.question_type_answer.language|capitalize }}</span><code class="language-{{ row.question_type_answer.language }}">{{ row.question_type_answer.code }}</code></pre>
+                                                    {% if row.is_answered %}
+                                                        <div 
+                                                            hx-get="{{ route('exam_records.coding_answer_result', { coding_answer:row.your_answer, number:row.number, question:row.question, max_score :row.max_score} ) }}"
+                                                            hx-trigger="load, every 8s"
+                                                            hx-swap="outerHTML"
+                                                            hx-target="this"
+                                                            hx-select="#coding-{{ row.number }}-div"
+                                                            hx-select-oob="#row-{{ row.number }}, #coding-{{ row.number }}-table"
+                                                            class="flex flex-1 justify-center items-center">
+                                                            <span class="animate-bounce font-bold font-mono text-xl text-gray-900">Currently Checking your Code...</span>
+                                                        </div>
+                                                        
+                                                        <pre class="bg-transparent border-2 overflow-x-auto"><span class="text-sm font-bold text-gray-900">{{ row.question_type_answer.language|capitalize }}</span><code class="language-{{ row.question_type_answer.language }}">{{ row.question_type_answer.code }}</code></pre>
+                                                    {% endif %}
                                                 {% endif %}
                                         </details>
                                     </td>
@@ -269,17 +277,30 @@
             </div>
 
 
+
             <div class="flex flex-col max-h-fit min-w-fit gap-y-2">
-                <div class="flex flex-col justify-between gap-y-4 rounded-xl bg-gray-10 p-4 shadow-sm ring-1 ring-gray-950/5"
+                <div class="htmx-animate flex flex-col justify-between gap-y-4 rounded-xl bg-gray-10 p-4 shadow-sm ring-1 ring-gray-950/5"
                     {% if exam_record.status == 'in_progress' %}
                     id="exam_record_info"
                     {% endif %}
                 >
-                    {{ show_item('Attempt #', exam_record.attempt)}}
-                    {{ show_item('Score', exam_record.total_score ~ '/' ~ exam.max_score )}}
+
+                    {% if exam_record.status == 'in_progress' %}
+                        <div class="h-[200px] w-[200px] flex flex-col gap-1 justify-center items-center">
+                            <span class="font-bold text-gray-800">Calculating Score</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" class="w-32 "><path fill="none" stroke="#2a4365" stroke-width="20" stroke-linecap="round" stroke-dasharray="300 385" stroke-dashoffset="0" d="M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z"><animate attributeName="stroke-dashoffset" calcMode="spline" dur="2.2" values="685;-685" keySplines="0 0 1 1" repeatCount="indefinite"></animate></path></svg>
+                        </div>
+                    {% else %}
+                        <div id="student-score-donut-graph" 
+                            class="h-[200px] w-[200px]"
+                            data-student-score-status="{{ exam_record.status }}" 
+                            data-student-score="{{ exam_record.total_score }}"
+                            data-exam-max-score = "{{ exam.max_score }}">
+                        </div>
+                    {% endif %}
+                    {{ show_item('Status', exam_record.status) }}
                     {{ show_item('Time Taken', exam_record.time_taken ~ ' minutes')}}
                     {{ show_item('Date Taken', exam_record.date_taken|date("m/d/Y"))}}
-                    {{ show_item('Status', exam_record.status) }}
                 </div> 
                 {% if exam_record.status != 'in_progress' %}
                 <div class="flex flex-col gap-y-2 w-full">
@@ -303,12 +324,69 @@
         </div>
     </div>
 </div>
+{% if exam_record.status != 'in_progress' %}
+<script>
+    function render_score_graph(){
+        student_data_div = document.getElementById('student-score-donut-graph');
+        if (!student_data_div) return;
+        student_score = student_data_div.dataset.studentScore;
+        exam_max_score = student_data_div.dataset.examMaxScore;
+        student_score_status = student_data_div.dataset.studentScoreStatus;
+        student_score_status_message = student_score_status == 'perfect_score' ? 'Perfect' : student_score_status == 'pass' ? 'Pass' : 'Review';
+        const remaining = exam_max_score - student_score;
+        const marker_color = student_score_status == 'perfect_score' ? '#FFD700' : student_score_status == 'pass' ? 'rgb(44, 160, 44)' : 'rgb(255, 127, 14)';
+
+        const student_score_donut_data = [{
+            type: 'pie',
+            values: [student_score, remaining],
+            labels: [`${student_score} pts`, ''],            
+            hole: 0.6,
+            text: [`${student_score} pts`, ''],   
+            textinfo: 'text',                        
+            hoverinfo: 'none',      
+            direction: 'counterclockwise',
+            sort: false,
+            marker: {
+                line: { width: 2, color: '#333'},
+                colors: [marker_color, 'rgb(220, 220, 220)'], 
+                opacity: 0.7  
+            },
+            textposition: 'inside',
+            showlegend: false
+        }];
+
+        const student_score_donut_layout = {
+            title: 'Score Breakdown',
+            showlegend: false,
+            annotations: [
+                {
+                    font: {
+                        size: 18
+                    },
+                    showarrow: false,
+                    text: `${student_score_status_message}`,
+                    x: 0.5,
+                    y: 0.5
+                }
+            ],
+            autosize: true,
+            margin: { l: 5, r:5, t: 5, b: 5 },
+        };
+        Plotly.newPlot('student-score-donut-graph', student_score_donut_data, student_score_donut_layout, {displayModeBar: false});
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', render_score_graph);
+    } else {
+        render_score_graph();
+    }   
+    document.body.addEventListener('htmx:afterSwap', render_score_graph);
+</script>
+{% endif %}
 
 <script>
   document.body.addEventListener('htmx:beforeSwap', function(event) {
     if (event.detail.xhr.status === 212) {
       event.preventDefault();
-      console.log('Swap prevented due to 212 No Content response.');
     }
   });
 </script>
