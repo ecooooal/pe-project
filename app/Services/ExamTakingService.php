@@ -20,11 +20,11 @@ class ExamTakingService
     public function validateExamAccess(Exam $exam, User $user){
         $isEnrolled = $user->exams()->where('exam_id', $exam->id)->exists();
         if (!$isEnrolled){
-            dd('not enrolled in this exam');
+            return false;
         }
         // check if exam is published
         if (!$exam->is_published){
-            dd('Not published');
+            return false;
         }
         // check examination date
         // if ($exam->examination_date){

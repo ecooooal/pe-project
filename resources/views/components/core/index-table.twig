@@ -14,11 +14,11 @@
         <tbody>
             
             {% for row in rows %}
-                <tr class="hover:bg-gray-100 transition duration-150"
->                    {% for cell in row %}
-                        {% if cell != row.id %}
-                        <td class="p-4 border-b border-gray-300 max-w-xs text-sm {{ cell == 'Incomplete' ? 'text-red-600' : (cell == 'Complete' ? 'text-green-600' : '') }} ">
-                            <span class="block truncate">{{ cell }}</span>
+                <tr class="hover:bg-gray-100 transition duration-150">                    
+                    {% for cell, value in row %}
+                        {% if cell != 'id' %}
+                        <td class="p-4 border-b border-gray-300 max-w-xs text-sm {{ value == 'Incomplete' ? 'text-red-600' : (value == 'Complete' ? 'text-green-600' : '') }} ">
+                            <span class="block truncate">{{ value }}</span> 
                         </td>
                         {% endif %}
                     {% endfor %}
@@ -103,10 +103,10 @@
                                 <tbody>
                                     {% for question in topic.questions %}         
                                         <tr class="hover:bg-gray-100 transition duration-150"> 
-                                                {% for cell in question %}
-                                                    {% if cell != question.id %}
-                                                    <td class="p-4 border-b border-gray-300 max-w-xs text-sm {{ cell == 'Incomplete' ? 'text-red-600' : (cell == 'Complete' ? 'text-green-600' : '') }} ">
-                                                        <span class="block truncate">{{ cell }}</span>
+                                                {% for cell, value in question %}
+                                                    {% if cell != 'id' %}
+                                                    <td class="p-4 border-b border-gray-300 max-w-xs text-sm">
+                                                        <span class="block truncate">{{ value }}</span>
                                                     </td>
                                                     {% endif %}
                                                 {% endfor %}
@@ -128,7 +128,7 @@
                                                                 hx-target="this"
                                                                 hx-swap="delete"
                                                                 hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
-                                                                hx-select-oob="#question-count-field, #subject-field, #topic-field, #type-field, #exam-question-field, #available-question-field, #score-count-field"
+                                                                hx-select-oob="#question-count-field, #subject-field, #topic-field, #type-field, #blooms-level-field, #exam-question-field, #available-question-field, #score-count-field"
                                                                 class="toggle-button  {{ forRemoving == true ? 'text-red-800 hover:text-red-800/90 active:text-red-900' : 'text-blue-800 hover:text-blue-800/90 active:text-blue-900' }} cursor-pointer"
                                                                 >
                                                                 {% if not forRemoving %}

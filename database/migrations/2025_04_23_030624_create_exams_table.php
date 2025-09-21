@@ -21,6 +21,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('passing_score')->default(50); 
             $table->integer('retakes')->nullable();
             $table->dateTime('examination_date')->nullable();
+            $table->dateTime('expiration_date')->nullable();
             $table->boolean('is_published',)->default(false);
             $table->string('applied_algorithm')->default('None');
             $table->softDeletes();

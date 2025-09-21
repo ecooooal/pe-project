@@ -37,6 +37,11 @@
   {{ input(name, value, "date", attributes) }}
 {% endmacro %}
 
+{% macro datetime(name, value, attributes) %}
+  {% from _self import input %}
+  {{ input(name, value, "datetime-local", attributes) }}
+{% endmacro %}
+
 {% macro number(name, value, attributes) %}
   {% from _self import input %}
   {{ input(name, value, "number", attributes) }}

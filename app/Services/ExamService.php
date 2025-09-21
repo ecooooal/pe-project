@@ -22,6 +22,22 @@ class ExamService
         return $exam->questions()->with('topic.subject')->get();
     }
 
+    public function getQuestionLevelsCountForExam(Exam $exam)
+    {
+        $questions = $exam->questions()->with(['tags' => function ($query) {
+                            $query->wherePivot('type', 'required');
+                        }])->get();
+                        
+        $level_count = [];
+        foreach ($questions as $question) {
+            foreach ($question->tags as $tag) {
+                $level_count[$tag->name] = ($level_count[$tag->name] ?? 0) + 1;
+            }
+        }
+
+        return $level_count;
+    }
+
     public function getAccessCodesForExam(Exam $exam)
     {
         return $exam->load('accessCodes')->accessCodes;
@@ -132,6 +148,7 @@ class ExamService
             'name' => $question->name,
             'subject' => $question->topic->subject->name,
             'topic' => $question->topic->name,
+            'level' => $question->bloomTagLabel(),
             'type' => $question->question_type->name,
             'points' => $question->total_points,
             'id' => $question->id

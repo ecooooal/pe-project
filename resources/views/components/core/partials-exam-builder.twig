@@ -45,6 +45,92 @@
     </div>
 </div>   
 
+<div id="blooms-level-field" class="flex max-w-full mx-8 justify-center gap-x-4">
+    <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+        <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+            🧠
+        </div>
+        
+        <div class="flex flex-col justify-center">
+            <span class="text-xl font-extrabold font-mono text-blue-900">
+            {{ exam_levels.remember ?? '0'}}
+            </span>
+            <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+            Remember
+            </span>
+        </div>
+    </div>  
+    <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+        <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+            📖
+        </div>
+        
+        <div class="flex flex-col justify-center">
+            <span class="text-xl font-extrabold font-mono text-blue-900">
+            {{ exam_levels.understand ?? '0'}}
+            </span>
+            <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+            Understand
+            </span>
+        </div>
+    </div>
+    <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+        <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+            🛠️
+        </div>
+        
+        <div class="flex flex-col justify-center">
+            <span class="text-xl font-extrabold font-mono text-blue-900">
+            {{ exam_levels.apply ?? '0'}}
+            </span>
+            <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+            Apply
+            </span>
+        </div>
+    </div>
+    <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+        <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+            🧩
+        </div>
+        
+        <div class="flex flex-col justify-center">
+            <span class="text-xl font-extrabold font-mono text-blue-900">
+            {{ exam_levels.analyze ?? '0'}}
+            </span>
+            <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+            Analyze
+            </span>
+        </div>
+    </div>
+    <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+        <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+            📝
+        </div>
+        
+        <div class="flex flex-col justify-center">
+            <span class="text-xl font-extrabold font-mono text-blue-900">
+            {{ exam_levels.evaluate ?? '0'}}
+            </span>
+            <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+            Evaluate
+            </span>
+        </div>
+    </div>
+    <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+        <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+            🎨
+        </div>
+        
+        <div class="flex flex-col justify-center">
+            <span class="text-xl font-extrabold font-mono text-blue-900">
+            {{ exam_levels.create ?? '0'}}
+            </span>
+            <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+            Create
+            </span>
+        </div>
+    </div>
+</div>
 
 <div id="exam-question-field" class="flex flex-col mx-4 p-4">
     <div class="flex ml-auto my-2">

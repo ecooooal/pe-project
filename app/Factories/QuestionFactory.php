@@ -154,16 +154,16 @@ class QuestionFactory
     public static function createFakeData(array $data, int $user_id)
         {
             if ($data['type'] == 'ranking' || $data['type'] == 'matching'){
-            $items = request()->input('items', []);
-            $totalPoints = 0;
+                $items = request()->input('items', []);
+                $totalPoints = 0;
 
-            foreach ($items as $item) {
-                if (isset($item['points']) && is_numeric($item['points'])) {
-                    $totalPoints += (int) $item['points'];
+                foreach ($items as $item) {
+                    if (isset($item['points']) && is_numeric($item['points'])) {
+                        $totalPoints += (int) $item['points'];
+                    }
                 }
+                $data['points'] = $totalPoints;
             }
-            $data['points'] = $totalPoints;
-        }
             $question_data = [
                 'topic_id' => (int) $data['topic'],
                 'question_type' => $data['type'],
@@ -177,16 +177,16 @@ class QuestionFactory
                 $question = Question::create($question_data);
                 $question_type_service = new QuestionTypeService();
                 if ($question_data['question_type'] == 'coding'){
-                            $coding_question_data = [
-                                    'instruction' => $data['instruction'],
-                                    'syntax_points' => $data['syntax_points'],
-                                    'runtime_points' => $data['runtime_points'],
-                                    'test_case_points' => $data['test_case_points'],
-                                ];
-                            $coding_question_language_data = json_decode($data['supported_languages'], true);
-                            $question_type_service->storeCoding(
-                                    $question, $question_data, $coding_question_data, $coding_question_language_data
-                            );
+                    $coding_question_data = [
+                        'instruction' => $data['instruction'],
+                        'syntax_points' => $data['syntax_points'],
+                        'runtime_points' => $data['runtime_points'],
+                        'test_case_points' => $data['test_case_points'],
+                    ];
+                    $coding_question_language_data = json_decode($data['supported_languages'], true);
+                    $question_type_service->storeCoding(
+                            $question, $question_data, $coding_question_data, $coding_question_language_data
+                    );
                 } else {
                     $question_type_data = [
                     'items' => $data['items'] ?? [],

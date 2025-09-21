@@ -166,12 +166,13 @@ class ExamController extends Controller
     public function exam_builder_show(Exam $exam){  
         $exam_course = $this->examService->getCourseForExam($exam);
         $exam_questions =  $this->examService->getQuestionsForExam($exam);
+        $exam_levels = $this->examService->getQuestionLevelsCountForExam($exam);
         $exam_topics = $this->examService->getTopicsForExam($exam);
         $exam_subjects = $this->examService->getSubjectsForExam($exam);
         $exam_question_types = $this->examService->getQuestionTypeCounts($exam);
 
         $available_questions = $this->examService->getAvailableQuestionsForExam($exam);
-        $questions_header = ['Name', 'Type', 'Points'];
+        $questions_header = ['Name', 'Level', 'Type', 'Points'];
         $exam_questions_rows = $this->examService->transformQuestionRows($exam_questions);
         $available_questions_rows = $this->examService->transformQuestionRows($available_questions);
         $data = [
@@ -181,6 +182,7 @@ class ExamController extends Controller
             'exam_topics' => $exam_topics,
             'exam_available_questions' => $available_questions,
             'exam_questions' => $exam_questions,
+            'exam_levels' => $exam_levels,
             'exam_question_types' => $exam_question_types,
             'questions_header' => $questions_header,
             'available_questions_rows' => $available_questions_rows,
@@ -198,12 +200,13 @@ class ExamController extends Controller
         }
 
         $exam_questions =  $this->examService->getQuestionsForExam($exam);
+            $exam_levels = $this->examService->getQuestionLevelsCountForExam($exam);
         $exam_topics = $this->examService->getTopicsForExam($exam);
         $exam_subjects = $this->examService->getSubjectsForExam($exam);
         $exam_question_types = $this->examService->getQuestionTypeCounts($exam);
 
         $available_questions = $this->examService->getAvailableQuestionsForExam($exam);
-        $questions_header = ['Name', 'Type', 'Points'];
+        $questions_header = ['Name', 'Level', 'Type', 'Points'];
         $exam_questions_rows = $this->examService->transformQuestionRows($exam_questions);
         $available_questions_rows = $this->examService->transformQuestionRows($available_questions);
 
@@ -213,6 +216,7 @@ class ExamController extends Controller
             'exam_topics' => $exam_topics,
             'exam_available_questions' => $available_questions,
             'exam_questions' => $exam_questions,
+            'exam_levels' => $exam_levels,
             'exam_question_types' => $exam_question_types,
             'questions_header' => $questions_header,
             'available_questions_rows' => $available_questions_rows,

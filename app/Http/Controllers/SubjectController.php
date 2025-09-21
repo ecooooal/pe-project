@@ -29,7 +29,7 @@ class SubjectController extends Controller
             return [
                 'id' => $subject->id,
                 'name' => $subject->name,
-                'year_level' => $subject->year_level
+                'year level' => $subject->year_level
             ];
         });
 
@@ -39,7 +39,6 @@ class SubjectController extends Controller
             'subjects' => $subject_courses,
             'url' => 'subjects'
         ];
-
         return view('subjects/index', $data);
     }
 
