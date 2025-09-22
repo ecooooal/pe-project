@@ -36,9 +36,15 @@ class SubjectController extends Controller
         $data = [
             'headers' => $header,
             'rows' => $rows,
-            'subjects' => $subject_courses,
+            'models' => $subject_courses,
             'url' => 'subjects'
         ];
+
+        if (request()->hasHeader('HX-Request')) {
+            // Return only the partial view for HTMX
+            return view('components/core/index-table', $data);
+        }
+
         return view('subjects/index', $data);
     }
 
@@ -60,8 +66,14 @@ class SubjectController extends Controller
             'headers' => $header,
             'rows' => $rows,
             'subject'=>$subject,
-            'questions' => $questions,
+            'models' => $questions,
+            'url' => 'questions'
         ];
+
+        if (request()->hasHeader('HX-Request')) {
+            // Return only the partial view for HTMX
+            return view('components/core/index-table', $data);
+        }
 
         return view('subjects/show', $data);
     }

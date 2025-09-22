@@ -154,7 +154,7 @@ class QuestionFactory
     public static function createFakeData(array $data, int $user_id)
         {
             if ($data['type'] == 'ranking' || $data['type'] == 'matching'){
-                $items = request()->input('items', []);
+                $items = $data['items'];
                 $totalPoints = 0;
 
                 foreach ($items as $item) {
@@ -172,9 +172,15 @@ class QuestionFactory
                 'created_by' => $user_id,
                 'updated_by' => $user_id,
             ];   
-        
+
             DB::transaction(function () use ($question_data, $data) {
                 $question = Question::create($question_data);
+
+                $question_level = Tag::firstOrCreate(['name' => $data['question_level']]);
+                $question_level_tag = [$question_level->id => ['type' => 'required']];
+                $question->tags()->wherePivot('type', 'required')->detach();
+                $question->tags()->attach($question_level_tag);
+
                 $question_type_service = new QuestionTypeService();
                 if ($question_data['question_type'] == 'coding'){
                     $coding_question_data = [

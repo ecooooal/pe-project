@@ -57,9 +57,8 @@
             </div>
         </div>  
     </div>
-    <div class="mx-8">
+    <div id="pagination-div" class="mx-8">
         <div class="flex justify-between items-center w-full h-16 p-6 bg-white border-x border-t border-gray-300 rounded-t-2xl">
-            <span class="text-2xl font-semibold text-gray-900">Questions in this Subject</span>
             <span>Filter here</span>
         </div>
         <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
@@ -67,7 +66,7 @@
 
         </div>
         <div class="flex justify-end items-center w-full h-16 p-6 bg-white border-x border-b border-gray-300 rounded-b-2xl">
-            {{ questions.onEachSide(3).links() }}
+            {{ models.onEachSide(3).links() }}
         </div>
     </div>
 </div>

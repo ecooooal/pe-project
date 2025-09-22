@@ -7,154 +7,585 @@ use App\Models\Course;
 use App\Models\Exam;
 use App\Models\Question;
 use App\Models\Subject;
+use App\Models\Tag;
 use App\Models\Topic;
 use App\Models\User;
 use App\Services\QuestionTypeService;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class FakeDataSeeder extends Seeder
 {
-    protected $subjects_with_topics = [
+    protected $subjects_with_topics;
+    protected $question_levels;
+    public function __construct()
+    {
+        $date_today = Carbon::now()->toDateString();
+
+        $this->subjects_with_topics = [
+
         [
+
             'name' => 'Computer Programming 1',
-            'Date Created' => '01/01/2025',
+
+            'year_level' => 1,
+
+            'Date Created' => $date_today,
+
+            'topics' => [
+
+                [
+
+                    'name' => 'Data Types',
+
+                    'questions' => [
+
+                        [
+
+                            'name' => 'A byte is an 8-bit signed integer?',
+
+                            'type' => 'true_or_false',
+
+                            'points' => 1,
+
+                            'solution' => 'true',       
+
+                            'question_level' => 'remember'
+
+  
+
+                        ],
+                        [
+
+                            'name' => 'What is the name for a memory location that stores specific value, such as numbers and letters?',
+
+                            'type' => 'identification',
+
+                            'points' => 1,
+
+                            'solution' => 'variable',
+
+                            'question_level' => 'remember'
+
+                        ],
+
+  
+
+                        [
+
+                            'name' => 'This is a memory location whose value cannot be changed during program execution.',
+
+                            'type' => 'identification',
+
+                            'points' => 7,
+
+                            'solution' => 'Constant',
+
+                            'question_level' => 'remember'
+
+  
+
+                        ],
+
+  
+
+                        [
+
+                            'name' => 'Which primitive data type in Java is used to store a single 16-bit Unicode character?',          
+
+                            'type' => 'identification',
+
+                            'points' => 1,
+
+                            'solution' => 'char',
+
+                            'question_level' => 'remember'
+
+  
+
+                        ],
+
+  
+
+                        [
+
+                            'name' => 'The int data type in Java is a 32-bit signed integer.',
+
+                            'type' => 'true_or_false',
+
+                            'points' => 1,
+
+                            'solution' => 'true',
+
+                            'question_level' => 'remember'
+
+                        ],
+
+                        [
+
+                            'name' => 'Which of the following is the default data type for decimal values in Java?',
+
+                            'type' => 'multiple_choice',
+
+                            'points' => 1,
+
+                            'items' => ['float', 'double', 'int', 'long'],
+
+                            'solution' => 'b',
+
+                            'question_level' => 'understand'
+
+                        ],
+
+                        [
+
+                            'name' => 'What keyword is used in Java to declare a constant?',
+
+                            'type' => 'identification',
+
+                            'points' => 1,
+
+                            'solution' => 'final',
+
+                            'question_level' => 'remember'
+
+                        ],
+
+                        [
+
+                            'name' => 'Arrange the following types in order of widening conversion (lowest precision to highest): int, double, long, float',
+
+                            'type' => 'ranking',
+
+                            'items' => [
+
+                                1 => ["solution" => "int", "points" => "2"],
+
+                                2 => ["solution" => "long", "points" => "2"],
+
+                                3 => ["solution" => "float", "points" => "2"],
+
+                                4 => ["solution" => "double", "points" => "2"],
+
+                            ],
+
+                            'question_level' => 'apply'
+
+                        ],
+
+                        [
+
+                            'name' => 'Match the data types with their correct descriptions:',
+
+                            'type' => 'matching',
+
+                            'items' => [
+
+                                1 => [
+
+                                    "left" => "boolean",
+
+                                    "right" => "true or false values",
+
+                                    "points" => "2"
+
+                                ],
+
+                                2 => [
+
+                                    "left" => "byte",
+
+                                    "right" => "8-bit signed integer",
+
+                                    "points" => "2"
+
+                                ],
+
+                                3 => [
+
+                                    "left" => "float",
+
+                                    "right" => "32-bit single precision floating point",
+
+                                    "points" => "2"
+
+                                ]
+
+                            ],
+
+                            'question_level' => 'understand'
+
+                        ],
+
+  
+
+                        [
+
+                            'name' => 'A program stores the value 6.82f into a float variable and then casts it to int. What value will the int variable hold?',
+
+                            'type' => 'identification',
+
+                            'points' => 2,
+
+                            'solution' => '6',
+
+                            'question_level' => 'analyze'
+
+                        ],
+
+                    ],
+
+                    'Date Created' => $date_today
+
+                ],
+
+                [
+
+                    'name' => 'Programming Environments',
+
+                    'questions' => [
+
+                        [
+
+                            'name' => 'What is the basic unit of a java program?',
+
+                            'type' => 'multiple_choice',
+
+                            'points' => 1,
+
+                            'items' => ['Applet', 'Source Code', 'Class', 'Syntax'],
+
+                            'solution' => 'c',
+
+                            'question_level' => 'remember'
+
+                        ],
+
+  
+
+                        [
+
+                            'name' => 'A reserved words or keywords can used in naming variables while retaining its original purpose.',
+
+                            'type' => 'true_or_false',
+
+                            'points' => 1,
+
+                            'solution' => 'false',
+
+                            'question_level' => 'remember'
+
+                        ],
+
+  
+
+                        [
+
+                            'name' => 'In java environment what method does the execution always begins?',
+
+                            'type' => 'identification',
+
+                            'points' => 2,
+
+                            'solution' => 'main',
+
+                            'question_level' => 'remember'
+
+                        ],
+
+  
+
+                        [
+
+                            'name' => 'In descending order, rank the flow on how a java program is created',
+
+                            'type' => 'ranking',
+
+                            'items' => [
+
+                                1 => [
+
+                                    "solution" => "Code is written",
+
+                                    "points" => "2"
+
+                                ],
+
+                                2 => [
+
+                                    "solution" => "Code is compiled",
+
+                                    "points" => "2"
+
+                                ],
+
+                                3 => [
+
+                                    "solution" => "Code is run",
+
+                                    "points" => "2"
+
+                                ],
+
+                                4 => [
+
+                                    "solution" => "terminate if the code has syntax errors",
+
+                                    "points" => "2"
+
+                                ],
+
+                                5 => [
+
+                                    "solution" => "Check if the output is not unexpected",
+
+                                    "points" => "2"
+
+                                ]
+
+                            ],
+
+                            'question_level' => 'understand'
+
+                        ]
+
+                    ],
+
+                    'Date Created' => $date_today
+
+                ],
+
+  
+
+                [
+
+                    'name' => 'Syntax and Logical Errors',
+
+                    'questions' => [
+
+                        [
+
+                            'name' => 'What does it mean when syntax errors is encountered',
+
+                            'type' => 'multiple_choice',
+
+                            'points' => 1,
+
+                            'items' => ['It means there is a logical error.', 'There is a grammatical mistake in the code of the program', 'There are comments in the codes.', 'The code was compiled but got unexpected output.'],
+
+                            'solution' => 'b',
+
+                            'question_level' => 'remember'
+
+                        ],
+
+  
+
+                        [
+
+                            'name' => 'Logical errors can be fixed as simple as correcting grammatical mistakes in the program.',
+
+                            'type' => 'true_or_false',
+
+                            'points' => 1,
+
+                            'solution' => 'false',
+
+                            'question_level' => 'understand'
+
+                        ],
+
+  
+
+                        [
+
+                            'name' => 'This error is encountered when the program produced unexpected result. (2 words)',
+
+                            'type' => 'identification',
+
+                            'points' => 2,
+
+                            'solution' => 'logical error',
+
+                            'question_level' => 'remember'
+
+                        ],
+
+  
+
+                        [
+
+                            'name' => 'Match The the following errors:',
+
+                            'type' => 'matching',
+
+                            'items' => [
+
+                                1 => [
+
+                                    "left" => "syntax error",
+
+                                    "right" => "error on grammar",
+
+                                    "points" => "2"
+
+                                ],
+
+                                2 => [
+
+                                    "left" => "logical error",
+
+                                    "right" => "unexpected output by the program",
+
+                                    "points" => "2"
+
+                                ],
+
+                                3 => [
+
+                                    "left" => "test case error",
+
+                                    "right" => "failure in test cases",
+
+                                    "points" => "5"
+
+                                ]
+
+                            ],
+
+                            'question_level' => 'remember'
+
+                        ]
+
+                    ],
+
+                    'Date Created' => $date_today
+
+                ],
+
+            ],
+        ],
+        [
+
+            'name' => 'Computer Programming 2',
+
+            'year_level' => 2,
+
+            'Date Created' => $date_today,
+
             'topics' => [
                 [
-                    'name' => 'Data Types',
+                    'name' => 'Functions and Parameter Passing',
                     'questions' => [
+
                         [
-                            'name' => 'A byte is an 8-bit signed integer?',
+                            'name' => 'Which package is automatically imported in every Java program by default?',
+                            'type' => 'identification',
+                            'points' => 1,
+                            'solution' => 'java.lang',
+                            'question_level' => 'remember'
+                        ],
+
+                        [
+                            'name' => 'The Math class methods in Java are static methods.',
                             'type' => 'true_or_false',
                             'points' => 1,
-                            'solution' => 'true'
+                            'solution' => 'true',
+                            'question_level' => 'remember'
                         ],
+
                         [
-                            'name' => 'What is the name for a memory location that stores specific value, such as numbers and letters?',
-                            'type' => 'identification',
-                            'points' => 1,
-                            'solution' => 'variable'
-                        ],
-                        [
-                            'name' => 'This is a memory location whose value cannot be changed during program execution.',
-                            'type' => 'identification',
-                            'points' => 7,
-                            'solution' => 'Constant'
-                        ],
-                    ],
-                    'Date Created' => '01/01/2025'
-                ],
-                [
-                    'name' => 'Programming Environments',
-                    'questions' => [
-                        [
-                            'name' => 'What is the basic unit of a java program?',
+                            'name' => 'Which of the following methods is used to return the square root of a number in Java?',
                             'type' => 'multiple_choice',
                             'points' => 1,
-                            'items' => ['Applet', 'Source Code', 'Class', 'Syntax'],
-                            'solution' => 'c'
+                            'items' => ['Math.power()', 'Math.sqrt()', 'Math.abs()', 'Math.exp()'],
+                            'solution' => 'b',
+                            'question_level' => 'understand'
                         ],
+
                         [
-                            'name' => 'A reserved words or keywords can used in naming variables while retaining its original purpose.',
-                            'type' => 'true_or_false',
-                            'points' => 1,
-                            'solution' => 'false'
-                        ],
-                        [
-                            'name' => 'In java environment what method does the execution always begins?',
+                            'name' => 'What keyword is used to create a function in Java that does not return a value?',
                             'type' => 'identification',
-                            'points' => 2,
-                            'solution' => 'main'
-                        ],
-                        [
-                            'name' => 'In descending order, rank the flow on how a java program is created',
-                            'type' => 'ranking',
-                            'items' => [
-                                1 => [
-                                    "solution" => "Code is written",
-                                    "points" => "2"
-                                ],
-                                2 => [
-                                    "solution" => "Code is compiled",
-                                    "points" => "2"
-                                ],
-                                3 => [
-                                    "solution" => "Code is run",
-                                    "points" => "2"
-                                ],
-                                4 => [
-                                    "solution" => "terminate if the code has syntax errors",
-                                    "points" => "2"
-                                ],
-                                5 => [
-                                    "solution" => "Check if the output is not unexpected",
-                                    "points" => "2"
-                                ]
-                            ]
-                        ]
-                    ],
-                    'Date Created' => '01/01/2025'
-                ],
-                [
-                    'name' => 'Syntax and Logical Errors',
-                    'questions' => [
-                        [
-                            'name' => 'What does it mean when syntax errors is encountered',
-                            'type' => 'multiple_choice',
                             'points' => 1,
-                            'items' => ['It means there is a logical error.', 'There is a grammatical mistake in the code of the program', 'There are comments in the codes.', 'The code was compiled but got unexpected output.'],
-                            'solution' => 'b'
+                            'solution' => 'void',
+                            'question_level' => 'remember'
                         ],
+
                         [
-                            'name' => 'Logical errors can be fixed as simple as correcting grammatical mistakes in the program.',
-                            'type' => 'true_or_false',
-                            'points' => 1,
-                            'solution' => 'false'
-                        ],
-                        [
-                            'name' => 'This error is encountered when the program produced unexpected result. (2 words)',
-                            'type' => 'identification',
-                            'points' => 2,
-                            'solution' => 'logical error'
-                        ],
-                        [
-                            'name' => 'Match The the following errors:',
+                            'name' => 'Match the following Math class methods with their correct descriptions:',
                             'type' => 'matching',
                             'items' => [
                                 1 => [
-                                    "left" => "syntax error",
-                                    "right" => "error on grammar",
+                                    "left" => "abs(x)",
+                                    "right" => "returns the absolute value of x",
                                     "points" => "2"
                                 ],
                                 2 => [
-                                    "left" => "logical error",
-                                    "right" => "unexpected output by the program",
+                                    "left" => "ceil(x)",
+                                    "right" => "smallest integer not less than x",
                                     "points" => "2"
                                 ],
                                 3 => [
-                                    "left" => "test case error",
-                                    "right" => "failure in test cases",
-                                    "points" => "5"
+                                    "left" => "floor(x)",
+                                    "right" => "largest integer less than x",
+                                    "points" => "2"
                                 ]
-                            ]
-                        ]
+                            ],
+                            'question_level' => 'understand'
+                        ],
+
+                        [
+                            'name' => 'Arrange the steps in defining and calling a value-returning function in the correct order:',
+                            'type' => 'ranking',
+                            'items' => [
+                                1 => ["solution" => "Write the method heading with return type and parameters", "points" => "2"],
+                                2 => ["solution" => "Implement the method body with statements and return value", "points" => "2"],
+                                3 => ["solution" => "Call the method by its name with actual parameters", "points" => "2"],
+                                4 => ["solution" => "Store or use the returned value in the calling program", "points" => "2"],
+                            ],
+                            'question_level' => 'apply'
+                        ],
+
+                        [
+                            'name' => 'If a method changes the value of a parameter inside its body, will the original variable passed into it also change in Java? Explain briefly.',
+                            'type' => 'identification',
+                            'points' => 3,
+                            'solution' => 'No, because Java uses pass-by-value. Changes inside the method do not affect the original variable.',
+                            'question_level' => 'analyze'
+                        ],
+
                     ],
-                    'Date Created' => '01/01/2025'
+                    'Date Created' => $date_today
                 ],
-            ],
+
+            ]
+
         ],
-    ];
+        
+        ];
+        $this->question_levels = [
+            'remember',
+            'understand',
+            'apply',
+            'analyze',
+            'evaluate',
+            'create'
+        ];
+    }
 
-
-    
     public function run(): void
     {
+        foreach ($this->question_levels as $level){
+            Tag::firstOrCreate(['name' => $level]);
+        }
+
         foreach ($this->subjects_with_topics as $subjectData) {
             $subject = Subject::firstOrCreate([
                 'name' => $subjectData['name'],
-                'year_level' => 1,
+                'year_level' => $subjectData['year_level'],
             ]);
-            $subject->courses()->attach([1, 2, 3]);
+            $subject->courses()->attach([1, 2]);
             
             foreach ($subjectData['topics'] as $topicData) {
                 $topic = Topic::firstOrCreate([

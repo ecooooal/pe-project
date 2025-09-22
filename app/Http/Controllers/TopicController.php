@@ -37,9 +37,14 @@ class TopicController extends Controller
         $data = [
             'headers' => $header,
             'rows' => $rows,
-            'topics' => $topics,
+            'models' => $topics,
             'url' => 'topics'
         ];
+
+        if (request()->hasHeader('HX-Request')) {
+            // Return only the partial view for HTMX
+            return view('components/core/index-table', $data);
+        }
 
         return view('topics/index', $data);
     }
@@ -63,9 +68,15 @@ class TopicController extends Controller
             'headers' => $header,
             'rows' => $rows,
             'topic'=>$topic,
-            'questions' => $questions,
+            'models' => $questions,
+            'url' => 'questions',
             'questions_are_in_exams' => $questions_are_in_exams
         ];
+
+        if (request()->hasHeader('HX-Request')) {
+            // Return only the partial view for HTMX
+            return view('components/core/index-table', $data);
+        }
 
         return view('topics/show', $data);
     }

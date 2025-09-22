@@ -20,7 +20,7 @@ class CourseController extends Controller
         $this->userService = $userService;
     }
     public function index(){
-        $courses = Course::with('subjects')->get();
+        $courses = Course::with('subjects')->paginate(10);
         $header = ['Name'];
         $rows = $courses->map(function ($course) {
             return [
@@ -32,9 +32,14 @@ class CourseController extends Controller
         $data = [
             'headers' => $header,
             'rows' => $rows,
-            'courses' => $courses,
+            'models' => $courses,
             'url' => 'courses'
         ];
+
+        if (request()->hasHeader('HX-Request')) {
+            // Return only the partial view for HTMX
+            return view('components/core/index-table', $data);
+        }
 
         return view('courses/index', $data);
     }
@@ -42,7 +47,7 @@ class CourseController extends Controller
     public function show(Course $course){
         $subject_count = $course->subjects()->count();
         $header = ['Name', 'Year Level', 'Date Created'];
-        $subjects = $course->subjects()->paginate(10);
+        $subjects = $course->subjects()->paginate(5);
 
 
         $rows = collect($subjects->items())->map(fn($subject) => [
@@ -56,9 +61,17 @@ class CourseController extends Controller
             'headers' => $header,
             'rows' => $rows,
             'course'=>$course,
-            'subjects' => $subjects,
+            'models' => $subjects,
             'subject_count' => $subject_count,
+            'url' => 'subjects'
         ];
+
+        
+        if (request()->hasHeader('HX-Request')) {
+            // Return only the partial view for HTMX
+            return view('components/core/index-table', $data);
+        }
+
         return view('courses/show', $data);
     }
 

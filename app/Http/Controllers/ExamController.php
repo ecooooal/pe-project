@@ -45,9 +45,14 @@ class ExamController extends Controller
         $data = [
             'headers' => $header,
             'rows' => $rows,
-            'exams' => $exams,
+            'models' => $exams,
             'url' => 'exams'
         ];
+
+        if (request()->hasHeader('HX-Request')) {
+            // Return only the partial view for HTMX
+            return view('components/core/index-table', $data);
+        }
 
         return view('exams/index', $data);
 

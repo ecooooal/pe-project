@@ -20,6 +20,7 @@ class Exam extends Model
         'passing_score',
         'retakes',
         'examination_date',
+        'expiration_date',
         'is_published',
         'applied_algorithm'
     ];

@@ -46,7 +46,7 @@ class QuestionController extends Controller
         $data = [
             'headers' => $header,
             'rows' => $rows,
-            'questions' => $questions,
+            'models' => $questions,
             'url' => 'questions'
         ];
 
