@@ -167,8 +167,8 @@ services:
     depends_on:
       - redis
       - postgres
-    volumes:
-      - /home/echo/PythonSSE:/code/app
+    # volumes:
+    #  - /home/echo/PythonSSE:/code/app
     networks:
       - laravel-development
     environment:

@@ -41,7 +41,7 @@ class TopicController extends Controller
             'url' => 'topics'
         ];
 
-        if (request()->hasHeader('HX-Request')) {
+        if (request()->hasHeader('HX-Request') && !request()->hasHeader('HX-History-Restore-Request')) {
             // Return only the partial view for HTMX
             return view('components/core/index-table', $data);
         }
