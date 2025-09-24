@@ -5,6 +5,7 @@ import Toast from './toast.js';
 window.global ||= window;
 
 window.htmx = htmx;
+htmx.config.getCacheBusterParam = true
 
 window.addEventListener('DOMContentLoaded', () => {
  const serverToast = document.getElementById('server-toast');

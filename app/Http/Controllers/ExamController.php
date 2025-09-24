@@ -79,13 +79,16 @@ class ExamController extends Controller
             'max_score' => 'required|integer|gte:1',
             'duration' => 'nullable|integer|min:1',
             'retakes' => 'nullable|integer|min:1',
-            'examination_date' => 'nullable|date|after:now',
-            'passing_score' => 'required|integer|gte:1|max:100'
+            'examination_date' => 'nullable|date|after_or_equal:now',
+            'passing_score' => 'required|integer|gte:1|max:100',
+            'expiration_date' => 'nullable|date|after:now|after_or_equal:examination_date',
         ], [
             'courses' => 'The course field is required.',
             'courses.*' => 'Invalid Course',
             'max_score' => 'The max score field is required',
-            'examination_date' => 'The examination date field must be a date after now.'
+            'examination_date' => 'The examination date field must be a date after now.',
+            'expiration_date.after' => 'The examination date field must be a date after now.',
+            'expiration_date.after_or_equal' => 'The expiration date must be on or after the examination date.'
         ]);
 
         $exam = Exam::create([
@@ -93,8 +96,9 @@ class ExamController extends Controller
             'max_score' => request('max_score'),
             'duration' => request('duration') ?? null,
             'retakes' => request('retakes') ?? null, 
-            'examination_date' => request('examination_date'),
-            'passing_score' => request('passing_score')
+            'examination_date' => request('examination_date') ?? null,
+            'passing_score' => request('passing_score'),
+            'expiration_date' => request('expiration_date') ?? null,
         ]);
 
         $exam->courses()->attach($validated['courses']);
@@ -124,11 +128,14 @@ class ExamController extends Controller
             'max_score' => 'required|integer|gte:1',
             'duration' => 'nullable|integer|min:1',
             'retakes' => 'nullable|integer|min:1',
-            'examination_date' => 'nullable|date|after:now',
-            'passing_score' => 'required|integer|gte:1|max:100'
+            'examination_date' => 'nullable|date|after_or_equal:now',
+            'passing_score' => 'required|integer|gte:1|max:100',
+            'expiration_date' => 'nullable|date|after:now|after_or_equal:examination_date',
         ], [
             'max_score' => 'The max score field is required',
-            'examination_date' => 'The examination date field must be a date after now.'
+            'examination_date.after' => 'The examination date field must be a date after now.',
+            'expiration_date.after' => 'The examination date field must be a date after now.',
+            'expiration_date.after_or_equal' => 'The expiration date must be on or after the examination date.'
         ]);
 
             $exam->update([
@@ -137,7 +144,8 @@ class ExamController extends Controller
                 'duration' => request('duration') ?? null,
                 'retakes' => request('retakes') ?? null, 
                 'examination_date' => request('examination_date') ?? null,
-                'passing_score' => request('passing_score')
+                'passing_score' => request('passing_score'),
+                'expiration_date' => request('expiration_date') ?? null,
             ]);
 
         session()->flash('toast', json_encode([
@@ -301,9 +309,9 @@ class ExamController extends Controller
 
     public function publishExam(Exam $exam){
         $is_published = $this->examService->attemptToPublish($exam);
-        if (!$is_published){
+        if ($is_published['status'] == false){
             return view('components/core/partials-exam-builder-publish-form-error', [
-                'error' => 'Sum of question points do not match the max score.'
+                'error' => $is_published['error_message']
             ]);        
         }
 

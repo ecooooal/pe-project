@@ -35,10 +35,16 @@ class ExamController extends Controller
     
     public function showExamOverview(Exam $exam)
     {
-        $exam->load('courses');
         $user = auth()->user();
+        $student_attempts_left = $this->examTakingService->getAttemptsLeft($exam, $user);
         $student_paper = $this->examTakingService->checkBooleanUnsubmittedExamPaper($exam, $user);
-        return view('students/exams/get-exam-overview', ['exam' => $exam, 'has_unsubmitted_paper' => $student_paper]);
+
+        $data = [
+            'exam' => $exam, 
+            'attempts_left' => $student_attempts_left,
+            'has_unsubmitted_paper' => $student_paper
+        ];
+        return view('students/exams/get-exam-overview', $data);
     }
     public function store(){
         $user = auth()->user();

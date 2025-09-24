@@ -51,7 +51,8 @@
                             </span>
                         </span>
                     @else
-                        <a  hx-get="{{ $paginator->previousPageUrl() }}" 
+                        <a  href="{{ $paginator->previousPageUrl() }}"
+                            hx-get="{{ $paginator->previousPageUrl() }}" 
                             hx-target="#pagination-div"
                             hx-push-url="true"
                             hx-swap="outerHTML" 
@@ -80,7 +81,8 @@
                                         <span class="relative inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 dark:bg-gray-800 dark:border-gray-600">{{ $page }}</span>
                                     </span>
                                 @else
-                                    <a  hx-get="{{ $url }}"
+                                    <a  href="{{ $url }}"
+                                        hx-get="{{ $url }}"
                                         hx-target="#pagination-div"
                                         hx-push-url="true"  
                                         hx-swap="outerHTML" 
@@ -94,7 +96,8 @@
 
                     {{-- Next Page Link --}}
                     @if ($paginator->hasMorePages())
-                        <a  hx-get="{{ $paginator->nextPageUrl() }}"
+                        <a  href="{{ $paginator->nextPageUrl() }}"
+                            hx-get="{{ $paginator->nextPageUrl() }}"
                             hx-target="#pagination-div"
                             hx-push-url="true"
                             hx-swap="outerHTML" 

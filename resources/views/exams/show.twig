@@ -76,7 +76,6 @@
                     <div class="flex flex-col gap-y-4">
                         {{ show_item('Max Score', exam.max_score)}}
                         {{ show_item('Passing Score (%)', exam.passing_score ~ '% = ' ~ exam.max_score * (exam.passing_score / 100) ~ 'pts' ) }}
-                        {{ show_item('Examination Date', exam.examination_date ?? "No Examination Date") }}
                         {{ show_item('Duration (in minutes)', exam.duration ?: 'Unlimited Duration')}}
                         {{ show_item('Retakes', exam.retakes ?: 'Unlimited Retakes')}}
                     </div>
@@ -89,9 +88,8 @@
                             {{ show_item('Is Currently', 'Current Points is not equal to Maximum Score', value_attributes:'text-red-600')}}
                         {% endif %}                    
                         {{ show_item('Publish Status', exam.is_published ? 'Published' : 'Unpublished', value_attributes: exam.is_published ? 'text-green-600' : 'text-red-600')}}
-                        {% if can('update exams') %}
-                        <span class="font-bold text-xs font-mono underline text-blue-900">Exam cannot be edited when published.</span>
-                        {% endif %}
+                        {{ show_item('Examination Date', exam.examination_date != null ? exam.examination_date|date('h:i A d M Y') : "No Examination Date") }}
+                        {{ show_item('Expiration Date', exam.expiration_date != null ? exam.expiration_date|date('h:i A d M Y', false) :  "No Expiration Date") }}
                     </div>
                 </div>
             </div>  

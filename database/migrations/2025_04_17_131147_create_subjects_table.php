@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('subjects', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable(false);
+            $table->string('abbreviation');
             $table->enum('year_level', [1, 2, 3, 4])->nullable(false);
             $table->timestamps();
             $table->softDeletes();

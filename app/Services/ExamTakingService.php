@@ -19,18 +19,36 @@ class ExamTakingService
     }
     public function validateExamAccess(Exam $exam, User $user){
         $isEnrolled = $user->exams()->where('exam_id', $exam->id)->exists();
+
         if (!$isEnrolled){
             return false;
         }
-        // check if exam is published
+
         if (!$exam->is_published){
             return false;
         }
-        // check examination date
-        // if ($exam->examination_date){
+                
+        $now = now();
+        if ($exam->examination_date && $exam->expiration_date) {
+            if ($now >= $exam->examination_date && $now <= $exam->expiration_date) {
+                return false;
+            }
+        }
+
+
+
+        $student_attempts_left = $this->getAttemptsLeft($exam, $user);
+        if($student_attempts_left == 0){
+            return false;
+        }
             
-        // }
         return true;
+    }
+
+    public function getAttemptsLeft(Exam $exam, User $user){
+        $get_student_paper_count = $user->exams()->where('exam_id', $exam->id)->withCount('studentPapers')->first()->student_papers_count;
+        $attempt_left = max(0, $exam->retakes - $get_student_paper_count);
+        return $attempt_left;
     }
 
     public function checkUnsubmittedExamPaper(Exam $exam, User $user){

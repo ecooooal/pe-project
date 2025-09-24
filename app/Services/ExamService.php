@@ -365,13 +365,21 @@ class ExamService
     {        
         if (!$exam->is_published) {
                 $exam->load('questions');
+                $publishing_status = [];
 
                 $sum_of_points = $exam->questions->sum('total_points');
-
                 if ($sum_of_points !== $exam->max_score) {
-                    return false;
+                    $publishing_status['status'] = false;
+                    $publishing_status['error_message'] = "Sum of question points do not match the max score.";
+                    return $publishing_status;
                 }
-
+                if ($exam->expiration_date != null){
+                    if ($exam->expiration_date < now()) {
+                        $publishing_status['status'] = false;
+                        $publishing_status['error_message'] = "Exam has Expired.";
+                        return $publishing_status;
+                    }
+                }
                 $exam->update(['is_published' => true]);
                 session()->flash('toast', json_encode([
                     'status' => 'Published',
@@ -386,8 +394,8 @@ class ExamService
                     'type' => 'info'
                 ]));
             }
-
-            return true;
+            $publishing_status['status'] = true;
+            return $publishing_status;
     }
 }
 

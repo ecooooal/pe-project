@@ -78,12 +78,12 @@ function renderCourseGraph() {
     };
 
     const question_shape_by_type = {
-      'T/F': 'triangle-up',
-      'MCQ': 'circle',
-      'Identification': 'square',
-      'Ranking': 'hourglass',
-      'Matching': 'bowtie',
-      'Coding' : 'arrow-bar-right'
+        'MCQ': 'circle',
+        'T/F': 'triangle-up',
+        'Identification': 'square',
+        'Ranking': 'hourglass',
+        'Matching': 'bowtie',
+        'Coding' : 'arrow-bar-right'
     };
 
     // separate question data by level
@@ -99,19 +99,28 @@ function renderCourseGraph() {
 
     // Step 3: Group questions by level
     const grouped = {};
+    
     sorted_question_levels.forEach(level => grouped[level] = []);
     question_stats.forEach(q => grouped[q.level].push(q));
 
     // Step 4: Build plot data
     const question_stats_x = [],  
-    question_stats_y = [],  
+    question_stats_y = [],
     question_stats_marker_colors = [], 
     question_stats_marker_symbols = [], 
     question_stats_texts = [];
 
+    let question_stats_max_count = 0;  
+
     for (const level of sorted_question_levels) {
-      const group = grouped[level];
-      group.forEach((q, i) => {
+        const group = grouped[level];
+
+        group.sort((a, b) => {
+            const typeOrder = Object.keys(question_shape_by_type); // define desired order if needed
+            return typeOrder.indexOf(a.question_type) - typeOrder.indexOf(b.question_type);
+        });
+
+        group.forEach((q, i) => {
         question_stats_x.push(level);
         question_stats_y.push(i+1); 
         question_stats_marker_colors.push(question_status_color_by_status[q.status]);
@@ -119,7 +128,8 @@ function renderCourseGraph() {
         question_stats_texts.push(`<b>Status</b>: ${q["status"]}<br>` +
         `<b>Name</b>: ${q["name"]}<br>` +
         `<b>Type</b>: ${q["question_type"]}<br>`);
-      });
+        });
+        if (question_stats_max_count < group.length) question_stats_max_count = group.length ;
     }
 
     // Plotly traces
@@ -179,7 +189,7 @@ function renderCourseGraph() {
         hoverinfo: 'text',
         hovertemplate: '%{text}<extra></extra>',   
         hoverlabel: {
-            font: { color: 'white' }      // hover text color
+            font: { color: 'white' }      
         },
         marker: { 
             color: question_stats_marker_colors,
@@ -187,7 +197,6 @@ function renderCourseGraph() {
             line: { width: 2, color: '#333'},
             size: 14,
             opacity: 0.7 },
-        offset: 90
     };
 
     const question_types = {
@@ -293,15 +302,17 @@ function renderCourseGraph() {
                 
                 tickangle: 0,
                 tickfont: {
-                    xanchor: 'left', // Align the text of the labels to the left
+                    xanchor: 'left',
                     size: 12,
                     color: 'rgb(107, 107, 107)'
                 }
             },
             xaxis3: {     
-            range: [0.5, question_stats_y.length - 1],
+                range: [0.5, question_stats_max_count + 1],
                 domain: [0.0, 1.0],
-                dtick:1,
+                tickmode: "linear", 
+                dtick: 1,            
+                tickangle: 45, 
                 title: {
                     text: 'Questions',
                     font: {

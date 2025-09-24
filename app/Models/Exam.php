@@ -24,7 +24,10 @@ class Exam extends Model
         'is_published',
         'applied_algorithm'
     ];
-
+    protected $casts = [
+        'examination_date' => 'datetime',
+        'expiration_date' => 'datetime'
+    ];
     public function courses()
     {
         return $this->belongsToMany(Course::class);
