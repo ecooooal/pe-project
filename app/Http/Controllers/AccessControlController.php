@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AcademicYear;
 use App\Models\User;
+use App\Rules\NoAcademicYearCollisions;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
@@ -21,7 +24,7 @@ class AccessControlController extends Controller
                 'id' => $user->id,
                 'name' => $user->getFullName(),
                 'email' => $user->email,
-                'Date Created' => Carbon::parse($user->created_at)->format('m/d/Y')
+                'Date Created' => Carbon::parse($user->created_at)->format('M d Y')
             ];
         });
 
@@ -47,7 +50,7 @@ class AccessControlController extends Controller
             return [
                 'id' => $role->id,
                 'name' => $role->name,
-                'Date Created' => Carbon::parse($role->created_at)->format('m/d/Y')
+                'Date Created' => Carbon::parse($role->created_at)->format('M d Y')
             ];
         });
 
@@ -152,5 +155,131 @@ class AccessControlController extends Controller
         ];
 
         return view('/roles/checkbox', $data);
+    }
+
+    public function indexAcademicYear(){
+        $header = ['Academic Year Label', 'Start Date', 'End Date'];
+
+        $academic_year = AcademicYear::all();
+        $current_academic_year = AcademicYear::current();
+        $rows = $academic_year->map(function ($year) {
+            return [
+                'id' => $year->id,
+                'year_label' => $year->year_label,
+                'start_date' => Carbon::parse($year->start_date)->format('M d Y'),
+                'end_date' => Carbon::parse($year->end_date)->format('M d Y'),
+                'is_locked' => $year->is_locked
+            ];
+        });
+
+        $data = [
+            'header' => $header,
+            'rows' => $rows,
+            'current_academic_year' => $current_academic_year
+        ];
+        return view('admins/academic-year', $data);
+    }
+
+    public function createAcademicYear(){
+        return view('academic-year/create');
+    }
+
+    public function storeAcademicYear(){
+        $validator = Validator::make(request()->post(), [
+             'year_label' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('academic_years', 'year_label'),
+            ],
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => [
+                'required',
+                'date',
+                'after:start_date',
+                new NoAcademicYearCollisions(request()->input('start_date')),
+            ],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->view('academic-year/create', [
+                'errors' => $validator->errors(),
+                'old' => request()->all()]);
+        }
+
+        $validated = $validator->validate();
+
+        $academic_year = AcademicYear::create($validated);
+
+        session()->flash('toast', json_encode([
+            'status' => 'Created!',
+            'message' => 'Academic Year: ' . $academic_year->year_label,
+            'type' => 'success'
+        ]));
+        return response('', 200)->header('HX-Redirect', route('admin.academic-year.index'));
+    }
+
+    public function editAcademicYear(AcademicYear $academic_year){
+        return view('academic-year/edit', $academic_year);
+    }
+
+    public function updateAcademicYear(AcademicYear $academic_year){
+        $validator = Validator::make(request()->post(), [
+            'year_label' => [
+            'required',
+            'string',
+            'max:255',
+                Rule::unique('academic_years', 'year_label')->ignore($academic_year->id),
+            ],
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => [
+                'required',
+                'date',
+                'after:start_date',
+                    new NoAcademicYearCollisions(request()->input('start_date'), $academic_year->id),
+            ],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->view('academic-year/edit', [
+                'id' => $academic_year->id,
+                'errors' => $validator->errors(),
+                'old' => request()->all()]
+            );
+        }
+
+        $validated = $validator->validate();
+
+        $academic_year->update($validated);
+
+        session()->flash('toast', json_encode([
+            'status' => 'Created!',
+            'message' => 'Academic Year: ' . $academic_year->year_label,
+            'type' => 'success'
+        ]));
+        return response('', 200)->header('HX-Redirect', route('admin.academic-year.index'));
+    }
+
+
+    public function destroyFormAcademicYear(AcademicYear $academic_year){
+        return view('academic-year/destroy', $academic_year);
+    }
+     public function destroyAcademicYear(AcademicYear $academic_year){
+
+        //  $this->authorize('delete', $academic_year);
+
+        // if (!$academic_year->is_locked) {
+        //     return back()->with('error', 'You cannot delete a locked Academic Year.');
+        // }
+
+        session()->flash('toast', json_encode([
+            'status' => 'Destroyed!',
+            'message' => 'Subject: ' . $academic_year->year_label,
+            'type' => 'warning'
+        ]));
+
+        $academic_year->delete();
+
+        return response('', 200)->header('HX-Redirect', route('admin.academic-year.index'));
     }
 }

@@ -127,6 +127,13 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
         Route::patch('/admins/roles/{role}', [AccessControlController::class, 'updateRole']);
         Route::delete('/admins/roles/{role}', [AccessControlController::class, 'destroyRole']);
         
+        Route::get('/admins/academic-year', [AccessControlController::class, 'indexAcademicYear'])->name('admin.academic-year.index');
+        Route::get('/admins/academic-year/create', [AccessControlController::class, 'createAcademicYear'])->name('admin.academic-year.create');
+        Route::post('/admins/academic-year', [AccessControlController::class, 'storeAcademicYear'])->name('admin.academic-year.store');
+        
+        Route::patch('/admins/academic-year/{academic_year}', [AccessControlController::class, 'updateAcademicYear'])->name('admin.academic-year.update');
+        Route::delete('/admins/academic-year/{academic_year}', [AccessControlController::class, 'destroyAcademicYear'])->name('admin.academic-year.destroy');
+
         Route::middleware('htmx.request:admin.redirect')->group(function () {
             Route::get('/admins/users/create', [RegisteredUserController::class, 'create']);    
             Route::get('/admins/users/{user}/edit', [RegisteredUserController::class, 'edit'])->name('admin.users.edit');
@@ -136,7 +143,9 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
             Route::get('/admins/roles/create', [AccessControlController::class, 'createRole']);
             Route::get('/admins/roles/{role}', [AccessControlController::class, 'showRole'])->name('admin.roles.show');
             Route::get('/admins/roles/{role}/edit', [AccessControlController::class, 'editRole']);
-
+            
+            Route::get('/admins/academic-year/{academic_year}/edit', [AccessControlController::class, 'editAcademicYear'])->name('admin.academic-year.edit');
+            Route::get('/admins/academic-year/{academic_year}/destroy', [AccessControlController::class, 'destroyFormAcademicYear'])->name('admin.academic-year.destroy-form');
         });
     });
 

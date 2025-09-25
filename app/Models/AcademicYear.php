@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
@@ -11,25 +13,34 @@ class AcademicYear extends Model
         'year_label',
         'start_date',
         'end_date',
-        'is_current',
+        'is_locked',
     ];
-
-        protected static function booted()
-    {
-        static::saving(function ($year) {
-            if ($year->is_current) {
-                static::where('id', '!=', $year->id)
-                      ->update(['is_current' => false]);
-
-                Cache::forget('academic_year_current');
-            }
-        });
+    protected $casts = [
+        'start_date' => 'date:Y-m-d',
+        'end_date'   => 'date:Y-m-d',
+    ];
+    
+    public function scopeCurrent($query){
+        return $query->where('start_date', '<=',  today())
+                     ->where('end_date', '>=',  today())
+                     ->where('is_locked', false);
     }
-
-        public static function current(): ?self
+    public static function current(){
+        return static::where('start_date', '<=',  today())
+                     ->where('end_date', '>=',  today())
+                     ->first();
+    }
+     protected function academicYearInterval(): Attribute
     {
-        return Cache::remember('academic_year_current', 3600, function () {
-            return static::where('is_current', true)->first();
+        return Attribute::get(function ($value, $attributes) {
+            // Get the year from the start_date (e.g., 2025)
+            $startYear = Carbon::parse($attributes['start_date'])->year;
+            
+            // Get the year from the end_date (e.g., 2026)
+            $endYear = Carbon::parse($attributes['end_date'])->year;
+
+            // Concatenate them to form the label
+            return "{$startYear}-{$endYear}";
         });
     }
 
