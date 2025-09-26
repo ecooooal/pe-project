@@ -18,44 +18,59 @@
         </div>
 
         <button type="button"
+                id="update-dashboard-button"
                 hx-get="{{ route('graphs.homepage.refresh') }}"
                 hx-trigger="click"
-                class="flex justify-center items-center gap-x-2 cursor-pointer rounded-lg bg-blue-900 text-sm text-white font-medium p-2 hover:bg-blue-800 transition duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-            <path fill-rule="evenodd" d="M10.5 3.75a6 6 0 0 0-5.98 6.496A5.25 5.25 0 0 0 6.75 20.25H18a4.5 4.5 0 0 0 2.206-8.423 3.75 3.75 0 0 0-4.133-4.303A6.001 6.001 0 0 0 10.5 3.75Zm2.25 6a.75.75 0 0 0-1.5 0v4.94l-1.72-1.72a.75.75 0 0 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06l-1.72 1.72V9.75Z" clip-rule="evenodd" />
+                onclick="this.disabled = true";
+                class="flex justify-center items-center gap-x-2 cursor-pointer rounded-lg bg-blue-900 text-sm text-white font-medium p-3 hover:bg-blue-800 transition duration-300
+                disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 disabled:fill-gray-500">
+            
+            <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 motion-safe:animate-bounce">
+                <path fill-rule="evenodd" d="M10.5 3.75a6 6 0 0 0-5.98 6.496A5.25 5.25 0 0 0 6.75 20.25H18a4.5 4.5 0 0 0 2.206-8.423 3.75 3.75 0 0 0-4.133-4.303A6.001 6.001 0 0 0 10.5 3.75Zm2.25 6a.75.75 0 0 0-1.5 0v4.94l-1.72-1.72a.75.75 0 0 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06l-1.72 1.72V9.75Z" clip-rule="evenodd" />
             </svg>
-            Update <br> Dashboard
+
+            <div id="svg-loader" class="hidden flex flex-row gap-1">
+            <div class="w-2 h-2 rounded-full bg-white animate-bounce [animation-delay:.1s]"></div>
+            <div class="w-2 h-2 rounded-full bg-white animate-bounce [animation-delay:.2s]"></div>
+            <div class="w-2 h-2 rounded-full bg-white animate-bounce [animation-delay:.3s]"></div>
+            </div>
+            
+            Dashboard
         </button>
     </div>
-    <div class="flex flex-col gap-2">
-        <div id="homepage-system-report"
+
+    <div
             hx-get="{{ route('graphs.homepage.system') }}"
-            hx-trigger="revealed"
-            hx-swap="outerHTML"
-            class="flex max-w-full h-64 mx-4 border-2 border-gray-200 rounded-lg bg-gray-50 font-mono text-gray-900 justify-center items-center">
+            hx-trigger="load"
+            hx-swap="outerHTML swap:1s"
+            hx-target="this"
+            class="dashboard-animate-swapping flex max-w-full h-96 mx-4 border-2 border-gray-200 rounded-lg bg-gray-50 font-mono text-gray-900 justify-center items-center">
                 Fetching System Report...
-        </div>
     </div>
 
-    <div class="flex flex-col gap-2">
-        <div id="homepage-exam-report"
-            hx-get="{{ route('graphs.homepage.exam') }}"
-            hx-trigger="revealed"
-            hx-swap="outerHTML"
-            class="flex max-w-full h-64 mx-4 border-2 border-gray-200 rounded-lg bg-gray-50 font-mono text-gray-900 justify-center items-center">
-                Fetching Exam Report...
-        </div>
+    <div id="homepage-exam-report"
+        hx-get="{{ route('graphs.homepage.exam') }}"
+        hx-trigger="load"
+        hx-swap="outerHTML swap:1s"
+        class="dashboard-animate-swapping flex max-w-full h-64 mx-4 border-2 border-gray-200 rounded-lg bg-gray-50 font-mono text-gray-900 justify-center items-center">
+            Fetching Exam Report...
     </div>
 
-    <div class="flex flex-col gap-2">
-        <div id="homepage-course-report"
-            hx-get="{{ route('graphs.homepage.course') }}"
-            hx-trigger="revealed"
-            hx-swap="outerHTML"
-            class="flex max-w-full h-64 mx-4 border-2 border-gray-200 rounded-lg bg-gray-50 font-mono text-gray-900 justify-center items-center">
-                Fetching Course Report...
-        </div>
+    <div id="homepage-course-report"
+        hx-get="{{ route('graphs.homepage.course') }}"
+        hx-trigger="load"
+        hx-swap="outerHTML swap:1s"
+        class="dashboard-animate-swapping flex max-w-full h-64 mx-4 border-2 border-gray-200 rounded-lg bg-gray-50 font-mono text-gray-900 justify-center items-center">
+            Fetching Course Report...
     </div>
 
 </div>
+<script>
+document.body.addEventListener('htmx:configRequest', (evt) => {
+    // Show loader, hide default icon
+    const btn = evt.target;
+    btn.querySelector('#refresh-icon')?.classList.add('hidden');
+    btn.querySelector('#svg-loader')?.classList.remove('hidden');
+});
+</script>
 {% endblock %}

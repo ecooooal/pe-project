@@ -12,10 +12,9 @@ use Illuminate\Support\Facades\DB;
 
 class StudentAnswerFactory
 {
-    public static function update(StudentAnswer $student_answer, array $data, int $attempt_count){
+    public static function update(StudentAnswer $student_answer, $data, int $attempt_count){
         $student_answer_service = new AnswerService();
-        $answer = $data['answer'] ?? null;
-        
+        $answer = $data ?? null;
         if ($student_answer_service->hasAnswerChanged($student_answer, $answer)) {
             DB::transaction(function () use ($student_answer, $answer, $attempt_count, $student_answer_service) {
             // load question and question type
@@ -23,7 +22,6 @@ class StudentAnswerFactory
             $question = $student_answer->question;
             $question_type = $question_service->getQuestionTypeShow($question);
             $update_student_answer = [];
-
             switch ($question->question_type->value){
                 case('multiple_choice'):
                     $update_student_answer = $student_answer_service->storeMultipleChoice($student_answer, $answer, $question_type);
@@ -51,8 +49,8 @@ class StudentAnswerFactory
                 'answered_at' => $answer ? now() : null
                 ]);
             });
-            
         } else {
+           
         }
     }
 }

@@ -16,29 +16,6 @@ class UserService
             ->get();
     }
 
-public function getCountsForCoursesForUser(User $user)
-{
-    $courses = $user->courses()
-        ->withCount([
-            'subjects',
-            'subjects.topics',
-        ])
-        ->with('subjects.topics.questions')  // eager load questions for manual count
-        ->get()
-        ->map(function ($course) {
-            // sum questions count manually from eager loaded relations
-            $course->questions_count = $course->subjects->flatMap(function ($subject) {
-                return $subject->topics->flatMap->questions;
-            })->count();
-
-            return $course;
-        });
-
-    return $courses;
-}
-
-
-
     public function getCourseById($courseId)
     {
         return Course::with('subjects')
@@ -52,8 +29,11 @@ public function getCountsForCoursesForUser(User $user)
 
     public function getSubjectsForUser(User $user)
     {
-        return Subject::whereIn('course_id', $user->getCourseIds());
+        return Subject::whereHas('courses', function($q) use ($user) {
+            $q->whereIn('courses.id', $user->getCourseIds());
+        });
     }
+
 
     public function getSubjectById($subjectId)
     {
@@ -77,7 +57,7 @@ public function getCountsForCoursesForUser(User $user)
     public function getQuestionsForUser(User $user)
     {
         $topicIds = $this->getTopicsForUser($user)->pluck('id');
-        return Question::with('topic.subject.course')
+        return Question::with('topic.subject.courses')
             ->whereIn('topic_id', $topicIds);
     }
 

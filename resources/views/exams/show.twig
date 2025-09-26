@@ -11,8 +11,15 @@
     {{ breadcrumb() }}
     <div class="flex flex-col mx-4 pl-4">
         <h1 class="font-bold text-4xl">{{ exam.name }}</h1>
-        <div class="flex flex-col gap-y-0.5">
-            <span class="pl-2 text-xs text-gray-400 font-semibold">{{ exam.course.name }}</span>
+        <div class="flex flex-col gap-y-1">
+            <div class="flex flex-wrap w-full pl-2 gap-0.5">
+                <p class="text-xs text-gray-400 font-semibold">Course/s : </p>
+                    {% for course in exam.courses %}
+                    <span class=" inline-flex items-center px-2 py-0.5 min-w-fit  bg-blue-100 rounded-full text-blue-900 font-semibold text-xs select-none"> 
+                    {{ course.abbreviation }}
+                    </span>
+                    {% endfor %}
+            </div>
             <span class="pl-2 text-xs text-gray-400 font-semibold">ID : {{ exam.id }}</span>
         </div>
     </div>
@@ -53,7 +60,7 @@
                             <span class="font-medium">Access Codes :</span>
                             <input  type="button" 
                                     class="hover:font-medium underline cursor-pointer"
-                                    popovertarget="create-course-popover" 
+                                    popovertarget="access-code-popover" 
                                     value="View Access Codes">
                         </div>
                         {{ show_item('Author', exam.createdBy.getFullName()) }}
@@ -68,7 +75,7 @@
                 <div class="flex justify-between">
                     <div class="flex flex-col gap-y-4">
                         {{ show_item('Max Score', exam.max_score)}}
-                        {{ show_item('Examination Date', exam.examination_date ?? "No Examination Date") }}
+                        {{ show_item('Passing Score (%)', exam.passing_score ~ '% = ' ~ exam.max_score * (exam.passing_score / 100) ~ 'pts' ) }}
                         {{ show_item('Duration (in minutes)', exam.duration ?: 'Unlimited Duration')}}
                         {{ show_item('Retakes', exam.retakes ?: 'Unlimited Retakes')}}
                     </div>
@@ -81,21 +88,20 @@
                             {{ show_item('Is Currently', 'Current Points is not equal to Maximum Score', value_attributes:'text-red-600')}}
                         {% endif %}                    
                         {{ show_item('Publish Status', exam.is_published ? 'Published' : 'Unpublished', value_attributes: exam.is_published ? 'text-green-600' : 'text-red-600')}}
-                        {% if can('update exams') %}
-                        <span class="font-bold text-xs font-mono underline text-blue-900">Exam cannot be edited when published.</span>
-                        {% endif %}
+                        {{ show_item('Examination Date', exam.examination_date != null ? exam.examination_date|date('h:i A d M Y') : "No Examination Date") }}
+                        {{ show_item('Expiration Date', exam.expiration_date != null ? exam.expiration_date|date('h:i A d M Y', false) :  "No Expiration Date") }}
                     </div>
                 </div>
             </div>  
         </div>
     </div>
 
-    <!-- <div popover="manual"
-        class="backdrop:bg-gray-900/15  m-auto ease-in-out transition-opacity rounded-xl w-96" 
-        id="create-course-popover"
+    <div popover="manual"
+        class="backdrop:bg-gray-900/15  htmx-animate m-auto rounded-xl w-96" 
+        id="access-code-popover"
         >
             <button type="button"
-                    popovertarget="create-course-popover" 
+                    popovertarget="access-code-popover" 
                     popovertargetaction="hide" 
                     class="absolute top-2 right-2 p-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6 cursor-pointer text-gray-900">
@@ -104,9 +110,9 @@
 
             </button>
 
-            <div class="flex flex-col p-8 max-w-full rounded-xl bg-white">
+            <div class="flex flex-col p-10 max-w-full rounded-xl bg-white">
                                 <div class="flex w-full justify-center gap-x-2 bg-white p-4 rounded border-1 border-gray-900/10">
-                                    <div class="m-auto">
+                                    <div class="flex flex-1 justify-center items-center">
                                         {{ forms.label(
                                                 id:'code', 
                                                 content:'Access Code', 
@@ -126,8 +132,8 @@
                                     
                                     <button 
                                             type="button"
-                                            hx-get="/exams/{{ exam.id }}/edit/generate_access_code" hx-target="#code" hx-select-oob="#save-access-code-button" hx-swap="outerHTML transition:true" hx-trigger="revealed, click"
-                                            class="cursor-pointer bg-blue-900 text-xs text-white p-2 font-semibold rounded hover:bg-blue-700 duration-300">
+                                            hx-get="{{ route('accesscodes.generate', { exam: exam } )}}" hx-target="#code" hx-select-oob="#save-access-code-button" hx-swap="outerHTML transition:true" hx-trigger="load, click"
+                                            class="cursor-pointer bg-blue-900 text-xs ml-auto text-white p-2 font-semibold rounded hover:bg-blue-700 duration-300">
                                             Generate
                                     </button>
                                 </div>
@@ -135,26 +141,34 @@
                             <table class="w-full table-auto">
                                 <thead class="bg-blue-900 text-left sticky top-0">
                                     <tr class="text-center">
-                                        <th class="px-4 py-2 text-white font-bold">Access Codes</th>
+                                        <th class="px-4 py-2 text-white font-bold w-[90%]">Access Codes</th>
+                                        <th class="px-4 py-2 text-white font-bold w-[10%]">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody  hx-get="/exams/{{ exam.id }}/edit/get_access_codes"
+                                <tbody  hx-get="{{ route('accesscodes.get', { exam: exam } )}}"
                                         hx-trigger="load"
                                         hx-swap="outerHTML"
                                         hx-target="this"
-                                        
-                                    >
-                                        <tr
-                                            class="border-t text-center hover:bg-blue-50">
-                                            <td 
-                                                class="px-4 py-2 font-mono cursor-pointer select-all">
-                                                access-code
+                                        class="min-w-24"
+                                        id="access-code-body">
+                                        <tr>
+                                            <td class="px-4 py-2 w-[90%]">ABC123</td>
+                                            <td class="px-4 py-2 w-[10%]">
+                                                <button class="bg-blue-500 text-white px-2 py-1 rounded">Edit</button>
                                             </td>
                                         </tr>
                                 </tbody>
                             </table>
                 </div>
             </div>
+    </div>
 
-    </div> -->
+
+<style>
+tr.fade-out td {
+    opacity: 0;
+    transition: opacity 1s ease-out;
+}
+</style>
+
     {% endblock %}

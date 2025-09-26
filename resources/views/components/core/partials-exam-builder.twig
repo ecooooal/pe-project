@@ -1,12 +1,12 @@
 {% from 'components/core/show-header' import show_header %}
 {% from 'components/core/show-item' import show_item %}
-{% from 'components/core/index-table' import table %}
+{% from 'components/core/index-table' import exam_questions_table %}
 {% set exam_topic_ids = exam_topics|map(t => t.id) %}
 
 <span id="subject-count-field" class="text-xs font-semibold text-gray-500">Total Subjects : {{ exam_subjects.count() }}</span>
 <span id="topic-count-field" class="text-xs font-semibold text-gray-500">Total Topics : {{ exam_topics.count() }}</span>
 <span id="question-count-field" class="text-xs font-semibold text-gray-500">Total Questions : {{exam_questions.count()}}</span>
-<span id="score-count-field" class="text-xs font-semibold text-gray-500">Current Score : {{exam_questions.sum('total_points')}}</span>    
+<span id="score-count-field" class="text-xs font-semibold text-gray-500">Current Score : {{exam_questions.sum('total_points') ~ '/' ~ exam.max_score}}</span>    
 <span id="algortihm-field" class="text-xs font-semibold text-gray-500">Current Algorithm : Greedy Algorithm {{exam_questions.algorithm}}</span>    
 
 <div id="subject-field" class="flex flex-col p-4 flex-1">
@@ -45,40 +45,117 @@
     </div>
 </div>   
 
+<div id="blooms-level-field" class="flex max-w-full mx-8 justify-center gap-x-4">
+    <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+        <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+            🧠
+        </div>
+        
+        <div class="flex flex-col justify-center">
+            <span class="text-xl font-extrabold font-mono text-blue-900">
+            {{ exam_levels.remember ?? '0'}}
+            </span>
+            <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+            Remember
+            </span>
+        </div>
+    </div>  
+    <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+        <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+            📖
+        </div>
+        
+        <div class="flex flex-col justify-center">
+            <span class="text-xl font-extrabold font-mono text-blue-900">
+            {{ exam_levels.understand ?? '0'}}
+            </span>
+            <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+            Understand
+            </span>
+        </div>
+    </div>
+    <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+        <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+            🛠️
+        </div>
+        
+        <div class="flex flex-col justify-center">
+            <span class="text-xl font-extrabold font-mono text-blue-900">
+            {{ exam_levels.apply ?? '0'}}
+            </span>
+            <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+            Apply
+            </span>
+        </div>
+    </div>
+    <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+        <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+            🧩
+        </div>
+        
+        <div class="flex flex-col justify-center">
+            <span class="text-xl font-extrabold font-mono text-blue-900">
+            {{ exam_levels.analyze ?? '0'}}
+            </span>
+            <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+            Analyze
+            </span>
+        </div>
+    </div>
+    <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+        <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+            📝
+        </div>
+        
+        <div class="flex flex-col justify-center">
+            <span class="text-xl font-extrabold font-mono text-blue-900">
+            {{ exam_levels.evaluate ?? '0'}}
+            </span>
+            <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+            Evaluate
+            </span>
+        </div>
+    </div>
+    <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+        <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+            🎨
+        </div>
+        
+        <div class="flex flex-col justify-center">
+            <span class="text-xl font-extrabold font-mono text-blue-900">
+            {{ exam_levels.create ?? '0'}}
+            </span>
+            <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+            Create
+            </span>
+        </div>
+    </div>
+</div>
 
 <div id="exam-question-field" class="flex flex-col mx-4 p-4">
     <div class="flex ml-auto my-2">
         <button type="button" 
-                class="cursor-pointer bg-blue-600 text-gray-200 hover:bg-blue-500 hover:text-white duration-300 rounded-lg p-2 font-semibold text-sm"
+                class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-800 hover:text-white duration-300 rounded-lg p-2 font-semibold text-sm"
                 popovertarget="add-question-popover">
                 Add Question
         </button>
     </div>
-    <div class="flex justify-between items-center w-full h-16 p-8 bg-white border-x border-t border-gray-300 rounded-t-2xl">
-        <h1 class="text-2xl font-medium text-gray-800">Exam Questions </h1>
-        <h1>Filter here</h1>
+    <div class="flex justify-between items-center w-full h-16 p-8 bg-blue-900 border-x border-t border-gray-300 rounded-t-2xl">
+        <h1 class="text-2xl font-medium text-gray-50">Exam Questions </h1>
     </div>
-    <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
-        {{ table(questions_header, exam_questions_rows, url:'questions', forAdding:can('update exams') and not exam.is_published ? true : false, openAction:true, exam_id:exam.id, forRemoving:can('update exams') and not exam.is_published ? true : false, actions:true) }}
-
-    </div>
-    <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300 rounded-b-2xl">
-        <h1>Pagination</h1>
+    <div class="overflow-auto max-w-full scroll-smooth rounded-b-2xl border-x border-y border-gray-300">
+        {{ exam_questions_table(questions_header, exam_questions_rows, url:'questions', forAdding:can('update exams') and not exam.is_published ? true : false, openAction:true, exam_id:exam.id, forRemoving:can('update exams') and not exam.is_published ? true : false, actions:true) }}
     </div>
 </div>
 
-<div id="available-question-field" class="flex flex-col flex-1  w-full p-4">
+<div id="available-question-field" class="flex flex-col flex-1 w-full p-4">
     {% if available_questions_rows.count != 0 %}
-    <div class="flex justify-between items-center w-full h-16 p-8 bg-white border-x border-t border-gray-300 rounded-t-2xl">
-        <h1 class="text-2xl font-medium text-gray-800">Available Questions </h1>
-        <h1>Filter here</h1>
+    <div class="flex justify-between items-center w-full h-16 p-8 bg-blue-900 border-x border-t border-gray-300 rounded-t-2xl">
+        <h1 class="text-2xl font-medium text-gray-50">Available Questions </h1>
     </div>
-    <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
-        {{ table(questions_header, available_questions_rows, url:'exams', forAdding:true, openAction:false, exam_id:exam.id) }}
+    <div class="overflow-auto max-w-full scroll-smooth rounded-b-2xl border-1 border-gray-300">
+        {{ exam_questions_table(questions_header, rows:available_questions_rows, url:'exams', forAvailableQuestions:true, forAdding:true, openAction:false, exam_id:exam.id) }}
 
-    </div>
-    <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300 rounded-b-2xl">
-        <h1>Pagination</h1>
     </div>
     {% else %}
     <div class="flex justify-between items-center w-full h-16 p-8 bg-white rounded-2xl">

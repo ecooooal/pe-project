@@ -17,14 +17,20 @@ class Exam extends Model
         'access_code',
         'max_score',
         'duration',
+        'passing_score',
         'retakes',
         'examination_date',
+        'expiration_date',
         'is_published',
         'applied_algorithm'
     ];
-
-    public function course() {
-        return $this->belongsTo(Course::class);
+    protected $casts = [
+        'examination_date' => 'datetime',
+        'expiration_date' => 'datetime'
+    ];
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class);
     }
 
     public function accessCodes() {

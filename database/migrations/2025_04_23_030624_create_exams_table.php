@@ -16,11 +16,12 @@ return new class extends Migration
         Schema::create('exams', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignIdFor(Course::class, 'course_id')->constrained()->onDelete('set null');;
             $table->integer('max_score');
             $table->integer('duration')->nullable();
+            $table->unsignedTinyInteger('passing_score')->default(50); 
             $table->integer('retakes')->nullable();
             $table->dateTime('examination_date')->nullable();
+            $table->dateTime('expiration_date')->nullable();
             $table->boolean('is_published',)->default(false);
             $table->string('applied_algorithm')->default('None');
             $table->softDeletes();

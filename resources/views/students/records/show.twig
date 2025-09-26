@@ -21,7 +21,7 @@
                 <button  
                         hx-get="{{ route('exams.student.overview', { exam: exam }) }}" 
                         hx-target="#exam-content"
-                        hx-swap="outerHTML"
+                        hx-swap="innerHTML"
                         class="cursor-pointer hover:text-blue-900 hover:underline">
                     Overview
                 </button>
@@ -29,283 +29,364 @@
                         hx-get="{{ route('exam_records.index', { exam: exam }) }}" 
                         hx-target="#exam-content"
                         hx-trigger="click" 
-                        hx-swap="outerHTML"
+                        hx-swap="innerHTML"
                         class="cursor-pointer hover:text-blue-900 hover:underline">
                     Exam Records
                 </button>
             </div>
 </div> 
 
-<div id="exam-content" class="flex flex-1 flex-col max-w-full gap-y-4 mx-8 bg-white rounded-xl shadow-sm ring-1 ring-gray-950/5">
-    <div class="flex flex-1 p-4 bg-blue-900 text-white font-bold text-lg rounded-xl justify-between">
-        Attempt #{{ exam_record.attempt }}
-        <button hx-get="{{ route('exam_records.index', { exam: exam }) }}" 
-                hx-target="#exam-content"
-                hx-swap="outerHTML" 
-                class="font-bold text-2xl text-white cursor-pointer hover:text-blue-300 duration-300 transition">
-            X
-        </button>
-    </div>
-    <div class="flex p-4 gap-x-4 max-w-full">
-        <div class="flex flex-col gap-y-8 w-full">
-            {{ show_header('Exam Results')}}
-
-            <div class="flex flex-col prose gap-y-4 p-4 min-w-full">
-                <div class="bg-gray-100 px-4 rounded-2xl text-gray-800 "
-                    {% if exam_record.status == 'in_progress' %}
-                    id="subjects"
-                    hx-get="{{ route('exam_records.show_updated_score', { exam_record:exam_record, max_score:exam.max_score} ) }}"
-                    hx-trigger="load, every 6s"
-                    hx-swap="outerHTML"
-                    hx-target="this"
-                    hx-select="#subjects"
-                    hx-select-oob="#exam_record_info"
-                    {% endif %}
-                >            
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Subject</th>
-                            <th>Max Score</th>
-                            <th>Score Obtained</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            {% for subject in exam_record.subjects %}
+<div id="exam-content">
+    <div class="flex flex-1 flex-col max-w-full gap-y-4 mx-8 bg-white rounded-xl shadow-sm ring-1 ring-gray-950/5">
+        <div class="flex flex-1 p-4  bg-blue-900 text-white font-bold text-lg rounded-xl justify-between">
+                Attempt #{{ exam_record.attempt }}
+                <button hx-get="{{ route('exam_records.index', { exam: exam }) }}" 
+                        hx-target="#exam-content"
+                        hx-swap="innerHTML" 
+                        class="font-bold text-2xl text-white cursor-pointer hover:text-blue-300 duration-300 transition">
+                    X
+                </button>
+        </div>
+        <div class="flex p-4 gap-x-4 max-w-full">
+            <div class="flex flex-col gap-y-8 w-full">
+                {{ show_header('Exam Results')}}
+                <div class="flex flex-col prose gap-y-4 p-4 min-w-full">
+                    <div class="bg-gray-100 px-4 rounded-2xl text-gray-800 "
+                        {% if exam_record.status == 'in_progress' %}
+                        id="subjects"
+                        hx-get="{{ route('exam_records.show_updated_score', { exam_record:exam_record, max_score:exam.max_score} ) }}"
+                        hx-trigger="load, every 10s"
+                        hx-swap="outerHTML"
+                        hx-target="this"
+                        hx-select="#subjects"
+                        hx-select-oob="#exam_record_info, #exam_record_header"
+                        {% endif %}
+                    >            
+                        <table>
+                            <thead>
                             <tr>
-                                <td>{{ subject.subject_name }}</td>
-                                <td>{{ subject.score }}</td>
-                                <td>{{ subject.score_obtained }}</td>
+                                <th>Subject</th>
+                                <th>Max Score</th>
+                                <th>Score Obtained</th>
                             </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="overflow-x-auto max-w-full ring-2 ring-gray-900/20 px-4 rounded-2xl text-gray-800">            
-                    <table>
-                        <thead>
-                        <tr>
-                        <th>Q#</th>
-                        <th>Question Type</th>
-                        <th>Question</th>
-                        <th>Your Answer</th>
-                        <th>Score</th>
-                        <th>Status</th>
-                        </tr>
-                        </thead>
-                        {% for row in rows %}
-                            <tr id="row-{{ row.number }}">
-                                <td>{{ row.number }}</td>
-                                <td>{{ row.question_type }}</td>
-                                <td>{{ row.question }}</td>
-                                <td class="text-xs">{{ row.is_answered ? row.question_type|lower not in ['ranking', 'matching', 'coding'] ? row.your_answer|title : '📝 see details' : 'No answer' }}</td>
-                                <td>{{ row.score }}/{{ row.max_score }}</td>
-                                <td>{{ row.score == row.max_score ? '🟢' : row.score > 0 and row.max_score != row.score ? '🟡' : '🔴'}}</td>
-                            </tr>
-                            {% if row.question_type|lower  in ['ranking', 'matching', 'coding'] %}
+                            </thead>
+                            <tbody>
+                                {% for subject in exam_record.subjects %}
+                                <tr>
+                                    <td>{{ subject.subject_name }}</td>
+                                    <td>{{ subject.score }}</td>
+                                    <td>{{ subject.score_obtained }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="overflow-x-auto max-w-full ring-2 ring-gray-900/20 px-4 rounded-2xl text-gray-800">            
+                        <table>
+                            <thead>
                             <tr>
-                                <td colspan="6" class="max-w-96">
-                                    <details class="bg-gray-100 px-4 py-2 rounded-2xl overflow-x-auto w-full">
-                                        <summary class="py-2">
-                                            Details
-                                        </summary>
-                                            {% if row.question_type|lower == 'ranking' %}
-                                                <table class="inner-table">
-                                                    <thead>
-                                                    <tr>
-                                                    <th>Order</th>
-                                                    <th>Answer</th>
-                                                    <th>Points</th>
-                                                    <th>Status</th>
-                                                    </tr>
-                                                    </thead>
-                                                    {% for ranking_answer in row.question_type_answer %}
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>{{ ranking_answer.answer_order }}</td>
-                                                                <td>{{ ranking_answer.answer }}</td>
-                                                                <td>{{ ranking_answer.answer_points }}</td>
-                                                                <td>{{ ranking_answer.answer_points > 0 ? '🟢' : '🟡' }}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    {% endfor %}
-                                                </table>
-                                            {% elseif row.question_type|lower == 'matching' %}
-                                                <table class="inner-table">
-                                                    <thead>
+                            <th>Q#</th>
+                            <th>Question Type</th>
+                            <th>Question</th>
+                            <th>Your Answer</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                            </tr>
+                            </thead>
+                            {% for row in rows %}
+                                <tr id="row-{{ row.number }}">
+                                    <td>{{ row.number }}</td>
+                                    <td>{{ row.question_type }}</td>
+                                    <td>{{ row.question }}</td>
+                                    <td class="text-xs">{{ row.is_answered ? row.question_type|lower not in ['ranking', 'matching', 'coding'] ? row.your_answer|title : '📝 see details' : 'No answer' }}</td>
+                                    <td>{{ row.score }}/{{ row.max_score }}</td>
+                                    <td class="{{ row.question_type|lower == 'coding' and row.is_answer == true ? 'animate-bounce' : '' }}">{{ row.question_type|lower == 'coding' and row.is_answer == true ? '⚪' :row.score == row.max_score ? '🟢' : row.score > 0 and row.max_score != row.score ? '🟡' : '🔴'}}</td>
+                                </tr>
+                                {% if row.question_type|lower  in ['ranking', 'matching', 'coding'] %}
+                                <tr>
+                                    <td colspan="6" class="max-w-96">
+                                        <details class="details-animated bg-gray-100 px-4 py-2 rounded-2xl overflow-x-auto w-full">
+                                            <summary class="py-2">
+                                                Details
+                                            </summary>
+                                                {% if row.question_type|lower == 'ranking' %}
+                                                    <table class="inner-table">
+                                                        <thead>
                                                         <tr>
-                                                        <th>To match</th>
-                                                        <th>Your Answer</th>
+                                                        <th>Order</th>
+                                                        <th>Answer</th>
                                                         <th>Points</th>
                                                         <th>Status</th>
                                                         </tr>
-                                                    </thead>
-                                                    {% for matching_answer in row.question_type_answer %}
-                                                        <tbody>
+                                                        </thead>
+                                                        {% for ranking_answer in row.question_type_answer %}
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>{{ ranking_answer.answer_order }}</td>
+                                                                    <td>{{ ranking_answer.answer }}</td>
+                                                                    <td>{{ ranking_answer.answer_points }}</td>
+                                                                    <td>{{ ranking_answer.answer_points > 0 ? '🟢' : '🟡' }}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        {% endfor %}
+                                                    </table>
+                                                {% elseif row.question_type|lower == 'matching' %}
+                                                    <table class="inner-table">
+                                                        <thead>
                                                             <tr>
-                                                                <td>{{ matching_answer.first_item_answer }}</td>
-                                                                <td>{{ matching_answer.second_item_answer }}</td>
-                                                                <td>{{ matching_answer.answer_points }}</td>
-                                                                <td>{{ matching_answer.answer_points > 0 ? '🟢' : '🟡' }}</td>
+                                                            <th>To match</th>
+                                                            <th>Your Answer</th>
+                                                            <th>Points</th>
+                                                            <th>Status</th>
                                                             </tr>
-                                                        </tbody>
-                                                    {% endfor %}
-                                                </table>
-                                            {% elseif row.question_type|lower == 'coding' %}
-                                                <table id="coding-{{ row.number }}-table">
-                                                    <thead>
-                                                        <tr>
-                                                        <th>Syntax Points</th>
-                                                        <th>Runtime Points</th>
-                                                        <th>Test Case Points</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>Waiting for Result...</td>
-                                                            <td>Waiting for Result...</td>
-                                                            <td>Waiting for Result...</td>
-                                                        </tr>
-                                                    </tbody> 
-                                                </table>
-
-                                                <div 
-                                                    hx-get="{{ route('exam_records.coding_answer_result', { coding_answer:row.your_answer, number:row.number, question:row.question, max_score :row.max_score} ) }}"
-                                                    hx-trigger="load, every 10s"
-                                                    hx-swap="outerHTML"
-                                                    hx-target="this"
-                                                    hx-select="#coding-{{ row.number }}-div"
-                                                    hx-select-oob="#row-{{ row.number }}, #coding-{{ row.number }}-table">
-                                                    Currently Checking your Code...
-                                                </div>
-                                                
-                                                <pre class="bg-transparent border-2 overflow-x-auto"><span class="text-sm font-bold text-gray-900">{{ row.question_type_answer.language|capitalize }}</span><code class="language-{{ row.question_type_answer.language }}">{{ row.question_type_answer.code }}</code></pre>
-                                            {% endif %}
-                                    </details>
-                                </td>
+                                                        </thead>
+                                                        {% for matching_answer in row.question_type_answer %}
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>{{ matching_answer.first_item_answer }}</td>
+                                                                    <td>{{ matching_answer.second_item_answer }}</td>
+                                                                    <td>{{ matching_answer.answer_points }}</td>
+                                                                    <td>{{ matching_answer.answer_points > 0 ? '🟢' : '🟡' }}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        {% endfor %}
+                                                    </table>
+                                                {% elseif row.question_type|lower == 'coding' %}
+                                                    <table id="coding-{{ row.number }}-table">
+                                                        <thead>
+                                                            <tr>
+                                                            <th>Syntax Points</th>
+                                                            <th>Runtime Points</th>
+                                                            <th>Test Case Points</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% if row.is_answered %}
+                                                            <tr>
+                                                                <td>Waiting for Result...</td>
+                                                                <td>Waiting for Result...</td>
+                                                                <td>Waiting for Result...</td>
+                                                            </tr>
+                                                            {% endif %}
+                                                            <tr>
+                                                                <td>No answer</td>
+                                                                <td>No answer</td>
+                                                                <td>No answer</td>
+                                                            </tr>
+                                                        </tbody> 
+                                                    </table>
+                                                    {% if row.is_answered %}
+                                                        <div 
+                                                            hx-get="{{ route('exam_records.coding_answer_result', { coding_answer:row.your_answer, number:row.number, question:row.question, max_score :row.max_score} ) }}"
+                                                            hx-trigger="load, every 8s"
+                                                            hx-swap="outerHTML"
+                                                            hx-target="this"
+                                                            hx-select="#coding-{{ row.number }}-div"
+                                                            hx-select-oob="#row-{{ row.number }}, #coding-{{ row.number }}-table"
+                                                            class="flex flex-1 justify-center items-center">
+                                                            <span class="animate-bounce font-bold font-mono text-xl text-gray-900">Currently Checking your Code...</span>
+                                                        </div>
+                                                        
+                                                        <pre class="bg-transparent border-2 overflow-x-auto"><span class="text-sm font-bold text-gray-900">{{ row.question_type_answer.language|capitalize }}</span><code class="language-{{ row.question_type_answer.language }}">{{ row.question_type_answer.code }}</code></pre>
+                                                    {% endif %}
+                                                {% endif %}
+                                        </details>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            {% endfor %}
                             </tr>
-                            {% endif %}
-                        {% endfor %}
-                        </tr>
-                    </table>
+                        </table>
+                    </div>
+                </div>
+                <div class="flex flex-col rounded-2xl gap-y-4 text-gray-800">            
+                    {{ show_header('Reviewers Recommendation')}}
+                    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-md">
+                        <h3 class="text-lg font-semibold text-gray-800">Reviewer Name</h3>
+                        <p class="text-sm text-gray-600 mb-3">Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...</p>
+                        <a href="#"
+                            download
+                            class="inline-flex items-center text-sm font-medium text-orange-900 hover:underline">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                            <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625Z" />
+                            <path d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
+                            </svg>
+                            Download this reviewer (PDF)
+                        </a>
+                        <p class="inline-flex font-bold text-gray-300 text-3xl mx-4"> | </p>
+                        <a href="#"
+                            download
+                            class="inline-flex items-center text-sm font-medium text-green-900 hover:underline gap-x-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                            <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
+                            <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z" />
+                            </svg>
+
+                            Email me this reviewer (PDF)
+                        </a>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-md">
+                        <h3 class="text-lg font-semibold text-gray-800">Reviewer Name</h3>
+                        <p class="text-sm text-gray-600 mb-3">Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...</p>
+                        <a href="#"
+                            download
+                            class="inline-flex items-center text-sm font-medium text-orange-900 hover:underline">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                            <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625Z" />
+                            <path d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
+                            </svg>
+                            Download this reviewer (PDF)
+                        </a>
+                        <p class="inline-flex font-bold text-gray-300 text-3xl mx-4"> | </p>
+                        <a href="#"
+                            download
+                            class="inline-flex items-center text-sm font-medium text-green-900 hover:underline gap-x-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                            <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
+                            <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z" />
+                            </svg>
+
+                            Email me this reviewer (PDF)
+                        </a>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-md">
+                        <h3 class="text-lg font-semibold text-gray-800">Reviewer Name</h3>
+                        <p class="text-sm text-gray-600 mb-3">Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...</p>
+                        <a href="#"
+                            download
+                            class="inline-flex items-center text-sm font-medium text-orange-900 hover:underline">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                            <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625Z" />
+                            <path d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
+                            </svg>
+                            Download this reviewer (PDF)
+                        </a>
+                        <p class="inline-flex font-bold text-gray-300 text-3xl mx-4"> | </p>
+                        <a href="#"
+                            download
+                            class="inline-flex items-center text-sm font-medium text-green-900 hover:underline gap-x-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                            <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
+                            <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z" />
+                            </svg>
+
+                            Email me this reviewer (PDF)
+                        </a>
+                    </div>
                 </div>
             </div>
-            <div class="flex flex-col rounded-2xl gap-y-4 text-gray-800">            
-                {{ show_header('Reviewers Recommendation')}}
-                <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-md">
-                    <h3 class="text-lg font-semibold text-gray-800">Reviewer Name</h3>
-                    <p class="text-sm text-gray-600 mb-3">Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...</p>
-                    <a href="#"
-                        download
-                        class="inline-flex items-center text-sm font-medium text-orange-900 hover:underline">
+
+
+
+            <div class="flex flex-col max-h-fit min-w-fit gap-y-2">
+                <div class="htmx-animate flex flex-col justify-between gap-y-4 rounded-xl bg-gray-10 p-4 shadow-sm ring-1 ring-gray-950/5"
+                    {% if exam_record.status == 'in_progress' %}
+                    id="exam_record_info"
+                    {% endif %}
+                >
+
+                    {% if exam_record.status == 'in_progress' %}
+                        <div class="h-[200px] w-[200px] flex flex-col gap-1 justify-center items-center">
+                            <span class="font-bold text-gray-800">Calculating Score</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" class="w-32 "><path fill="none" stroke="#2a4365" stroke-width="20" stroke-linecap="round" stroke-dasharray="300 385" stroke-dashoffset="0" d="M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z"><animate attributeName="stroke-dashoffset" calcMode="spline" dur="2.2" values="685;-685" keySplines="0 0 1 1" repeatCount="indefinite"></animate></path></svg>
+                        </div>
+                    {% else %}
+                        <div id="student-score-donut-graph" 
+                            class="h-[200px] w-[200px]"
+                            data-student-score-status="{{ exam_record.status }}" 
+                            data-student-score="{{ exam_record.total_score }}"
+                            data-exam-max-score = "{{ exam.max_score }}">
+                        </div>
+                    {% endif %}
+                    {{ show_item('Status', exam_record.status) }}
+                    {{ show_item('Time Taken', exam_record.time_taken ~ ' minutes')}}
+                    {{ show_item('Date Taken', exam_record.date_taken|date("m/d/Y"))}}
+                </div> 
+                {% if exam_record.status != 'in_progress' %}
+                <div class="flex flex-col gap-y-2 w-full">
+                    <a href="#" class="flex p-2 max-h-fit w-full bg-orange-900 rounded-lg font-medium text-white hover:bg-orange-700 hover:text-gray-50 cursor-pointer justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
                         <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625Z" />
                         <path d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
                         </svg>
-                        Download this reviewer (PDF)
+                        Download this record
                     </a>
-                    <p class="inline-flex font-bold text-gray-300 text-3xl mx-4"> | </p>
-                    <a href="#"
-                        download
-                        class="inline-flex items-center text-sm font-medium text-green-900 hover:underline gap-x-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                    <a href="#" class="flex p-2 max-h-fit w-full bg-green-900 rounded-lg font-medium text-white hover:bg-green-700 hover:text-gray-50 cursor-pointer justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 mr-1">
                         <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
                         <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z" />
                         </svg>
-
-                        Email me this reviewer (PDF)
+                        Email me this record
                     </a>
                 </div>
-                <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-md">
-                    <h3 class="text-lg font-semibold text-gray-800">Reviewer Name</h3>
-                    <p class="text-sm text-gray-600 mb-3">Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...</p>
-                    <a href="#"
-                        download
-                        class="inline-flex items-center text-sm font-medium text-orange-900 hover:underline">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                        <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625Z" />
-                        <path d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
-                        </svg>
-                        Download this reviewer (PDF)
-                    </a>
-                    <p class="inline-flex font-bold text-gray-300 text-3xl mx-4"> | </p>
-                    <a href="#"
-                        download
-                        class="inline-flex items-center text-sm font-medium text-green-900 hover:underline gap-x-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                        <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
-                        <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z" />
-                        </svg>
-
-                        Email me this reviewer (PDF)
-                    </a>
-                </div>
-                <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-md">
-                    <h3 class="text-lg font-semibold text-gray-800">Reviewer Name</h3>
-                    <p class="text-sm text-gray-600 mb-3">Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...Reviewer Description...</p>
-                    <a href="#"
-                        download
-                        class="inline-flex items-center text-sm font-medium text-orange-900 hover:underline">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                        <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625Z" />
-                        <path d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
-                        </svg>
-                        Download this reviewer (PDF)
-                    </a>
-                    <p class="inline-flex font-bold text-gray-300 text-3xl mx-4"> | </p>
-                    <a href="#"
-                        download
-                        class="inline-flex items-center text-sm font-medium text-green-900 hover:underline gap-x-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                        <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
-                        <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z" />
-                        </svg>
-
-                        Email me this reviewer (PDF)
-                    </a>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="flex flex-col max-h-fit min-w-fit gap-y-2">
-            <div class="flex flex-col justify-between gap-y-4 rounded-xl bg-gray-10 p-4 shadow-sm ring-1 ring-gray-950/5"
-                {% if exam_record.status == 'in_progress' %}
-                id="exam_record_info"
                 {% endif %}
-            >
-                {{ show_item('Attempt #', exam_record.attempt)}}
-                {{ show_item('Score', exam_record.total_score ~ '/' ~ exam.max_score )}}
-                {{ show_item('Time Taken', exam_record.time_taken ~ ' minutes')}}
-                {{ show_item('Date Taken', exam_record.date_taken|date("m/d/Y"))}}
-                {{ show_item('Status', exam_record.status) }}
-            </div> 
-            <div class="flex flex-col gap-y-2 w-full">
-                <a href="#" class="flex p-2 max-h-fit w-full bg-orange-900 rounded-lg font-medium text-white hover:bg-orange-700 hover:text-gray-50 cursor-pointer justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                    <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625Z" />
-                    <path d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
-                    </svg>
-                    Download this record
-                </a>
-                <a href="#" class="flex p-2 max-h-fit w-full bg-green-900 rounded-lg font-medium text-white hover:bg-green-700 hover:text-gray-50 cursor-pointer justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 mr-1">
-                    <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
-                    <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z" />
-                    </svg>
-                    Email me this record
-                </a>
             </div>
         </div>
     </div>
-
 </div>
+{% if exam_record.status != 'in_progress' %}
+<script>
+    function render_score_graph(){
+        student_data_div = document.getElementById('student-score-donut-graph');
+        if (!student_data_div) return;
+        student_score = student_data_div.dataset.studentScore;
+        exam_max_score = student_data_div.dataset.examMaxScore;
+        student_score_status = student_data_div.dataset.studentScoreStatus;
+        student_score_status_message = student_score_status == 'perfect_score' ? 'Perfect' : student_score_status == 'pass' ? 'Pass' : 'Review';
+        const remaining = exam_max_score - student_score;
+        const marker_color = student_score_status == 'perfect_score' ? '#FFD700' : student_score_status == 'pass' ? 'rgb(44, 160, 44)' : 'rgb(255, 127, 14)';
+
+        const student_score_donut_data = [{
+            type: 'pie',
+            values: [student_score, remaining],
+            labels: [`${student_score} pts`, ''],            
+            hole: 0.6,
+            text: [`${student_score} pts`, `${remaining} pts`],   
+            textinfo: 'text',                        
+            hoverinfo: 'none',      
+            direction: 'counterclockwise',
+            sort: false,
+            marker: {
+                line: { width: 2, color: '#333'},
+                colors: [marker_color, 'rgb(220, 220, 220)'], 
+                opacity: 0.7  
+            },
+            textposition: 'inside',
+            showlegend: false
+        }];
+
+        const student_score_donut_layout = {
+            title: 'Score Breakdown',
+            showlegend: false,
+            annotations: [
+                {
+                    font: {
+                        size: 18
+                    },
+                    showarrow: false,
+                    text: `${student_score_status_message}`,
+                    x: 0.5,
+                    y: 0.5
+                }
+            ],
+            autosize: true,
+            margin: { l: 5, r:5, t: 5, b: 5 },
+        };
+        Plotly.newPlot('student-score-donut-graph', student_score_donut_data, student_score_donut_layout, {displayModeBar: false});
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', render_score_graph);
+    } else {
+        render_score_graph();
+    }   
+    document.body.addEventListener('htmx:afterSwap', render_score_graph);
+</script>
+{% endif %}
 
 <script>
   document.body.addEventListener('htmx:beforeSwap', function(event) {
     if (event.detail.xhr.status === 212) {
       event.preventDefault();
-      console.log('Swap prevented due to 212 No Content response.');
     }
   });
 </script>
