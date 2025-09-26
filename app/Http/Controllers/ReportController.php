@@ -2,18 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Exam;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 
 class ReportController extends Controller
 {
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
     public function index(){
-        return view('reports/index');
+        $courseIds = $this->userService->getCoursesForUser(auth()->user())->pluck('id');
+        $exams = Exam::with(['courses', 'questions'])
+            ->whereHas('courses', function ($query) use ($courseIds) {
+                $query->whereIn('courses.id', $courseIds);
+            })->get();
+
+        $data = [
+            'exams' => $exams
+        ];
+        return view('reports/index', $data);
 
     }
 
-    public function show(){
-        return view('reports/show');
+    public function show(Exam $exam){
+        $exam->load(['questions','courses']);
+
+        return view('reports/show', ['exam' => $exam]);
 
     }
 

@@ -36,7 +36,7 @@ class QuestionController extends Controller
             return [
                 'id' => $question->id,
                 'name' => $question->name,
-                'subject' => $question->topic->subject->name,
+                'subject' => $question->topic->subject->code,
                 'topic' => $question->topic->name,
                 'type' => $question->question_type->name,
                 'author' => $question->author->getFullName() ?? "No Author"

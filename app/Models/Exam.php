@@ -13,6 +13,7 @@ class Exam extends Model
 
     protected $fillable = [
         'name',
+        'academic_year_id',
         'course_id',
         'access_code',
         'max_score',
@@ -28,10 +29,16 @@ class Exam extends Model
         'examination_date' => 'datetime',
         'expiration_date' => 'datetime'
     ];
+
+    public function academicYear(){
+        return $this->belongsTo(AcademicYear::class);
+    }
+
     public function courses()
     {
         return $this->belongsToMany(Course::class);
     }
+    
 
     public function accessCodes() {
         return $this->hasMany(ExamAccessCode::class);

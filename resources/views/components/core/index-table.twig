@@ -18,18 +18,18 @@
                     {% for cell, value in row %}
                         {% if forAdmin == true %}
                         <td class="p-4 border-b border-gray-300 max-w-xs text-sm {{ value == 'Incomplete' ? 'text-red-600' : (value == 'Complete' ? 'text-green-600' : 'text-gray-900') }} ">
-                            <span class="block truncate">{{ value }}</span> 
+                            <span class="block break-words">{{ value }}</span> 
                         </td>
                         {% elseif cell != 'id' %}
                         <td class="p-4 border-b border-gray-300 max-w-xs text-sm {{ value == 'Incomplete' ? 'text-red-600' : (value == 'Complete' ? 'text-green-600' : 'text-gray-900') }} ">
-                            <span class="block truncate">{{ value }}</span> 
+                            <span class="block break-words">{{ value }}</span> 
                         </td>
                         {% endif %}
                     {% endfor %}
                     {% if actions %}
                         <td class="p-4 max-w-48  border-b border-gray-300">
                             {% if openAction %}
-                                 <a href="/{{ url }}/{{ row.id }}" class="text-blue-900 text-sm font-medium hover:underline">
+                                 <a href="/{{ url }}/{{ row.id }}" class="inline-flex w-fit text-blue-900 text-sm font-medium hover:underline">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
                                     <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
                                     <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clip-rule="evenodd" />
@@ -132,7 +132,7 @@
                                                                 type="button"
                                                                 hx-post="/exams/{{ exam_id }}/builder/add-question/{{ question.id }}"
                                                                 hx-target="this"
-                                                                hx-swap="delete"
+                                                                hx-swap="delete swap:.25s"
                                                                 hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
                                                                 hx-select-oob="#question-count-field, #subject-field, #topic-field, #type-field, #blooms-level-field, #exam-question-field, #available-question-field, #score-count-field"
                                                                 class="toggle-button  {{ forRemoving == true ? 'text-red-800 hover:text-red-800/90 active:text-red-900' : 'text-blue-800 hover:text-blue-800/90 active:text-blue-900' }} cursor-pointer"
@@ -161,43 +161,39 @@
 {% endfor %}
 
 <script>
-let lastClickedButton = null;
 
 // On request config, store the button that triggered the request
 document.body.addEventListener('htmx:configRequest', (evt) => {
     lastClickedButton = evt.target;
+    row = lastClickedButton.closest('tr');
 
     // Disable all toggle buttons
     document.querySelectorAll('.toggle-button').forEach(button => {
+        button_row = button.closest('tr');
         button.disabled = true;
-        button.classList.add('opacity-50', 'pointer-events-none');
+        button_row.classList.add('pointer-events-none');
+        button.classList.add('opacity-50');
     });
-
-    // Add animation class immediately if you want
-    const row = lastClickedButton.closest('tr');
 });
 
 // In beforeSwap, use the stored button to add classes or control swap timing
 document.body.addEventListener('htmx:beforeSwap', (evt) => {
     if (!lastClickedButton) return;
 
-    const row = lastClickedButton.closest('tr');
     if (row) {
-        // Example: keep animation class (or do something else)
         row.classList.add('delete-tag-animation', 'opacity-50', 'pointer-events-none');
-
-        // If you want to delay swap until animation ends, do that here
-        // or just let it swap now.
     }
 
     // Reset stored button after swap if needed
     lastClickedButton = null;
 });
 
-document.addEventListener('htmx:afterRequest', function (evt) {
-    document.querySelectorAll('.toggle-button').forEach(b => {
-        b.disabled = false;
-        b.classList.remove('pointer-events-none', 'opacity-50');
+document.addEventListener('htmx:afterSettle', function (evt) {
+    document.querySelectorAll('.toggle-button').forEach(button => {
+        button_row = button.closest('tr');
+        button.disabled = false;
+        button_row.classList.remove('pointer-events-none');
+        button.classList.remove('opacity-50');
     });
 });
 </script>
@@ -216,16 +212,16 @@ document.addEventListener('htmx:afterRequest', function (evt) {
         <tbody>
             
             {% for row in rows %}
-                <tr class="{{ row.is_locked == false ? 'hover:bg-gray-100' : 'bg-gray-600' }} transition duration-150">                    
+                <tr class="{{ row.is_locked == false ? 'hover:bg-gray-100' : 'bg-gray-100 opacity-60' }} transition duration-150">                    
                     {% for cell, value in row %}
-                        {% if cell != 'id' and cell != 'is_locked' %}
-                            <td class="p-4 border-b border-gray-300 max-w-xs text-sm {{ row.is_locked != false ? 'text-gray-100' : 'text-gray-900' }}">
-                                <span class="block truncate">{{ value }}</span> 
+                        {% if cell != 'id' and cell != 'is_locked' and cell !='is_current' %}
+                            <td class="p-4 border-b border-gray-300 max-w-xs text-sm {{ row.is_locked != false ? 'text-gray-800' : 'text-gray-900' }}">
+                                <span class="block truncate {{ row.is_current ? 'text-blue-900 font-bold underline' }}">{{ value }}</span> 
                             </td>
                         {% endif %}
                     {% endfor %}
                         <td class="pl-4 border-b border-gray-300">
-                            {% if cell != 'is_locked' %}
+                        {% if not row.is_locked %}
                             <button type="button" 
                                     hx-get="{{ route('admin.academic-year.edit', {'academic_year': row.id}) }}"
                                     hx-trigger="click"
@@ -237,25 +233,27 @@ document.addEventListener('htmx:afterRequest', function (evt) {
                                         <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
                                     </svg>
                             </button>
-                            <button type="button" 
-                                    hx-get="{{ route('admin.academic-year.destroy-form', {'academic_year': row.id}) }}"
-                                    hx-trigger="click"
-                                    hx-target="#academic-year-form"
-                                    hx-swap="outerHTML"
-                                    popovertarget="create-academic-year-popover"
-                                    class="inline-flex w-fit text-red-900 cursor-pointer">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-6">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM6.75 9.25a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5h-6.5Z" clip-rule="evenodd" />
-                                            </svg>
+                                {% if not row.is_current %}
+                                    <button type="button" 
+                                            hx-get="{{ route('admin.academic-year.destroy-form', {'academic_year': row.id}) }}"
+                                            hx-trigger="click"
+                                            hx-target="#academic-year-form"
+                                            hx-swap="outerHTML"
+                                            popovertarget="create-academic-year-popover"
+                                            class="inline-flex w-fit text-red-900 cursor-pointer">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-6">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM6.75 9.25a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5h-6.5Z" clip-rule="evenodd" />
+                                                </svg>
 
-                            </button>
-                            {% else %}
+                                    </button>
+                                {% endif %}
+                        {% else %}
                             <span class="inline-flex w-fit text-gray-900">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
                                 <path fill-rule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clip-rule="evenodd" />
                                 </svg>
                             </span>
-                            {% endif %}
+                        {% endif %}
                         </td>
                 </tr>
             {% endfor %}

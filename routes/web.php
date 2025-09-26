@@ -235,8 +235,8 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     });
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/show', [ReportController::class, 'show'])->name('reports.show');
     Route::get('/reports/info', [ReportController::class, 'info'])->name('reports.info');
+    Route::get('/reports/{exam}', [ReportController::class, 'show'])->name('reports.show');
 
     Route::middleware('htmx.request:faculty.index')->group(function () {
         // Faculty Homepage

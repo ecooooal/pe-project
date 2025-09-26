@@ -366,16 +366,15 @@
 
     {% endif %}
 <script>
+let lastClickedButton = null;
+let row = null;
 document.addEventListener('DOMContentLoaded', () => {
-    // Variable to store the IDs of all open details tags
     let openDetailsState = [];
 
-    // Capture the state of all open details before an htmx request
     document.body.addEventListener('htmx:beforeRequest', (evt) => {
         openDetailsState = Array.from(document.querySelectorAll('details[open]')).map(details => details.id);
     });
 
-    // Re-apply the 'open' attribute after the htmx swap has completed
     document.body.addEventListener('htmx:afterSwap', (evt) => {
         if (openDetailsState.length > 0) {
             openDetailsState.forEach(id => {

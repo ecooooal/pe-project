@@ -160,7 +160,9 @@ class AccessControlController extends Controller
     public function indexAcademicYear(){
         $header = ['Academic Year Label', 'Start Date', 'End Date'];
 
-        $academic_year = AcademicYear::all();
+        $academic_year = AcademicYear::orderBy('start_date', 'desc')
+                        ->orderBy('end_date', 'desc')
+                        ->get();
         $current_academic_year = AcademicYear::current();
         $rows = $academic_year->map(function ($year) {
             return [
@@ -168,6 +170,7 @@ class AccessControlController extends Controller
                 'year_label' => $year->year_label,
                 'start_date' => Carbon::parse($year->start_date)->format('M d Y'),
                 'end_date' => Carbon::parse($year->end_date)->format('M d Y'),
+                'is_current' => $year->isCurrent(),
                 'is_locked' => $year->is_locked
             ];
         });
@@ -189,7 +192,7 @@ class AccessControlController extends Controller
              'year_label' => [
                 'required',
                 'string',
-                'max:255',
+                'max:9',
                 Rule::unique('academic_years', 'year_label'),
             ],
             'start_date' => 'required|date|after_or_equal:today',
@@ -220,23 +223,32 @@ class AccessControlController extends Controller
     }
 
     public function editAcademicYear(AcademicYear $academic_year){
+        $academic_year['is_current'] = $academic_year->isCurrent();
         return view('academic-year/edit', $academic_year);
     }
 
     public function updateAcademicYear(AcademicYear $academic_year){
+        if ($academic_year->is_locked) {
+            session()->flash('toast', json_encode([
+                'status' => 'UPDATING NOT ALLOWED',
+                'message' => 'Academic Year: ' . $academic_year->year_label,
+                'type' => 'warning'
+            ]));
+            return response('', 200)->header('HX-Redirect', route('admin.academic-year.index'));
+        }
         $validator = Validator::make(request()->post(), [
             'year_label' => [
-            'required',
-            'string',
-            'max:255',
+                'required',
+                'string',
+                'max:9',
                 Rule::unique('academic_years', 'year_label')->ignore($academic_year->id),
             ],
-            'start_date' => 'required|date|after_or_equal:today',
+            'start_date' => 'required|date|after_or_equal:today|sometimes',
             'end_date' => [
                 'required',
                 'date',
                 'after:start_date',
-                    new NoAcademicYearCollisions(request()->input('start_date'), $academic_year->id),
+                new NoAcademicYearCollisions(request()->input('start_date'), $academic_year->id),
             ],
         ]);
 
@@ -268,13 +280,18 @@ class AccessControlController extends Controller
 
         //  $this->authorize('delete', $academic_year);
 
-        // if (!$academic_year->is_locked) {
-        //     return back()->with('error', 'You cannot delete a locked Academic Year.');
-        // }
+        if ($academic_year->isCurrent() || $academic_year->is_locked) {
+            session()->flash('toast', json_encode([
+                'status' => 'DESTROYING NOT ALLOWED',
+                'message' => 'Academic Year: ' . $academic_year->year_label,
+                'type' => 'warning'
+            ]));
+            return response('', 200)->header('HX-Redirect', route('admin.academic-year.index'));
+        }
 
         session()->flash('toast', json_encode([
             'status' => 'Destroyed!',
-            'message' => 'Subject: ' . $academic_year->year_label,
+            'message' => 'Academic Year: ' . $academic_year->year_label,
             'type' => 'warning'
         ]));
 

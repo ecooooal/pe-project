@@ -18,28 +18,88 @@ class AcademicYear extends Model
     protected $casts = [
         'start_date' => 'date:Y-m-d',
         'end_date'   => 'date:Y-m-d',
+        'academic_year_interval' => 'string',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updating(function (AcademicYear $year) {
+            
+            if ($year->getOriginal('is_locked')) {
+                return false;
+            }
+
+            if ($year->isCurrent()) {
+                
+                if ($year->isDirty('start_date')) {
+                    return false;
+                }
+            }
+            
+        });
+
+        static::deleting(function (AcademicYear $year) {
+            
+            if ($year->is_locked) {
+                return false;
+            }
+
+            if ($year->isCurrent()) {
+                return false;
+            }
+
+        });
+    }
+
+    public function exams(){
+        return $this->hasMany(Exam::class, 'academic_year_id');
+    }
     
     public function scopeCurrent($query){
         return $query->where('start_date', '<=',  today())
                      ->where('end_date', '>=',  today())
                      ->where('is_locked', false);
     }
-    public static function current(){
-        return static::where('start_date', '<=',  today())
-                     ->where('end_date', '>=',  today())
+
+    public static function getCurrentAndLockPassed(): ?self
+    {
+        self::lockPassedYears(); 
+        return static::where('start_date', '<=', today())
+                     ->where('end_date', '>=', today())
                      ->first();
+    }
+    protected static function lockPassedYears(): int
+    {
+        $today = Carbon::today()->toDateString();
+
+        $query = static::where('is_locked', false)
+                       ->where('end_date', '<', $today);
+
+        if ($query->exists()) {
+            return $query->update(['is_locked' => true]);
+        }
+        return 0;
+    }
+    public static function current(){
+        return self::getCurrentAndLockPassed();
+    }
+
+    public function isCurrent(): bool
+    {
+        $today = today();
+        return $this->start_date->lte($today) && $this->end_date->gte($today);
+    }
+    public static function hasCurrent(): bool
+    {
+        return !is_null(self::current()); 
     }
      protected function academicYearInterval(): Attribute
     {
         return Attribute::get(function ($value, $attributes) {
-            // Get the year from the start_date (e.g., 2025)
             $startYear = Carbon::parse($attributes['start_date'])->year;
-            
-            // Get the year from the end_date (e.g., 2026)
             $endYear = Carbon::parse($attributes['end_date'])->year;
-
-            // Concatenate them to form the label
             return "{$startYear}-{$endYear}";
         });
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AcademicYear;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\ExamAccessCode;
@@ -71,15 +72,27 @@ class ExamController extends Controller
     }
 
     public function store(){
+        if (!AcademicYear::hasCurrent()) {
+
+            session()->flash('toast', json_encode([
+                'status' => 'SYSTEM IS ON MAINTENANCE',
+                'message' => 'Currently no Academic Year is set.',
+                'type' => 'warning'
+            ]));
+
+            return redirect()->route('exams.index');
+        } else {
+        $academic_year_id = AcademicYear::current()->id;
+        }
 
         $validated = request()->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:exams,name',
             'courses' => 'required|array|min:1',
             'courses.*' => 'exists:courses,id|required|string|distinct',
             'max_score' => 'required|integer|gte:1',
             'duration' => 'nullable|integer|min:1',
             'retakes' => 'nullable|integer|min:1',
-            'examination_date' => 'nullable|date|after_or_equal:now',
+            'examination_date' => 'nullable|date|after_or_equal:today',
             'passing_score' => 'required|integer|gte:1|max:100',
             'expiration_date' => 'nullable|date|after:now|after_or_equal:examination_date',
         ], [
@@ -93,6 +106,7 @@ class ExamController extends Controller
 
         $exam = Exam::create([
             'name' => request('name'),
+            'academic_year_id' => $academic_year_id,
             'max_score' => request('max_score'),
             'duration' => request('duration') ?? null,
             'retakes' => request('retakes') ?? null, 

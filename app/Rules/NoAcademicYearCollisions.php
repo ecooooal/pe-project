@@ -19,18 +19,19 @@ class NoAcademicYearCollisions implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
         {
-            $endDate = $value; // Use the value passed to the method
+            $endDate = $value;
+            $start_date_formatted = \Carbon\Carbon::parse($this->startDate)->toDateString();
+            $end_date_formatted = \Carbon\Carbon::parse($endDate)->toDateString();
 
-            $query = AcademicYear::where(function ($query) use ($endDate) {
-                $query->whereBetween('start_date', [$this->startDate, $endDate])
-                    ->orWhereBetween('end_date', [$this->startDate, $endDate])
-                    ->orWhere(function ($query) use ($endDate) {
-                        $query->where('start_date', '<=', $this->startDate)
-                                ->where('end_date', '>=', $endDate);
-                    });
-            });
+            $query = AcademicYear::where(function ($query) use ($start_date_formatted, $end_date_formatted) {
+                    $query->whereBetween('start_date', [$start_date_formatted, $end_date_formatted])
+                        ->orWhereBetween('end_date', [$start_date_formatted, $end_date_formatted])
+                        ->orWhere(function ($query) use ($start_date_formatted, $end_date_formatted) {
+                            $query->where('start_date', '<=', $start_date_formatted)
+                                    ->where('end_date', '>=', $end_date_formatted);
+                        });
+                });
 
-            // Ignore the current model if we are updating
             if ($this->idToIgnore) {
                 $query->where('id', '!=', $this->idToIgnore);
             }
