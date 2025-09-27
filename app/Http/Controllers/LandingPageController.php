@@ -148,7 +148,8 @@ class LandingPageController extends Controller
                 'id'             => $row[0],
                 'name'           => $row[1],
                 'question_type'  => $relabel_type[$row[2]] ?? ucfirst(str_replace('_', ' ', $row[2])),
-                'reused_count'   => $row[3],
+                'level' => $row[3],
+                'status'   => $row[4],
             ];
         })->toJson();
 

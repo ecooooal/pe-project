@@ -17,7 +17,7 @@
     {{ breadcrumb() }}
     {{ vite('resources/js/text-editor.js')|raw }}
 {% endif %}
-<form   id="test-code"
+<form   id="coding-form"
         {% if isEdit %}
             hx-patch="{{ route('questions.update', { question: question }) }}"
         {% else %}
@@ -25,7 +25,8 @@
         {% endif %}
         hx-redirect="/questions"
         hx-target="#name-form-error"
-        hx-select-oob="#instruction-form-error, #language-form-error, #syntax-points-form-error, #runtime-points-form-error, #test-case-points-form-error">
+        hx-select-oob="#instruction-form-error, #language-form-error, #syntax-points-form-error, #runtime-points-form-error, #test-case-points-form-error"
+        class="htmx-animate">
     {{ csrf_field() }}
     <input class="hidden" name="type" value="coding">
     <textarea class="hidden" name="supported_languages" id="code-input"></textarea>
@@ -117,12 +118,53 @@
                         )}}
                 </div>
                 <div id="name-form-error"></div>
-                <div class="flex flex-1 gap-x-4 w-full">
+                <div class="flex gap-x-1 justify-left items-center">
+                    <span class="pt-2 whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']">Question Level : </span>
+                    {% set values = {
+                        'remember' : '🧠 Remember', 
+                        'understand' : '📖 Understand',
+                        'apply' : '🛠️ Apply', 
+                        'analyze' : '🧩 Analyze',
+                        'evaluate' : '📝 Evaluate', 
+                        'create' : '🎨 Create'
+                    } %}
+
+                    {{ forms.form_field(
+                        input: forms.radio(
+                            name: 'question_level',
+                            values: values,
+                            value: level,
+                            attributes: {
+                                'class': 'opacity-0  -ml-[1rem]',
+                                'required' : true
+                            },
+                            label_attributes: {
+                                'class': 'flex items-center  gap-1 px-2 py-1 min-w-fit bg-gray-100 rounded-full cursor-pointer has-checked:bg-blue-100 has-checked:text-blue-900 has-checked:font-semibold text-xs'
+                            }))
+                    }}
+                    <div id="question-level-form-error" class="flex gap-x-4 justify-between"></div>
+                </div>
+                <div class="flex gap-1">
+                    <div class="flex justify-start items-center gap-x-2">
+                        <label  for="tag-input"
+                                class="whitespace-nowrap text-sm/6 font-medium text-gray-900 ">
+                            Optional tags :
+                        </label>                        
+                        <input  type="text" 
+                                id="tag-input" 
+                                placeholder="Type tag and press Enter"
+                                class="rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                    </div>
+                    <div id="tags-container" class="ml-1 flex flex-wrap w-full justify-start items-center" {% if isEdit == true %}  data-initial-tags="{{ optional_tags|json_encode|e('html_attr') }}" {% endif %}></div>
+                    <input type="hidden" name="optional_tags" id="optional-tags" />
+
+                </div>
+                <div id="points-forms" class="flex flex-1 gap-x-4 w-full">
                     <div class="flex flex-col flex-1">
                         {{ forms.form_field(
                             label:forms.label(
                                 id:'syntax_points', 
-                                content:'Syntax/Compiling Points', 
+                                content:'🟢 Syntax/Compiling Points', 
                                 attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
                                 ),
@@ -143,7 +185,7 @@
                            {{ forms.form_field(
                             label:forms.label(
                                 id:'runtime_points', 
-                                content:'Runtime Points', 
+                                content:'🟢 Runtime Points', 
                                 attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
                                 ),
@@ -164,7 +206,7 @@
                          {{ forms.form_field(
                             label:forms.label(
                                 id:'test_case_points', 
-                                content:'Test Case Points', 
+                                content:'🟢 Test Case Points', 
                                 attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
                                 ),
@@ -182,8 +224,74 @@
                         <div id="test-case-points-form-error"></div>
                     </div>
                 </div>
+                <div id="points-deduction-forms" class="flex flex-1 gap-x-4 w-full">
+                    <div class="flex flex-col flex-1">
+                        {{ forms.form_field(
+                            label:forms.label(
+                                id:'syntax_points_deduction', 
+                                content:'🔴 Syntax/Compiling Points Deduction Per Error', 
+                                attributes:{
+                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
+                                ),
+                            input:forms.number(
+                                name:'syntax_points_deduction', 
+                                value : isEdit ? question_type_data.syntax_points_deduction_per_error : '',
+                                attributes:{
+                                    'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                    'required': true,
+                                    'min':0,
+                                    'max':10,
+                                    'placeholder':'1 - 10 points'}),
+                            isColumn: true
+                        )}}
+                        <div id="syntax-points-deduction-form-error"></div>
+                    </div>
+                    <div class="flex flex-col flex-1">
+                           {{ forms.form_field(
+                            label:forms.label(
+                                id:'runtime_points_deduction', 
+                                content: '🔴 Runtime Points Deduction Per Error', 
+                                attributes:{
+                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
+                                ),
+                            input:forms.number(
+                                name:'runtime_points_deduction', 
+                                value : isEdit ? question_type_data.runtime_points_deduction_per_error : '',
+                                attributes:{
+                                    'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                    'required': true,
+                                    'min':0,
+                                    'max':10,
+                                    'placeholder':'1 - 10 points'}),
+                            isColumn: true
+                        )}}
+                        <div id="runtime-points-deduction-form-error"></div>
+                    </div>
+                    <div class="flex flex-col flex-1">
+                         {{ forms.form_field(
+                            label:forms.label(
+                                id:'test_case_points_deduction', 
+                                content:'🔴 Test Case Points Deduction Per Error', 
+                                attributes:{
+                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
+                                ),
+                            input:forms.number(
+                                name:'test_case_points_deduction', 
+                                value : isEdit ? question_type_data.test_case_points_deduction_per_error : '',
+                                attributes:{
+                                    'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                    'required': true,
+                                    'min':0,
+                                    'max':10,
+                                    'placeholder':'1 - 10 points'}),
+                            isColumn: true
+                        )}}
+                        <div id="test-case-points-deduction-form-error"></div>
+                    </div>
+                    
+                </div>
                 <div class="flex flex-1 rounded-t-md">
-                    <div class="flex flex-col flex-1 w-full overflow-auto ">
+                    <div class="flex flex-col flex-1 w-full ">
                         <div class="flex w-full bg-gray-800 p-2 rounded-t-md justify-between">
                             <h1 class="text-gray-50 p-2 font-semibold text-lg">
                                 Instruction
@@ -195,8 +303,9 @@
                             </button>
                             
                         </div>
-                            <div id="instruction-div" class="max-w-full w-full overflow-auto text-gray-500 border-1 border-gray-500 max-h-96">
-                        </div>
+                            <div id="instruction-div" class="htmx-animate max-w-full w-full text-gray-500 border-2 border-gray-500 max-h-[29rem]">
+                                
+                            </div>
                         <div id="instruction-form-error"></div>
                     </div>
                 </div>
@@ -205,9 +314,10 @@
         </div>
         <div class="flex flex-1 justify-between max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5 gap-x-4">
             <div class="flex flex-col flex-1 min-w-0  p-4 ">
-                <div class="flex h-16 pb-4 justify-between">
+
+                <div class="flex pb-4 justify-between">
                     <div class="flex items-center gap-x-2">
-                        {{ forms.form_field(
+                         {{ forms.form_field(
                             label:forms.label(
                                 id:'programming_language', 
                                 content:'Programming Language', 
@@ -222,39 +332,61 @@
                                     'hx-on:change':'switchLanguageFromEvent(event)',
                                     'required':true
                                 }
-                            )
+                            ),
+                            isColumn: true
                         )}}
                         <div id="language-form-error"></div>
                     </div>
-                    <div id="loader" class="htmx-indicator mx-auto transition-opacity duration-500 opacity-0 pointer-events-none">
+                    <div id="loader" class="htmx-indicator m-auto transition-opacity duration-500 opacity-0 pointer-events-none">
                         <img class="mr-10" width="50" src="{{ asset('images/bars-scale.svg') }}"/>
                     </div>
-                    <div class="flex">
-                        <button  form="validate-complete-solution-form"  type="submit" name="action" value="validate"
-                                class="flex items-center justify-start gap-x-1 cursor-pointer bg-orange-900 text-gray-200 hover:bg-orange-600 hover:text-white duration-300 rounded-lg p-2 text-sm font-semibold">
+                        <div id="button-actions" class="flex flex-col gap-y-2">
+                            <button form="validate-complete-solution-form" type="submit" name="action" value="compile"
+                                    class="flex items-center justify-start gap-x-1 cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 text-sm font-semibold
+                                        disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 disabled:fill-gray-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
-                                <path d="M11.625 16.5a1.875 1.875 0 1 0 0-3.75 1.875 1.875 0 0 0 0 3.75Z" />
-                                <path fill-rule="evenodd" d="M5.625 1.5H9a3.75 3.75 0 0 1 3.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 0 1 3.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 0 1-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875Zm6 16.5c.66 0 1.277-.19 1.797-.518l1.048 1.048a.75.75 0 0 0 1.06-1.06l-1.047-1.048A3.375 3.375 0 1 0 11.625 18Z" clip-rule="evenodd" />
-                                <path d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z" />
+                                <path fill-rule="evenodd" d="M12 6.75a5.25 5.25 0 0 1 6.775-5.025.75.75 0 0 1 .313 1.248l-3.32 3.319c.063.475.276.934.641 1.299.365.365.824.578 1.3.64l3.318-3.319a.75.75 0 0 1 1.248.313 5.25 5.25 0 0 1-5.472 6.756c-1.018-.086-1.87.1-2.309.634L7.344 21.3A3.298 3.298 0 1 1 2.7 16.657l8.684-7.151c.533-.44.72-1.291.634-2.309A5.342 5.342 0 0 1 12 6.75ZM4.117 19.125a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z" clip-rule="evenodd" />
+                                <path d="m10.076 8.64-2.201-2.2V4.874a.75.75 0 0 0-.364-.643l-3.75-2.25a.75.75 0 0 0-.916.113l-.75.75a.75.75 0 0 0-.113.916l2.25 3.75a.75.75 0 0 0 .643.364h1.564l2.062 2.062 1.575-1.297Z" />
+                                <path fill-rule="evenodd" d="m12.556 17.329 4.183 4.182a3.375 3.375 0 0 0 4.773-4.773l-3.306-3.305a6.803 6.803 0 0 1-1.53.043c-.394-.034-.682-.006-.867.042a.589.589 0 0 0-.167.063l-3.086 3.748Zm3.414-1.36a.75.75 0 0 1 1.06 0l1.875 1.876a.75.75 0 1 1-1.06 1.06L15.97 17.03a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
                                 </svg>
+                                    Compile Only
+                            </button>
 
-                                Validate Solution
-                        </button>
-                    </div>
+                            <button form="validate-complete-solution-form" type="submit" name="action" value="validate"
+                                    class="flex items-center justify-start gap-x-1 cursor-pointer bg-orange-900 text-gray-200 hover:bg-orange-600 hover:text-white duration-300 rounded-lg p-2 text-sm font-semibold
+                                        disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 disabled:fill-gray-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
+                                    <path d="M11.625 16.5a1.875 1.875 0 1 0 0-3.75 1.875 1.875 0 0 0 0 3.75Z" />
+                                    <path fill-rule="evenodd" d="M5.625 1.5H9a3.75 3.75 0 0 1 3.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 0 1 3.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 0 1-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875Zm6 16.5c.66 0 1.277-.19 1.797-.518l1.048 1.048a.75.75 0 0 0 1.06-1.06l-1.047-1.048A3.375 3.375 0 1 0 11.625 18Z" clip-rule="evenodd" />
+                                    <path d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z" />
+                                    </svg>
+
+                                    Validate Solution
+                            </button>
+
+                            <button form="validate-complete-solution-form" type="submit" name="action" value="check"
+                                    class="flex items-center justify-start gap-x-1 cursor-pointer bg-green-900 text-gray-200 hover:bg-green-600 hover:text-white duration-300 rounded-lg p-2 text-sm font-semibold
+                                        disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 disabled:fill-gray-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
+                                    <path fill-rule="evenodd" d="M10.5 3.798v5.02a3 3 0 0 1-.879 2.121l-2.377 2.377a9.845 9.845 0 0 1 5.091 1.013 8.315 8.315 0 0 0 5.713.636l.285-.071-3.954-3.955a3 3 0 0 1-.879-2.121v-5.02a23.614 23.614 0 0 0-3 0Zm4.5.138a.75.75 0 0 0 .093-1.495A24.837 24.837 0 0 0 12 2.25a25.048 25.048 0 0 0-3.093.191A.75.75 0 0 0 9 3.936v4.882a1.5 1.5 0 0 1-.44 1.06l-6.293 6.294c-1.62 1.621-.903 4.475 1.471 4.88 2.686.46 5.447.698 8.262.698 2.816 0 5.576-.239 8.262-.697 2.373-.406 3.092-3.26 1.47-4.881L15.44 9.879A1.5 1.5 0 0 1 15 8.818V3.936Z" clip-rule="evenodd" />
+                                    </svg>
+
+                                    Check Solution
+                            </button>
+                        </div>
                 </div>
-
                 <div id="validate-div"></div>
 
 
                 <div class="flex flex-col gap-y-4 mb-4">
                     <div class="flex flex-1 flex-col rounded-md">
                         <div class="flex w-full bg-gray-800 p-2 justify-between rounded-t-md">
-                            <button type="button" class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 cursor-pointer text-sm">Complete Solution</button>
-                            <button type="button" class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 cursor-pointer text-sm">Initial Solution</button>
+                            <span class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 text-sm">Complete Solution</span>
+                            <span class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 text-sm">Initial Solution</span>
                         </div>
                         <div class="flex">
-                            <div id="solution-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
-                            <div id="initial-solution-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
+                            <div id="solution-div" class="flex-1 min-h-48 max-h-96 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
+                            <div id="initial-solution-div" class="flex-1 min-h-96 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
                         </div>
                         <span class="text-xs font-semibold text-gray-800 cursor-default">*Validation is done by running the Complete Solution against the Test Case.</span>
                         <span class="text-xs font-semibold text-gray-800 cursor-default">*The code inside initial solution will be presented to students.</span>
@@ -262,10 +394,10 @@
                     </div>
                     <div class="flex flex-1 flex-col rounded-md">
                         <div class="flex w-full bg-gray-800 p-2 justify-between rounded-t-md">
-                            <button type="button" class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 cursor-pointer text-sm">Test Case</button>
+                            <span class="bg-gray-800 text-gray-50 font-semibold p-4 rounded-md hover:bg-gray-50 hover:text-gray-900 duration-300 text-sm">Test Case</span>
                         </div>         
                         <div class="flex">
-                            <div id="test-case-div" class="flex-1 min-h-48 max-h-48 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
+                            <div id="test-case-div" class="flex-1 min-h-48 max-h-96 overflow-y-auto text-gray-500 border-1 border-gray-500"></div>
                         </div>
                         <span class="text-xs font-semibold text-gray-800 cursor-default">*Scaffold programing languages codes for both student solution and sample test </span>
                     </div>
@@ -274,14 +406,15 @@
             </div>
         </div>
         <div class="flex gap-x-2">
-            <button form="test-code" type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm "
+            <button form="coding-form" type="submit" class="cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm "
                     hx-on:click="getSolutionCode(); getInstructionCode();">
                     {{ isEdit ? 'Edit' : 'Create' }}  Coding Question
             </button>
             <a href="{{ route('questions.index') }}" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">Cancel</a>
         </div>
     </div>
-</form>
+</form>    
+<div id="debug-popover-div"></div>            
 <form   id="preview-markdown-form"
         class="hidden"
         hx-post="/questions/create/preview-markdown"
@@ -295,18 +428,105 @@
 
 <form   id="validate-complete-solution-form"
         class="hidden"
-        hx-post="/questions/create/validate-complete-solution"
+        hx-post="{{ route('validate.coding.question') }}"
         hx-target="#validate-div"
         hx-swap="outerHTML"
-        hx-indicator="#loader" 
-        onsubmit="validateLanguageCompleteSolution()">
-    {{ csrf_field() }}
-    <textarea class="hidden" name="validate-complete-solution" id="validate-complete-solution-input" ></textarea>
-    <textarea class="hidden" name="validate-test-case" id="validate-test-case-input" ></textarea>
-    <input type="text" class="hidden" name="language-to-validate" id="language_to_validate-input">
+        hx-indicator="#loader"
+        hx-select-oob="#debug-popover-div"
+        
+        onsubmit="validateLanguageCompleteSolution(true)">
+        {{ csrf_field() }}
+        <!-- Settings -->
+        <input type="hidden" name="validate_syntax_points" id="validate_syntax_points_hidden">
+        <input type="hidden" name="validate_runtime_points" id="validate_runtime_points_hidden">
+        <input type="hidden" name="validate_test_case_points" id="validate_test_case_points_hidden">
+
+        <input type="hidden" name="validate_syntax_points_deduction" id="validate_syntax_points_deduction_hidden">
+        <input type="hidden" name="validate_runtime_points_deduction" id="validate_runtime_points_deduction_hidden">
+        <input type="hidden" name="validate_test_case_points_deduction" id="validate_test_case_points_deduction_hidden">
+
+        <textarea class="hidden" name="validate-complete-solution" id="validate-complete-solution-input" ></textarea>
+        <textarea class="hidden" name="validate-test-case" id="validate-test-case-input" ></textarea>
+        <input type="text" class="hidden" name="language-to-validate" id="language_to_validate-input">
 </form>
+<script>
+    
+    const tag_input = document.getElementById("tag-input");
+    const tag_container = document.getElementById("tags-container");
+    const tagsHiddenInput = document.getElementById('optional-tags');
+    const initial_tags = JSON.parse(tag_container.dataset.initialTags ?? '[]');
+    tags = new Set(initial_tags);  
+    tags.forEach(tag => addTag(tag));
+    updateHiddenInput();
+
+    tag_input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        const tag = tag_input.value.trim();
+        if (tag && !tags.has(tag)) {
+        addTag(tag);
+        tags.add(tag);
+        updateHiddenInput();
+        }
+        tag_input.value = "";
+    }
+    });
+
+    function addTag(tag) {
+    const tagEl = document.createElement("span");
+    tagEl.className = `
+    inline-flex 
+    items-center 
+    gap-1
+    pl-2 pr-1 
+    min-w-fit 
+    bg-blue-100 
+    rounded-full 
+    text-blue-900 
+    font-semibold 
+    text-xs 
+    select-none
+    mr-1 my-1
+    add-tag-animation
+    `;
+
+    tagEl.textContent = tag;
+
+    const closeBtn = document.createElement("button");
+    closeBtn.innerHTML = "&times;";
+    closeBtn.type = "button"; 
+    closeBtn.className = `
+    text-blue-900
+    text-sm 
+    font-bold 
+    cursor-pointer 
+    bg-transparent 
+    border-none
+    `;
+
+
+    closeBtn.addEventListener("click", () => {
+        tagEl.classList.add("delete-tag-animation");
+        
+        tagEl.addEventListener("animationend", () => {
+            tag_container.removeChild(tagEl);
+            tags.delete(tag);
+            updateHiddenInput();
+        });
+    });
+
+    tagEl.appendChild(closeBtn);
+        tag_container.appendChild(tagEl);
+    }
+
+    function updateHiddenInput() {
+    tagsHiddenInput.value = Array.from(tags).join(',');
+  }
+</script>
 {% if isEdit %}
 <script>
+
+
     window.instruction = JSON.parse('{{ question_type_data.instruction_raw|json_encode|e("js") }}');
     window.question_supported_languages = JSON.parse('{{ question_type_data.language_codes|json_encode|e("js") }}');
 </script>

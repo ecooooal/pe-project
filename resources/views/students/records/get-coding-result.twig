@@ -8,8 +8,8 @@
     {% else %}
         border-green-200 bg-green-50 text-green-800
     {% endif %} 
-    px-4 border-4 rounded-xl max-h-34 w-full overflow-hidden">
-    <div class="flex items-center gap-x-4">
+    flex flex-col max-w-none p-4 border-4 rounded-xl my-2">
+    <div class="flex items-center gap-x-8 h-48">
             <div class="flex justify-center items-center gap-x-2">
                 {% if data.failures or data.success == false %}
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-15 shrink-0 inline-block">
@@ -34,32 +34,9 @@
                         <pre class="text-gray-50 font-semibold text-xs">{{ failure }}</pre> 
                     {% endfor %}
                 {% else %}
-                    <div class="flex max-h-28 space-x-4 my-2">
+                    <div class="flex max-h-[10rem] space-x-4 my-2">
                     {% for class in data.test_results %}
                         {% for test in class.methods %}
-                            <div class="p-4 rounded-lg border {{ test.status != 'PASSED' ? 'border-yellow-400 bg-yellow-100' : 'border-green-400 bg-green-100' }}">
-                                <div class="flex items-center justify-between mb-2">
-                                    <p class="font-bold text-sm flex items-center gap-x-1 {{ test.status != 'PASSED' ? 'text-yellow-600' : 'text-green-600' }}">
-                                        {% if test.status != 'PASSED' %}
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
-                                        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
-                                        </svg>
-                                        {% else %}
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
-                                        <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
-                                        </svg>
-
-                                        {% endif %}
-                                        {{ test.status }}
-                                    </p>
-                                    <p class="font-mono font-bold text-sm mx-2 {{ test.status != 'PASSED' ? 'border-yellow-400 bg-yellow-100' : 'border-green-400 bg-green-100' }}">{{ test.methodName }}</p>
-                                </div>
-                                {% if test.status != 'PASSED' %}
-                                <pre class="whitespace-pre-wrap text-gray-700 text-xs">message : {{ test.message }}</pre>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-                            {% for test in class.methods %}
                             <div class="p-4 rounded-lg border {{ test.status != 'PASSED' ? 'border-yellow-400 bg-yellow-100' : 'border-green-400 bg-green-100' }}">
                                 <div class="flex items-center justify-between mb-2">
                                     <p class="font-bold text-sm flex items-center gap-x-1 {{ test.status != 'PASSED' ? 'text-yellow-600' : 'text-green-600' }}">

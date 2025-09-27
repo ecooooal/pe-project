@@ -12,7 +12,7 @@
 </div>
 
 <div class="flex flex-1 flex-col mx-16">
-    <form method="POST" hx-post="{{ route('questions.store') }}" hx-redirect="/questions" hx-target="#question-type-content" hx-select-oob="#name-form-error, #points-form-error, #topic" class="flex flex-col gap-y-4">
+    <form method="POST" hx-post="{{ route('questions.store') }}" hx-redirect="/questions" hx-target="#question-type-content" hx-select-oob="#name-form-error, #question-level-form-error, #topic" class="flex flex-col gap-y-4">
     {{ csrf_field() }}
         <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
             <div class="flex flex-col p-4 flex-1">
@@ -39,7 +39,21 @@
                             ),
                             isColumn:true 
                         )}}
-                        <a href="/questions/create/coding-question" class="text-xs text-blue-800 font-bold"><span>Create a Coding Question</span></a>
+                        <div class="flex items-center gap-x-2">
+                            <a href="/questions/create/coding-question" 
+                                id="double_click_coding_question"
+                                class="flex gap-x-1 items-center text-xs text-blue-800 font-bold hover:underline hover:text-blue-900">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
+                                <path fill-rule="evenodd" d="M6.28 5.22a.75.75 0 0 1 0 1.06L2.56 10l3.72 3.72a.75.75 0 0 1-1.06 1.06L.97 10.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Zm7.44 0a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L17.44 10l-3.72-3.72a.75.75 0 0 1 0-1.06ZM11.377 2.011a.75.75 0 0 1 .612.867l-2.5 14.5a.75.75 0 0 1-1.478-.255l2.5-14.5a.75.75 0 0 1 .866-.612Z" clip-rule="evenodd" />
+                                </svg>
+                                <span>
+                                    Create a Coding Question
+                                </span>
+                            </a>
+                            <small id="double_click_msg" class="text-gray-500 text-xs italic opacity-0 transition-opacity duration-300 pointer-event-none select-none">
+                                Double click to proceed
+                            </small>
+                        </div>
                         <div id="question-name-form">
                             {{ forms.form_field(
                                 label:forms.label(
@@ -60,7 +74,45 @@
                             <div id="name-form-error" class="flex gap-x-4 justify-between"></div>
 
                         </div>
+                        <div>
+                            <span class="whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']">Question Level</span>
+                            {% set values = {
+                                'remember' : '🧠 Remember', 
+                                'understand' : '📖 Understand',
+                                'apply' : '🛠️ Apply', 
+                                'analyze' : '🧩 Analyze',
+                                'evaluate' : '📝 Evaluate', 
+                                'create' : '🎨 Create'
+                            } %}
 
+                            {{ forms.form_field(
+                                input: forms.radio(
+                                    name: 'question_level',
+                                    values: values,
+                                    attributes: {
+                                        'class': 'opacity-0  -ml-[1rem]',
+                                        'required' : true
+                                    },
+                                    label_attributes: {
+                                        'class': 'flex items-center  gap-1 px-2 py-1 min-w-fit bg-gray-100 rounded-full cursor-pointer has-checked:bg-blue-100 has-checked:text-blue-900 has-checked:font-semibold text-xs'
+                                    }))
+                            }}
+                            <div id="question-level-form-error" class="flex gap-x-4 justify-between"></div>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <div class="flex justify-left items-center gap-x-2">
+                                <label  for="tag-input"
+                                        class="whitespace-nowrap text-sm/6 font-medium text-gray-900 ">
+                                    Optional tags:
+                                </label>                        
+                                <input  type="text" 
+                                        id="tag-input" 
+                                        placeholder="Type tag and press Enter"
+                                        class="rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                            </div>
+                            <div id="tags-container"></div>
+                            <input type="hidden" name="optional_tags" id="optional-tags" />
+                        </div>
                     </div>
                     <div class="flex flex-1/2 flex-col gap-y-4 w-full" hx-sync="this:queue">
                         {{ forms.form_field(
@@ -150,4 +202,91 @@
         </div>
     </form>
 </div>
+<script>
+    const input = document.getElementById("tag-input");
+    const container = document.getElementById("tags-container");
+    const tagsHiddenInput = document.getElementById('optional-tags');
+    const tags = new Set();  
+
+    input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        const tag = input.value.trim();
+        if (tag && !tags.has(tag)) {
+        addTag(tag);
+        tags.add(tag);
+        updateHiddenInput();
+        }
+        input.value = "";
+    }
+    });
+
+    function addTag(tag) {
+    const tagEl = document.createElement("span");
+    tagEl.className = `
+    inline-flex 
+    items-center 
+    gap-1
+    pl-2 pr-1 
+    min-w-fit 
+    bg-blue-100 
+    rounded-full 
+    text-blue-900 
+    font-semibold 
+    text-xs 
+    select-none
+    mr-1 my-1
+    add-tag-animation
+    `;
+
+    tagEl.textContent = tag;
+
+    const closeBtn = document.createElement("button");
+    closeBtn.innerHTML = "&times;";
+    closeBtn.type = "button"; 
+    closeBtn.className = `
+    text-blue-900
+    text-sm 
+    font-bold 
+    cursor-pointer 
+    bg-transparent 
+    border-none
+    `;
+
+    closeBtn.addEventListener("click", () => {
+        tagEl.classList.add("delete-tag-animation");
+        
+        tagEl.addEventListener("animationend", () => {
+            container.removeChild(tagEl);
+            tags.delete(tag);
+            updateHiddenInput();
+        });
+    });
+
+    tagEl.appendChild(closeBtn);
+        container.appendChild(tagEl);
+    }
+
+    function updateHiddenInput() {
+    tagsHiddenInput.value = Array.from(tags).join(',');
+  }
+
+const link = document.getElementById('double_click_coding_question');
+const msg = document.getElementById('double_click_msg');
+
+link.addEventListener('click', function(e) {
+  if (!this.dataset.clickedOnce) {
+    e.preventDefault();
+    this.dataset.clickedOnce = 'true';
+    this.style.opacity = 0.6;
+    msg.style.opacity = 1; 
+
+    setTimeout(() => {
+      this.dataset.clickedOnce = '';
+      this.style.opacity = 1;
+      msg.style.opacity = 0; 
+    }, 1000);
+  }
+});
+</script>
 {% endblock %}

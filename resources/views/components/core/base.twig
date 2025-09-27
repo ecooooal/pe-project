@@ -12,13 +12,21 @@
 
     {{ vite('resources/css/app.css')|raw }}
     {{ vite('resources/js/app.js')|raw }}
-
     <title>Thesis Project</title>
 
 </head>
 <body class="flex bg-[#fbfbfe]">
+    <div id="toast-container" class="fixed bottom-4 right-4 flex flex-col gap-2 z-[9999]"></div>
+    {% if session_has('toast') %}
+        <div id="server-toast" style="display:none;">
+            {{ session_get('toast') }}
+        </div>
+    {% endif %}
+
     {% block layout %}
 
     {% endblock %}
+    
 </body>
+
 </html>

@@ -40,7 +40,14 @@
             {{ show_header('Details') }}
             <div class="flex justify-between">
                 <div class="flex flex-col gap-y-4">
-                    {{ show_item('Course', subject.course.name) }}
+                    <div class="flex flex-wrap w-full gap-1">
+                        <p class="text-medium font-medium"> Course/s : </p>
+                        {% for course in subject.courses %}
+                        <span class=" inline-flex items-center px-2 py-0.5 min-w-fit  bg-blue-100 rounded-full text-blue-900 font-semibold text-xs select-none"> 
+                        {{ course.abbreviation }}
+                        </span>
+                        {% endfor %}
+                    </div>
                     {{ show_item('Year Level', subject.year_level) }}
                     {{ show_item('Current No. of Topics', subject.topics.count() )}}
                 </div>
@@ -50,9 +57,8 @@
             </div>
         </div>  
     </div>
-    <div class="mx-8">
+    <div id="pagination-div" class="mx-8">
         <div class="flex justify-between items-center w-full h-16 p-6 bg-white border-x border-t border-gray-300 rounded-t-2xl">
-            <span class="text-2xl font-semibold text-gray-900">Questions in this Subject</span>
             <span>Filter here</span>
         </div>
         <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
@@ -60,7 +66,7 @@
 
         </div>
         <div class="flex justify-end items-center w-full h-16 p-6 bg-white border-x border-b border-gray-300 rounded-b-2xl">
-            {{ questions.onEachSide(3).links() }}
+            {{ models.onEachSide(3).links() }}
         </div>
     </div>
 </div>

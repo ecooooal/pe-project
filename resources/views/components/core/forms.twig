@@ -2,8 +2,9 @@
   <input name="{{ name }}" type="{{ type }}" value="{{ value }}"{% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %}{% if not attributes.id is defined %} id="{{ name }}"{% endif %}/>
 {% endmacro %}
 
-{% macro label(id, content, attributes) %}
+{% macro label(id, content, attributes, icon = null) %}
   <label for="{{ id }}"{% for attr, value in attributes %} {{ attr }}="{{ value }}"{% endfor %}>
+    {{ icon|raw }}
     {{ content|e }}
   </label>
 {% endmacro %}
@@ -35,6 +36,11 @@
 {% macro date(name, value, attributes) %}
   {% from _self import input %}
   {{ input(name, value, "date", attributes) }}
+{% endmacro %}
+
+{% macro datetime(name, value, attributes) %}
+  {% from _self import input %}
+  {{ input(name, value, "datetime-local", attributes) }}
 {% endmacro %}
 
 {% macro number(name, value, attributes) %}

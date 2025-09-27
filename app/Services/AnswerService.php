@@ -169,7 +169,10 @@ class AnswerService
             'testUnit' => $test_case->getTestCase(),
             'syntax_points' => $question_type->syntax_points,
             'runtime_points' => $question_type->runtime_points,
-            'test_case_points' => $question_type->test_case_points
+            'test_case_points' => $question_type->test_case_points,
+            'syntax_points_deduction' => $question_type->syntax_points_deduction_per_error,
+            'runtime_points_deduction' => $question_type->runtime_points_deduction_per_error,
+            'test_case_points_deduction' => $question_type->test_case_points_deduction_per_error,
         ];
         
         Redis::hmset($key, $data);

@@ -1,4 +1,4 @@
-<div class="bg-white border border-gray-300 rounded-lg shadow-sm p-4 min-w-72 max-w-80 mb-4">
+<div class="bg-white border border-gray-300 rounded-lg shadow-sm p-4 min-w-72 max-w-80 mb-4 transition duration-300 hover:scale-105">
 
     <div class="w-4 h-4 bg-blue-900 rounded-full shadow-md ring-2 ring-gray-300 z-10 mb-1"></div>
     <div class="flex flex-col p-1">
@@ -18,20 +18,17 @@
         <div>
         <span class="font-semibold">Time Taken:</span><br> {{ record.time_taken }}
         </div>
-        <div>
-        <span class="font-semibold">Status:</span>
-        <span class="text-green-600 font-semibold">{{ record.status }}</span>
-        </div>
-        <div>
-        <span class="font-semibold">Date Taken: </span><br> {{ record.date_taken|date('F d Y') }}
-        </div>
-    </div>
-
-    <div class="mt-4 flex justify-start">
-        <a href="{{ route('exam_records.show', { exam: record.studentPaper.exam, exam_record: record}) }}" class="bg-blue-900 text-white text-sm font-semibold px-4 py-2 rounded hover:bg-blue-700 transition">
+            <div class="flex items-center">
+        <a href="{{ route('exam_records.show', { exam: record.studentPaper.exam, exam_record: record}) }}" class="bg-blue-900 text-white text-xs font-semibold p-2 rounded hover:bg-blue-700 transition">
         Visit This Record
         </a>
     </div>
+        <div>
+        <span class="font-semibold">Date Taken: </span><br> {{ record.date_taken|date('M d Y') }}
+        </div>
+    </div>
+
+
     </div>
     
 </div>

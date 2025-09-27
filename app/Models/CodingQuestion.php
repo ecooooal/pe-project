@@ -11,7 +11,10 @@ class CodingQuestion extends Model
         'instruction',
         'syntax_points',
         'runtime_points',
-        'test_case_points'
+        'test_case_points',
+        'syntax_points_deduction_per_error',
+        'runtime_points_deduction_per_error',
+        'test_case_points_deduction_per_error'
     ];
 
     public function question(){

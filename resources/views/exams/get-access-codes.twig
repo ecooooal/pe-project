@@ -1,14 +1,57 @@
-<tbody  hx-get="/exams/{{ exam.id }}/edit/get_access_codes"
-        hx-trigger="mouseenter, click[event.target.id === 'save-access-code-button'] from:body"
+<tbody  hx-get="{{ route('accesscodes.get', { exam: exam } )}}"
+        hx-trigger="mouseenter throttle:10s"
         hx-target="this"
         hx-swap="outerHTML"
-        hx-sync="#save-access-code-button">
+        hx-sync="#save-access-code-button"
+        id="access-code-body">
 {% for code in access_codes %}
-    <tr class="border-t border-gray-900/10 text-center hover:bg-blue-50">
+    <tr id="{{ code.access_code }}-row" class="border-t border-gray-900/10 text-center ">
         <td 
-            class="px-4 py-2 font-mono cursor-pointer select-all">
+            class="copyable w-[90%] px-4 py-2 font-mono cursor-pointer select-all hover:bg-blue-50">
             {{ code.access_code }}
+        </td>
+        <td 
+            class="flex w-full justify-center items-center">
+            <button type="button" 
+                    hx-delete="{{ route('accesscodes.destroy', { exam: exam } )}}" 
+                    hx-confirm="Are you sure?" 
+                    hx-target="closest tr" 
+                    hx-swap="outerHTML swap:1s"
+                    hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
+                    hx-vals='{ "code" : "{{code.access_code}}" }'
+                    class="flex text-xl font-bold text-red-700 hover:text-red-500 transition-colors cursor-pointer items-center">
+                    X
+            </button>
         </td>
     </tr>
 {% endfor %}
+
 </tbody>
+<script>
+document.querySelector("#access-code-body").addEventListener("click", function (e) {
+    const access_code_cell = e.target.closest("td.copyable");
+    if (!access_code_cell) return;
+
+        const text_to_copy = access_code_cell.textContent.trim();
+        navigator.clipboard.writeText(text_to_copy).then(() => {
+        Toast.show({
+            status: "Copied",
+            message: text_to_copy,
+            type: "success"
+    });
+    }).catch(err => {
+        console.error("Copy failed:", err);
+        Toast.show({
+            status: "Error",
+            message: "Failed to copy text",
+            type: "error"
+        });
+    });
+    });
+
+
+
+</script>
+
+
+

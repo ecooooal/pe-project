@@ -11,8 +11,30 @@
 <div class="flex flex-col mx-4 pl-4">
     <h1 class="font-bold text-4xl">{{ question.name }}</h1>
     <div class="flex flex-col gap-y-0.5 my-1">
-        <span class="pl-2 text-xs text-gray-400 font-semi">Course : {{ question.topic.subject.course.abbreviation }}</span>
-        <span class="pl-2 text-xs text-gray-400 font-semi">ID : {{ question.id }}</span>
+        <div class="flex flex-wrap w-full pl-2 gap-0.5">
+                <span class="text-xs text-gray-400 font-semibold">Course/s : </span>
+                {% for course in question.topic.subject.courses %}
+                <span class=" inline-flex items-center px-2 py-0.5 min-w-fit  bg-gray-300 rounded-full text-gray-700 font-semibold text-xs select-none"> 
+                {{ course.abbreviation }}
+                </span>
+                {% endfor %}
+        </div>        
+        <span class="pl-2 text-xs text-gray-400 font-semibold">Subject : {{ question.topic.subject.name }}</span>
+        <span class="pl-2 text-xs text-gray-400 font-semibold">ID : {{ question.id }}</span>
+        {% if optional_tags is not empty %}
+        <div class="flex flex-wrap w-full pl-1 gap-0.5">
+                {% for tag in optional_tags %}
+                <span class=" inline-flex items-center px-2 py-0.5 min-w-fit  bg-blue-100 rounded-full text-blue-900 font-semibold text-xs select-none"> 
+                {{ tag }}
+                </span>
+                {% endfor %}
+        </div>
+        {% endif %}
+        {% if is_in_exam %}
+        <span class="ml-1 mt-1 inline-flex items-center px-2 py-1 max-w-fit  bg-green-100 rounded-full text-green-900 font-semibold text-xs select-none"> 
+        ✔ Currently In Exam/s
+        </span>        
+        {% endif %}
     </div>
 </div>
 <div class="flex flex-1 flex-col gap-y-4">
@@ -46,6 +68,8 @@
                 </div>
                 <div class="flex flex-col mr-16 gap-y-4">
                     {{ show_item('Author', question.author.getFullName()  )}}
+                    {{ show_item('Level', question_level, value_attributes:'px-2 py-0.5 min-w-fit bg-blue-100 rounded-full text-blue-900 font-semibold select-none'  )}}
+
                 </div>
             </div>
         </div>  
@@ -57,10 +81,12 @@
                     hx-target="this"
                     hx-trigger="load"
                     hx-select="#{{ question.question_type.name }}-content"
-                    hx-swap="innerHTML transition:true">
+                    hx-swap="innerHTML">
             </div>
     </div>
+
 
 </div>
 
 {% endblock %}
+

@@ -13,11 +13,23 @@
 <div class="flex flex-col mx-4 pl-4">
     <h1 class="font-bold text-4xl">{{ topic.name }}</h1>
     <div class="flex flex-col pt-1 gap-y-0.5">
-        <a href="{{ route('subjects.show', { subject:topic.subject.id } ) }}">
-            <span class="pl-2 text-xs text-gray-400 font-semibold hover:text-blue-900 hover:underline duration-150">Subject : {{ topic.subject.name }}</span>
-        </a>
-        <span class="pl-2 text-xs text-gray-400 font-semibold">Course : {{ topic.subject.course.abbreviation }}</span>
+        <div class="flex flex-wrap w-full pl-2 gap-1">
+                <span class="text-xs text-gray-400 font-semibold">Course/s : </span>
+                {% for course in topic.subject.courses %}
+                <span class=" inline-flex items-center px-2 py-0.5 min-w-fit  bg-gray-300 rounded-full text-gray-700 font-semibold text-xs select-none"> 
+                {{ course.abbreviation }}
+                </span>
+                {% endfor %}
+        </div>   
+        <a href="{{ route('subjects.show', { subject:topic.subject.id } ) }}" class="max-w-fit">
+            <span class="pl-2 text-xs  text-gray-400 font-semibold hover:text-blue-900 hover:underline duration-150">Subject : {{ topic.subject.name }}</span>
+        </a>          
         <span class="pl-2 text-xs text-gray-400 font-semibold">ID : {{ topic.id }}</span>
+        {% if questions_are_in_exams %}
+        <span class="ml-1 mt-1 inline-flex items-center px-2 py-1 max-w-fit  bg-green-100 rounded-full text-green-900 font-semibold text-xs select-none"> 
+        ✔ Currently In Exam/s
+        </span>        
+        {% endif %}
     </div>
 </div>
 
@@ -50,17 +62,18 @@
             </div>
         </div>  
     </div>
-    <div class="mx-8">
+    <div id="pagination-div" class="mx-8">
         <div class="flex justify-between items-center w-full h-16 p-6 bg-white border-x border-t border-gray-300 rounded-t-2xl">
             <span class="text-2xl font-semibold text-gray-900">Questions in this Topic</span>
             <span>Filter here</span>
         </div>
         <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
-            {{ table(headers,rows:rows, url:'questions') }}
+            
+            {{ table(headers:headers, rows:rows, url:url) }}
 
         </div>
         <div class="flex justify-end items-center w-full h-16 p-6 bg-white border-x border-b border-gray-300 rounded-b-2xl">
-            {{ questions.onEachSide(3).links() }}
+            {{ models.onEachSide(3).links() }}
         </div>
     </div>
 </div>

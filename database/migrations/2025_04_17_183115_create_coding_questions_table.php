@@ -19,6 +19,9 @@ return new class extends Migration
             $table->unsignedTinyInteger('syntax_points');
             $table->unsignedTinyInteger('runtime_points');
             $table->unsignedTinyInteger('test_case_points');
+            $table->unsignedTinyInteger('syntax_points_deduction_per_error');
+            $table->unsignedTinyInteger('runtime_points_deduction_per_error');
+            $table->unsignedTinyInteger('test_case_points_deduction_per_error');
             $table->timestamps();
         });
     }

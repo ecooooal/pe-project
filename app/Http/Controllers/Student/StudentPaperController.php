@@ -42,6 +42,9 @@ class StudentPaperController extends Controller
         })->count();
 
         session(['current_attempt' => $attempt_count + 1]);
+        $question_to_show = $this->examTakingService->getCurrentQuestion($student_paper);
+        $question_to_show_id = $question_to_show['question']->id;
+        session(['question_to_answer' => $question_to_show_id]);
 
         $data = [
             'student_paper' => $student_paper,  
