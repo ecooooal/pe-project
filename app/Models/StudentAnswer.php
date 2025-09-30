@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\QuestionType;
 use Illuminate\Database\Eloquent\Model;
 
 class StudentAnswer extends Model
@@ -40,5 +41,18 @@ class StudentAnswer extends Model
 
     public function codingAnswer(){
         return $this->hasOne(CodingAnswer::class);
+    }
+
+    public function getTypeModel()
+    {                
+        return match ($this->question_type) {
+            QuestionType::MultipleChoice => $this->multipleChoiceAnswer,
+            QuestionType::TrueOrFalse => $this->trueOrFalseAnswer,
+            QuestionType::Identification => $this->identificationAnswer,
+            QuestionType::Ranking => $this->rankingAnswers,
+            QuestionType::Matching => $this->matchingAnswers,
+            QuestionType::Coding => $this->codingAnswer,
+            default => null,
+        };
     }
 }

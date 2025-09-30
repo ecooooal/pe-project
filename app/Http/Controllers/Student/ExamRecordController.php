@@ -44,18 +44,18 @@ class ExamRecordController extends Controller
 
         // AGGREGATE student points by subjects, get subject id, subject name, sum of student points for that subject, sum of obtainable points for subject
         $subject_table = DB::table('student_answers')
-        ->join('questions', 'student_answers.question_id', '=', 'questions.id')
-        ->join('topics', 'questions.topic_id', '=', 'topics.id')
-        ->join('subjects', 'topics.subject_id', '=', 'subjects.id')
-        ->where('student_answers.student_paper_id', $student_paper->id)
-        ->groupBy('subjects.id', 'subjects.name')
-        ->select(
-            'subjects.id as id',    
-            'subjects.name as subject_name',
-            DB::raw('SUM(student_answers.points) as subject_score_obtained'),
-            DB::raw('SUM(questions.total_points) as subject_score'))
-        ->get()
-        ->keyBy('id');
+            ->join('questions', 'student_answers.question_id', '=', 'questions.id')
+            ->join('topics', 'questions.topic_id', '=', 'topics.id')
+            ->join('subjects', 'topics.subject_id', '=', 'subjects.id')
+            ->where('student_answers.student_paper_id', $student_paper->id)
+            ->groupBy('subjects.id', 'subjects.name')
+            ->select(
+                'subjects.id as id',    
+                'subjects.name as subject_name',
+                DB::raw('SUM(student_answers.points) as subject_score_obtained'),
+                DB::raw('SUM(questions.total_points) as subject_score'))
+            ->get()
+            ->keyBy('id');
 
         $total_score = $subject_table->sum('subject_score_obtained');
         $date_taken = $student_paper->created_at;
@@ -100,16 +100,16 @@ class ExamRecordController extends Controller
 
             if ($score == $exam->max_score) {
                 $status = 'perfect_score';
-            } elseif ($score >= $exam->max_score/2) {
+            } elseif ($score >= $exam->max_score * ($exam->passing_score / 100)) {
                 $status = 'pass';
             } else {
                 $status = 'more_review';
             }
 
             $exam_record->update(['status' => $status]);
+            $student_paper->update(['status'  => 'completed']);
         }
 
-        $student_paper->update(['status'  => 'completed']);
         
 
         return response('', 204)->header('HX-Redirect', route('exam_records.show', ['exam' => $exam, 'exam_record' => $exam_record]));
@@ -182,7 +182,7 @@ class ExamRecordController extends Controller
                 'score' => $answer->points ?? 0,
                 'max_score' => $question->total_points,
                 'status' => ($answer->gained_points >= $question->points) ? 'Correct' : 'Incorrect',
-                'question_type_answer' => $question_type_answer ?? null,
+                'question_type_answer' => $question_type_answer ?? null
             ];
         }
 
@@ -221,8 +221,13 @@ class ExamRecordController extends Controller
 
     public function showUpdatedScore(ExamRecord $examRecord){
         if ($examRecord->status != 'in_progress'){
+            $student_paper = StudentPaper::findOrFail($examRecord->student_paper_id);
             $examRecord->load('subjects');
+        
             $examRecord['max_score'] = request()->input('max_score');
+
+            $student_paper->update(['status'  => 'completed']);
+
             return view('students/records/get-updated-score', ['exam_record' => $examRecord]);
         } else {
             return response('', 212);

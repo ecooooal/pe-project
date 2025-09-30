@@ -47,7 +47,11 @@ class ExamTakingService
 
     public function getAttemptsLeft(Exam $exam, User $user){
         $get_student_paper_count = $user->exams()->where('exam_id', $exam->id)->withCount('studentPapers')->first()->student_papers_count;
-        $attempt_left = max(0, $exam->retakes - $get_student_paper_count);
+        if ($exam->retakes == null){
+            $attempt_left = 99;
+        } else {
+            $attempt_left = max(0, $exam->retakes - $get_student_paper_count);
+        }
         return $attempt_left;
     }
 

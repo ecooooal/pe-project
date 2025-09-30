@@ -176,7 +176,6 @@ class AnswerService
         ];
         
         Redis::hmset($key, $data);
-        Redis::expire($key, 3600);
 
         return ['total_points' => $this->total_points, 'is_correct' => $this->is_correct];
     }
