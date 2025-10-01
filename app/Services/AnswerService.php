@@ -216,7 +216,12 @@ class AnswerService
         $oldHash = Redis::get($key);
 
         if (!$oldHash || $hash !== $oldHash) {
+            if ($student_answer['is_answered']){
+                $student_answer->update(['last_answered_at' => now()]);
+            };
+
             Redis::setex($key, 3600, $hash);
+            
             return true; 
         }
         return false;

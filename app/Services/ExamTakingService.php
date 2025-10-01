@@ -153,10 +153,16 @@ class ExamTakingService
             } 
         }
 
+
         $question_data = [
             'question' => $question,
             'question_type_data' => $filtered_question_type
         ];
+        
+        if($student_answer->first_viewed_at == null){
+            $student_answer->update(['first_viewed_at' => now()]);
+        }
+
         return $question_data;
     }
 

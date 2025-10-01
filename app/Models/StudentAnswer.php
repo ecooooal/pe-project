@@ -13,7 +13,9 @@ class StudentAnswer extends Model
         'points',
         'is_answered',
         'is_correct',
-        'answered_at'
+        'first_viewed_at',
+        'first_answered_at',
+        'last_answered_at'
     ];
 
     public function studentPaper(){

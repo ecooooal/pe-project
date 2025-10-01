@@ -41,7 +41,6 @@ class StudentPaper extends Model
         return $this->hasMany(StudentAnswer::class);
     }
 
-    // --- WARNING: Synchronous processing in 'booted' is discouraged (see notes below) ---
     protected static function booted()
     {
         self::updated(static function (StudentPaper $studentPaper) {

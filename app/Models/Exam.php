@@ -59,6 +59,20 @@ class Exam extends Model
                     ->withTimestamps();
     }
 
+    public function takers()
+    {
+        return $this->hasManyThrough(
+            \App\Models\User::class,         
+            \App\Models\StudentPaper::class, 
+            'exam_id',                       
+            'id',                           
+            'id',                            
+            'user_id'                        
+        )
+        ->where('student_papers.status', 'completed') 
+        ->distinct()->get();
+    }
+
     public function createdBy(){
         return $this->belongsTo(User::class, 'created_by');
         }

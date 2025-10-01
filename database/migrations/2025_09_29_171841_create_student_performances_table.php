@@ -24,10 +24,15 @@ return new class extends Migration
             $table->foreignIdFor(StudentPaper::class, 'student_paper_id')->constrained();
             $table->unsignedTinyInteger('attempt');
             $table->foreignIdFor(User::class, 'user_id')->constrained();
+
             $table->foreignIdFor(Course::class, 'course_id')->constrained();
             $table->foreignIdFor(Subject::class, 'subject_id')->constrained();
             $table->foreignIdFor(Topic::class, 'topic_id')->constrained();
             $table->foreignIdFor(Question::class, 'question_id')->constrained();
+
+            $table->string('course_abbreviation');
+            $table->string('subject_name');
+            $table->string('topic_name');
             $table->text('question_name');
             $table->enum('question_type', [
                 'multiple_choice',
@@ -39,7 +44,14 @@ return new class extends Migration
             ]);
             $table->string('question_level');   
             $table->unsignedTinyInteger('question_points');
+
+            $table->boolean('is_answered')->default(false);
+            $table->boolean('is_correct')->default(false);
             $table->unsignedTinyInteger('points_obtained')->default(0);
+            $table->timestamp('first_viewed_at')->nullable();
+            $table->timestamp('first_answered_at')->nullable(); 
+            $table->timestamp('last_answered_at')->nullable(); 
+
             $table->timestamps();
 
             $table->index(['attempt']); 

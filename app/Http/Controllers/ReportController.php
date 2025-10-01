@@ -3,18 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Exam;
+use App\Services\ExamService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
 
 class ReportController extends Controller
 {
     protected $userService;
+    protected $examService;
 
-    public function __construct(UserService $userService)
+    public function __construct(UserService $userService, ExamService $examService)
     {
         $this->userService = $userService;
+        $this->examService = $examService;
     }
+
     public function index(){
         $courseIds = $this->userService->getCoursesForUser(auth()->user())->pluck('id');
         $exams = Exam::with(['courses', 'questions'])
@@ -30,10 +35,40 @@ class ReportController extends Controller
     }
 
     public function show(Exam $exam){
-        $exam->load(['questions','courses']);
+        $exam->load('courses');
 
         return view('reports/show', ['exam' => $exam]);
 
+    }
+
+    public function create(Exam $exam){
+        $topics = $this->examService->getTopicsForExam($exam)->count();
+        $subjects = $this->examService->getSubjectsForExam($exam)->count();
+        $questions =  $exam->questions()->count();
+        $enrolled_students = $exam->users()->count();
+        $students_that_took_exam = $exam->takers()->count();
+        $data = [
+            'exam' => $exam,
+            'subjects' => $subjects,
+            'topics' => $topics,
+            'questions' =>$questions,
+            'students' => $enrolled_students,
+            'takers' => $students_that_took_exam
+        ];
+
+        return view('reports/create', $data);
+    }
+
+    public function store(Exam $exam){
+        $response = Http::timeout(30)
+            ->get("http://fastapi:80/api/reports/create-store/{$exam->id}");
+        if ($response->successful()) {
+            $data = $response->json();
+            dd($data);
+            return $data;
+        }
+        dd($response);
+        return response('', 200)->header('HX-Redirect', route('reports.show', ['exam' => $exam]));
     }
 
     public function info(){

@@ -64,16 +64,26 @@ class ProcessStudentPerformanceJob implements ShouldQueue
                 'student_paper_id' => $this->studentPaper->id,
                 'attempt' => $exam_record->attempt,
                 'user_id' => $student->id,
+
                 'course_id' => $student_course->id,
                 'subject_id' => $subject->id,
                 'topic_id' => $topic->id,
                 'question_id' => $question->id,
+                'course_abbreviation' => $student_course->abbreviation,
+                'subject_name' => $subject->name,
+                'topic_name' => $topic->name,
                 'question_name' => $question->name,
                 'question_type' => $question->question_type,
-                
-                'question_points' => $question->total_points ?? 0, 
                 'question_level' => $question_level,
+                'question_points' => $question->total_points ?? 0, 
+
+                'is_answered' => $answer->is_answered,
+                'is_correct' => $answer->is_correct,
                 'points_obtained' => $points_obtained,
+                'first_viewed_at' => $answer->first_viewed_at,
+                'first_answered_at' => $answer->first_answered_at,
+                'last_answered_at' => $answer->last_answered_at,
+
                 'created_at' => now(), 
                 'updated_at' => now(), 
             ];

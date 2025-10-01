@@ -291,6 +291,8 @@ const customColorScale = [
   [1.0, 'rgb(49,130,189)']
 ];
 
+console.log(transposedScores);
+
 const data = [{
   z: transposedScores,
   x: studentGroups,
@@ -464,6 +466,8 @@ function renderBarChartCompareTypesWithLevels(data){
         });
     });
 
+    console.log(data);
+
     const exam_compare_types_and_blooms_layout = {
         title: {
             text: "Compare by Question Types with Bloom's Level",
@@ -568,6 +572,7 @@ function renderBarChartCompareTypesWithLevelsDistribution(data){
         });
 }
 function renderHeatStripQuestions(data){
+    console.log(data);
     var question_heatmap_traces = Object.keys(data).map(level => {
         let qData = data[level].sort((a, b) => a.average_percentage - b.average_percentage);
             return {
