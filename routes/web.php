@@ -10,6 +10,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\Student\ExamRecordController;
 use App\Http\Controllers\Student\StudentAnswerController;
 use App\Http\Controllers\Student\StudentPaperController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\Student\ExamController as StudentExamController;
@@ -251,9 +252,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
 
     });
 
-    Route::get('/notifications', function(){
-        return view('notifications');
-    });
+    Route::get('/notifications', [NotificationController::class, 'index']);
 
     Route::get('/settings', function(){
         return view('settings');
