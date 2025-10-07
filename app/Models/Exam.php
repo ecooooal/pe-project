@@ -38,6 +38,10 @@ class Exam extends Model
     {
         return $this->belongsToMany(Course::class);
     }
+
+    public function reports() {
+        return $this->hasMany(Report::class);
+    }
     
 
     public function accessCodes() {
@@ -72,6 +76,8 @@ class Exam extends Model
         ->where('student_papers.status', 'completed') 
         ->distinct()->get();
     }
+
+
 
     public function createdBy(){
         return $this->belongsTo(User::class, 'created_by');

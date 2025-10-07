@@ -236,37 +236,44 @@ class ExamRecordController extends Controller
 
     private static function storeCodeToJSON($user_id, $student_paper_id){
         $pattern = "user:$user_id:paper:$student_paper_id:language:*:answer:*:code";
-        $student_paper_date = StudentPaper::find($student_paper_id)->submitted_at;
-        $student_paper_submitted_at_unix = (String) Carbon::parse($student_paper_date)->timestamp;
-        $key = $student_paper_submitted_at_unix . '-' . $user_id;
+        // $student_paper_date = StudentPaper::find($student_paper_id)->submitted_at;
+        // $student_paper_submitted_at_unix = (String) Carbon::parse($student_paper_date)->timestamp;
+        // $key = $student_paper_submitted_at_unix . '-' . $user_id;
 
         $keys = Redis::keys($pattern); 
-        $values = Redis::mget($keys);
+        // $values = Redis::mget($keys);
         $data = [];
 
         foreach ($keys as $index => $key) {
+            try {
+                $hashData = Redis::hgetall($key);
 
-            preg_match('/paper:([^:]+)/', $key, $student_paper_matches);
-            $student_paper_id = (int)$student_paper_matches[1] ?? null;
+                preg_match('/paper:([^:]+)/', $key, $student_paper_matches);
+                $student_paper_id = (int)$student_paper_matches[1] ?? null;
 
-            preg_match('/language:([^:]+)/', $key, $language_matches);
-            $language = $language_matches[1] ?? null;
+                preg_match('/language:([^:]+)/', $key, $language_matches);
+                $language = $language_matches[1] ?? null;
 
-            preg_match('/answer:(\d+)/', $key, $answer_matches);
-            $answer_id = isset($answer_matches[1]) ? (int)$answer_matches[1] : null;
+                preg_match('/answer:(\d+)/', $key, $answer_matches);
+                $answer_id = isset($answer_matches[1]) ? (int)$answer_matches[1] : null;
 
-            preg_match('/coding_answer:(\d+)/', $key, $coding_answer_matches);
-            $coding_answer_id = isset($coding_answer_matches[1]) ? (int)$coding_answer_matches[1] : null;
+                preg_match('/coding_answer:(\d+)/', $key, $coding_answer_matches);
+                $coding_answer_id = isset($coding_answer_matches[1]) ? (int)$coding_answer_matches[1] : null;
 
-            $hashData = Redis::hgetall($key);
 
-            $data[] = [
-                'student_paper_id' => $student_paper_id,
-                'answer_id' => $answer_id,
-                'coding_answer_id'     => $coding_answer_id,
-                'language'      => $language,
-                'data'          => $hashData,
-            ];
+                $data[] = [
+                    'student_paper_id' => $student_paper_id,
+                    'answer_id' => $answer_id,
+                    'coding_answer_id'     => $coding_answer_id,
+                    'language'      => $language,
+                    'data'          => $hashData,
+                ];
+                
+                Redis::del($key);
+            } catch (\Exception $e) {
+                // log the error
+                continue;
+            }
         }
 
         $json_pretty_print = json_encode($data, JSON_PRETTY_PRINT);

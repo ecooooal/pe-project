@@ -4,6 +4,7 @@
 
  <form 
         hx-post="{{ route('reports.store', { exam:exam }) }}" 
+        hx-target="this"
         hx-indicator="#loader"
         hx-disabled-elt="#create-report-button, #close-report-popover"
         class="flex flex-col gap-y-2 p-4 mb-2 max-h-4/5 overflow-auto">
