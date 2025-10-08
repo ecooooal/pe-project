@@ -8,7 +8,12 @@ use Illuminate\Support\Facades\DB;
 
 class Notification extends Model
 {
-        protected $fillable = ['title', 'message'];
+        protected $fillable = ['title', 'message', 'type', 'data', 'read_at',];
+
+        protected $casts = [
+        'data' => 'array',
+        'read_at' => 'datetime',
+];
 
     public function roles()
     {
