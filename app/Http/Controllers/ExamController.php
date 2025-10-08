@@ -8,6 +8,7 @@ use App\Models\ExamAccessCode;
 use App\Models\Question;
 use App\Services\ExamService;
 use App\Services\UserService;
+use App\Events\ExamResultsPublished;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Str;
@@ -235,6 +236,12 @@ class ExamController extends Controller
                 'error' => 'Sum of question points do not match the max score.'
             ]);        
         }
+
+        if ($is_published) {
+        // dispatch immediately
+        event(new ExamResultsPublished($exam));
+        }
+
         return response('', 200)->header('HX-Refresh', 'true');
     }
 

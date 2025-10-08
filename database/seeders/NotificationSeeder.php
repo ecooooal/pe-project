@@ -14,8 +14,8 @@ class NotificationSeeder extends Seeder
      */
     public function run(): void
     {
-                 // Make sure the role exists FIRST
-            $superadminRole = Role::firstOrCreate(['name' => 'superadmin']);
+        // Make sure the role exists FIRST
+        $superadminRole = Role::firstOrCreate(['name' => 'superadmin']);
 
         // Create notification
             $notif = Notification::create([

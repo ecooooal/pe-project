@@ -12,6 +12,7 @@ use App\Services\ExamTakingService;
 use App\Services\UserService;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use App\Events\StudentEnrolled;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Str;
@@ -57,6 +58,12 @@ class ExamController extends Controller
             'errors' => ['access-code' => ['Already enrolled in this Exam.']],
             'old' => ['access-code' => request()->input('access-code')]
             ]);
+        }
+
+        // dispatch enrollment event so listeners can create notifications, etc.
+        $exam = $exam_access_code->exam ?? null;
+        if ($exam) {
+            event(new StudentEnrolled($user, $exam));
         }
 
         return response('', 200)->header('HX-Refresh', 'true');
