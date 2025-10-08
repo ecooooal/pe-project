@@ -24,6 +24,7 @@ class StudentController extends Controller
             ->orderByDesc('updated_at')
             ->limit(4)
             ->get();
+        $enrolled_exams->load('courses');
 
         $data = [
             'enrolled_exams' => $enrolled_exams,

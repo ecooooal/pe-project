@@ -6,6 +6,7 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\Student\ExamRecordController;
 use App\Http\Controllers\Student\StudentAnswerController;
@@ -40,7 +41,7 @@ Route::get('/test', function () {
 
 Route::post('/login', [SessionController::class, 'authenticate']);
 Route::post('/logout', [SessionController::class, 'logout'])->middleware(['auth']);;
-Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution']);
+Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution'])->name('validate.coding.question');
 
 Route::group(['middleware' => ['can:view student']], function () { 
 });
@@ -164,9 +165,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/exams/{exam}/builder/swap-algorithm',[ExamController::class, 'swap_partial_algorithm']);
     Route::get('/exams/{exam}/builder/build', [ExamController::class, 'build_exam']);
     Route::patch('/exams/{exam}/publishExam', [ExamController::class, 'publishExam'])->name('exams.publish');;
-    Route::get('/exams/{exam}/edit/generate_access_code', [ExamController::class, 'generateAccessCode']);
-    Route::post('/exams/{exam}/edit/generate_access_code', [ExamController::class, 'saveAccessCode']);
-    Route::get('/exams/{exam}/edit/get_access_codes', [ExamController::class, 'getAccessCode']);
+
     Route::get('/exams/builder/tabs', [ExamController::class, 'swap_tabs']);
 
     Route::get('/questions', [QuestionController::class, 'index'])->name('questions.index');
@@ -238,11 +237,12 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
         return view('reviewers/questions');
     });
 
-    Route::get('/reports', function(){
-        return view('reports');
-    });
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/show', [ReportController::class, 'show'])->name('reports.show');
+    Route::get('/reports/info', [ReportController::class, 'info'])->name('reports.info');
 
     Route::middleware('htmx.request:faculty.index')->group(function () {
+        // Faculty Homepage
         Route::get('/homepage/report/exam', [LandingPageController::class, 'examReportShow'])->name('graphs.homepage.exam');
         Route::get('/homepage/report/course', [LandingPageController::class, 'courseReportShow'])->name('graphs.homepage.course');
         Route::get('/homepage/report/specific-course', [LandingPageController::class, 'specificCourseReportShow'])->name('graphs.homepage.specific.course');
@@ -250,6 +250,11 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
         Route::get('/homepage/report/refresh', [LandingPageController::class, 'refreshDashboard'])->name('graphs.homepage.refresh');
         Route::get('/homepage/report/timer', [LandingPageController::class, 'getTimer'])->name('graphs.homepage.timer');
 
+        // Exam Model
+        Route::get('/exams/{exam}/edit/generate_access_code', [ExamController::class, 'generateAccessCode'])->name('accesscodes.generate');
+        Route::post('/exams/{exam}/edit/save_access_code', [ExamController::class, 'saveAccessCode'])->name('accesscodes.save');
+        Route::get('/exams/{exam}/edit/get_access_codes', action: [ExamController::class, 'getAccessCode'])->name('accesscodes.get');
+        Route::delete('/exams/{exam}/edit/destroy_access_code', action: [ExamController::class, 'destroyAccessCode'])->name('accesscodes.destroy');
     });
 
     Route::get('/notifications', [NotificationController::class, 'index']);

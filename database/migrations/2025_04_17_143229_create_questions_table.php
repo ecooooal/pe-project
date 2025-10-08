@@ -24,7 +24,7 @@ return new class extends Migration
                 'matching',
                 'coding'
             ])->index();           
-            $table->string('name');
+            $table->text('name');
             $table->unsignedTinyInteger('total_points');
             $table->timestamps();
             $table->softDeletes();

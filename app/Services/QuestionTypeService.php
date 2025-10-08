@@ -63,7 +63,10 @@ class QuestionTypeService
             'instruction' => $coding_question_data['instruction'],
             'syntax_points' => $coding_question_data['syntax_points'],
             'runtime_points' => $coding_question_data['runtime_points'],
-            'test_case_points' => $coding_question_data['test_case_points']
+            'test_case_points' => $coding_question_data['test_case_points'],
+            'syntax_points_deduction_per_error' => $coding_question_data['syntax_points_deduction'],
+            'runtime_points_deduction_per_error' => $coding_question_data['runtime_points_deduction'],
+            'test_case_points_deduction_per_error' => $coding_question_data['test_case_points_deduction']
         ]);
         
         foreach ($coding_question_language_data as $language => $codes) {
@@ -154,12 +157,14 @@ class QuestionTypeService
         $slug_name = Str::slug($coding_question_data['name']);
         $folder = "codingQuestions/{$question->id}_{$slug_name}/";
         Storage::makeDirectory($folder);
-
        $coding_question = $question->codingQuestion()->create([
             'instruction' => $coding_question_data['instruction'],
             'syntax_points' => $coding_question_data['syntax_points'],
             'runtime_points' => $coding_question_data['runtime_points'],
-            'test_case_points' => $coding_question_data['test_case_points']
+            'test_case_points' => $coding_question_data['test_case_points'],
+            'syntax_points_deduction_per_error' => $coding_question_data['syntax_points_deduction'],
+            'runtime_points_deduction_per_error' => $coding_question_data['runtime_points_deduction'],
+            'test_case_points_deduction_per_error' => $coding_question_data['test_case_points_deduction']
         ]);
 
         foreach ($language_data as $language => $codes) {

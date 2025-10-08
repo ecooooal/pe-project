@@ -90,8 +90,26 @@ class ExamRecordController extends Controller
         ['score_obtained', 'score', 'updated_at']
         );
         
+        $coding_question_answers_pattern = "user:{$user->id}:paper:{$student_paper->id}:language:*:answer:*:code";
 
-        Self::storeCodeToJSON($user->id, $student_paper->id);
+        $keys = Redis::keys($coding_question_answers_pattern);
+
+        if (!empty($keys)) {
+            Self::storeCodeToJSON($user->id, $student_paper->id);
+        } else {
+            $score = $exam_record->total_score;
+
+            if ($score == $exam->max_score) {
+                $status = 'perfect_score';
+            } elseif ($score >= $exam->max_score/2) {
+                $status = 'pass';
+            } else {
+                $status = 'more_review';
+            }
+
+            $exam_record->update(['status' => $status]);
+        }
+
         $student_paper->update(['status'  => 'completed']);
         
         // Dispatch ExamSubmitted after commit so listeners see consistent DB state

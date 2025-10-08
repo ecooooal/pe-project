@@ -26,13 +26,16 @@ class Course extends Model
         return $this->belongsToMany(User::class)->withTimestamps();
     }
 
-    public function subjects(){
-        return $this->hasMany(Subject::class);
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class);
     }
 
-    public function exams(){
-        return $this->hasMany(Exam::class);
+    public function exams()
+    {
+        return $this->belongsToMany(Exam::class);
     }
+    
     public function createdBy(){
     return $this->belongsTo(User::class, 'created_by');
     }

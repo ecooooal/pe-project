@@ -26,15 +26,16 @@ class ExamController extends Controller
 
     public function index(){
         $courseIds = $this->userService->getCoursesForUser(auth()->user())->pluck('id');
-        $exams = Exam::with('course', 'questions') 
-                    ->whereIn('course_id', $courseIds)
-                    ->paginate(10);
-        $header = ['ID', 'Name', 'Course', 'Questions', 'Status', 'is Published', 'Examination Date'];
+        $exams = Exam::with(['courses', 'questions'])
+            ->whereHas('courses', function ($query) use ($courseIds) {
+                $query->whereIn('courses.id', $courseIds);
+            })
+            ->paginate(10);
+        $header = ['Name', 'Questions', 'Status', 'is Published', 'Examination Date'];
         $rows = $exams->map(function ($exam) {
             return [
                 'id' => $exam->id,
                 'name' => $exam->name,
-                'course' => $exam->course->name,
                 'questions' => $exam->questions->count(),
                 'status' => $exam->questions()->sum('total_points') >= $exam->max_score ? 'Complete' : 'Incomplete',
                 'is_published' => $exam->is_published ? 'Yes' : 'No',
@@ -45,50 +46,72 @@ class ExamController extends Controller
         $data = [
             'headers' => $header,
             'rows' => $rows,
-            'exams' => $exams
+            'models' => $exams,
+            'url' => 'exams'
         ];
+
+        if (request()->hasHeader('HX-Request')) {
+            // Return only the partial view for HTMX
+            return view('components/core/index-table', $data);
+        }
 
         return view('exams/index', $data);
 
     }
 
     public function show(Exam $exam){
-        $exam->load('questions');
+        $exam->load(['questions','courses']);
 
         return view('exams/show', ['exam' => $exam]);
     }
 
     public function create(){
-        $courses = Course::all()->pluck('name', 'id');
+        $courses =$this->userService->getCoursesForUser(auth()->user()); 
         return view('exams/create', ['courses' => $courses]);
 
     }
 
     public function store(){
-        request()->validate([
+
+        $validated = request()->validate([
             'name' => 'required|string|max:255',
-            'course_id' => 'required|exists:courses,id',
+            'courses' => 'required|array|min:1',
+            'courses.*' => 'exists:courses,id|required|string|distinct',
             'max_score' => 'required|integer|gte:1',
             'duration' => 'nullable|integer|min:1',
             'retakes' => 'nullable|integer|min:1',
-            'examination_date' => 'nullable|date|after:now',
+            'examination_date' => 'nullable|date|after_or_equal:now',
+            'passing_score' => 'required|integer|gte:1|max:100',
+            'expiration_date' => 'nullable|date|after:now|after_or_equal:examination_date',
         ], [
-            'course_id' => 'The course field is required.',
+            'courses' => 'The course field is required.',
+            'courses.*' => 'Invalid Course',
             'max_score' => 'The max score field is required',
-            'examination_date' => 'The examination date field must be a date after now.'
+            'examination_date' => 'The examination date field must be a date after now.',
+            'expiration_date.after' => 'The examination date field must be a date after now.',
+            'expiration_date.after_or_equal' => 'The expiration date must be on or after the examination date.'
         ]);
 
         $exam = Exam::create([
             'name' => request('name'),
-            'course_id' => request('course_id'),
             'max_score' => request('max_score'),
             'duration' => request('duration') ?? null,
             'retakes' => request('retakes') ?? null, 
-            'examination_date' => request('examination_date'),
+            'examination_date' => request('examination_date') ?? null,
+            'passing_score' => request('passing_score'),
+            'expiration_date' => request('expiration_date') ?? null,
         ]);
+
+        $exam->courses()->attach($validated['courses']);
 
         $access_code = $this->examService->generateAccessCode();
         $this->examService->saveAccessCode($exam, $access_code);
+
+        session()->flash('toast', json_encode([
+            'status' => 'Created!',
+            'message' => 'Exam: ' . $exam->name,
+            'type' => 'success'
+        ]));
 
         return redirect('/exams');
     }
@@ -106,19 +129,31 @@ class ExamController extends Controller
             'max_score' => 'required|integer|gte:1',
             'duration' => 'nullable|integer|min:1',
             'retakes' => 'nullable|integer|min:1',
-            'examination_date' => 'nullable|date|after:now',
+            'examination_date' => 'nullable|date|after_or_equal:now',
+            'passing_score' => 'required|integer|gte:1|max:100',
+            'expiration_date' => 'nullable|date|after:now|after_or_equal:examination_date',
         ], [
             'max_score' => 'The max score field is required',
-            'examination_date' => 'The examination date field must be a date after now.'
+            'examination_date.after' => 'The examination date field must be a date after now.',
+            'expiration_date.after' => 'The examination date field must be a date after now.',
+            'expiration_date.after_or_equal' => 'The expiration date must be on or after the examination date.'
         ]);
 
-        $exam->update([
-            'name' => request('name'),
-            'max_score' => request('max_score'),
-            'duration' => request('duration') ?? null,
-            'retakes' => request('retakes') ?? null, 
-            'examination_date' => request('examination_date') ?? null,
-        ]);
+            $exam->update([
+                'name' => request('name'),
+                'max_score' => request('max_score'),
+                'duration' => request('duration') ?? null,
+                'retakes' => request('retakes') ?? null, 
+                'examination_date' => request('examination_date') ?? null,
+                'passing_score' => request('passing_score'),
+                'expiration_date' => request('expiration_date') ?? null,
+            ]);
+
+        session()->flash('toast', json_encode([
+            'status' => 'Updated!',
+            'message' => 'Exam: ' . $exam->name,
+            'type' => 'info'
+        ]));
         return redirect()->route('exams.show', $exam);
 
     }
@@ -126,6 +161,16 @@ class ExamController extends Controller
     public function destroy(Exam $exam){
         
         $this->authorize('delete', $exam);
+
+        if ($exam->is_published) {
+            return back()->with('error', 'You cannot delete an exam that is currently published.');
+        }
+
+        session()->flash('toast', json_encode([
+            'status' => 'Destroyed!',
+            'message' => 'Exam: ' . $exam->name,
+            'type' => 'warning'
+        ]));
 
         $exam->delete();
 
@@ -135,12 +180,13 @@ class ExamController extends Controller
     public function exam_builder_show(Exam $exam){  
         $exam_course = $this->examService->getCourseForExam($exam);
         $exam_questions =  $this->examService->getQuestionsForExam($exam);
+        $exam_levels = $this->examService->getQuestionLevelsCountForExam($exam);
         $exam_topics = $this->examService->getTopicsForExam($exam);
         $exam_subjects = $this->examService->getSubjectsForExam($exam);
         $exam_question_types = $this->examService->getQuestionTypeCounts($exam);
 
         $available_questions = $this->examService->getAvailableQuestionsForExam($exam);
-        $questions_header = ['ID', 'Name', 'Subject', 'Topic', 'Type'];
+        $questions_header = ['Name', 'Level', 'Type', 'Points'];
         $exam_questions_rows = $this->examService->transformQuestionRows($exam_questions);
         $available_questions_rows = $this->examService->transformQuestionRows($available_questions);
         $data = [
@@ -150,6 +196,7 @@ class ExamController extends Controller
             'exam_topics' => $exam_topics,
             'exam_available_questions' => $available_questions,
             'exam_questions' => $exam_questions,
+            'exam_levels' => $exam_levels,
             'exam_question_types' => $exam_question_types,
             'questions_header' => $questions_header,
             'available_questions_rows' => $available_questions_rows,
@@ -167,12 +214,13 @@ class ExamController extends Controller
         }
 
         $exam_questions =  $this->examService->getQuestionsForExam($exam);
+            $exam_levels = $this->examService->getQuestionLevelsCountForExam($exam);
         $exam_topics = $this->examService->getTopicsForExam($exam);
         $exam_subjects = $this->examService->getSubjectsForExam($exam);
         $exam_question_types = $this->examService->getQuestionTypeCounts($exam);
 
         $available_questions = $this->examService->getAvailableQuestionsForExam($exam);
-        $questions_header = ['ID', 'Name', 'Subject', 'Topic', 'Type'];
+        $questions_header = ['Name', 'Level', 'Type', 'Points'];
         $exam_questions_rows = $this->examService->transformQuestionRows($exam_questions);
         $available_questions_rows = $this->examService->transformQuestionRows($available_questions);
 
@@ -182,6 +230,7 @@ class ExamController extends Controller
             'exam_topics' => $exam_topics,
             'exam_available_questions' => $available_questions,
             'exam_questions' => $exam_questions,
+            'exam_levels' => $exam_levels,
             'exam_question_types' => $exam_question_types,
             'questions_header' => $questions_header,
             'available_questions_rows' => $available_questions_rows,
@@ -223,17 +272,47 @@ class ExamController extends Controller
         $is_success =$this->examService->saveAccessCode($exam, $access_code);
         
         if ($is_success !== true) {
+            session()->flash('toast', json_encode([
+                'status' => 'Error!',
+                'message' => 'Access Code Not Saved',
+                'type' => 'error'
+            ]));
             return back()->withErrors(['access_code' => $is_success]);
+            
         }
 
-        return view('components/core/partials-exam-access-code', ['access_code' => $access_code, 'generate' => false]);
+        $toast =  json_encode([
+            'status' => 'Created!',
+            'message' => 'Access Code Saved',
+            'type' => 'success'
+        ]);
+
+
+        return view('components/core/partials-exam-access-code', 
+        ['access_code' => $access_code, 
+                'generate' => false, 
+                'toast' => $toast
+        ]);
+    }
+
+    public function destroyAccessCode(Exam $exam, Request $request)
+    {
+        $access_code = $request->input('code'); 
+        $deleted = $exam->accessCodes()
+                ->where('access_code', $access_code)
+                ->delete();
+        if (!$deleted) {
+            return back()->withErrors(['access_code' => 'Code not found']);
+        }
+        
+        return response()->noContent();
     }
 
     public function publishExam(Exam $exam){
         $is_published = $this->examService->attemptToPublish($exam);
-        if (!$is_published){
+        if ($is_published['status'] == false){
             return view('components/core/partials-exam-builder-publish-form-error', [
-                'error' => 'Sum of question points do not match the max score.'
+                'error' => $is_published['error_message']
             ]);        
         }
 

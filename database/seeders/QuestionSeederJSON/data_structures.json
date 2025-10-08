@@ -1,0 +1,88 @@
+{
+    "name": "Data Structures",
+    "year_level": 2,
+    "topics": [
+        {
+            "name": "Fundamentals of Data Structures",
+            "questions": [
+                {
+          "name": "Which of the following is a linear data structure?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": ["Graph", "Tree", "Stack", "Heap"],
+          "solution": "c",
+          "question_level": "remember"
+                },
+                {
+                "name": "Which of the following is a non-linear data structure?",
+                "type": "multiple_choice",
+                "points": 1,
+                "items": ["Queue", "Array", "Tree", "Stack"],
+                "solution": "c",
+                "question_level": "remember"
+                },
+                {
+                "name": "Which ADT follows the Last-In-First-Out principle?",
+                "type": "identification",
+                "points": 1,
+                "solution": "Stack",
+                "question_level": "remember"
+                },
+                {
+                "name": "Which ADT follows the First-In-First-Out principle?",
+                "type": "identification",
+                "points": 1,
+                "solution": "Queue",
+                "question_level": "remember"
+                },
+                {
+                "name": "Which of the following retrieves the minimum or maximum element efficiently?",
+                "type": "multiple_choice",
+                "points": 1,
+                "items": ["Set", "Priority Queue", "Stack", "Linked List"],
+                "solution": "b",
+                "question_level": "remember"
+                },
+                {
+                "name": "Which of the following represents a hierarchical structure?",
+                "type": "multiple_choice",
+                "points": 1,
+                "items": ["Queue", "Tree", "Stack", "Array"],
+                "solution": "b",
+                "question_level": "remember"
+                },
+                {
+                "name": "Which structure is defined as a collection of unique unordered elements?",
+                "type": "multiple_choice",
+                "points": 1,
+                "items": ["Set", "Map", "Heap", "Graph"],
+                "solution": "a",
+                "question_level": "remember"
+                },
+                {
+                "name": "Which structure stores data as key-value pairs?",
+                "type": "identification",
+                "points": 1,
+                "solution": "Map",
+                "question_level": "remember"
+                },
+                {
+                "name": "Which algorithm characteristic ensures it stops after a certain number of steps?",
+                "type": "multiple_choice",
+                "points": 1,
+                "items": ["Finiteness", "Definiteness", "Uniqueness", "Determinism"],
+                "solution": "a",
+                "question_level": "remember"
+                },
+                {
+                "name": "Which algorithm paradigm always chooses the best immediate option?",
+                "type": "multiple_choice",
+                "points": 1,
+                "items": ["Greedy", "Divide and Conquer", "Dynamic Programming", "Backtracking"],
+                "solution": "a",
+                "question_level": "remember"
+                }
+            ]
+        }
+    ]
+}
