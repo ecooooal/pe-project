@@ -158,7 +158,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::delete('/exams/{exam}', [ExamController::class, 'destroy'])->name('exams.destroy');
 
     Route::get('/exams/{exam}/builder', [ExamController::class, 'exam_builder_show']);
-    Route::post('/exams/{exam}/builder/add-question/{question}',[ExamController::class, 'toggle_question'])->name('exam.toggleQuestion');
+    Route::post('/exams/{exam}/builder/toggle-question',[ExamController::class, 'toggle_question'])->name('exam.toggleQuestion');
     Route::get('/exams/{exam}/builder/swap-algorithm',[ExamController::class, 'swap_partial_algorithm']);
     Route::get('/exams/{exam}/builder/build', [ExamController::class, 'build_exam']);
     Route::patch('/exams/{exam}/publishExam', [ExamController::class, 'publishExam'])->name('exams.publish');;

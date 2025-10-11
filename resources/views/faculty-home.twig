@@ -21,7 +21,7 @@
                 id="update-dashboard-button"
                 hx-get="{{ route('graphs.homepage.refresh') }}"
                 hx-trigger="click"
-                onclick="this.disabled = true";
+                hx-disabled-elt="this"
                 class="flex justify-center items-center gap-x-2 cursor-pointer rounded-lg bg-blue-900 text-sm text-white font-medium p-3 hover:bg-blue-800 transition duration-300
                 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 disabled:fill-gray-500">
             
