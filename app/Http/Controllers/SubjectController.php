@@ -24,10 +24,14 @@ class SubjectController extends Controller
     public function index(){
         $subject_courses = $this->userService->getSubjectsForUser(auth()->user())->paginate(10);
         $subject_courses->load('courses');
-        $header = ['Code', 'Name', 'Year Level'];
+        $header = ['Courses', 'Code', 'Name', 'Year Level'];
         $rows = $subject_courses->map(function ($subject) {
+            $courses_abbreviations = $subject->courses->map(function ($course){
+                return $course->abbreviation;
+            });
             return [
                 'id' => $subject->id,
+                'courses' => $courses_abbreviations,
                 'code' => $subject->code,
                 'name' => $subject->name,
                 'year level' => $subject->year_level

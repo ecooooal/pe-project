@@ -20,6 +20,12 @@
                         <td class="p-4 border-b border-gray-300 max-w-xs text-sm {{ value == 'Incomplete' ? 'text-red-600' : (value == 'Complete' ? 'text-green-600' : 'text-gray-900') }} ">
                             <span class="block break-words">{{ value }}</span> 
                         </td>
+                        {% elseif value is iterable %}
+                            <td class="p-4 border-b border-gray-300 max-w-xs text-sm {{ value == 'Incomplete' ? 'text-red-600' : (value == 'Complete' ? 'text-green-600' : 'text-gray-900') }} ">
+                                {% for item in value %}
+                                    <span class="block break-words">{{ item }}</span> 
+                                {% endfor %}
+                            </td>
                         {% elseif cell != 'id' %}
                         <td class="p-4 border-b border-gray-300 max-w-xs text-sm {{ value == 'Incomplete' ? 'text-red-600' : (value == 'Complete' ? 'text-green-600' : 'text-gray-900') }} ">
                             <span class="block break-words">{{ value }}</span> 

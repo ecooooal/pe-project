@@ -135,6 +135,8 @@ class QuestionController extends Controller
                     $rules['syntax_points_deduction'] = ['required', 'integer', 'min:1', 'max:10'];
                     $rules['runtime_points_deduction'] = ['required', 'integer', 'min:1', 'max:10'];
                     $rules['test_case_points_deduction'] = ['required', 'integer', 'min:1', 'max:10'];
+                    $rules['syntax_only_checkbox'] = ['nullable'];
+                    $rules['enable_student_compile'] = ['nullable'];
                     $rules['instruction'] = ['required'];
                     $rules['supported_languages'] = ['required', 'json', function ($attribute, $value, $fail) {
                         $decoded = json_decode($value, true);
@@ -289,7 +291,6 @@ class QuestionController extends Controller
             ];
         }
 
-
        switch ($question_type) {
             case('coding'):
                     $rules['syntax_points'] = ['required', 'integer', 'min:1'];
@@ -298,6 +299,8 @@ class QuestionController extends Controller
                     $rules['syntax_points_deduction'] = ['required', 'integer', 'min:1', 'max:10'];
                     $rules['runtime_points_deduction'] = ['required', 'integer', 'min:1', 'max:10'];
                     $rules['test_case_points_deduction'] = ['required', 'integer', 'min:1', 'max:10'];
+                    $rules['syntax_only_checkbox'] = ['nullable'];
+                    $rules['enable_student_compile'] = ['nullable'];
                     $rules['instruction'] = ['required'];
                     $rules['supported_languages'] = ['required', 'json', function ($attribute, $value, $fail) {
                         $decoded = json_decode($value, true);
@@ -354,6 +357,8 @@ class QuestionController extends Controller
         $validator = Validator::make(request()->all(), $rules, $messages);
         if ($validator->fails()) {
             if($question_type == 'coding'){
+                                dd($validator->errors());
+
                 return view('components/core/coding-question-error', [
                     'errors' => $validator->errors()
                 ]);
@@ -566,7 +571,6 @@ class QuestionController extends Controller
     public function validateCompleteSolution(Request $request){
         $code_settings['action'] = $request->post('action');
         $language = $request->post('language-to-validate');
-
         if ($code_settings['action'] == 'test_student_code') {
             $code_settings['action'] = 'compile';
             $code = $request->post('student-code-test');
