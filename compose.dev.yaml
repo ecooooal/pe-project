@@ -32,6 +32,7 @@ services:
     ports:
       # Map port 80 inside the container to the port specified by 'NGINX_PORT' on the host machine
       - "80:80"
+      - "8080:80"
     environment:
       - NGINX_HOST=localhost
     networks:
@@ -79,6 +80,7 @@ services:
       - ./vendor:/var/www/vendor
       - app-node-modules:/var/www/node_modules
       - ./storage:/var/www/storage
+      - ./firebase-admin.json:/var/www/firebase-admin.json:ro
 
 
     networks:

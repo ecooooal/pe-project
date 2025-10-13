@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\FirebaseController;
 use App\Http\Controllers\AccessControlController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ExamController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\Student\ExamRecordController;
 use App\Http\Controllers\Student\StudentAnswerController;
 use App\Http\Controllers\Student\StudentPaperController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\Student\ExamController as StudentExamController;
@@ -20,6 +22,8 @@ use App\Services\QuestionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Role;
+
+Route::post('/firebase-login', [FirebaseController::class, 'login']);
 
 Route::get('/', function () {
 
@@ -256,9 +260,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
         Route::delete('/exams/{exam}/edit/destroy_access_code', action: [ExamController::class, 'destroyAccessCode'])->name('accesscodes.destroy');
     });
 
-    Route::get('/notifications', function(){
-        return view('notifications');
-    });
+    Route::get('/notifications', [NotificationController::class, 'index']);
 
     Route::get('/settings', function(){
         return view('settings');
