@@ -44,6 +44,23 @@ window.onpopstate = function () {
 history.go(1); // Prevent back navigation
 };
 
+document.addEventListener('copy', function(event) {
+  event.preventDefault();
+});
+
+document.addEventListener('paste', function(event) {
+  event.preventDefault();
+});
+
+document.addEventListener('contextmenu', function(event) {
+  event.preventDefault();
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    alert("Switching tab detected");
+  }
+});
 </script>
 
 {% endblock %}

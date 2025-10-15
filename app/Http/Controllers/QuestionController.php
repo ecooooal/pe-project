@@ -206,10 +206,15 @@ class QuestionController extends Controller
         $data['optional_tags'] = $optional_tags;
 
         if ($question_type == 'coding'){
+            $is_syntax_only = request()->input('syntax_only_checkbox') ?? false;
             $syntax_points = request()->input('syntax_points', 0);
             $runtime_points = request()->input('runtime_points', 0);
             $test_case_points = request()->input('test_case_points', 0);
-            $totalPoints = $syntax_points + $runtime_points + $test_case_points;
+            if ($is_syntax_only){
+                $totalPoints = $syntax_points;
+            } else {
+                $totalPoints = $syntax_points + $runtime_points + $test_case_points;
+            }
             $data['points'] = $totalPoints;
         } else if ($question_type == 'ranking' || $question_type == 'matching'){
             $items = request()->input('items', []);
@@ -382,10 +387,15 @@ class QuestionController extends Controller
         $data['optional_tags'] = $optional_tags;
 
         if ($question_type == 'coding'){
+            $is_syntax_only = request()->input('syntax_only_checkbox') ?? false;
             $syntax_points = request()->input('syntax_points', 0);
             $runtime_points = request()->input('runtime_points', 0);
             $test_case_points = request()->input('test_case_points', 0);
-            $totalPoints = $syntax_points + $runtime_points + $test_case_points;
+            if ($is_syntax_only){
+                $totalPoints = $syntax_points;
+            } else {
+                $totalPoints = $syntax_points + $runtime_points + $test_case_points;
+            }
             $data['points'] = $totalPoints;
         } else if ($question_type == 'ranking' || $question_type == 'matching'){
             $items = request()->input('items', []);
@@ -570,7 +580,9 @@ class QuestionController extends Controller
 
     public function validateCompleteSolution(Request $request){
         $code_settings['action'] = $request->post('action');
+        $code_settings['syntax_coding_question_only'] = $request->post('syntax_only_checkbox') ? true : false;
         $language = $request->post('language-to-validate');
+
         if ($code_settings['action'] == 'test_student_code') {
             $code_settings['action'] = 'compile';
             $code = $request->post('student-code-test');
@@ -589,8 +601,13 @@ class QuestionController extends Controller
             $code_settings['test_case_points_deduction'] = 1;
 
         } else {
+            if (!$code_settings['syntax_coding_question_only']){
+                $test_case = $request->post('validate-test-case');
+            } else {
+                $test_case = '';
+            };
+
             $code = $request->post('validate-complete-solution');
-            $test_case = $request->post('validate-test-case');
             $code_settings['syntax_points'] = $request->post('validate_syntax_points') ?? 0;
             $code_settings['runtime_points'] = $request->post('validate_runtime_points') ?? 0;
             $code_settings['test_case_points'] = $request->post('validate_test_case_points') ?? 0;
@@ -598,8 +615,10 @@ class QuestionController extends Controller
             $code_settings['runtime_points_deduction'] = $request->post('validate_runtime_points_deduction') ?? 1;
             $code_settings['test_case_points_deduction'] = $request->post('validate_test_case_points_deduction') ?? 1;
         }
-        if (empty($code) || empty($test_case)) {
-            $api_data = ['error' => 'Complete solution and test case are both required.'];
+        if (empty($code) && $code_settings['syntax_coding_question_only'] == true) {
+            $api_data = ['error' => 'Complete solution is required.'];
+        } else if (empty($code) || empty($test_case) && $code_settings['syntax_coding_question_only'] == false){
+            $api_data = ['error' => 'Complete solution and Test Cases are both required.'];
         } else {
             $api_data = $this->questionService::validate($language, $code, $test_case, $code_settings);
         }

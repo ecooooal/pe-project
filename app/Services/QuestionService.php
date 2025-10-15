@@ -115,6 +115,7 @@ class QuestionService
                     $response = Http::timeout(30)->post('http://java-api:8090/execute', [
                         'code' => $code,
                         'testUnit' => $test,
+                        'syntax_coding_question_only' => $code_settings['syntax_coding_question_only'],
                         'request_action' => $code_settings['action'],
                         'syntax_points' => $code_settings['syntax_points'],
                         'runtime_points' => $code_settings['runtime_points'],
