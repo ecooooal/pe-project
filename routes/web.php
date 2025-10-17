@@ -44,6 +44,7 @@ Route::post('/logout', [SessionController::class, 'logout'])->middleware(['auth'
 Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution'])->name('validate.coding.question');
 
 Route::group(['middleware' => ['can:view student']], function () { 
+    Route::get('/student/notifications', [NotificationController::class, 'studentIndex'])->name('student.notifications.index');
 });
 
 Route::prefix('student')->middleware(['can:view student'])->group(function() {
@@ -67,7 +68,6 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/exams/{exam}/take', [StudentPaperController::class, 'takeExam'])->name('exam_papers.take');
     Route::get('/student_papers/{student_paper}/question', [StudentPaperController::class, 'show'])->name('exam_papers.show');
     Route::patch('/student_papers/{student_paper}/{question}', [StudentAnswerController::class, 'update'])->name('student_answer.update');
-
 
 
 

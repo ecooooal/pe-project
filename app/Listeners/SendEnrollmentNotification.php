@@ -36,12 +36,11 @@ class SendEnrollmentNotification
             'message' => "{$event->student->first_name} enrolled in {$event->exam->name}.",
             'is_public' => false,
         ]);
-        $profNotif->roles()->attach([1,2,3,4,5]); 
+        $profNotif->roles()->attach([1,2,3,4]); 
         //superadmin role_id = 1
         //faculty role_id = 2
         //department head role_id = 3
         //college dean role_id = 4
-        //student role_id = 5
         
     }
 }

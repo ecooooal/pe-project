@@ -44,4 +44,21 @@ class NotificationController extends Controller
     ]);
         
     }
+
+        public function studentIndex()
+    {
+        $user = Auth::user();
+        $roleIds = $user->roles->pluck('id');
+
+        $notifications = Notification::where(function ($q) use ($roleIds) {
+            $q->where('is_public', true)
+              ->orWhereHas('roles', function ($query) use ($roleIds) {
+                  $query->whereIn('roles.id', $roleIds);
+              });
+        })->latest()->get();
+
+    return view('students.student-notification', [
+    'notifications' => $notifications,
+]);
+    }
 }
