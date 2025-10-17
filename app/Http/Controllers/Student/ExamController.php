@@ -68,19 +68,11 @@ class ExamController extends Controller
             ]);
         }
 
-<<<<<<< HEAD
         // dispatch enrollment event so listeners can create notifications, etc.
         $exam = $exam_access_code->exam ?? null;
         if ($exam) {
             event(new StudentEnrolled($user, $exam));
         }
-=======
-        session()->flash('toast', json_encode([
-            'status' => 'Enrolled!',
-            'message' => 'Successful enrolling in this exam' ,
-            'type' => 'success'
-        ]));
->>>>>>> upstream/feature/ReportsAndHousekeepingMatters
 
         return response('', 200)->header('HX-Refresh', 'true');
     }
