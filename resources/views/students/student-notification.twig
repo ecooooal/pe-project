@@ -1,0 +1,63 @@
+{% extends 'components/core/student-layout' %}
+
+{% block content %}
+
+<div class="mx-32 mt-8">
+    <!-- Page Header -->
+    <div class="flex items-center gap-x-3 mb-5">
+        <!-- Notification Bell Icon (black color) -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" 
+             viewBox="0 0 24 24" class="w-10 h-10 text-black">
+            <path fill-rule="evenodd" 
+                d="M5.25 9a6.75 6.75 0 0 1 13.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 0 1-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 1 1-7.48 0 24.585 24.585 0 0 1-4.831-1.244.75.75 0 0 1-.298-1.205A8.217 8.217 0 0 0 5.25 9.75V9Zm4.502 8.9a2.25 2.25 0 1 0 4.496 0 25.057 25.057 0 0 1-4.496 0Z" 
+                clip-rule="evenodd" />
+        </svg>
+
+        <!-- Notifications Title (bold + black) -->
+        <h1 class="text-4xl font-bold text-black tracking-wide">
+            Notifications
+        </h1>
+    </div>
+
+    <!-- Notifications Table (lowered slightly for spacing) -->
+    <div class="border border-gray-300 rounded-2xl overflow-hidden shadow-sm mt-5">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider">Title</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider">Message</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider">Visibility</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for notif in notifications %}
+                    <tr>
+                        <td class="px-6 py-4 text-sm text-gray-800">{{ notif.title }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">{{ notif.message }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">{{ notif.created_at|date('m-d-Y g:i A') }}</td>
+                        <td class="px-6 py-4 text-sm">
+                            {% if notif.is_public %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Public
+                                </span>
+                            {% else %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    Private
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                            No notifications yet.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

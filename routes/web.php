@@ -11,6 +11,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\Student\ExamRecordController;
 use App\Http\Controllers\Student\StudentAnswerController;
 use App\Http\Controllers\Student\StudentPaperController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\Student\ExamController as StudentExamController;
@@ -43,6 +44,7 @@ Route::post('/logout', [SessionController::class, 'logout'])->middleware(['auth'
 Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution'])->name('validate.coding.question');
 
 Route::group(['middleware' => ['can:view student']], function () { 
+    Route::get('/student/notifications', [NotificationController::class, 'studentIndex'])->name('student.notifications.index');
 });
 
 Route::prefix('student')->middleware(['can:view student'])->group(function() {
@@ -66,7 +68,6 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/exams/{exam}/take', [StudentPaperController::class, 'takeExam'])->name('exam_papers.take');
     Route::get('/student_papers/{student_paper}/question', [StudentPaperController::class, 'show'])->name('exam_papers.show');
     Route::patch('/student_papers/{student_paper}/{question}', [StudentAnswerController::class, 'update'])->name('student_answer.update');
-
 
 
 
@@ -258,9 +259,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
         Route::delete('/exams/{exam}/edit/destroy_access_code', action: [ExamController::class, 'destroyAccessCode'])->name('accesscodes.destroy');
     });
 
-    Route::get('/notifications', function(){
-        return view('notifications');
-    });
+    Route::get('/notifications', [NotificationController::class, 'index']);
 
     Route::get('/settings', function(){
         return view('settings');

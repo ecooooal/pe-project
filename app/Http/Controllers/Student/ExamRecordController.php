@@ -9,6 +9,7 @@ use App\Models\StudentAnswer;
 use App\Models\StudentPaper;
 use App\Services\ExamTakingService;
 use App\Services\QuestionService;
+use App\Events\ExamSubmitted;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
@@ -111,6 +112,10 @@ class ExamRecordController extends Controller
         }
 
         
+        // Dispatch ExamSubmitted after commit so listeners see consistent DB state
+        DB::afterCommit(function () use ($user, $exam) {
+            event(new ExamSubmitted($user, $exam));
+        });
 
         return response('', 204)->header('HX-Redirect', route('exam_records.show', ['exam' => $exam, 'exam_record' => $exam_record]));
     }
