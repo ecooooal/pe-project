@@ -10,6 +10,113 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@layer base {
+  /* Base (closed) state for all popovers */
+  [popover] {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all 0.25s ease;
+    transition-behavior: allow-discrete; /* enables smooth close */
+  }
+
+  /* Open state for all popovers */
+  [popover]:popover-open {
+    opacity: 1;
+    transform: scale(1);
+
+    @starting-style {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+    .dashboard-animate.htmx-added {
+        opacity: 0;
+        transform: translateY(-40px);
+    }
+
+    .dashboard-animate {
+        opacity: 1;
+        transform: translateY(0);
+        transition: opacity 0.5s ease, transform 1s ease;
+    }
+    .dashboard-animate-swapping.htmx-swapping {
+        opacity: 0;                
+        transform: translateY(-50px); 
+        transition: opacity 1s ease-out, transform 1s ease-out;
+    }
+
+    .htmx-animate {
+        opacity: 1;
+        transform: scale(1); 
+        transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .htmx-animate.htmx-added {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    .htmx-animate-swapping.htmx-swapping {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    .details-animated::details-content {
+        interpolate-size: allow-keywords;
+        block-size: 0;
+        opacity: 0;
+        overflow: hidden;
+        content-visibility: hidden;
+        transition: block-size .4s ease, opacity 0s, content-visibility .4s;
+        transition-behavior: allow-discrete;
+    }
+
+    .details-animated[open]::details-content {
+        block-size: auto;
+        opacity: 1;
+        content-visibility: visible;
+        transition: block-size .4s ease, opacity .3s ease 0.4s;
+    }
+    
+    @keyframes bounce-in-up {
+    0% {
+        transform: translateY(-20px) scale(0.9);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(5px) scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    }
+
+    @keyframes bounce-out-down {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    40% {
+        transform: translateY(10px) scale(1.1);
+        opacity: 0.5;
+    }
+    100% {
+        transform: translateY(-20px) scale(0.9);
+        opacity: 0;
+    }
+    }
+
+    .add-tag-animation {
+    animation: bounce-in-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+    .delete-tag-animation {
+    animation: bounce-out-down 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+    }
+}
+
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';

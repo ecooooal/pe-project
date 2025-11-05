@@ -7,172 +7,68 @@ use App\Models\Course;
 use App\Models\Exam;
 use App\Models\Question;
 use App\Models\Subject;
+use App\Models\Tag;
 use App\Models\Topic;
 use App\Models\User;
 use App\Services\QuestionTypeService;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Storage;
 
 class FakeDataSeeder extends Seeder
 {
-    protected $subjects_with_topics = [
-        [
-            'name' => 'Computer Programming 1',
-            'Date Created' => '01/01/2025',
-            'topics' => [
-                [
-                    'name' => 'Data Types',
-                    'questions' => [
-                        [
-                            'name' => 'A byte is an 8-bit signed integer?',
-                            'type' => 'true_or_false',
-                            'points' => 1,
-                            'solution' => 'true'
-                        ],
-                        [
-                            'name' => 'What is the name for a memory location that stores specific value, such as numbers and letters?',
-                            'type' => 'identification',
-                            'points' => 1,
-                            'solution' => 'variable'
-                        ],
-                        [
-                            'name' => 'This is a memory location whose value cannot be changed during program execution.',
-                            'type' => 'identification',
-                            'points' => 7,
-                            'solution' => 'Constant'
-                        ],
-                    ],
-                    'Date Created' => '01/01/2025'
-                ],
-                [
-                    'name' => 'Programming Environments',
-                    'questions' => [
-                        [
-                            'name' => 'What is the basic unit of a java program?',
-                            'type' => 'multiple_choice',
-                            'points' => 1,
-                            'items' => ['Applet', 'Source Code', 'Class', 'Syntax'],
-                            'solution' => 'c'
-                        ],
-                        [
-                            'name' => 'A reserved words or keywords can used in naming variables while retaining its original purpose.',
-                            'type' => 'true_or_false',
-                            'points' => 1,
-                            'solution' => 'false'
-                        ],
-                        [
-                            'name' => 'In java environment what method does the execution always begins?',
-                            'type' => 'identification',
-                            'points' => 2,
-                            'solution' => 'main'
-                        ],
-                        [
-                            'name' => 'In descending order, rank the flow on how a java program is created',
-                            'type' => 'ranking',
-                            'items' => [
-                                1 => [
-                                    "solution" => "Code is written",
-                                    "points" => "2"
-                                ],
-                                2 => [
-                                    "solution" => "Code is compiled",
-                                    "points" => "2"
-                                ],
-                                3 => [
-                                    "solution" => "Code is run",
-                                    "points" => "2"
-                                ],
-                                4 => [
-                                    "solution" => "terminate if the code has syntax errors",
-                                    "points" => "2"
-                                ],
-                                5 => [
-                                    "solution" => "Check if the output is not unexpected",
-                                    "points" => "2"
-                                ]
-                            ]
-                        ]
-                    ],
-                    'Date Created' => '01/01/2025'
-                ],
-                [
-                    'name' => 'Syntax and Logical Errors',
-                    'questions' => [
-                        [
-                            'name' => 'What does it mean when syntax errors is encountered',
-                            'type' => 'multiple_choice',
-                            'points' => 1,
-                            'items' => ['It means there is a logical error.', 'There is a grammatical mistake in the code of the program', 'There are comments in the codes.', 'The code was compiled but got unexpected output.'],
-                            'solution' => 'b'
-                        ],
-                        [
-                            'name' => 'Logical errors can be fixed as simple as correcting grammatical mistakes in the program.',
-                            'type' => 'true_or_false',
-                            'points' => 1,
-                            'solution' => 'false'
-                        ],
-                        [
-                            'name' => 'This error is encountered when the program produced unexpected result. (2 words)',
-                            'type' => 'identification',
-                            'points' => 2,
-                            'solution' => 'logical error'
-                        ],
-                        [
-                            'name' => 'Match The the following errors:',
-                            'type' => 'matching',
-                            'items' => [
-                                1 => [
-                                    "left" => "syntax error",
-                                    "right" => "error on grammar",
-                                    "points" => "2"
-                                ],
-                                2 => [
-                                    "left" => "logical error",
-                                    "right" => "unexpected output by the program",
-                                    "points" => "2"
-                                ],
-                                3 => [
-                                    "left" => "test case error",
-                                    "right" => "failure in test cases",
-                                    "points" => "5"
-                                ]
-                            ]
-                        ]
-                    ],
-                    'Date Created' => '01/01/2025'
-                ],
-            ],
-        ],
-    ];
+    protected $question_levels;
+    public function __construct()
+    {
+        $this->question_levels = [
+            'remember',
+            'understand',
+            'apply',
+            'analyze',
+            'evaluate',
+            'create'
+        ];
+    }
 
-
-    
     public function run(): void
     {
-        foreach ($this->subjects_with_topics as $subjectData) {
-            $subject = Subject::firstOrCreate([
-                'name' => $subjectData['name'],
-                'course_id' => 1,
-                'year_level' => 1,
-            ]);
+        foreach ($this->question_levels as $level){
+            Tag::firstOrCreate(['name' => $level]);
+        }
 
-            foreach ($subjectData['topics'] as $topicData) {
+        $dataPath = database_path('seeders/QuestionSeederJSON');
+        $files = glob($dataPath . '/*.json'); 
+
+        foreach ($files as $file) {
+            $subject_data = json_decode(file_get_contents($file), true);
+
+            $subject = Subject::firstOrCreate([
+                'name' => $subject_data['name'],
+                'code' => $subject_data['code'],
+                'year_level' => $subject_data['year_level'],
+                'created_at' => Carbon::now()
+            ]);
+            $subject->courses()->attach([1, 2]);
+            
+            foreach ($subject_data['topics'] as $topic_data) {
                 $topic = Topic::firstOrCreate([
-                    'name' => $topicData['name'],
+                    'name' => $topic_data['name'],
                     'subject_id' => $subject->id,
+                    'created_at' => Carbon::now()
                 ]);
 
 
-                foreach ($topicData['questions'] ?? [] as $questionData) {
-                    $exists = Question::where('name', $questionData['name'])
+                foreach ($topic_data['questions'] ?? [] as $question_data) {
+                    $exists = Question::where('name', $question_data['name'])
                         ->where('topic_id', $topic->id)
                         ->exists();
 
                     if (! $exists) {
-                        $questionData['topic'] = $topic->id;
+                        $question_data['topic'] = $topic->id;
                         $super_admin_id = User::role('super_admin')->first()->id;
                         $question_factory = new OwnQuestionFactory();
-                        $question_factory->createFakeData($questionData, $super_admin_id);
+                        $question_factory->createFakeData($question_data, $super_admin_id);
                     }
                 }
             }

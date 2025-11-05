@@ -11,7 +11,9 @@
         <h1 class="text-white text-2xl font-semibold hover:text-blue-400 group-hover:text-blue-400 delay-100 duration-300">
             Application Name Here
         </h1>
-        <p class="text-gray-300 text-xs font-semibold mt-2">S.Y 2025-2026</p>
+        {% if auth_user() %}
+            <p class="{{ current_academic_year ? 'text-gray-300' : 'text-red-300' }}  text-xs font-semibold mt-2">{{ current_academic_year ? 'S.Y' : '' }} {{ current_academic_year ?? 'MAINTENANCE' }}</p>
+        {% endif %}
     </div> 
 
     <div class="flex gap-2 items-center">
@@ -57,7 +59,7 @@
             </form>          
         {% endif %}
         {% if auth_guest() %}
-            <button popovertarget="mydiv" 
+            <button popovertarget="login-popover" 
                     class="text-white font-medium cursor-pointer">
                     Login
             </button>
@@ -67,7 +69,7 @@
 </div>
 
 {% if auth_guest() %}
-    <div popover="manual" class="backdrop:bg-gray-900/15 backdrop:backdrop-blur-[1px] transition-discrete duration-300 m-auto p-16 ease-in-out transition-opacity rounded-xl" id="mydiv">
+    <div popover="manual" class="backdrop:bg-gray-900/15 backdrop:backdrop-blur-[1px] m-auto p-16 rounded-xl" id="login-popover">
         <div class="flex flex-col gap-y-4">
             {{ show_header('Login') }}
             <div class="flex">
@@ -130,7 +132,7 @@
             </div>
         </div>
         
-        <button popovertarget="mydiv" popovertargetaction="hide" class="absolute right-0 top-0 pt-4 pr-4">
+        <button popovertarget="login-popover" popovertargetaction="hide" class="absolute right-0 top-0 pt-4 pr-4">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
             </svg>          

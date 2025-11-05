@@ -7,9 +7,11 @@ use App\Models\ExamRecord;
 use App\Models\StudentPaper;
 use App\Services\ExamService;
 use App\Services\ExamTakingService;
+use Cache;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class StudentPaperController extends Controller
 {
@@ -40,10 +42,13 @@ class StudentPaperController extends Controller
         })->count();
 
         session(['current_attempt' => $attempt_count + 1]);
+        $question_to_show = $this->examTakingService->getCurrentQuestion($student_paper);
+        $question_to_show_id = $question_to_show['question']->id;
+        session(['question_to_answer' => $question_to_show_id]);
 
         $data = [
             'student_paper' => $student_paper,  
-            'exam' => $exam
+            'exam' => $exam,
         ];
 
         return view( 'students/papers/layout-take-exam', $data);

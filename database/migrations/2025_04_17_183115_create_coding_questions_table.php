@@ -16,9 +16,14 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Question::class, 'question_id')->constrained()->cascadeOnDelete();
             $table->text('instruction');
+            $table->boolean('is_syntax_code_only')->default(false);
+            $table->boolean('enable_compilation')->default(false);
             $table->unsignedTinyInteger('syntax_points');
             $table->unsignedTinyInteger('runtime_points');
             $table->unsignedTinyInteger('test_case_points');
+            $table->unsignedTinyInteger('syntax_points_deduction_per_error');
+            $table->unsignedTinyInteger('runtime_points_deduction_per_error');
+            $table->unsignedTinyInteger('test_case_points_deduction_per_error');
             $table->timestamps();
         });
     }

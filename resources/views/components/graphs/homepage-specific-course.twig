@@ -1,0 +1,46 @@
+<div id="course-counts">
+            <div id="subject_graph_data" data-questions="{{ subject_graph_data }}" class="hidden"></div>
+            <div id="topic_graph_data" data-questions="{{ topic_graph_data }}" class="hidden"></div>
+            <div id="question_type_graph_data" data-questions="{{ question_type_graph_data }}" class="hidden"></div>
+            <div id="reused_question_graph_data" data-questions="{{ reused_question_graph_data }}" class="hidden"></div>
+    <div class="flex  gap-x-1">
+        <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+        <span class="text-2xl font-bold text-gray-900 self-center">
+            {{ question_count }}
+        </span>
+        <span class="text-xs text-gray-400 font-mono font-semibold self-center mt-auto">Question Count</span>
+        </div>
+        <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+            <span class="text-2xl font-bold text-green-900 self-center">
+                {{ subject_count }}
+            </span>
+            <span class="text-xs text-green-400 font-mono font-semibold self-center mt-auto">Subject Count</span>
+        </div>
+        <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+            <span class="text-2xl font-bold text-orange-900 self-center">
+                {{ topic_count}}
+            </span>
+            <span class="text-xs text-orange-400 font-mono font-semibold self-center mt-auto">Topic Count</span>
+        </div>
+    </div>
+    <div class="flex  gap-x-1">
+        <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+        <span class="text-2xl font-bold text-gray-900 self-center">
+            {{ exam_count }}
+        </span>
+        <span class="text-xs text-gray-400 font-mono font-semibold self-center mt-auto">Exam Count</span>
+        </div>
+        <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+            <span class="text-2xl font-bold text-orange-900 self-center">
+                {{ unused_question_count }}
+            </span>
+            <span class="text-xs text-orange-700/70 font-mono font-semibold self-center mt-auto">Unused Questions</span>
+        </div>
+        <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+            <span class="text-2xl font-bold text-orange-900 self-center">
+                {{ reused_question_count }}
+            </span>
+            <span class="text-xs text-orange-700/70 font-mono font-semibold self-center mt-auto">Reused Questions</span>
+        </div>
+    </div>            
+</div>

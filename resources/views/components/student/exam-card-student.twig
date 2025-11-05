@@ -1,11 +1,21 @@
+{% if not exam.is_published %}
+    {% set status_label = 'Status' %}
+    {% set status = 'Exam is on maintenance' %}
+    {% set status_color = 'text-orange-600 group-hover:text-orange-300' %}
+{% elseif exam.expiration_date < date('now') and exam.expiration_date is not null %}
+    {% set status_label = 'Status' %}
+    {% set status = 'Exam Expired' %}
+    {% set status_color = 'text-red-600 group-hover:text-red-300' %}
+{% else %}
+    {% set status_label = 'Examination Date' %}
+    {% set status = exam.examination_date != null  ? exam.examination_date|date('h:i A d M Y'): 'Anytime' %}
+    {% set status_color = 'text-green-600 group-hover:text-green-300' %}
+{% endif %}
 <a href="{{ route('exams.student.show', {exam:exam})}}">
 <div class="relative flex flex-col bg-white shadow-sm drop-shadow-xl border border-slate-200 rounded-lg w-80 hover:bg-blue-900 group duration-300">     
     <div class="mx-3 mb-0 border-b border-slate-200 pt-3 pb-2 px-1 flex justify-between">
-        <span class="text-xs font-semibold text-slate-600 group-hover:text-blue-50/75">
-            Exam ID: {{ exam.id }}
-        </span>
-        <span class="text-xs text-slate-600 font-semibold group-hover:text-blue-50/75">
-            Course: BSCS
+        <span class="text-xs font-medium {{ status_color }}">
+            {{ status_label }}: {{ status }}
         </span>
     </div>
 
@@ -17,16 +27,16 @@
         <p class="text-xs text-slate-600 leading-normal group-hover:text-white">
             Maximum Score: {{ exam.max_score }}
         </p>
-
     </div>
     <div class="mx-3 border-t border-slate-200 pb-3 pt-2 px-1 flex justify-between">
-        <span class="text-xs font-medium {{ exam.is_published ? 'text-green-600 group-hover:text-green-300' : 'text-orange-600 group-hover:text-orange-300' }}">
-            Status: {{ exam.is_published ? 'Published' : 'On Maintenance'}}
-        </span>
-
-        <span class="text-xs text-slate-600 font-medium group-hover:text-blue-50/75">
-            Exam Date: {{ exam.examination_date ?: 'Anytime'}}
-        </span>
+            <div class="flex flex-wrap w-full gap-1">
+                <p class="text-xs text-gray-400 font-semibold">{{ exam.courses.count == 1 ? 'Course' : 'Courses'}} : </p>
+                    {% for course in exam.courses %}
+                    <span class=" inline-flex items-center px-2 py-0.5 min-w-fit  bg-blue-100 rounded-full text-blue-900 font-semibold text-xs select-none"> 
+                    {{ course.abbreviation }}
+                    </span>
+                    {% endfor %}
+            </div>
     </div>
  
 </div>

@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers\Student;
 
+use App\Models\CodingAnswer;
 use App\Models\Exam;
 use App\Models\ExamRecord;
 use App\Models\StudentAnswer;
 use App\Models\StudentPaper;
 use App\Services\ExamTakingService;
 use App\Services\QuestionService;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Redis;
+use Storage;
 use Str;
 
 class ExamRecordController extends Controller
@@ -29,6 +33,7 @@ class ExamRecordController extends Controller
 
     public function store(StudentPaper $student_paper)
     {
+        $user = auth()->user();
         // validate that the student_paper's author is the authenticated user
         $student_paper->update(['submitted_at' => now()]);
 
@@ -37,19 +42,20 @@ class ExamRecordController extends Controller
 
         $attempt_count = session()->pull('current_attempt', 1);
 
+        // AGGREGATE student points by subjects, get subject id, subject name, sum of student points for that subject, sum of obtainable points for subject
         $subject_table = DB::table('student_answers')
-        ->join('questions', 'student_answers.question_id', '=', 'questions.id')
-        ->join('topics', 'questions.topic_id', '=', 'topics.id')
-        ->join('subjects', 'topics.subject_id', '=', 'subjects.id')
-        ->where('student_answers.student_paper_id', $student_paper->id)
-        ->groupBy('subjects.id', 'subjects.name')
-        ->select(
-            'subjects.id as id',    
-            'subjects.name as subject_name',
-            DB::raw('SUM(student_answers.points) as subject_score_obtained'),
-            DB::raw('SUM(questions.total_points) as subject_score'))
-        ->get()
-        ->keyBy('id');
+            ->join('questions', 'student_answers.question_id', '=', 'questions.id')
+            ->join('topics', 'questions.topic_id', '=', 'topics.id')
+            ->join('subjects', 'topics.subject_id', '=', 'subjects.id')
+            ->where('student_answers.student_paper_id', $student_paper->id)
+            ->groupBy('subjects.id', 'subjects.name')
+            ->select(
+                'subjects.id as id',    
+                'subjects.name as subject_name',
+                DB::raw('SUM(student_answers.points) as subject_score_obtained'),
+                DB::raw('SUM(questions.total_points) as subject_score'))
+            ->get()
+            ->keyBy('id');
 
         $total_score = $subject_table->sum('subject_score_obtained');
         $date_taken = $student_paper->created_at;
@@ -82,8 +88,28 @@ class ExamRecordController extends Controller
         ['exam_record_id', 'subject_id'],
         ['score_obtained', 'score', 'updated_at']
         );
+        
+        $coding_question_answers_pattern = "user:{$user->id}:paper:{$student_paper->id}:language:*:answer:*:code";
 
-        $student_paper->update(['status'  => 'completed']);
+        $keys = Redis::keys($coding_question_answers_pattern);
+
+        if (!empty($keys)) {
+            Self::storeCodeToJSON($user->id, $student_paper->id);
+        } else {
+            $score = $exam_record->total_score;
+
+            if ($score == $exam->max_score) {
+                $status = 'perfect_score';
+            } elseif ($score >= $exam->max_score * ($exam->passing_score / 100)) {
+                $status = 'pass';
+            } else {
+                $status = 'more_review';
+            }
+
+            $exam_record->update(['status' => $status]);
+            $student_paper->update(['status'  => 'completed']);
+        }
+
         
 
         return response('', 204)->header('HX-Redirect', route('exam_records.show', ['exam' => $exam, 'exam_record' => $exam_record]));
@@ -139,17 +165,7 @@ class ExamRecordController extends Controller
                                 : 'N/A';
                             break;
                         case 'coding':
-                            $yourAnswer = $question_type_answer;
-
-                            if ($answer->codingAnswer) {
-                                $points = $answer->codingAnswer->only([
-                                    'answer_syntax_points',
-                                    'answer_runtime_points',
-                                    'answer_test_case_points'
-                                ]);
-
-                                $yourAnswer = array_merge($yourAnswer, $points);
-                            }
+                            $yourAnswer = $answer->codingAnswer;
                             break;
                         default:
                             $yourAnswer = 'Unsupported';
@@ -166,7 +182,7 @@ class ExamRecordController extends Controller
                 'score' => $answer->points ?? 0,
                 'max_score' => $question->total_points,
                 'status' => ($answer->gained_points >= $question->points) ? 'Correct' : 'Incorrect',
-                'question_type_answer' => $question_type_answer ?? null,
+                'question_type_answer' => $question_type_answer ?? null
             ];
         }
 
@@ -179,5 +195,98 @@ class ExamRecordController extends Controller
         ];
 
         return view('students/records/show', $data);
+    }
+
+    public function showCodingResult(CodingAnswer $codingAnswer){
+        $coding_answer_status = Redis::hget('checked_code', $codingAnswer->id);
+        $data['status'] = $coding_answer_status;    
+        if ($coding_answer_status == 'checked'){
+            $data['code_answer'] = $codingAnswer;
+            $data['success'] = $codingAnswer->is_code_success;
+            $data['test_results'] = json_decode($codingAnswer->test_results);
+            $data['failures'] = json_decode($codingAnswer->failures);
+            $data['syntax_points'] = $codingAnswer->answer_syntax_points;
+            $data['runtime_points'] = $codingAnswer->answer_runtime_points;
+            $data['test_case_points'] = $codingAnswer->answer_test_case_points;
+            $data['number'] = request()->input('number');
+            $data['question'] = request()->input('question');
+            $data['score'] = $codingAnswer->answer_syntax_points + $codingAnswer->answer_runtime_points + $codingAnswer->answer_test_case_points;
+            $data['max_score'] = request()->input('max_score');
+
+            return view('students/records/get-coding-result', ['data' => $data]);
+        } else {
+            return response('', 212);
+        }
+    }
+
+    public function showUpdatedScore(ExamRecord $examRecord){
+        if ($examRecord->status != 'in_progress'){
+            $student_paper = StudentPaper::findOrFail($examRecord->student_paper_id);
+            $examRecord->load('subjects');
+        
+            $examRecord['max_score'] = request()->input('max_score');
+
+            $student_paper->update(['status'  => 'completed']);
+
+            return view('students/records/get-updated-score', ['exam_record' => $examRecord]);
+        } else {
+            return response('', 212);
+        }
+    }
+
+    private static function storeCodeToJSON($user_id, $student_paper_id){
+        $pattern = "user:$user_id:paper:$student_paper_id:language:*:answer:*:code";
+        // $student_paper_date = StudentPaper::find($student_paper_id)->submitted_at;
+        // $student_paper_submitted_at_unix = (String) Carbon::parse($student_paper_date)->timestamp;
+        // $key = $student_paper_submitted_at_unix . '-' . $user_id;
+
+        $keys = Redis::keys($pattern); 
+        // $values = Redis::mget($keys);
+        $data = [];
+
+        foreach ($keys as $index => $key) {
+            try {
+                $hashData = Redis::hgetall($key);
+
+                preg_match('/paper:([^:]+)/', $key, $student_paper_matches);
+                $student_paper_id = (int)$student_paper_matches[1] ?? null;
+
+                preg_match('/language:([^:]+)/', $key, $language_matches);
+                $language = $language_matches[1] ?? null;
+
+                preg_match('/answer:(\d+)/', $key, $answer_matches);
+                $answer_id = isset($answer_matches[1]) ? (int)$answer_matches[1] : null;
+
+                preg_match('/coding_answer:(\d+)/', $key, $coding_answer_matches);
+                $coding_answer_id = isset($coding_answer_matches[1]) ? (int)$coding_answer_matches[1] : null;
+
+
+                $data[] = [
+                    'student_paper_id' => $student_paper_id,
+                    'answer_id' => $answer_id,
+                    'coding_answer_id'     => $coding_answer_id,
+                    'language'      => $language,
+                    'data'          => $hashData,
+                ];
+                
+                Redis::del($key);
+            } catch (\Exception $e) {
+                // log the error
+                continue;
+            }
+        }
+
+        $json_pretty_print = json_encode($data, JSON_PRETTY_PRINT);
+        $json = json_encode($data);
+
+        $folder = "codeInJSON/";
+
+        $answer_file_path = "{$folder}user_{$user_id}:paper_{$student_paper_id}.json";
+
+        Storage::makeDirectory($folder);
+        Storage::put($answer_file_path, $json_pretty_print);
+        
+        Redis::XADD("code_checker", '*', ["data" => $json]);
+
     }
 }

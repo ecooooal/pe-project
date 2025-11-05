@@ -19,18 +19,40 @@ class ExamTakingService
     }
     public function validateExamAccess(Exam $exam, User $user){
         $isEnrolled = $user->exams()->where('exam_id', $exam->id)->exists();
+
         if (!$isEnrolled){
-            dd('not enrolled in this exam');
+            return false;
         }
-        // check if exam is published
+
         if (!$exam->is_published){
-            dd('Not published');
+            return false;
         }
-        // check examination date
-        if ($exam->examination_date){
-            dd('date');
+                
+        $now = now();
+        if ($exam->examination_date && $exam->expiration_date) {
+            if ($now >= $exam->examination_date && $now <= $exam->expiration_date) {
+                return false;
+            }
         }
+
+
+
+        $student_attempts_left = $this->getAttemptsLeft($exam, $user);
+        if($student_attempts_left == 0){
+            return false;
+        }
+            
         return true;
+    }
+
+    public function getAttemptsLeft(Exam $exam, User $user){
+        $get_student_paper_count = $user->exams()->where('exam_id', $exam->id)->withCount('studentPapers')->first()->student_papers_count;
+        if ($exam->retakes == null){
+            $attempt_left = 99;
+        } else {
+            $attempt_left = max(0, $exam->retakes - $get_student_paper_count);
+        }
+        return $attempt_left;
     }
 
     public function checkUnsubmittedExamPaper(Exam $exam, User $user){
@@ -42,6 +64,14 @@ class ExamTakingService
         }
         return $exam_paper;
 
+    }
+    public function checkBooleanUnsubmittedExamPaper(Exam $exam, User $user){
+        $exam_paper = $user->studentPapers()->where(['exam_id' => $exam->id, 'status' => 'in_progress'])->first() ?? false;
+        if (!$exam_paper){
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public function generateExamPaper(Exam $exam, User $user){
@@ -55,7 +85,8 @@ class ExamTakingService
             'exam_id' => $exam->id,
             'user_id' => $user->id,
             'questions_order' => json_encode($shuffled_ids),
-            'question_count' => $question_count
+            'question_count' => $question_count,
+            'current_position' => 0
         ]);
 
         foreach($shuffled_ids as $id){
@@ -122,10 +153,16 @@ class ExamTakingService
             } 
         }
 
+
         $question_data = [
             'question' => $question,
             'question_type_data' => $filtered_question_type
         ];
+        
+        if($student_answer->first_viewed_at == null){
+            $student_answer->update(['first_viewed_at' => now()]);
+        }
+
         return $question_data;
     }
 

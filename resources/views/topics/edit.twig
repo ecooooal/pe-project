@@ -11,12 +11,30 @@
 {{ breadcrumb() }}
 <div class="flex flex-col mx-4 pl-4">
     <div class="flex justify-between">
-    <h1 class="font-bold text-4xl">{{ topic.name }}</h1>
-    <button form="delete-form" type="submit" class="cursor-pointer bg-red-600 text-gray-200 hover:bg-red-500 hover:text-white duration-300 rounded-lg px-2 py-1 font-semibold text-sm">Delete Topic</button>
+        <h1 class="font-bold text-4xl">{{ topic.name }}</h1>
+        <div class="flex flex-col gap-y-1">
+            <button form="delete-form" type="submit" class="cursor-pointer bg-red-600 text-gray-200 hover:bg-red-500 hover:text-white duration-300 rounded-lg p-3 font-semibold text-sm">Delete Topic</button>
+            {% if session('error') %} <p class="add-tag-animation text-xs font-semibold text-red-500 italic">{{ session('error') }}</p> {% endif %}
+        </div>
     </div>
-    <div class="flex flex-col pt-1 gap-y-0.5">
-        <span class="pl-2 text-xs text-gray-400 font-semibold">{{ topic.subject.name }}</span>
-        <span class="pl-2 text-xs text-gray-400 font-semi">ID : {{ topic.id }}</span>
+    <div class="flex flex-col pt-1 gap-y-1">
+        <div class="flex flex-wrap w-full pl-2 gap-1">
+                <span class="text-xs text-gray-400 font-semibold">Course/s : </span>
+                {% for course in topic.subject.courses %}
+                <span class=" inline-flex items-center px-2 py-0.5 min-w-fit  bg-gray-300 rounded-full text-gray-700 font-semibold text-xs select-none"> 
+                {{ course.abbreviation }}
+                </span>
+                {% endfor %}
+        </div>   
+        <a href="{{ route('subjects.show', { subject:topic.subject.id } ) }}">
+            <span class="pl-2 text-xs text-gray-400 font-semibold hover:text-blue-900 hover:underline duration-150">Subject : {{ topic.subject.name }}</span>
+        </a>          
+        <span class="pl-2 text-xs text-gray-400 font-semibold">ID : {{ topic.id }}</span>
+        {% if questions_are_in_exams %}
+        <span class="ml-1 mt-1 inline-flex items-center px-2 py-1 max-w-fit  bg-green-100 rounded-full text-green-900 font-semibold text-xs select-none"> 
+        ✔ Currently In Exam/s
+        </span>        
+        {% endif %}
     </div>
     
 </div>
@@ -63,23 +81,43 @@
                                 errors: errors.get('name'),
 
                             )}}
-                            {{ forms.form_field(
-                                label:forms.label(
-                                    id:'subject', 
-                                    content:'Subject', 
-                                    attributes:{
-                                        'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
+                            {% if questions_are_in_exams %}
+                                    {{ forms.form_field(
+                                        label:forms.label(
+                                            id:'subject-none', 
+                                            content:'Subject', 
+                                            attributes:{
+                                                'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
                                         ),
-                                input:forms.select(
-                                    name:'subject', 
-                                    values: subjects, 
-                                    attributes:{
-                                        'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                        'placeholder':'Select a Subject',
-                                        'required':true}
-                                ),
-                                isColumn:true 
-                            )}}
+                                        input:forms.text(
+                                            name:'subject-none', 
+                                            value: topic.subject.name,
+                                            attributes:{
+                                                'class':'block w-full cursor-not-allowed rounded-md bg-gray-100 px-3 py-1.5 outline-1 -outline-offset-1 outline-gray-300 text-gray-400 sm:text-sm/6',
+                                                'disabled':true}
+                                        ),
+                                        isColumn:true 
+                                    )}}
+                            {% else %}
+                                {{ forms.form_field(
+                                    label:forms.label(
+                                        id:'subject', 
+                                        content:'Subject', 
+                                        attributes:{
+                                            'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
+                                            ),
+                                    input:forms.select(
+                                        name:'subject', 
+                                        values: subjects, 
+                                        value: topic.subject.id,
+                                        attributes:{
+                                            'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                            'placeholder':'Select a Subject',
+                                            'required':true}
+                                    ),
+                                    isColumn:true 
+                                )}}
+                            {% endif %}
                             {{ forms.form_field(
                                 label:forms.label(
                                     id:'author', 

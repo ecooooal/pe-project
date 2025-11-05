@@ -1,0 +1,69 @@
+{
+"name": "Computer Programming 2",
+"code": "COMPROG2",
+"year_level": 2,
+"topics": [
+    {
+    "name": "Functions and Parameter Passing",
+    "questions": [
+        {
+        "name": "Which package is automatically imported in every Java program by default?",
+        "type": "identification",
+        "points": 1,
+        "solution": "java.lang",
+        "question_level": "remember"
+        },
+        {
+        "name": "The Math class methods in Java are static methods.",
+        "type": "true_or_false",
+        "points": 1,
+        "solution": "true",
+        "question_level": "remember"
+        },
+        {
+        "name": "Which of the following methods is used to return the square root of a number in Java?",
+        "type": "multiple_choice",
+        "points": 1,
+        "items": ["Math.power()", "Math.sqrt()", "Math.abs()", "Math.exp()"],
+        "solution": "b",
+        "question_level": "understand"
+        },
+        {
+        "name": "What keyword is used to create a function in Java that does not return a value?",
+        "type": "identification",
+        "points": 1,
+        "solution": "void",
+        "question_level": "remember"
+        },
+        {
+        "name": "Match the following Math class methods with their correct descriptions:",
+        "type": "matching",
+        "items": {
+            "1": { "left": "abs(x)", "right": "returns the absolute value of x", "points": "2" },
+            "2": { "left": "ceil(x)", "right": "smallest integer not less than x", "points": "2" },
+            "3": { "left": "floor(x)", "right": "largest integer less than x", "points": "2" }
+        },
+        "question_level": "understand"
+        },
+        {
+        "name": "Arrange the steps in defining and calling a value-returning function in the correct order:",
+        "type": "ranking",
+        "items": {
+            "1": { "solution": "Write the method heading with return type and parameters", "points": "2" },
+            "2": { "solution": "Implement the method body with statements and return value", "points": "2" },
+            "3": { "solution": "Call the method by its name with actual parameters", "points": "2" },
+            "4": { "solution": "Store or use the returned value in the calling program", "points": "2" }
+        },
+        "question_level": "apply"
+        },
+        {
+        "name": "If a method changes the value of a parameter inside its body, will the original variable passed into it also change in Java? Explain briefly.",
+        "type": "identification",
+        "points": 3,
+        "solution": "No, because Java uses pass-by-value. Changes inside the method do not affect the original variable.",
+        "question_level": "analyze"
+        }
+    ]
+    }
+]
+}

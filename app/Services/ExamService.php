@@ -6,6 +6,7 @@ use App\Models\ExamAccessCode;
 use App\Models\Question;
 use App\Models\User;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Str;
@@ -13,12 +14,28 @@ class ExamService
 {
     public function getCourseForExam(Exam $exam)
     {
-        return $exam->course()->with('subjects.topics.questions')->first();
+        return $exam->courses()->with('subjects.topics.questions')->get();
     }
 
     public function getQuestionsForExam(Exam $exam)
     {
         return $exam->questions()->with('topic.subject')->get();
+    }
+
+    public function getQuestionLevelsCountForExam(Exam $exam)
+    {
+        $questions = $exam->questions()->with(['tags' => function ($query) {
+                            $query->wherePivot('type', 'required');
+                        }])->get();
+                        
+        $level_count = [];
+        foreach ($questions as $question) {
+            foreach ($question->tags as $tag) {
+                $level_count[$tag->name] = ($level_count[$tag->name] ?? 0) + 1;
+            }
+        }
+
+        return $level_count;
     }
 
     public function getAccessCodesForExam(Exam $exam)
@@ -64,15 +81,17 @@ class ExamService
 
     public function getAvailableQuestionsForExam(Exam $exam)
     {
-        $exam_course = $this->getCourseForExam($exam); 
+        $exam_courses = $this->getCourseForExam($exam); 
 
         $exam_questions = $exam->questions()->pluck('question_id');
 
-        $available_questions = $exam_course->subjects->flatMap(function ($subject) {
-            return $subject->topics->flatMap->questions;
-        });
+        $available_questions = $exam_courses->flatMap(function ($course) {
+                return $course->subjects->flatMap(function ($subject) {
+                    return $subject->topics->flatMap->questions;
+                });
+            })->unique('id')->values();
 
-        return $available_questions->whereNotIn('id', $exam_questions);
+    return $available_questions->whereNotIn('id', $exam_questions)->values();
     }
 
     public function getTopicsForExam(Exam $exam){
@@ -118,19 +137,50 @@ class ExamService
 
 
     public function transformQuestionRows(Collection $questions)
-    {   
-        foreach ($questions as $question){
+    {
+        // Eager-load relationships
+        foreach ($questions as $question) {
             $question->load('topic.subject');
         }
-        return $questions->map(fn ($question) => [
-            'id' => $question->id, 
+
+        // Flatten and transform the question data
+        $transformed = $questions->map(fn ($question) => [
             'name' => $question->name,
             'subject' => $question->topic->subject->name,
             'topic' => $question->topic->name,
-            'type' => $question->question_type->name
+            'level' => $question->bloomTagLabel(),
+            'type' => $question->question_type->name,
+            'points' => $question->total_points,
+            'id' => $question->id
         ]);
-    }
 
+        // Group by subject
+        $grouped = $transformed
+            ->groupBy('subject')
+            ->map(function ($questionsBySubject) {
+
+                $topics = $questionsBySubject
+                    ->groupBy('topic')
+                    ->map(function ($questionsByTopic) {
+                        return [
+                            'total_score' => $questionsByTopic->sum('points'),
+                            'question_count' => $questionsByTopic->count(),
+                            'questions' => $questionsByTopic
+                                ->map(fn ($q) => Arr::except($q, ['subject', 'topic']))
+                                ->values()
+                        ];
+                    });
+
+                return [
+                    'topics' => $topics,
+                    'total_score' => $questionsBySubject->sum('points'),
+                    'question_count' => $questionsBySubject->count(),
+                ];
+            });
+
+
+        return $grouped;
+    }
 
 
 
@@ -138,19 +188,22 @@ class ExamService
     public function assignValuesToQuestionsForKnapsack(Exam $exam, $subject_weight, $criteria)
     {
         // Get all questions related to the exam’s course
-        $course = $this->getCourseForExam($exam);
-        $course->load([
+        $courses = $this->getCourseForExam($exam);
+        $courses->load([
             'subjects.topics.questions.topic.subject'
         ]);
         $knapsack = [];
 
         // Check if course does exist   
-        if ($course) {
+        if ($courses) {
             $topic_weight = 1 - $subject_weight;
 
-            $questions = $course->subjects->flatMap(function ($subject) {
-                                            return $subject->topics->flatMap->questions;
-                                        });
+            $questions = $courses->flatMap(function ($course) {
+                return $course->subjects->flatMap(function ($subject) {
+                    return $subject->topics->flatMap->questions;
+                });
+            })->unique('id')->values();
+
 
             // Count questions per subject and topic
             $questions_in_subjects = $questions->groupBy(fn($question) => $question->topic->subject->id)
@@ -312,19 +365,37 @@ class ExamService
     {        
         if (!$exam->is_published) {
                 $exam->load('questions');
+                $publishing_status = [];
 
                 $sum_of_points = $exam->questions->sum('total_points');
-
                 if ($sum_of_points !== $exam->max_score) {
-                    return false;
+                    $publishing_status['status'] = false;
+                    $publishing_status['error_message'] = "Sum of question points do not match the max score.";
+                    return $publishing_status;
                 }
-
+                if ($exam->expiration_date != null){
+                    if ($exam->expiration_date < now()) {
+                        $publishing_status['status'] = false;
+                        $publishing_status['error_message'] = "Exam has Expired.";
+                        return $publishing_status;
+                    }
+                }
                 $exam->update(['is_published' => true]);
+                session()->flash('toast', json_encode([
+                    'status' => 'Published',
+                    'message' => 'Exam: ' . $exam->name . ' is now published',
+                    'type' => 'info'
+                ]));
             } else {
                 $exam->update(['is_published' => false]);
+                session()->flash('toast', json_encode([
+                    'status' => 'Unpublished!',
+                    'message' => 'Exam: ' . $exam->name . ' is now unpublished',
+                    'type' => 'info'
+                ]));
             }
-
-            return true;
+            $publishing_status['status'] = true;
+            return $publishing_status;
     }
 }
 

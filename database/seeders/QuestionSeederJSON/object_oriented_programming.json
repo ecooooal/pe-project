@@ -1,0 +1,366 @@
+{
+  "name": "Object Oriented Programming",
+  "code": "OOP",
+  "year_level": 2,
+  "topics": [
+    {
+      "name": "Designing Methods",
+      "questions": [
+        {
+          "name": "Which part of a method declaration specifies the data type of the returned value?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Return type",
+          "question_level": "remember"
+        },
+        {
+          "name": "A parameter is a variable in a method declaration, while an argument is the actual value passed when the method is called.",
+          "type": "true_or_false",
+          "points": 1,
+          "solution": "true",
+          "question_level": "understand"
+        },
+        {
+          "name": "Which of the following method declarations is valid in Java?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": [
+            "public void run() {}",
+            "private static int sum(a, b) {}",
+            "public int compute double x, double y {}",
+            "final void main(args) {}"
+          ],
+          "solution": "a",
+          "question_level": "apply"
+        },
+        {
+          "name": "Why does the following code output '1' instead of '3'?\n\npublic static void main(String[] args) {\n  int num = 1;\n  newNumber(2);\n  System.out.println(num);\n}\n\npublic static void newNumber(int num) {\n  num = 3;\n}",
+          "type": "multiple_choice",
+          "points": 2,
+          "items": [
+            "Because Java is pass-by-value",
+            "Because Java is pass-by-reference",
+            "Because num is declared as static",
+            "Because the compiler optimizes the call"
+          ],
+          "solution": "a",
+          "question_level": "analyze"
+        },
+        {
+          "name": "Method overloading can be done by changing only the return type of methods.",
+          "type": "true_or_false",
+          "points": 2,
+          "solution": "false",
+          "question_level": "evaluate"
+        },
+        {
+          "name": "Arrange the following steps in the correct order to declare and use a value-returning method:\n1. Write the method heading with return type and parameters\n2. Implement the method body with statements and return value\n3. Call the method by its name with actual parameters\n4. Store or use the returned value in the calling program",
+          "type": "ranking",
+          "items": {
+            "1": { "solution": "Write the method heading with return type and parameters", "points": "1" },
+            "2": { "solution": "Implement the method body with statements and return value", "points": "1" },
+            "3": { "solution": "Call the method by its name with actual parameters", "points": "1" },
+            "4": { "solution": "Store or use the returned value in the calling program", "points": "1" }
+          },
+          "question_level": "create"
+        }
+      ]
+    },
+    {
+      "name": "Static Methods",
+      "questions": [
+        {
+          "name": "A static method belongs to the ____ rather than the object of a class.",
+          "type": "identification",
+          "points": 1,
+          "solution": "class",
+          "question_level": "remember"
+        },
+        {
+          "name": "Static methods cannot directly access instance variables.",
+          "type": "true_or_false",
+          "points": 1,
+          "solution": "true",
+          "question_level": "understand"
+        },
+        {
+          "name": "Which of the following is the correct way to call a static method displayNumber() of class NumberClass?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": [
+            "new NumberClass().displayNumber();",
+            "NumberClass.displayNumber();",
+            "displayNumber();",
+            "this.displayNumber();"
+          ],
+          "solution": "b",
+          "question_level": "apply"
+        },
+        {
+          "name": "In the code below, why is the output 5 instead of 6?\n\nNumberClass nc1 = new NumberClass();\nNumberClass nc2 = new NumberClass();\nnc1.num = 6;\nnc2.num = 5;\nSystem.out.println(NumberClass.num);",
+          "type": "multiple_choice",
+          "points": 2,
+          "items": [
+            "Because each object has its own copy of num",
+            "Because num is static and shared by all objects",
+            "Because num was declared as final",
+            "Because the last object always overrides values"
+          ],
+          "solution": "b",
+          "question_level": "analyze"
+        },
+        {
+          "name": "Static methods can access instance variables directly.",
+          "type": "true_or_false",
+          "points": 2,
+          "solution": "false",
+          "question_level": "evaluate"
+        },
+        {
+          "name": "Match the following Java keywords with their description:",
+          "type": "matching",
+          "items": {
+            "1": { "left": "static", "right": "method or variable belongs to the class", "points": "1" },
+            "2": { "left": "final", "right": "value cannot be changed or method cannot be overridden", "points": "1" },
+            "3": { "left": "abstract", "right": "method without a body", "points": "1" }
+          },
+          "question_level": "create"
+        }
+      ]
+    },
+        {
+      "name": "Constructors",
+      "questions": [
+        {
+          "name": "A constructor has the same name as the ____.",
+          "type": "identification",
+          "points": 1,
+          "solution": "class",
+          "question_level": "remember"
+        },
+        {
+          "name": "Constructors in Java can be inherited by subclasses.",
+          "type": "true_or_false",
+          "points": 1,
+          "solution": "false",
+          "question_level": "understand"
+        },
+        {
+          "name": "Which of the following statements correctly creates an object using a constructor?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": [
+            "Employee emp = Employee();",
+            "Employee emp = new Employee();",
+            "Employee emp = create Employee();",
+            "Employee emp = construct Employee();"
+          ],
+          "solution": "b",
+          "question_level": "apply"
+        },
+        {
+          "name": "When a constructor calls another constructor within the same class, this is called ____.",
+          "type": "identification",
+          "points": 1,
+          "solution": "constructor chaining",
+          "question_level": "analyze"
+        },
+        {
+          "name": "Overloading constructors requires changing the parameter list, not just the return type.",
+          "type": "true_or_false",
+          "points": 2,
+          "solution": "true",
+          "question_level": "evaluate"
+        },
+        {
+          "name": "Arrange the steps in creating a constructor with parameters:\n1. Declare the constructor with the class name\n2. Add parameters inside parentheses\n3. Initialize instance variables using this keyword\n4. Use the constructor in object creation with new",
+          "type": "ranking",
+          "items": {
+            "1": { "solution": "Declare the constructor with the class name", "points": "1" },
+            "2": { "solution": "Add parameters inside parentheses", "points": "1" },
+            "3": { "solution": "Initialize instance variables using this keyword", "points": "1" },
+            "4": { "solution": "Use the constructor in object creation with new", "points": "1" }
+          },
+          "question_level": "create"
+        }
+      ]
+    },
+    {
+      "name": "Encapsulation",
+      "questions": [
+        {
+          "name": "Which keyword is used to declare an instance variable hidden from other classes?",
+          "type": "identification",
+          "points": 1,
+          "solution": "private",
+          "question_level": "remember"
+        },
+        {
+          "name": "Encapsulation allows restricting access only to declared public features.",
+          "type": "true_or_false",
+          "points": 1,
+          "solution": "true",
+          "question_level": "understand"
+        },
+        {
+          "name": "Which of the following methods is an example of an accessor (getter)?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": [
+            "public void setName(String name)",
+            "public String getName()",
+            "private void showName()",
+            "public void resetName()"
+          ],
+          "solution": "b",
+          "question_level": "apply"
+        },
+        {
+          "name": "Match the encapsulation terms with their descriptions:",
+          "type": "matching",
+          "items": {
+            "1": { "left": "Getter", "right": "returns data from a private variable", "points": "1" },
+            "2": { "left": "Setter", "right": "changes data in a private variable", "points": "1" },
+            "3": { "left": "Immutable class", "right": "cannot be modified after creation", "points": "1" }
+          },
+          "question_level": "analyze"
+        },
+        {
+          "name": "An immutable class should provide setters to modify its fields.",
+          "type": "true_or_false",
+          "points": 2,
+          "solution": "false",
+          "question_level": "evaluate"
+        },
+        {
+          "name": "Arrange the rules of implementing encapsulation:\n1. Declare instance variables as private\n2. Create getter methods with 'get' or 'is'\n3. Create setter methods with 'set'",
+          "type": "ranking",
+          "items": {
+            "1": { "solution": "Declare instance variables as private", "points": "1" },
+            "2": { "solution": "Create getter methods with 'get' or 'is'", "points": "1" },
+            "3": { "solution": "Create setter methods with 'set'", "points": "1" }
+          },
+          "question_level": "create"
+        }
+      ]
+    },
+    {
+      "name": "Inheritance",
+      "questions": [
+        {
+          "name": "All classes in Java inherit from the ____ class.",
+          "type": "identification",
+          "points": 1,
+          "solution": "Object",
+          "question_level": "remember"
+        },
+        {
+          "name": "A class can extend more than one parent class in Java.",
+          "type": "true_or_false",
+          "points": 1,
+          "solution": "false",
+          "question_level": "understand"
+        },
+        {
+          "name": "Which of the following correctly declares a subclass Student that inherits from Person?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": [
+            "public class Student inherit Person {}",
+            "public class Student extends Person {}",
+            "public class Student implements Person {}",
+            "public class Student derives Person {}"
+          ],
+          "solution": "b",
+          "question_level": "apply"
+        },
+        {
+          "name": "Match the inheritance terms with their definitions:",
+          "type": "matching",
+          "items": {
+            "1": { "left": "Superclass", "right": "base or parent class", "points": "1" },
+            "2": { "left": "Subclass", "right": "derived or child class", "points": "1" },
+            "3": { "left": "Method overriding", "right": "child class redefines parent method", "points": "1" }
+          },
+          "question_level": "analyze"
+        },
+        {
+          "name": "The super() call must always be the first statement in a constructor.",
+          "type": "true_or_false",
+          "points": 2,
+          "solution": "true",
+          "question_level": "evaluate"
+        },
+        {
+          "name": "Arrange the constructor execution order in inheritance:\n1. Call to parent constructor\n2. Call to child constructor\n3. Object fully created",
+          "type": "ranking",
+          "items": {
+            "1": { "solution": "Call to parent constructor", "points": "1" },
+            "2": { "solution": "Call to child constructor", "points": "1" },
+            "3": { "solution": "Object fully created", "points": "1" }
+          },
+          "question_level": "create"
+        }
+      ]
+    },
+    {
+      "name": "Interfaces",
+      "questions": [
+        {
+          "name": "Which keyword is used to define an interface in Java?",
+          "type": "identification",
+          "points": 1,
+          "solution": "interface",
+          "question_level": "remember"
+        },
+        {
+          "name": "Interfaces can contain constants, abstract methods, default methods, and static methods.",
+          "type": "true_or_false",
+          "points": 1,
+          "solution": "true",
+          "question_level": "understand"
+        },
+        {
+          "name": "Which of the following correctly implements an interface Drinkable?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": [
+            "public class Water inherits Drinkable {}",
+            "public class Water extends Drinkable {}",
+            "public class Water implements Drinkable {}",
+            "public interface Water implements Drinkable {}"
+          ],
+          "solution": "c",
+          "question_level": "apply"
+        },
+        {
+          "name": "Match the interface rules with their descriptions:",
+          "type": "matching",
+          "items": {
+            "1": { "left": "final interface", "right": "not allowed in Java", "points": "1" },
+            "2": { "left": "multiple interfaces", "right": "a class can implement many", "points": "1" },
+            "3": { "left": "interface inheritance", "right": "an interface can extend another interface", "points": "1" }
+          },
+          "question_level": "analyze"
+        },
+        {
+          "name": "A class cannot extend an interface in Java.",
+          "type": "true_or_false",
+          "points": 2,
+          "solution": "true",
+          "question_level": "evaluate"
+        },
+        {
+          "name": "Arrange the steps for implementing an interface:\n1. Use the 'implements' keyword in the class declaration\n2. Provide implementations for all abstract methods\n3. Create an object of the class",
+          "type": "ranking",
+          "items": {
+            "1": { "solution": "Use the 'implements' keyword in the class declaration", "points": "1" },
+            "2": { "solution": "Provide implementations for all abstract methods", "points": "1" },
+            "3": { "solution": "Create an object of the class", "points": "1" }
+          },
+          "question_level": "create"
+        }
+      ]
+    }
+  ]
+}

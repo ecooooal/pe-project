@@ -1,0 +1,380 @@
+{% import 'components/core/forms' as forms %}
+
+<div id="homepage-course-report" 
+        class="dashboard-animate flex flex-col max-w-full mx-4 p-4 gap-2 bg-white rounded-2xl shadow-md">
+    <div class="flex gap-x-2">
+        <span class="text-3xl font-bold text-blue-900">
+            Course : 
+        </span>
+        {{ forms.form_field(
+            label:forms.label(
+                id:'course', 
+                content:'Course', 
+                attributes:{
+                    'class':'hidden'}
+                    ),
+            input:forms.select(
+                name:'course', 
+                values:courses, 
+                attributes:{
+                    'class':'w-24 cursor-pointer block rounded-md bg-white px-3 py-1 text-base font-bold text-blue-900 focus:outline-none placeholder:text-gray-400',
+                    'placeholder':'Select a Course',
+                    'required':true,
+                    'hx-get' : route('graphs.homepage.specific.course'),
+                    'hx-target': '#course-counts',
+                    'hx-swap':'outerHTML',
+                    'hx-trigger':'load, change'
+                }
+            ),
+        )}}
+    </div>   
+    <div id="specific-course-data" class="flex flex-1 justify-between">
+        <div class="flex flex-col gap-y-2">
+            <div id="course-counts">
+            </div>
+
+            <div class="h-full w-full">
+                <div id="questions-type-graph" class="w-full"></div>
+            </div>
+        </div>
+
+        
+        <div class="flex flex-1 flex-col w-full ">
+            <div class="w-full pl-4">
+                <div id="course-graph" class="w-full"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+function renderCourseGraph() {
+    const course_graph = document.getElementById('course-graph');
+    console.log(course_graph);
+    if (!course_graph) return;
+
+    const subject_raw_data = document.getElementById('subject_graph_data');
+    const topic_raw_data = document.getElementById('topic_graph_data');
+    const question_type_raw_data = document.getElementById('question_type_graph_data');
+    const question_stats_raw_data = document.getElementById('reused_question_graph_data');
+
+    const subjects = JSON.parse(subject_raw_data.dataset.questions || '[]');
+    const topics = JSON.parse(topic_raw_data.dataset.questions || '[]');
+    const types = JSON.parse(question_type_raw_data.dataset.questions || '[]');
+    const question_stats = JSON.parse(question_stats_raw_data.dataset.questions || '[]');
+    const subject_graph_text = subjects.map(q =>
+        `<b>Name</b>: ${q["name"]}<br>`
+    );
+
+    const topic_graph_text = topics.map(q =>
+        `<b>Name</b>: ${q["name"]}<br>`
+    );
+
+    // Mapping for colors and symbols, this is for question graph
+    const question_status_color_by_status = {
+        used: 'rgb(49, 130, 189)', 
+        reused: 'rgb(195,140,60)', 
+        unused: 'rgb(153, 27, 30)'
+    };
+
+    const question_shape_by_type = {
+        'MCQ': 'circle',
+        'T/F': 'triangle-up',
+        'Identification': 'square',
+        'Ranking': 'hourglass',
+        'Matching': 'bowtie',
+        'Coding' : 'star'
+    };
+
+    // separate question data by level
+    const question_level_separator = {};
+    question_stats.forEach(q => {
+    question_level_separator[q.level] = (question_level_separator[q.level] || 0) + 1;
+    });
+
+    // sort each level by question count
+    const sorted_question_levels = Object.entries(question_level_separator)
+      .sort((a, b) => b[1] - a[1])
+      .map(entry => entry[0]);
+
+    // Step 3: Group questions by level
+    const grouped = {};
+    
+    sorted_question_levels.forEach(level => grouped[level] = []);
+    question_stats.forEach(q => grouped[q.level].push(q));
+
+    // Step 4: Build plot data
+    const question_stats_x = [],  
+    question_stats_y = [],
+    question_stats_marker_colors = [], 
+    question_stats_marker_symbols = [], 
+    question_stats_texts = [];
+
+    let question_stats_max_count = 0;  
+
+    for (const level of sorted_question_levels) {
+        const group = grouped[level];
+
+        group.sort((a, b) => {
+            const typeOrder = Object.keys(question_shape_by_type); // define desired order if needed
+            return typeOrder.indexOf(a.question_type) - typeOrder.indexOf(b.question_type);
+        });
+
+        group.forEach((q, i) => {
+        question_stats_x.push(level);
+        question_stats_y.push(i+1); 
+        question_stats_marker_colors.push(question_status_color_by_status[q.status]);
+        question_stats_marker_symbols.push(question_shape_by_type[q.question_type] || 'circle');
+        question_stats_texts.push(`<b>Status</b>: ${q["status"]}<br>` +
+        `<b>Name</b>: ${q["name"]}<br>` +
+        `<b>Type</b>: ${q["question_type"]}<br>`);
+        });
+        if (question_stats_max_count < group.length) question_stats_max_count = group.length ;
+    }
+
+    // Plotly traces
+    let subject_graph = {
+        name:'Questions by Subject',
+        x: subjects.map(s => s.name),
+        y: subjects.map(s => s.question_count),
+        text: subject_graph_text,
+        textposition: 'none', 
+        hoverinfo: 'text',
+        hovertemplate:  '<b>No. of Questions</b>: %{y}' +
+                        '<br>%{text}<br><extra></extra>',   
+        hoverlabel: {
+            font: { color: 'white' }      // hover text color
+        },
+        width: 0.8,
+        type: 'bar',
+        marker: {
+            line: { width: 2, color: '#333'},
+            color: 'rgb(49,130,189)',
+            opacity:0.7
+        }
+    };
+
+    let topic_graph = {
+        name:'Questions by topic',
+        x: topics.map(d => d.name),
+        y: topics.map(d => d.question_count),
+        text: topic_graph_text,
+        textposition: 'none', 
+        hoverinfo: 'text',
+        hovertemplate:  '<b>No. of Questions</b>: %{y}' +
+                        '<br>%{text}<br><extra></extra>',   
+        hoverlabel: {
+            font: { color: 'white' }      // hover text color
+        },
+        width: 0.7,
+        xaxis: 'x2',
+        yaxis: 'y2',
+        type: 'bar',
+        marker: {
+            line: { width: 2, color: '#333'},
+            color: 'rgb(49,130,189)',
+            opacity:0.7
+        }
+    };
+
+    const question_stats_graph = {
+        name:'Questions Stats',
+        y: question_stats_x,
+        x: question_stats_y,
+        xaxis: 'x3',
+        yaxis: 'y3',
+        type: 'scatter',
+        mode: 'markers',
+        text: question_stats_texts,
+        hoverinfo: 'text',
+        hovertemplate: '%{text}<extra></extra>',   
+        hoverlabel: {
+            font: { color: 'white' }      
+        },
+        marker: { 
+            color: question_stats_marker_colors,
+            symbol: question_stats_marker_symbols,
+            line: { width: 2, color: '#333'},
+            size: 14,
+            opacity: 0.7 },
+    };
+
+    const question_types = {
+        name: 'Question Types',
+        x: types.map(d => d.name),
+        y: types.map(d => d.question_count),
+        type: 'bar',
+        text: types.map(d => d.question_count),
+        textposition: 'auto',
+        hovertemplate:  '<b>No. of Questions</b>: %{y}<br>' +
+                        '<b>Type</b>: %{x}<br><extra></extra>',
+        marker: { 
+            line: { width: 2, color: '#333'},
+            color: 'rgb(49,130,189)', opacity: 0.7 }
+    };
+
+    const subject_and_topic_data = [subject_graph, topic_graph, question_stats_graph];
+    const question_type_data = [question_types];
+
+    var course_graph_layout = {
+            grid: {    
+                rows: 2,
+                columns: 2,
+                pattern: 'independent',
+                roworder: 'top to bottom'
+            },
+            showlegend: false, 
+            title: {
+                text: "Course Composition Report",
+                font: {
+                    size: 16,
+                    color: "#4B5563", 
+                    family: "Arial Black, sans-serif" 
+                },
+                x: 0.5,           // center horizontally
+                xanchor: 'center', 
+                y: 0.95,          // slightly down from top
+                yanchor: 'top'
+            },            
+            height: 400,
+            autosize: true,
+            margin: { l: 80, r:10, t: 60, b: 40 },
+            
+            xaxis: {
+                type: 'category', 
+                title: {
+                    text: 'Subjects',
+                    font: {
+                        size: 12,
+                        color: '#7f7f7f'
+                    }
+                },       
+                tickangle: -45,    
+                tickfont: {
+                    size: 14,
+                    color: 'rgb(107, 107, 107)'
+                },
+                showticklabels: false,
+            },
+            yaxis: {
+                title: {
+                    text: 'No. of Questions',
+                    font: {
+                        size: 12,
+                        color: '#7f7f7f'
+                    }
+                },    
+                tickfont: {
+                    size: 14,
+                    color: 'rgb(107, 107, 107)'
+                    }
+            },
+
+            xaxis2: { 
+                title: {
+                    text: 'Topics',
+                    font: {
+                        size: 12,
+                        color: '#7f7f7f'
+                    }
+                },   
+                tickfont: {
+                    size: 10,
+                    color: 'rgb(107, 107, 107)'
+                },
+                showticklabels: false,
+                
+            },
+            yaxis2: {        
+                tickfont: {
+                    size: 14,
+                    color: 'rgb(107, 107, 107)'
+                    }
+            },
+
+            yaxis3: {
+                categorygap: 0,
+                type: 'category',
+                categoryorder: 'array',
+                categoryarray: ["create", "evaluate", "analyze", "apply", "understand", "remember"],
+                anchor: 'y3',
+                showgrid: false,
+                
+                tickangle: 0,
+                tickfont: {
+                    xanchor: 'left',
+                    size: 12,
+                    color: 'rgb(107, 107, 107)'
+                }
+            },
+            xaxis3: {     
+                range: [0.5, question_stats_max_count + 1],
+                domain: [0.0, 1.0],
+                tickmode: "linear", 
+                dtick: 1,            
+                tickangle: 45, 
+                title: {
+                    text: 'Questions',
+                    font: {
+                        size: 12,
+                        color: '#7f7f7f'
+                    }
+                },  
+                anchor: 'x3',
+                zeroline: false
+            },
+        
+        };
+
+    var questions_per_subject_graph_layout = {
+        showlegend: false, 
+        title: {
+            text: "Questions per Type",
+            font: {
+                size: 16,
+                color: "#4B5563", 
+                family: "Arial Black, sans-serif" 
+            },
+            x: 0.5,           // center horizontally
+            xanchor: 'center', 
+            y: 0.95,          // slightly down from top
+            yanchor: 'top'
+        },            
+        height: 225,
+        autosize: true,
+        margin: { l: 35, r:10, t: 30, b: 80 },
+        
+        xaxis: {     
+            tickangle: -45,    
+            tickfont: {
+                size: 12,
+                color: 'rgb(107, 107, 107)'
+            },
+            showticklabels: true,
+        },
+        yaxis: {      
+            tickfont: {
+                size: 14,
+                color: 'rgb(107, 107, 107)'
+                }
+        },
+    };
+
+    // Render both graphs
+    Plotly.react('course-graph', subject_and_topic_data, course_graph_layout, { responsive: true })
+        .then(() => {
+            Plotly.Plots.resize('course-graph');  
+        });
+    Plotly.react('questions-type-graph', question_type_data, questions_per_subject_graph_layout, { responsive: true })
+        .then(() => {
+            Plotly.Plots.resize('questions-type-graph');  
+        });
+}
+document.addEventListener('DOMContentLoaded', renderCourseGraph);
+
+document.body.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target.closest('#course-counts')) {
+        renderCourseGraph();
+    }
+});
+</script>

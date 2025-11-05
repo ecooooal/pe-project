@@ -1,0 +1,207 @@
+<div id="homepage-system-report" 
+        class="dashboard-animate flex mx-4 p-4 gap-2 bg-white rounded-2xl shadow-md ">
+        <div class="flex flex-col md:w-3/4 gap-y-2">
+            <div class="flex justify-start">
+                <span class="text-3xl font-bold text-blue-900">
+                    System
+                </span>
+            </div>
+                        
+        
+            <div class="flex  gap-x-1">
+                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+                <span class="text-2xl font-bold text-gray-900 self-center">
+                    50
+                </span>
+                <span class="text-xs text-gray-400 font-mono font-semibold self-center mt-auto">Online Users</span>
+                </div>
+                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+                    <span class="text-2xl font-bold text-green-900 self-center">
+                        30
+                    </span>
+                    <span class="text-xs text-green-400 font-mono font-semibold self-center mt-auto">Online Students</span>
+                </div>
+                 <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+                    <span class="text-2xl font-bold text-green-900 self-center">
+                        15
+                    </span>
+                    <span class="text-xs text-green-400 font-mono font-semibold self-center mt-auto">DB Queries/sec</span>
+                </div>
+                <div class="flex flex-col h-fit w-24 p-1 gap-y-2">
+                    <span class="text-2xl font-bold text-green-900 self-center">
+                        25
+                    </span>
+                    <span class="text-xs text-green-400 font-mono font-semibold self-center mt-auto">Users request/sec</span>
+                </div>
+            </div>
+            <div class="w-full">
+                <div id="system-graph" class="w-full"></div>
+            </div>
+        </div>
+
+        <div class="flex flex-col h-fit md:w-1/2 p-4 gap-y-4 bg-gray-50 rounded-xl">
+            <p class="mx-auto text-xl text-gray-900 font-bold">Containers</p>
+            <div class="flex flex-col justify-center items-center gap-y-1 ">
+                <div class="flex flex-1 gap-x-4 ml-auto">
+                    <div class="min-h-24 bg-white shadow-md rounded-lg p-4 border-l-4 border-red-500">
+                        <div class="flex justify-between items-center gap-x-2">
+                            <div class="flex flex-col justify-center items-center">
+                                <div class="flex gap-x-1">
+                                    <img class="object-cover w-10 h-10" src="{{ asset('images/fastapi-logo.svg') }}">
+                                </div>
+                                <span class="text-[#049688] font-semibold font-mono text-sm">FastAPI</span>
+                            </div>
+                            <span class="text-red-600 text-sm font-semibold font-mono">No Response</span>
+                        </div>
+                    </div>
+                </div>
+                <span class="self-end font-semibold text-md text-gray-800">Background Task</span>
+            </div>
+            <div class="flex flex-col w-full gap-y-1">
+                <div class="flex max-w-full justify-center ml-auto gap-x-4 items-center">
+                    <div class="min-h-24 bg-white shadow-md rounded-lg p-4 border-l-4 border-green-500">
+                        <div class="flex justify-between items-center gap-x-2">
+                            <div class="flex flex-col justify-center items-center">
+                                <div class="flex gap-x-1">
+                                    <img class="object-cover w-10 h-10" src="{{ asset('images/java-logo.svg') }}">
+                                </div>
+                                <span class="text-[#0074BD] font-semibold font-mono text-sm">Java</span>
+                            </div>
+                            <span class="text-green-600 text-sm font-semibold font-mono">Running</span>
+                        </div>
+                    </div>
+                </div>
+                <span class="self-end font-semibold text-md text-gray-800">Language Executor</span>
+            </div>
+        </div>
+</div>
+
+<script>
+    // Check if exam-graph id is present
+    let system_graph = document.getElementById('system-graph');
+    if (system_graph){
+        const today = new Date().toISOString().split('T')[0];
+        var traceSELECT = {
+            type: "scatter",
+            mode: "lines",
+            name: 'SELECT',
+            x: [
+                '2025-08-01', '2025-08-02', '2025-08-03', '2025-08-04', '2025-08-05',
+                '2025-08-06', '2025-08-07', '2025-08-08', '2025-08-09', '2025-08-10',
+                '2025-08-11', '2025-08-12', '2025-08-13', '2025-08-14', '2025-08-15',
+                '2025-08-16', '2025-08-17', '2025-08-18', '2025-08-19', '2025-08-20',
+                '2025-08-21'
+            ],
+            y: [
+                145, 160, 150, 155, 162,
+                170, 168, 175, 160, 158,
+                180, 190, 185, 178, 172,
+                165, 160, 175, 185, 190,
+                195
+            ],
+            line: { 
+                color: '#1c398e',
+                shape: 'spline'
+            }
+        };
+
+        var traceINSERT = {
+            type: "scatter",
+            mode: "lines",
+            name: 'INSERT',
+            x: traceSELECT.x,
+            y: [
+                40, 42, 38, 45, 48,
+                50, 46, 49, 47, 45,
+                52, 55, 50, 51, 48,
+                44, 43, 46, 50, 53,
+                55
+            ],
+            line: { 
+                color: '#f9f871' ,
+                shape: 'spline'
+            }
+        };
+
+        var traceUPDATE = {
+            type: "scatter",
+            mode: "lines",
+            name: 'UPDATE',
+            x: traceSELECT.x,
+            y: [
+                30, 28, 35, 32, 34,
+                36, 35, 37, 34, 33,
+                38, 40, 39, 36, 35,
+                34, 32, 33, 36, 37,
+                39
+            ],
+            line: { 
+                color: '#943d92',
+                shape: 'spline'
+            }
+        };
+
+        var traceDELETE = {
+            type: "scatter",
+            mode: "lines",
+            name: 'DELETE',
+            x: traceSELECT.x,
+            y: [
+                15, 12, 10, 14, 13,
+                16, 15, 14, 13, 12,
+                17, 18, 16, 15, 14,
+                13, 12, 13, 14, 15,
+                16
+            ],
+            line: { 
+                color: '#ff7d67',
+                shape: 'spline'
+            }
+        };
+
+        var system_data = [traceSELECT, traceINSERT, traceUPDATE, traceDELETE];
+
+        var system_layout = {
+        title: {
+            text: 'DB Queries',
+            font: {
+                    size: 16,
+                    color: "#4B5563", 
+                    family: "Arial Black, sans-serif" 
+                },
+            x: 0.5,           // center horizontally
+            xanchor: 'center', 
+            y: 0.95,          // slightly down from top
+            yanchor: 'top'
+            },
+        legend: {
+            orientation: 'h',  // horizontal
+            x: 1,               // align to left
+            y: 1,            // position above the plot (1 is top of plot area, >1 is above)
+            xanchor: 'right',
+            yanchor: 'bottom'
+        },
+        margin: { l: 40, r:10, t: 55, b: 50 },
+        autosize: true,
+        height: 300,
+        xaxis: {
+            autorange: true,
+            range: ['2025-08-01', '2025-08-31'],
+            rangeslider: {range: ['2025-08-01', today]},
+            type: 'date'
+        },
+        yaxis: {
+            autorange: true,
+            title: 'Query Count',
+            type: 'linear'
+        }
+        };
+
+        Plotly.newPlot('system-graph', system_data, system_layout)
+            .then(() => {
+                Plotly.Plots.resize('system-graph');  
+            });
+
+    }
+
+</script>

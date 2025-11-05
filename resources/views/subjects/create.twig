@@ -1,7 +1,7 @@
 {% from 'components/core/breadcrumbs' import breadcrumb %}
 {% from 'components/core/show-header' import show_header %}
 {% import 'components/core/forms' as forms %}
-<form hx-post="{{ route('subjects.store') }}" class="flex flex-col gap-y-2 p-4 mb-2">
+<form id="subject-form" hx-post="{{ route('subjects.store') }}" class="flex flex-col gap-y-2 p-4 mb-2">
     {{ csrf_field() }}
     <div class="flex max-w-full p-4 rounded-xl bg-white">
         <div class="flex flex-col flex-1">
@@ -16,7 +16,8 @@
                                 'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
                         ),
                         input:forms.text(
-                            name:'name', 
+                            name:'name',
+                            value: old.name ?: '',   
                             attributes:{
                                 'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                 'required': true
@@ -25,23 +26,48 @@
                         errors: errors.get('name'),
                         isColumn:true 
                     )}}
+                        <div class="flex gap-1">
+                            <div class="relative inline-block shrink-0">
+                                <button 
+                                    id="toggle-course-list" 
+                                    type="button"
+                                    class="px-2 py-1 mt-1 bg-blue-900 text-sm text-gray-50 rounded-md cursor-pointer hover:bg-blue-700 transition"
+                                >
+                                    + Add Course
+                                </button>
+                                <div 
+                                    id="course-list" 
+                                    class="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-50 hidden"
+                                >
+                                    <ul class="text-sm max-h-56 overflow-auto text-gray-700">
+                                    {% for course in courses %}
+                                    <li><button type="button" class="course-btn w-full text-left px-4 py-2 hover:bg-blue-100" data-tag-abbv="{{ course.abbreviation }}" data-tag-id="{{ course.id }}">{{ course.abbreviation }}</button></li>
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                                </div>
+                            <div id="course-container" class="flex flex-wrap gap-1 p-1 "></div>
+                            <input type="hidden" name="courses[]" id="courses-id" />
+                            {% if errors.get('courses.0') or errors.get('courses') %}
+                                <span class="add-tag-animation text-red-500 font-semibold text-sm mt-2">Course required</span>
+                            {% endif %}
+                        </div>
                     {{ forms.form_field(
                         label:forms.label(
-                            id:'course', 
-                            content:'Course', 
+                            id:'code', 
+                            content:'Code', 
                             attributes:{
-                                'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
-                                ),
-                        input:forms.select(
-                            name:'course', 
-                            values: courses,
-                            value:old['course'] ?: 1,
-                            attributes:{
-                                'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                'placeholder':'Select a Course',
-                                'required':true}
+                                'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
                         ),
-                        errors: errors.get('course'),
+                        input:forms.text(
+                            name:'code',
+                            value: old.code ?: '',  
+                            attributes:{
+                                'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                'required': true
+                            }
+                        ),
+                        errors: errors.get('code'),
                         isColumn:true 
                     )}}
                     {{ forms.form_field(
@@ -53,6 +79,7 @@
                             ),
                         input:forms.number(
                             name:'year_level',
+                            value: old.year_level ?: '',  
                             attributes:{
                                 'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                                 'required':true,
@@ -90,3 +117,93 @@
 
     </div>
 </form>
+<script>
+  var container = document.getElementById("course-container");
+  var tagsHiddenInput = document.getElementById('courses-id');
+  var tags = new Set();
+
+  var toggleBtn = document.getElementById("toggle-course-list");
+  var courseList = document.getElementById("course-list");
+
+  toggleBtn.addEventListener("click", () => {
+    courseList.classList.toggle("hidden");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!toggleBtn.contains(e.target) && !courseList.contains(e.target)) {
+      courseList.classList.add("hidden");
+    }
+  });
+
+  // Handle course selection
+  var courseButtons = document.querySelectorAll(".course-btn");
+
+  courseButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const tag = button.dataset.tagAbbv;
+      const tag_id = button.dataset.tagId;
+        if (tag && tag_id && !tags.has(tag_id)) {
+            addTag(tag, tag_id);
+            tags.add(tag_id);
+            updateHiddenInput();
+            courseList.classList.add("hidden");
+        }
+    });
+  });
+
+  function addTag(tag, tag_id) {
+    const tagEl = document.createElement("span");
+    tagEl.className = `
+      inline-flex 
+      items-center 
+      gap-1 
+      px-2 py-1 
+      bg-blue-100 
+      text-blue-900 
+      rounded-full 
+      font-semibold 
+      text-xs 
+      select-none
+    `;
+    tagEl.textContent = tag;
+    tagEl.dataset.tagId = tag_id;
+
+    const closeBtn = document.createElement("button");
+    closeBtn.innerHTML = "&times;";
+    closeBtn.type = "button"; 
+    closeBtn.className = `
+      text-blue-900 
+      text-sm 
+      font-bold 
+      cursor-pointer 
+      bg-transparent 
+      border-none
+      add-tag-animation
+    `;
+
+    closeBtn.addEventListener("click", () => {
+        tagEl.classList.add("delete-tag-animation");
+        
+        tagEl.addEventListener("animationend", () => {
+            container.removeChild(tagEl);
+            tags.delete(tag_id);
+            updateHiddenInput();
+        });
+    });
+
+    tagEl.appendChild(closeBtn);
+    container.appendChild(tagEl);
+  }
+
+  function updateHiddenInput() {
+    document.querySelectorAll('input[name="courses[]"]').forEach(el => el.remove());
+    Array.from(tags).forEach(tagId => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "courses[]";
+        input.value = tagId;
+        document.getElementById("subject-form").appendChild(input); 
+    });
+  }
+</script>
+

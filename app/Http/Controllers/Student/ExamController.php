@@ -35,8 +35,16 @@ class ExamController extends Controller
     
     public function showExamOverview(Exam $exam)
     {
-        $exam->load('course');
-        return view('students/exams/get-exam-overview', ['exam' => $exam]);
+        $user = auth()->user();
+        $student_attempts_left = $this->examTakingService->getAttemptsLeft($exam, $user);
+        $student_paper = $this->examTakingService->checkBooleanUnsubmittedExamPaper($exam, $user);
+
+        $data = [
+            'exam' => $exam, 
+            'attempts_left' => $student_attempts_left,
+            'has_unsubmitted_paper' => $student_paper
+        ];
+        return view('students/exams/get-exam-overview', $data);
     }
     public function store(){
         $user = auth()->user();
@@ -58,6 +66,12 @@ class ExamController extends Controller
             'old' => ['access-code' => request()->input('access-code')]
             ]);
         }
+
+        session()->flash('toast', json_encode([
+            'status' => 'Enrolled!',
+            'message' => 'Successful enrolling in this exam' ,
+            'type' => 'success'
+        ]));
 
         return response('', 200)->header('HX-Refresh', 'true');
     }

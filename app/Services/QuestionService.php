@@ -64,10 +64,15 @@ class QuestionService
                                     'html_input' => 'strip',
                                 ]);
                 $instruction_raw = $question_type->instruction;
+                $is_syntax_code_only = $question_type->is_syntax_code_only;
+                $enable_compilation = $question_type->enable_compilation;
                 $syntax_points = $question_type->syntax_points;
                 $runtime_points = $question_type->runtime_points;
                 $test_case_points = $question_type->test_case_points;
-
+                $syntax_points_deduction_per_error = $question_type->syntax_points_deduction_per_error;
+                $runtime_points_deduction_per_error = $question_type->runtime_points_deduction_per_error;
+                $test_case_points_deduction_per_error = $question_type->test_case_points_deduction_per_error;
+                            
                 $languages = $question_type->codingQuestionLanguages()->pluck('language');
                 $coding_languages = $question_type->codingQuestionLanguages;            
                 $language_codes = $coding_languages->mapWithKeys(function ($item) {
@@ -82,9 +87,14 @@ class QuestionService
 
                 $data = [
                     'instruction' => $instruction,
+                    'is_syntax_code_only' => $is_syntax_code_only,
+                    'enable_compilation' => $enable_compilation,
                     'syntax_points' => $syntax_points,
                     'runtime_points' => $runtime_points,
                     'test_case_points' => $test_case_points,
+                    'syntax_points_deduction_per_error' => $syntax_points_deduction_per_error,
+                    'runtime_points_deduction_per_error' => $runtime_points_deduction_per_error,
+                    'test_case_points_deduction_per_error' => $test_case_points_deduction_per_error,
                     'instruction_raw' =>  $instruction_raw,
                     'languages' => $languages,
                     'language_codes' =>$language_codes
@@ -105,29 +115,18 @@ class QuestionService
                     $response = Http::timeout(30)->post('http://java-api:8090/execute', [
                         'code' => $code,
                         'testUnit' => $test,
+                        'syntax_coding_question_only' => $code_settings['syntax_coding_question_only'],
                         'request_action' => $code_settings['action'],
                         'syntax_points' => $code_settings['syntax_points'],
                         'runtime_points' => $code_settings['runtime_points'],
-                        'test_case_points' => $code_settings['test_case_points']
+                        'test_case_points' => $code_settings['test_case_points'],
+                        'syntax_points_deduction' => $code_settings['syntax_points_deduction'],
+                        'runtime_points_deduction' => $code_settings['runtime_points_deduction'],
+                        'test_case_points_deduction' => $code_settings['test_case_points_deduction']
                     ]);
+                    
                     if ($response->successful()) {
                         $data = $response->json();
-                        $hasFailures = false;
-
-                        if (isset($data['testResults']) && is_array($data['testResults'])) {
-                            foreach ($data['testResults'] as $testResult) {
-                                if (isset($testResult['methods']) && is_array($testResult['methods'])) {
-                                    foreach ($testResult['methods'] as $method) {
-                                        if (isset($method['status']) && $method['status'] !== 'PASSED') {
-                                            $hasFailures = true;
-                                            break 2;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        $data['success'] = !$hasFailures;
                         return $data;
                     }
                     return ['success' => false, 'error' => 'API returned error'];

@@ -2,7 +2,7 @@
 {% from 'components/core/breadcrumbs' import breadcrumb %}
 {% from 'components/core/show-header' import show_header %}
 {% from 'components/core/show-item' import show_item %}
-{% from 'components/core/index-table' import table %}
+{% from 'components/core/index-table' import exam_questions_table %}
 {% import 'components/core/forms' as forms %}
 
 {% set values = {
@@ -127,12 +127,20 @@
         </div>
         <div class="flex max-w-full mx-8 rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
             <div class="flex flex-col p-4 flex-1 items-center">
-                <h1 class="text-2xl font-bold text-gray-800">{{ exam.course.name }} </h1>
+                <h1 class="text-5xl font-bold text-gray-800">{{ exam_course.count() > 1 ? 'Courses' : 'Course' }} </h1>
+                <div class="flex gap-x-2 m-1">
+                {% for course in exam_course %}
+                <span class="text-lg items-center px-2 py-0.5 min-w-fit  bg-blue-100 rounded-full text-blue-700 font-semibold select-none"> 
+                {{ course.abbreviation }}
+                </span>
+                {% endfor %}  
+                </div>
+                
                 <div class="flex gap-x-4">
                     <span id="subject-count-field" class="text-xs font-semibold text-gray-500">Total Subjects : {{ exam_subjects.count() }}</span>
                     <span id="topic-count-field" class="text-xs font-semibold text-gray-500">Total Topics : {{ exam_topics.count() }}</span>
                     <span id="question-count-field" class="text-xs font-semibold text-gray-500">Total Questions : {{exam_questions.count()}}</span>
-                    <span id="score-count-field" class="text-xs font-semibold text-gray-500">Current Score : {{exam_questions.sum('total_points')}}</span>    
+                    <span id="score-count-field" class="text-xs font-semibold text-gray-500">Current Score : {{exam_questions.sum('total_points') ~ '/' ~ exam.max_score}}</span>    
                 </div>
                 <span id="algortihm-field" class="text-xs italic font-semibold text-gray-500">Current Algorithm : {{ exam.applied_algorithm }}</span>    
             </div>  
@@ -180,6 +188,93 @@
                 </div>  
             </div>
         </div>
+        <div id="blooms-level-field" class="flex max-w-full mx-8 justify-center gap-x-4">
+            <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+                <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+                    🧠
+                </div>
+                
+                <div class="flex flex-col justify-center">
+                    <span class="text-xl font-extrabold font-mono text-blue-900">
+                    {{ exam_levels.remember ?? '0'}}
+                    </span>
+                    <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+                    Remember
+                    </span>
+                </div>
+            </div>  
+            <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+                <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+                    📖
+                </div>
+                
+                <div class="flex flex-col justify-center">
+                    <span class="text-xl font-extrabold font-mono text-blue-900">
+                    {{ exam_levels.understand ?? '0'}}
+                    </span>
+                    <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+                    Understand
+                    </span>
+                </div>
+            </div>
+            <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+                <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+                    🛠️
+                </div>
+                
+                <div class="flex flex-col justify-center">
+                    <span class="text-xl font-extrabold font-mono text-blue-900">
+                    {{ exam_levels.apply ?? '0'}}
+                    </span>
+                    <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+                    Apply
+                    </span>
+                </div>
+            </div>
+            <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+                <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+                    🧩
+                </div>
+                
+                <div class="flex flex-col justify-center">
+                    <span class="text-xl font-extrabold font-mono text-blue-900">
+                    {{ exam_levels.analyze ?? '0'}}
+                    </span>
+                    <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+                    Analyze
+                    </span>
+                </div>
+            </div>
+            <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+                <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+                    📝
+                </div>
+                
+                <div class="flex flex-col justify-center">
+                    <span class="text-xl font-extrabold font-mono text-blue-900">
+                    {{ exam_levels.evaluate ?? '0'}}
+                    </span>
+                    <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+                    Evaluate
+                    </span>
+                </div>
+            </div>
+            <div class="flex items-center h-20 w-35 p-3 bg-white border-gray-100 border-1 rounded-lg shadow-sm gap-2">
+                <div class="flex pb-2 font-mono items-center justify-center w-8 h-8 text-blue-900 text-2xl font-bold">
+                    🎨
+                </div>
+                
+                <div class="flex flex-col justify-center">
+                    <span class="text-xl font-extrabold font-mono text-blue-900">
+                    {{ exam_levels.create ?? '0'}}
+                    </span>
+                    <span class="text-xs text-blue-900/80 font-mono font-semibold tracking-wide">
+                    Create
+                    </span>
+                </div>
+            </div>
+        </div>
+
         <div class="flex gap-x-2 mx-8">
             <span class="text-xs font-bold italic text-gray-500">*Total questions per Categories </span>  
             <span class="text-xs font-bold italic text-gray-500">*Categories are scrollable</span>
@@ -191,24 +286,28 @@
 
             <div class="flex ml-auto my-2">
                 <button type="button" 
-                        class="cursor-pointer bg-blue-600 text-gray-200 hover:bg-blue-500 hover:text-white duration-300 rounded-lg p-2 font-semibold text-sm"
+                        class="flex items-center gap-1 cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-800 hover:text-white duration-300 rounded-lg p-2 font-semibold text-sm"
                         popovertarget="add-question-popover">
-                        Add Question
+                        <svg xmlns="http://www.w3.org/2000/svg" id="add-remove-icon" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clip-rule="evenodd" />
+                        </svg> 
+                        Question
                 </button>
             </div>
 
             {% endif %}
-            <div class="flex justify-between items-center w-full h-16 p-8 bg-white border-x border-t border-gray-300 rounded-t-2xl">
-                <h1 class="text-2xl font-medium text-gray-800">Exam Questions </h1>
-                <h1>Filter here</h1>
+            <div class="flex justify-between items-center w-full h-16 p-8 bg-blue-900 border-x border-t border-gray-300 rounded-t-2xl">
+                <h1 class="text-2xl font-medium text-gray-50">Exam Questions </h1>
             </div>
-            <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
-                {{ table(questions_header, exam_questions_rows, url:'questions', forAdding:can('update exams') and not exam.is_published ? true : false, openAction:true, exam_id:exam.id, forRemoving:can('update exams') and not exam.is_published ? true : false, actions:true) }}
-        
+            {% if exam_questions_rows.count != 0 %}
+            <div class="overflow-auto max-w-full scroll-smooth rounded-b-2xl border-x border-y border-gray-300">
+                {{ exam_questions_table(questions_header, exam_questions_rows, url:'questions', forAdding:can('update exams') and not exam.is_published ? true : false, openAction:true, exam_id:exam.id, forRemoving:can('update exams') and not exam.is_published ? true : false, actions:true) }}
             </div>
-            <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300 rounded-b-2xl">
-                <h1>Pagination</h1>
+            {% else %}
+            <div class="flex justify-between items-center w-full h-16 p-8 bg-white rounded-2xl">
+                <h1 class="text-2xl font-medium text-gray-800">No Exam Questions Yet</h1>
             </div>
+            {% endif %}
         </div>
         {% if can('update exams') %}
 
@@ -232,19 +331,15 @@
 
 
 
-        <div popover="manual" class="w-full h-full backdrop:bg-gray-900/15 backdrop:backdrop-blur-[1px] m-auto p-6 bg-gray-50/0 rounded-xl" id="add-question-popover">
+        <div popover="manual" class="w-full h-full backdrop:bg-gray-900/15 m-auto p-6 bg-gray-50/0 rounded-xl" id="add-question-popover">
             <div id="available-question-field" class="flex flex-col flex-1 w-full p-4">
                 {% if available_questions_rows.count != 0 %}
-                <div class="flex justify-between items-center w-full h-16 p-8 bg-white border-x border-t border-gray-300 rounded-t-2xl">
-                    <h1 class="text-2xl font-medium text-gray-800">Available Questions </h1>
-                    <h1>Filter here</h1>
+                <div class="flex justify-between items-center w-full h-16 p-8 bg-blue-900 border-x border-t border-gray-300 rounded-t-2xl">
+                    <h1 class="text-2xl font-medium text-gray-50">Available Questions </h1>
                 </div>
-                <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
-                    {{ table(questions_header, available_questions_rows, url:'exams', forAdding:true, openAction:false, exam_id:exam.id) }}
+                <div class="bg-white overflow-auto max-w-full scroll-smooth rounded-b-2xl border-1 border-gray-300">
+                    {{ exam_questions_table(questions_header, rows:available_questions_rows, url:'exams', forAvailableQuestions:true, forAdding:true, openAction:false, exam_id:exam.id) }}
             
-                </div>
-                <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300 rounded-b-2xl">
-                    <h1>Pagination</h1>
                 </div>
                 {% else %}
                 <div class="flex justify-between items-center w-full h-16 p-8 bg-white rounded-2xl">
@@ -273,4 +368,77 @@
     </div>
 
     {% endif %}
+<script>
+    function bindCheckboxListeners(container = document) {
+        const addButtons = container.querySelectorAll('#add-questions-button');
+        addButtons.forEach(button => {
+            const form = button.closest('form') || container;
+            const checkboxes = form.querySelectorAll('input[name="toggle-questions[]"]');
+
+            function updateButton() {
+                const anyChecked = [...checkboxes].some(cb => cb.checked);
+                button.disabled = !anyChecked;
+            }
+
+            checkboxes.forEach(cb => {
+                cb.removeEventListener('change', updateButton);
+                cb.addEventListener('change', updateButton);
+            });
+
+            updateButton();
+        });
+
+        const removeButtons = container.querySelectorAll('#remove-questions-button');
+        removeButtons.forEach(button => {
+            const form = button.closest('form') || container;
+            const checkboxes = form.querySelectorAll('input[name="toggle-questions[]"]');
+
+            function updateButton() {
+                const anyChecked = [...checkboxes].some(cb => cb.checked);
+                button.disabled = !anyChecked;
+            }
+
+            checkboxes.forEach(cb => {
+                cb.removeEventListener('change', updateButton);
+                cb.addEventListener('change', updateButton);
+            });
+
+            updateButton();
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        bindCheckboxListeners();
+    });
+
+    document.body.addEventListener('htmx:afterSwap', (evt) => {
+        bindCheckboxListeners(evt.target);
+    });
+
+
+
+    let lastClickedButton = null;
+    let row = null;
+    document.addEventListener('DOMContentLoaded', () => {
+        let openDetailsState = [];
+
+        document.body.addEventListener('htmx:beforeRequest', (evt) => {
+            openDetailsState = Array.from(document.querySelectorAll('details[open]')).map(details => details.id);
+        });
+
+        document.body.addEventListener('htmx:afterSwap', (evt) => {
+            if (openDetailsState.length > 0) {
+                openDetailsState.forEach(id => {
+                    const detailsElement = document.getElementById(id);
+                    if (detailsElement) {
+                        detailsElement.setAttribute('open', '');
+                        detailsElement.classList.add('bg-blue-900');
+                    }
+                });
+                // Clear the state after re-applying it
+                openDetailsState = [];
+            }
+        });
+    });
+</script>
 {% endblock %}

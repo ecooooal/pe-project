@@ -8,6 +8,7 @@ use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class CourseController extends Controller
 {
@@ -19,44 +20,58 @@ class CourseController extends Controller
         $this->userService = $userService;
     }
     public function index(){
-        $course_courses = Course::all();
-        $header = ['ID', 'Name', 'Date Created'];
-        $rows = $course_courses->map(function ($course) {
+        $courses = Course::with('subjects')->paginate(10);
+        $header = ['Name'];
+        $rows = $courses->map(function ($course) {
             return [
                 'id' => $course->id,
-                'name' => $course->name,
-                'Date Created' => Carbon::parse($course->created_at)->format('m/d/Y')
+                'name' => $course->name
             ];  
         });
 
         $data = [
             'headers' => $header,
             'rows' => $rows,
-            'courses' => $course_courses
+            'models' => $courses,
+            'url' => 'courses'
         ];
+
+        if (request()->hasHeader('HX-Request') && !request()->hasHeader('HX-History-Restore-Request')) {
+            // Return only the partial view for HTMX
+            return view('components/core/index-table', $data);
+        }
 
         return view('courses/index', $data);
     }
 
     public function show(Course $course){
-        $header = ['ID', 'Name', 'Year Level', 'Date Created'];
-        $subjects = Subject::with(['course'])
-            ->where('course_id', $course->id)
-            ->Paginate(10);
+        $subject_count = $course->subjects()->count();
+        $header = ['Name', 'Year Level', 'Date Created'];
+        $subjects = $course->subjects()->paginate(5);
 
-        $rows = $subjects->map(fn($subject) => [
-                'id' => $subject->id,
-                'name' => $subject->name,
-                'type' => $subject->year_level,
-                'Date Created' => Carbon::parse($subject->created_at)->format('m/d/Y')
+
+        $rows = collect($subjects->items())->map(fn($subject) => [
+            'id' => $subject->id,
+            'name' => $subject->name,
+            'type' => $subject->year_level,
+            'Date Created' => $subject->created_at->format('m/d/Y'),
         ]);
 
         $data = [
             'headers' => $header,
             'rows' => $rows,
             'course'=>$course,
-            'subjects' => $subjects
+            'models' => $subjects,
+            'subject_count' => $subject_count,
+            'url' => 'subjects'
         ];
+
+        
+        if (request()->hasHeader('HX-Request') && !request()->hasHeader('HX-History-Restore-Request')) {
+            // Return only the partial view for HTMX
+            return view('components/core/index-table', $data);
+        }
+
         return view('courses/show', $data);
     }
 
@@ -65,21 +80,30 @@ class CourseController extends Controller
     }
 
     public function store(){
-        $validator = Validator::make(request()->post(), [
-            'name'    => ['required'],
-            'abbreviation' => ['required']
+        $data = request()->post();
+        $data['abbreviation'] = strtoupper($data['abbreviation']);
+
+        $validator = Validator::make($data, [
+            'name'    => ['required', 'unique:courses,name'],
+            'abbreviation' => ['required', 'unique:courses,abbreviation']
         ]);
 
         if ($validator->fails()) {
             return response()->view('courses.create', [
                 'errors' => $validator->errors(),
-                'old' => request()->all()]);
+                'old' => $data]);
         }
 
-        Course::create([
-            'name' => request('name'),
-            'abbreviation' => request('abbreviation')
+        $course = Course::create([
+            'name' => $data['name'],
+            'abbreviation' => $data['abbreviation']
         ]);
+
+        session()->flash('toast', json_encode([
+            'status' => 'Created!',
+            'message' => 'Course: ' . $course->name,
+            'type' => 'success'
+        ]));
 
         return response('', 200)->header('HX-Redirect', route('courses.index'));
     }
@@ -93,15 +117,32 @@ class CourseController extends Controller
     }
 
     public function update(Course $course){
+        $data = request()->all();
+        $data['abbreviation'] = strtoupper($data['abbreviation']);
+        request()->merge($data);
+
         request()->validate([
-            'name'    => ['required'],
-            'abbreviation' => ['required']        
-        ]); 
-        
-        $course->update([
-            'name' => request('name'),
-            'abbreviation' => request('abbreviation')        
+            'name' => [
+                'required',
+                Rule::unique('courses', 'name')->ignore($course->id),
+            ],
+            'abbreviation' => [
+                'required',
+                Rule::unique('courses', 'abbreviation')->ignore($course->id),
+            ],
         ]);
+
+
+        $course->update([
+            'name' => $data['name'],
+            'abbreviation' => $data['abbreviation']   
+        ]);
+
+        session()->flash('toast', json_encode([
+            'status' => 'Updated!',
+            'message' => 'Course: ' . $course->name,
+            'type' => 'info'
+        ]));
 
         return redirect()->route('courses.show', $course);
     }
@@ -112,6 +153,12 @@ class CourseController extends Controller
         if ($course->subjects()->exists()) {
             return back()->with('error', 'You cannot delete a course that has subjects.');
         }
+
+        session()->flash('toast', json_encode([
+            'status' => 'Destroyed!',
+            'message' => 'Course: ' . $course->name,
+            'type' => 'warning'
+        ]));
 
         $course->delete();
 

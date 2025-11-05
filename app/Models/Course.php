@@ -16,23 +16,20 @@ class Course extends Model
         'abbreviation'
     ];
 
-    protected $appends = [
-        'subjects_count',
-        'topics_count',
-        'questions_count'
-    ];
-
     public function users(){
         return $this->belongsToMany(User::class)->withTimestamps();
     }
 
-    public function subjects(){
-        return $this->hasMany(Subject::class);
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class);
     }
 
-    public function exams(){
-        return $this->hasMany(Exam::class);
+    public function exams()
+    {
+        return $this->belongsToMany(Exam::class);
     }
+    
     public function createdBy(){
     return $this->belongsTo(User::class, 'created_by');
     }

@@ -1,37 +1,71 @@
 {% from 'components/core/show-item' import show_item %}
-<div id="exam-content" class="flex flex-1 ml-4 ">
+<div class="htmx-animate flex flex-1">
     <div class="flex flex-col p-4 gap-y-8 w-full">
-        {% if exam.is_published %}
+        {% if exam.expiration_date < date('now') and exam.expiration_date is not null or exam.examination_date > date('now') %}
+            <div class="flex">
+                <button type="button"
+                    class="flex items-center gap-x-0.5 ml-4 p-2 max-h-fit bg-red-500 hover:bg-red-400 rounded-lg font-medium text-white hover:text-gray-50 pointer-event-none select-none">
+                    {{ exam.expiration_date < date('now') and exam.expiration_date is not null ? '
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd" />
+                    </svg>
+
+                    Exam Expired' : '
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                    <path d="M5.25 12a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H6a.75.75 0 0 1-.75-.75V12ZM6 13.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V14a.75.75 0 0 0-.75-.75H6ZM7.25 12a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H8a.75.75 0 0 1-.75-.75V12ZM8 13.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V14a.75.75 0 0 0-.75-.75H8ZM9.25 10a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H10a.75.75 0 0 1-.75-.75V10ZM10 11.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V12a.75.75 0 0 0-.75-.75H10ZM9.25 14a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H10a.75.75 0 0 1-.75-.75V14ZM12 9.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V10a.75.75 0 0 0-.75-.75H12ZM11.25 12a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H12a.75.75 0 0 1-.75-.75V12ZM12 13.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V14a.75.75 0 0 0-.75-.75H12ZM13.25 10a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 .75.75v.01a.75.75 0 0 1-.75.75H14a.75.75 0 0 1-.75-.75V10ZM14 11.25a.75.75 0 0 0-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 0 0 .75-.75V12a.75.75 0 0 0-.75-.75H14Z" />
+                    <path fill-rule="evenodd" d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z" clip-rule="evenodd" />
+                    </svg>
+
+                    Exam to be released'}}
+                </button>
+            </div>
+
+        {% elseif exam.is_published and attempts_left != 0 %}
             <div class="flex">
                 <a  href="{{ route('exam_papers.take', { exam:exam } ) }}" 
                     hx-get="{{ route('exam_papers.take', { exam:exam } ) }}" 
                     hx-target="body"
                     hx-push-url=false
-                    class="p-2 max-h-fit bg-orange-500 rounded-lg font-medium text-white hover:bg-orange-400 hover:text-gray-50 cursor-pointer">
-                    Take Exam
+                    class="ml-4 p-2 max-h-fit {{ has_unsubmitted_paper ? 'bg-green-500 hover:bg-green-400' : 'bg-orange-500 hover:bg-orange-400' }} rounded-lg font-medium text-white hover:text-gray-50 cursor-pointer">
+                    {{ has_unsubmitted_paper ? 'Resume Exam' : 'Take Exam' }}
                 </a>
+            </div>
+        {% else %}
+            <div class="flex">
+                <button type="button"
+                    class="flex items-center gap-x-0.5 ml-4 p-2 max-h-fit bg-red-500 hover:bg-red-400 rounded-lg font-medium text-white hover:text-gray-50 pointer-event-none select-none">
+                    {{ not exam.is_published ? '
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd" />
+                    </svg>
+
+                    Exam is on Maintenance' : attempts_left == 0 ? '
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
+                    <path fill-rule="evenodd" d="M19 5.5a4.5 4.5 0 0 1-4.791 4.49c-.873-.055-1.808.128-2.368.8l-6.024 7.23a2.724 2.724 0 1 1-3.837-3.837L9.21 8.16c.672-.56.855-1.495.8-2.368a4.5 4.5 0 0 1 5.873-4.575c.324.105.39.51.15.752L13.34 4.66a.455.455 0 0 0-.11.494 3.01 3.01 0 0 0 1.617 1.617c.17.07.363.02.493-.111l2.692-2.692c.241-.241.647-.174.752.15.14.435.216.9.216 1.382ZM4 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd" />
+                    </svg>
+                    No more Attempts Left' : ''}}
+                </button>
             </div>
         {% endif %}
     </div>
     <div class="flex flex-col max-h-fit min-w-fit gap-y-2 mr-8">
-        <div class="flex flex-col min-w-64   justify-between gap-y-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
-            {{ show_item('Course', exam.course.abbreviation)}}
+        <div class="flex flex-col min-w-64 justify-between gap-y-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
+            <div class="flex gap-x-2 text-pretty break-keep">
+                <span class="font-medium">
+                    {{ exam.courses.count > 1 ? 'Courses :' : 'Course :' }}
+                </span>
+                    {% for course in exam.courses %}
+                        <span class=" inline-flex items-center px-2 py-0.5 max-w-fit  bg-blue-100 rounded-full text-blue-900 font-semibold text-sm select-none"> 
+                        {{ course.abbreviation }}
+                        </span>
+                    {% endfor %}
+            </div>
+
             {{ show_item('Max Score', exam.max_score)}}
-            {{ show_item('Duration', exam.duration ?: 'No Timer')}}
-            {{ show_item('Examination Date', exam.examination_date ?: 'Anytime') }}
-            {{ show_item('Retakes', exam.retakes ?: 'Unlimited')}}
-            {{ show_item('Status', exam.is_published ? 'Can be taken' : 'On Maintenance', value_attributes:exam.is_published ? 'text-green-600 font-semibold' : 'text-orange-600 font-semibold')}}
-        </div> 
-        <div class="flex flex-col prose prose-sm rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
-            <h4>Exam Structure</h4>
-                <ul>
-                    <li>Multiple Choice </li>
-                    <li>True or False</li>
-                    <li>Identification</li>
-                    <li>Ranking</li>
-                    <li>Matching</li>
-                    <li>Coding</li>
-                </ul>
+            {{ show_item('Duration', exam.duration ?? '∞')}}
+            {{ show_item('Attempts Left', exam.retake == null ? '∞', value_attributes: attempts_left == 0 ? 'text-red-600 font-semibold' : '') }}
+            {{ show_item('Examination Date', exam.examination_date is null ? 'Anytime' : exam.examination_date|date('h:i A d M Y')) }}
+            {{ show_item('Expiration Date', exam.expiration_date is null ? 'No Expiration' : exam.expiration_date|date('h:i A d M Y')) }}
         </div> 
     </div>
 </div>

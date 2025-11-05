@@ -10,7 +10,7 @@
 {{ vite('resources/js/answering-text-editor.js')|raw }}
 
 <div class="flex flex-1 gap-x-4 m-4">
-    <div class="flex flex-1 flex-col">
+    <div class="flex flex-1 flex-col max-w-[75vw]">
         <div    id="exam-content" 
                 class="flex flex-1 flex-col max-w-full max-h-fit gap-y-8 bg-white rounded-xl p-4 shadow-sm ring-1 ring-gray-950/5"
                 hx-get="{{ route('exam_papers.show', {student_paper:student_paper}) }}"
@@ -19,7 +19,7 @@
                 hx-target="this">
         </div>
     </div>
-    <div class="flex flex-col md:w-1/5 ml-auto max-h-fit max-w-full gap-y-2 text-wrap rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
+    <div class="flex flex-col shrink-0 md:w-1/5 ml-auto max-h-fit max-w-full gap-y-2 text-wrap rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
         {{ show_item('Exam', exam.name|title)}}
         {{ show_header('') }}
         {{ show_item('Duration', exam.duration ?: 'No Timer')}}
@@ -35,8 +35,6 @@
                 
             </ul>
         </div>
-            {{ show_header('') }}
-            <a href="#" class="flex gap-x-4">{{ show_item('Submit')}}<span>❗</span></a>
     </div>  
 
 </div>
@@ -46,6 +44,23 @@ window.onpopstate = function () {
 history.go(1); // Prevent back navigation
 };
 
+document.addEventListener('copy', function(event) {
+  event.preventDefault();
+});
+
+document.addEventListener('paste', function(event) {
+  event.preventDefault();
+});
+
+document.addEventListener('contextmenu', function(event) {
+  event.preventDefault();
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    alert("Switching tab detected");
+  }
+});
 </script>
 
 {% endblock %}

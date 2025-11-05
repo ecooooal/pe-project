@@ -2,9 +2,8 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "vite",
         "dev": "vite --host",
-        "build": "vite build"   
+        "build": "vite build"
     },
     "devDependencies": {
         "@tailwindcss/typography": "^0.5.16",
@@ -26,6 +25,9 @@
         "@codemirror/lang-python": "^6.2.0",
         "@codemirror/state": "^6.5.2",
         "@codemirror/view": "^6.36.7",
-        "codemirror": "^6.0.1"
+        "codemirror": "^6.0.1",
+        "htmx.org": "^2.0.6",
+        "plotly.js-dist-min": "^3.1.0",
+        "sortablejs": "^1.15.6"
     }
 }

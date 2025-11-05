@@ -22,17 +22,20 @@ class StudentAnswerController extends Controller
 
     public function update(StudentPaper $student_paper, Question $question)
     {
+        $question_to_answer = session('question_to_answer');
         // authorize using studentpaper, question id
-        $student_answer = $student_paper->studentAnswers()->where(['student_paper_id' => $student_paper->id, 'question_id' => $question->id])->first();
+        $student_answer = $student_paper->studentAnswers()->where(['student_paper_id' => $student_paper->id, 'question_id' => $question_to_answer])->first();
         if ($student_answer == null){
-            dd('yes');
+            return redirect('/');
         }   
+
         // update and check student answer here
         $current_attempt = session('current_attempt', 1);
-        StudentAnswerFactory::update($student_answer, request()->post(), $current_attempt);
-
+        $answer = request()->post('answer');
+        StudentAnswerFactory::update($student_answer, $answer, $current_attempt);
+        
         $action = request()->input('action');
-        // increment current position
+        // increment/decrement current position
         match ($action) {
             'back' => $student_paper->decrement('current_position'),
             'next' => $student_paper->increment('current_position'),
@@ -40,14 +43,17 @@ class StudentAnswerController extends Controller
             default => dd($student_paper),
         };
 
-        $isLastQuestion = $student_paper->current_position >= $student_paper->question_count;
+        $is_last_question = $student_paper->current_position >= $student_paper->question_count;
 
-        if ($isLastQuestion){
+        if ($is_last_question){
             return redirect()->route('exam_records.store', $student_paper);
         } else {
             $data = $this->examTakingService->getCurrentQuestion($student_paper);
+            $question_to_jump_id = $data['question']->id;
+            session(['question_to_answer' => $question_to_jump_id]);
             $data['student_paper'] = $student_paper;
-            $data['isLastQuestion'] = $isLastQuestion;
+            $data['is_last_question'] = $is_last_question;
+
             return view( 'students/papers/show', $data);
         }
     }
