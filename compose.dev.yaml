@@ -139,16 +139,27 @@ services:
       - laravel-development
 
   java-api:
-    build:
-      context: ./java-api
+    image: java-api
     ports:
       - "8082:8090"
     networks:
       - laravel-development
+    cap_drop: 
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: '0.50'
+    stop_grace_period: 15s 
+    stop_signal: SIGKILL 
 
+    # volumes:
+    #   - /home/echo/JavaAPI:/app
   fastapi:
-    build:
-      context: ./fastapi
+    image: fastapi
     ports:
       - "8085:80"
     depends_on:
@@ -156,6 +167,7 @@ services:
       - postgres
     volumes:
      - /home/echo/PythonSSE:/code/app
+     - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - laravel-development
     environment:
