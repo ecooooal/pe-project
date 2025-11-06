@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Student;
 use App\Models\CodingAnswer;
 use App\Models\Exam;
 use App\Models\ExamRecord;
+use App\Models\Reviewer;
 use App\Models\StudentAnswer;
 use App\Models\StudentPaper;
 use App\Services\ExamTakingService;
@@ -191,12 +192,32 @@ class ExamRecordController extends Controller
             ];
         }
 
+        // Get subject-topic pairs from exam questions
+        $examQuestions = $exam->questions()->with('topic.subject')->get();
+
+        $topics = [];
+
+        foreach ($examQuestions as $question) {
+            if (!in_array($question->topic_id, $topics)) {
+                $topics[] = $question->topic_id;
+            }
+        }
+
+        $reviewers = DB::select('
+            SELECT reviewers.*, subjects.name as subject_name, topics.name AS topic_name
+            FROM reviewers
+            INNER JOIN topics ON topics.id = reviewers.topic
+            INNER JOIN subjects ON subjects.id = topics.subject_id
+            WHERE reviewers.topic IN ('.implode(',', array_fill(0, count($topics), '?')).')
+        ', $topics);
+
 
         $data = [
             'exam_record' => $examRecord,
             'student_paper' => $student_paper,
             'exam' => $exam,
-            'rows' => $rows
+            'rows' => $rows,
+            'reviewers' => $reviewers
         ];
 
         return view('students/records/show', $data);

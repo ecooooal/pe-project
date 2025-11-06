@@ -31,7 +31,8 @@ class ExamTakingService
         $now = now();
         if ($exam->examination_date && $exam->expiration_date) {
             if ($now >= $exam->examination_date && $now <= $exam->expiration_date) {
-                return false;
+                // return false;
+                return true; // dapat pwede ka magtake ng exam
             }
         }
 
