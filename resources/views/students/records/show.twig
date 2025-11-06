@@ -21,6 +21,7 @@
                 <button  
                         hx-get="{{ route('exams.student.overview', { exam: exam }) }}" 
                         hx-target="#exam-content"
+                        hx-replace-url="/student/exams/{{exam.id}}"
                         hx-swap="innerHTML"
                         class="cursor-pointer hover:text-blue-900 hover:underline">
                     Overview
@@ -298,9 +299,8 @@
                             data-exam-max-score = "{{ exam.max_score }}">
                         </div>
                     {% endif %}
-                    {{ show_item('Status', exam_record.status) }}
                     {{ show_item('Time Taken', exam_record.time_taken ~ ' minutes')}}
-                    {{ show_item('Date Taken', exam_record.date_taken|date("m/d/Y"))}}
+                    {{ show_item('Date Taken', exam_record.date_taken|date("M d Y"))}}
                 </div> 
                 {% if exam_record.status != 'in_progress' %}
                 <div class="flex flex-col gap-y-2 w-full">

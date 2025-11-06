@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Jobs\ProcessStudentPerformanceJob;
+use App\Services\ReportService;
 use Illuminate\Database\Eloquent\Model;
 
 class StudentPaper extends Model
@@ -24,7 +26,6 @@ class StudentPaper extends Model
         'expired_at' => 'datetime',
     ];
 
-
     public function exam(){
         return $this->belongsTo(Exam::class);
     }
@@ -38,5 +39,15 @@ class StudentPaper extends Model
 
     public function studentAnswers() {
         return $this->hasMany(StudentAnswer::class);
+    }
+
+    protected static function booted()
+    {
+        self::updated(static function (StudentPaper $studentPaper) {
+            
+            if ($studentPaper->status == 'completed') {
+                ProcessStudentPerformanceJob::dispatch($studentPaper);
+            }
+        });
     }
 }
