@@ -220,7 +220,7 @@ class AnswerService
                 $student_answer->update(['last_answered_at' => now()]);
             };
 
-            Redis::setex($key, 3600, $hash);
+            Redis::setex($key, 43200, $hash);
             
             return true; 
         }
