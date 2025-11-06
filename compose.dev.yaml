@@ -1,8 +1,7 @@
 services:
   web:
-    image: nginx:latest # Using the default Nginx image with custom configuration.
+    image: nginx:latest
     volumes:
-      # Mount the application code for live updates
       - ./app:/var/www/app
       - ./bootstrap:/var/www/bootstrap
       - ./routes:/var/www/routes
@@ -25,12 +24,8 @@ services:
       - ./vendor:/var/www/vendor
       - app-node-modules:/var/www/node_modules
       - ./storage:/var/www/storage
-
-
-      # Mount the Nginx configuration file
       - ./docker/development/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
-      # Map port 80 inside the container to the port specified by 'NGINX_PORT' on the host machine
       - "80:80"
     environment:
       - NGINX_HOST=localhost
@@ -38,10 +33,9 @@ services:
       - laravel-development
     depends_on:
       php-fpm:
-        condition: service_started  # Wait for php-fpm to start
+        condition: service_started
 
   php-fpm:
-    # For the php-fpm service, we will create a custom image to install the necessary PHP extensions and setup proper permissions.
     image: laravel-php-fpm:dev
     build:
       context: .
@@ -52,11 +46,9 @@ services:
         GID: ${GID:-1000}
     pull_policy: never
     env_file:
-      # Load the environment variables from the Laravel application
       - .env
     user: "root"
     volumes:
-      # Mount the application code for live updates
       - ./app:/var/www/app
       - ./bootstrap:/var/www/bootstrap
       - ./routes:/var/www/routes
@@ -79,16 +71,13 @@ services:
       - ./vendor:/var/www/vendor
       - app-node-modules:/var/www/node_modules
       - ./storage:/var/www/storage
-
-
     networks:
       - laravel-development
     depends_on:
       postgres:
-        condition: service_started  # Wait for postgres to start
+        condition: service_started
 
   workspace:
-   # For the workspace service, we will also create a custom image to install and setup all the necessary stuff.
     image: laravel-workspace:dev
     build:
       context: .
@@ -99,8 +88,8 @@ services:
     pull_policy: never
     ports:
       - '${VITE_PORT:-5173}:5173'
-    tty: true  # Enables an interactive terminal
-    stdin_open: true  # Keeps standard input open for 'docker exec'
+    tty: true
+    stdin_open: true
     env_file:
       - .env
     volumes:
@@ -126,10 +115,8 @@ services:
       - ./vendor:/var/www/vendor
       - app-node-modules:/var/www/node_modules
       - ./storage:/var/www/storage
-
     networks:
-      - laravel-development 
-      
+      - laravel-development
 
   postgres:
     image: postgres:16
@@ -152,16 +139,16 @@ services:
       - laravel-development
 
   java-api:
-    image: java-api
+    build:
+      context: ./java-api
     ports:
       - "8082:8090"
-    # volumes:
-    #   - /home/echo/JavaAPI:/app
     networks:
       - laravel-development
 
   fastapi:
-    image: fastapi
+    build:
+      context: ./fastapi
     ports:
       - "8085:80"
     depends_on:
@@ -178,37 +165,6 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=postgres
       - DB_PORT=5432
-
-  # RUN API WITH FOR SANDBOXING
-  # docker run \
-  # --rm \
-  # --cpus="0.5" \
-  # --memory="256m" \
-  # --read-only \
-  # --network=none \
-  # --security-opt no-new-privileges \
-  # --security-opt seccomp=seccomp_profile.json \
-  # java-runner-image
-
-  # # ✅ Resource limits (safe defaults for dev/testing)
-  # mem_limit: 512m
-  # cpus: 0.5
-
-  # # ✅ Isolation (basic sandboxing)
-  # cap_drop:
-  #   - ALL
-  # security_opt:
-  #   - no-new-privileges:true
-  # read_only: true
-  # tmpfs:
-  #   - /tmp  # you need tmpfs so Java can still use /tmp
-
-  # # ✅ No internet access (optional but recommended)
-  # network_mode: none
-
-  # # Optional volume for report output, writable even if fs is read-only
-  # volumes:
-  #   - reports:/app/reports:rw
 
 networks:
   laravel-development:

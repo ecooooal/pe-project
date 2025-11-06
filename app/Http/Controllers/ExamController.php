@@ -9,6 +9,7 @@ use App\Models\ExamAccessCode;
 use App\Models\Question;
 use App\Services\ExamService;
 use App\Services\UserService;
+use App\Events\ExamResultsPublished;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -341,6 +342,11 @@ class ExamController extends Controller
             return view('components/core/partials-exam-builder-publish-form-error', [
                 'error' => $is_published['error_message']
             ]);        
+        }
+
+        if ($is_published) {
+        // dispatch immediately
+        event(new ExamResultsPublished($exam));
         }
 
         return response('', 200)->header('HX-Refresh', 'true');
