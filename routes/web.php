@@ -12,6 +12,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\Student\ExamRecordController;
 use App\Http\Controllers\Student\StudentAnswerController;
 use App\Http\Controllers\Student\StudentPaperController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\Student\ExamController as StudentExamController;
@@ -39,6 +40,9 @@ Route::post('/login', [SessionController::class, 'authenticate']);
 Route::post('/logout', [SessionController::class, 'logout'])->middleware(['auth']);
 Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution'])->name('validate.coding.question');
 
+Route::group(['middleware' => ['can:view student']], function () { 
+});
+
 Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/', [StudentController::class, 'index'])->name('students.index');
     Route::redirect('/exams', '/student#exam-div');
@@ -61,22 +65,49 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/student_papers/{student_paper}/question', [StudentPaperController::class, 'show'])->name('exam_papers.show');
     Route::patch('/student_papers/{student_paper}/{question}', [StudentAnswerController::class, 'update'])->name('student_answer.update');
 
-    // Student email routes with rate limiting
-    Route::post('/email-reviewer', [MailController::class, 'emailReviewer'])
-        ->middleware('throttle:5,1')
-        ->name('student.email.reviewer');
+
+
+
+
+
+
     
-    Route::post('/email-exam-record', [MailController::class, 'emailExamRecord'])
-        ->middleware('throttle:5,1')
-        ->name('student.email.exam.record');
-    
-    // Student download routes
-    Route::get('/download-exam-record/{exam_record}', [MailController::class, 'downloadExamRecord'])
-        ->name('student.download.exam.record');
-    
-    Route::get('/download-reviewer/{reviewer_type}', [MailController::class, 'downloadReviewer'])
-        ->name('student.download.reviewer');
+    Route::get('/exams/exam.id/mcq-example', function () {
+        return view('students/exams/mcq-example');
+    });
+    Route::get('/exams/exam.id/torf-example', function () {
+        return view('students/exams/TorF-example');
+    });
+    Route::get('/exams/exam.id/iden-example', function () {
+        return view('students/exams/iden-example');
+    });
+    Route::get('/exams/exam.id/rank-example', function () {
+        $items = [
+            0 => 'Code writing',
+            1 => 'Syntax checking',
+            2 => 'Compiling',
+            3 => 'Execution'
+        ];
+
+        return view('students/exams/rank-example',['items' => $items]);
+    });
+    Route::get('/exams/exam.id/match-example', function () {
+        return view('students/exams/match-example');
+    });
+    Route::get('/exams/exam.id/coding-example', function () {
+        $programming_languages = [
+            'c++' => "C++",
+            'java' => "Java",
+            'sql' => "SQL",
+            'python' => "Python",
+        ];
+        return view('students/exams/coding-example', ['programming_languages' => $programming_languages]);
+    });
+    Route::get('/exams/exam.id/result', function () {
+        return view('students/exams/result-example');
+    });
 });
+
 
 Route::prefix('')->middleware(['can:view faculty'])->group(function () { 
     Route::get('/faculty', [LandingPageController::class, 'facultyShow'])->name('faculty.index');
@@ -202,9 +233,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
         Route::delete('/exams/{exam}/edit/destroy_access_code', [ExamController::class, 'destroyAccessCode'])->name('accesscodes.destroy');
     });
 
-    Route::get('/notifications', function(){
-        return view('notifications');
-    });
+    Route::get('/notifications', [NotificationController::class, 'index']);
 
     Route::get('/settings', function(){
         return view('settings');
