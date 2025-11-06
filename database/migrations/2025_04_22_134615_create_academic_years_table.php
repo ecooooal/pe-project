@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('year_label', 9)->unique();
             $table->date('start_date');
             $table->date('end_date');
-            $table->boolean('is_current')->default(false);
+            $table->boolean('is_locked')->default(false);
             $table->timestamps();
         });
     }

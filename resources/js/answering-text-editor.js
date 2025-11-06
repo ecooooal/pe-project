@@ -63,7 +63,24 @@ import {indentWithTab} from "@codemirror/commands"
 
             const initial_solution_state = EditorState.create({
                 doc: values.initial_solution || "",
-                extensions: [basicSetup, keymap.of([indentWithTab]), extension]
+                extensions: [
+                    basicSetup, 
+                    keymap.of([indentWithTab]), 
+                    EditorView.domEventHandlers({
+                        paste: (event, view) => {
+                            event.preventDefault();
+                            return true;
+                        },
+                        copy: (event, view) => {
+                            event.preventDefault(); 
+                            return true;
+                        },
+                        cut: (event, view) => {
+                            event.preventDefault(); 
+                            return true;
+                        },
+                    }),
+                    extension]
             });
             const test_case_state = EditorState.create({
                 doc: values.test_case || "",

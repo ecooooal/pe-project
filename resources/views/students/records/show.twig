@@ -14,25 +14,25 @@
         </svg>
     </a>    
 </div>
-<div class="flex flex-col max-w-full mx-8 my-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
-    {{ show_header( exam.name|title ) }}
-    <div class="flex gap-x-4">
-        <button  
-            hx-get="{{ route('exams.student.overview', { exam: exam }) }}" 
-            hx-target="#exam-content"
-            hx-swap="innerHTML"
-            class="cursor-pointer hover:text-blue-900 hover:underline">
-            Overview
-        </button>
-        <button 
-            hx-get="{{ route('exam_records.index', { exam: exam }) }}" 
-            hx-target="#exam-content"
-            hx-trigger="click" 
-            hx-swap="innerHTML"
-            class="cursor-pointer hover:text-blue-900 hover:underline">
-            Exam Records
-        </button>
-    </div>
+    <div class="flex flex-col max-w-full mx-8 my-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
+            {{ show_header( exam.name|title ) }}
+            <div class="flex gap-x-4">
+                <button  
+                        hx-get="{{ route('exams.student.overview', { exam: exam }) }}" 
+                        hx-target="#exam-content"
+                        hx-swap="innerHTML"
+                        class="cursor-pointer hover:text-blue-900 hover:underline">
+                    Overview
+                </button>
+                <button 
+                        hx-get="{{ route('exam_records.index', { exam: exam }) }}" 
+                        hx-target="#exam-content"
+                        hx-trigger="click" 
+                        hx-swap="innerHTML"
+                        class="cursor-pointer hover:text-blue-900 hover:underline">
+                    Exam Records
+                </button>
+            </div>
 </div> 
 
 <div id="exam-content">
@@ -254,9 +254,8 @@
                             data-exam-max-score = "{{ exam.max_score }}">
                         </div>
                     {% endif %}
-                    {{ show_item('Status', exam_record.status) }}
                     {{ show_item('Time Taken', exam_record.time_taken ~ ' minutes')}}
-                    {{ show_item('Date Taken', exam_record.date_taken|date("m/d/Y"))}}
+                    {{ show_item('Date Taken', exam_record.date_taken|date("M d Y"))}}
                 </div> 
                 {% if exam_record.status != 'in_progress' %}
                 <div class="flex flex-col gap-y-2 w-full">

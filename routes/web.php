@@ -82,26 +82,15 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/faculty', [LandingPageController::class, 'facultyShow'])->name('faculty.index');
 
     Route::group(['middleware' => ['can:view access control']], function () { 
-        Route::get('/admins', [AccessControlController::class, 'redirect']);
-        Route::get('/admins/access-control', [AccessControlController::class, 'index']);
-    
-        Route::get('/admins/load-users', [AccessControlController::class, 'viewUsers']);
-        Route::get('/admins/users/create', [RegisteredUserController::class, 'create']);    
+        Route::get('/admins', [AccessControlController::class, 'redirect'])->name('admin.redirect');
+        
+        Route::get('/admins/users', [AccessControlController::class, 'indexUsers'])->name('admin.users.index');
         Route::post('/admins/users', [RegisteredUserController::class, 'store']);
-        Route::get('/admins/users/{user}/edit', [RegisteredUserController::class, 'edit'])->name('admin.users.edit');
-        Route::get('/admins/users/{user}', [RegisteredUserController::class, 'show'])->name('admin.users.show');
         Route::patch('/admins/users/{user}', [RegisteredUserController::class, 'update']);
         Route::delete('/admins/users/{user}', [RegisteredUserController::class, 'destroy']);
-    
-        Route::get('/admins/roles', function () {
-            return view('admins/roles');
-        });
-        Route::get('/admins/load-roles', [AccessControlController::class, 'viewRoles']);
-        Route::post('/admins/roles/load-role-checkbox', [AccessControlController::class, 'loadRoleCheckbox']);
-        Route::get('/admins/roles/create', [AccessControlController::class, 'createRole']);
+        
+        Route::get('/admins/roles', [AccessControlController::class, 'indexRoles'])->name('admin.roles.index');
         Route::post('/admins/roles', [AccessControlController::class, 'storeRole']);
-        Route::get('/admins/roles/{role}', [AccessControlController::class, 'showRole'])->name('admin.roles.show');
-        Route::get('/admins/roles/{role}/edit', [AccessControlController::class, 'editRole']);
         Route::patch('/admins/roles/{role}', [AccessControlController::class, 'updateRole']);
         Route::delete('/admins/roles/{role}', [AccessControlController::class, 'destroyRole']);
     
@@ -115,6 +104,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
         Route::get('/admins/permissions/{permission}/edit', [AccessControlController::class, 'editPermission']);
         Route::patch('/admins/permissions/{permission}', [AccessControlController::class, 'updatePermission']);
         Route::delete('/admins/permissions/{permission}', [AccessControlController::class, 'destroyPermission']);
+    
     });
 
     Route::get('/exams', [ExamController::class, 'index'])->name('exams.index');
@@ -126,7 +116,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::delete('/exams/{exam}', [ExamController::class, 'destroy'])->name('exams.destroy');
 
     Route::get('/exams/{exam}/builder', [ExamController::class, 'exam_builder_show']);
-    Route::post('/exams/{exam}/builder/add-question/{question}',[ExamController::class, 'toggle_question'])->name('exam.toggleQuestion');
+    Route::post('/exams/{exam}/builder/toggle-question',[ExamController::class, 'toggle_question'])->name('exam.toggleQuestion');
     Route::get('/exams/{exam}/builder/swap-algorithm',[ExamController::class, 'swap_partial_algorithm']);
     Route::get('/exams/{exam}/builder/build', [ExamController::class, 'build_exam']);
     Route::patch('/exams/{exam}/publishExam', [ExamController::class, 'publishExam'])->name('exams.publish');
@@ -191,8 +181,12 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     // Route::get('/reviewers/{reviewer}/download', [MailController::class, 'downloadFacultyReviewer'])->name('reviewers.download');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/show', [ReportController::class, 'show'])->name('reports.show');
     Route::get('/reports/info', [ReportController::class, 'info'])->name('reports.info');
+    Route::get('/reports/{exam}', [ReportController::class, 'index_exam'])->name('reports.index_exam');
+    Route::post('/reports/{exam}', [ReportController::class, 'store'])->name('reports.store');
+    Route::get('/reports/{exam}/create', [ReportController::class, 'create'])->name('reports.create');
+    Route::get('/reports/{exam}/{report}', [ReportController::class, 'show'])->name('reports.show');
+    Route::delete('/reports/{exam}/{report}', [ReportController::class, 'destroy'])->name('reports.destroy');
 
     Route::middleware('htmx.request:faculty.index')->group(function () {
         Route::get('/homepage/report/exam', [LandingPageController::class, 'examReportShow'])->name('graphs.homepage.exam');

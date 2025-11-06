@@ -168,7 +168,7 @@ services:
       - redis
       - postgres
     volumes:
-      - /home/echo/PythonSSE:/code/app
+     - /home/echo/PythonSSE:/code/app
     networks:
       - laravel-development
     environment:
