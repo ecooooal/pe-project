@@ -167,7 +167,6 @@ services:
       - postgres
     volumes:
      - /home/echo/PythonSSE:/code/app
-     - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - laravel-development
     environment:
