@@ -3,8 +3,13 @@
 /public/build
 /public/hot
 /public/storage
+/private/codeInJSON
+/private/codingAnswers
+/private/codingQuestions
 /storage/*.key
 /storage/pail
+/storage/logs/laravel.log
+/storage/logs/*.log
 /vendor
 .env
 .env.backup
