@@ -139,7 +139,7 @@ services:
       - laravel-development
 
   java-api:
-    image: java-api
+    image: coooal/pcu-dasma-pe-project-java-api:main
     ports:
       - "8082:8090"
     networks:
@@ -156,17 +156,13 @@ services:
     stop_grace_period: 15s 
     stop_signal: SIGKILL 
 
-    # volumes:
-    #   - /home/echo/JavaAPI:/app
   fastapi:
-    image: fastapi
+    image: coooal/pcu-dasma-pe-project-fastapi:main
     ports:
       - "8085:80"
     depends_on:
       - redis
       - postgres
-    volumes:
-     - /home/echo/PythonSSE:/code/app
     networks:
       - laravel-development
     environment:
