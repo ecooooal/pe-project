@@ -135,13 +135,15 @@ services:
     image: redis:alpine
     ports:
       - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_dev_data:/data
     networks:
       - laravel-development
 
   java-api:
     image: coooal/pcu-dasma-pe-project-java-api:main
     ports:
-      - "8082:8090"
+      - "${JAVA_API_PORT}:8090"
     networks:
       - laravel-development
     cap_drop: 
@@ -159,7 +161,7 @@ services:
   fastapi:
     image: coooal/pcu-dasma-pe-project-fastapi:main
     ports:
-      - "8085:80"
+      - "${FASTAPI_PORT}:8080"
     depends_on:
       - redis
       - postgres
@@ -170,8 +172,8 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=postgres
-      - DB_PORT=5432
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
 
 networks:
   laravel-development:
@@ -179,3 +181,4 @@ networks:
 volumes:
   postgres-data-development:
   app-node-modules:
+  redis_dev_data:
