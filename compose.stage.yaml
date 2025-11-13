@@ -12,6 +12,7 @@ services:
       # The 'php-fpm' service mounts the same volume without ':ro' to allow write operations.
       # -----------------------------------------------------------
       - laravel-storage-staging:/var/www/storage:ro
+      - laravel-public-assets:/var/www/public/build:ro
     networks:
       - laravel-staging
     ports:
@@ -33,9 +34,10 @@ services:
       target: production # Use the 'production' stage in the Dockerfile
     restart: unless-stopped
     volumes:
+      - laravel-public-assets:/var/www/public/build
       - laravel-storage-staging:/var/www/storage # Mount the storage volume
     env_file:
-      - .env
+      - .env.staging
     networks:
       - laravel-staging
     healthcheck:
@@ -62,7 +64,7 @@ services:
     tty: true # Enables an interactive terminal
     stdin_open: true # Keeps standard input open for 'docker exec'
     env_file:
-      - .env
+      - .env.staging
     networks:
       - laravel-staging
 
@@ -71,13 +73,16 @@ services:
       context: .
       dockerfile: ./docker/php-cli/Dockerfile
     env_file:
-      - .env
+      - .env.staging
     command: php artisan queue:work --sleep=3 --tries=3
     restart: unless-stopped
     volumes:
       - laravel-storage-staging:/var/www/storage
     networks:
       - laravel-staging
+    depends_on:
+      redis:
+        condition: service_healthy
 
   postgres:
     image: postgres:16
@@ -110,6 +115,8 @@ services:
     restart: unless-stopped # Automatically restart unless the service is explicitly stopped
     networks:
       - laravel-staging
+    volumes:
+      - redis_staging_data:/data
     # Health check for Redis
     # -----------------------------------------------------------
     # Checks if Redis is responding to the 'PING' command.
@@ -124,7 +131,7 @@ services:
   java-api:
     image: coooal/pcu-dasma-pe-project-java-api:main
     ports:
-      - "8082:8090"
+      - "8085:8090"
     networks:
       - laravel-staging
     cap_drop: 
@@ -142,7 +149,7 @@ services:
   fastapi:
     image: coooal/pcu-dasma-pe-project-fastapi:main
     ports:
-      - "8085:8080"
+      - "8082:8080"
     depends_on:
       - redis
       - postgres
@@ -167,3 +174,5 @@ networks:
 volumes:
   postgres-data-staging:
   laravel-storage-staging:
+  redis_staging_data:
+  laravel-public-assets:
