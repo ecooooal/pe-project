@@ -28,10 +28,7 @@ services:
 
   php-fpm:
     # For the php-fpm service, we will create a custom image to install the necessary PHP extensions and setup proper permissions.
-    build:
-      context: .
-      dockerfile: ./docker/common/php-fpm/Dockerfile
-      target: production # Use the 'production' stage in the Dockerfile
+    image: coooal/pcu-dasma-pe-project-app:stage-true
     restart: unless-stopped
     volumes:
       - laravel-public-assets:/var/www/public/build
