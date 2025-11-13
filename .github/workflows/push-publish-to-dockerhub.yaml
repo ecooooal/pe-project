@@ -13,6 +13,8 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Docker metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -43,11 +45,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Debug workspace
+        run: |
+          echo "Current directory: $(pwd)"
+          ls -R docker/common/php-fpm
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./docker/common/php-fpm/Dockerfile
+          context: ${{ github.workspace }}
+          file: ${{ github.workspace }}/docker/common/php-fpm/Dockerfile
           target: production
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
