@@ -45,8 +45,8 @@ Route::group(['middleware' => ['can:view student']], function () {
 
 Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/', [StudentController::class, 'index'])->name('students.index');
-    Route::redirect('/exams', '/student#exam-div');
-
+    
+    Route::get('/exams', [StudentExamController::class, 'index']);
     Route::post('/exams', [StudentExamController::class, 'store'])->name('exams.student.store');
     Route::get('/exams/{exam}', [StudentExamController::class, 'show'])->name('exams.student.show');
     
