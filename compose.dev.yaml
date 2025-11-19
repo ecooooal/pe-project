@@ -158,6 +158,8 @@ services:
 
   fastapi:
     image: coooal/pcu-dasma-pe-project-fastapi:main
+    command: sh -c "ln -sf /code /code/app 2>/dev/null || true && uvicorn main:app --host 0.0.0.0 --port 80"
+    working_dir: /code
     ports:
       - "8085:80"
     depends_on:
@@ -172,6 +174,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=postgres
       - DB_PORT=5432
+      - SKIP_STARTUP_REFRESH=true
 
 networks:
   laravel-development:
