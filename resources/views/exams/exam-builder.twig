@@ -313,14 +313,18 @@
 
         <div class="flex gap-x-2 mx-8 justify-end">
             {% if exam.is_published %}
-                <button hx-patch="{{ route('exams.publish', exam) }}" 
+                <button 
+                        type="button"
+                        hx-patch="{{ route('exams.publish', {exam: exam.id}) }}" 
                         hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}' 
                         class="cursor-pointer bg-red-600 text-gray-200 hover:bg-red-500 hover:text-white duration-300 rounded-lg p-2 font-semibold text-sm">
                     Unpublish
                 </button>
             {% else %}
                 <div id="publish-form-error" class="flex gap-x-4 justify-between"></div>
-                <button hx-patch="{{ route('exams.publish', exam) }}" 
+                <button 
+                        type="button"
+                        hx-patch="{{ route('exams.publish', {exam: exam.id}) }}" 
                         hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
                         hx-target="#publish-form-error"
                         class="cursor-pointer bg-orange-600 text-gray-200 hover:bg-orange-500 hover:text-white duration-300 rounded-lg p-2 font-semibold text-sm">

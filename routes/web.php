@@ -64,48 +64,6 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/exams/{exam}/take', [StudentPaperController::class, 'takeExam'])->name('exam_papers.take');
     Route::get('/student_papers/{student_paper}/question', [StudentPaperController::class, 'show'])->name('exam_papers.show');
     Route::patch('/student_papers/{student_paper}/{question}', [StudentAnswerController::class, 'update'])->name('student_answer.update');
-
-
-
-
-
-
-
-    
-    Route::get('/exams/exam.id/mcq-example', function () {
-        return view('students/exams/mcq-example');
-    });
-    Route::get('/exams/exam.id/torf-example', function () {
-        return view('students/exams/TorF-example');
-    });
-    Route::get('/exams/exam.id/iden-example', function () {
-        return view('students/exams/iden-example');
-    });
-    Route::get('/exams/exam.id/rank-example', function () {
-        $items = [
-            0 => 'Code writing',
-            1 => 'Syntax checking',
-            2 => 'Compiling',
-            3 => 'Execution'
-        ];
-
-        return view('students/exams/rank-example',['items' => $items]);
-    });
-    Route::get('/exams/exam.id/match-example', function () {
-        return view('students/exams/match-example');
-    });
-    Route::get('/exams/exam.id/coding-example', function () {
-        $programming_languages = [
-            'c++' => "C++",
-            'java' => "Java",
-            'sql' => "SQL",
-            'python' => "Python",
-        ];
-        return view('students/exams/coding-example', ['programming_languages' => $programming_languages]);
-    });
-    Route::get('/exams/exam.id/result', function () {
-        return view('students/exams/result-example');
-    });
 });
 
 
@@ -151,6 +109,11 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/exams', [ExamController::class, 'index'])->name('exams.index');
     Route::get('/exams/create', [ExamController::class, 'create'])->name('exams.create');
     Route::post('/exams', [ExamController::class, 'store'])->name('exams.store');
+    Route::patch('/exams/{exam}/publishExam', [ExamController::class, 'publishExam'])
+        ->whereNumber('exam')
+        ->name('exams.publish');
+
+    
     Route::get('/exams/{exam}', [ExamController::class, 'show'])->name('exams.show');
     Route::get('/exams/{exam}/edit', [ExamController::class, 'edit'])->name('exams.edit');
     Route::patch('/exams/{exam}', [ExamController::class, 'update'])->name('exams.update');
@@ -160,7 +123,6 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::post('/exams/{exam}/builder/toggle-question',[ExamController::class, 'toggle_question'])->name('exam.toggleQuestion');
     Route::get('/exams/{exam}/builder/swap-algorithm',[ExamController::class, 'swap_partial_algorithm']);
     Route::get('/exams/{exam}/builder/build', [ExamController::class, 'build_exam']);
-    Route::patch('/exams/{exam}/publishExam', [ExamController::class, 'publishExam'])->name('exams.publish');
 
     Route::get('/exams/builder/tabs', [ExamController::class, 'swap_tabs']);
 
