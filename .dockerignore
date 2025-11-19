@@ -34,7 +34,6 @@
 **/values.dev.yaml
 **/vendor
 **/.DS_Store
-storage/logs/
 *.log
 .editorconfig
 .env.example
