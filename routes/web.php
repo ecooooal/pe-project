@@ -65,7 +65,11 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/student_papers/{student_paper}/question', [StudentPaperController::class, 'show'])->name('exam_papers.show');
     Route::patch('/student_papers/{student_paper}/{question}', [StudentAnswerController::class, 'update'])->name('student_answer.update');
 
+// Add these routes inside the student middleware group (after line where you have Route::patch('/student_papers/{student_paper}/{question}', ...))
 
+    Route::post('/download/exam-record/{exam_record}', [ExamRecordController::class, 'downloadExamRecord'])->name('student.download.exam.record');
+    Route::post('/email/reviewer', [StudentController::class, 'emailReviewer'])->name('student.email.reviewer');
+    Route::post('/email/exam-record', [StudentController::class, 'emailExamRecord'])->name('student.email.exam.record');
 
 
 
