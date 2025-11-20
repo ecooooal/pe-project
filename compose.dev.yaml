@@ -135,13 +135,15 @@ services:
     image: redis:alpine
     ports:
       - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_dev_data:/data
     networks:
       - laravel-development
 
   java-api:
     image: coooal/pcu-dasma-pe-project-java-api:main
     ports:
-      - "8082:8090"
+      - "8085:8090"
     networks:
       - laravel-development
     cap_drop: 
@@ -161,7 +163,7 @@ services:
     command: sh -c "ln -sf /code /code/app 2>/dev/null || true && uvicorn main:app --host 0.0.0.0 --port 80"
     working_dir: /code
     ports:
-      - "8085:80"
+      - "8082:8080"
     depends_on:
       - redis
       - postgres
@@ -172,9 +174,8 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - SKIP_STARTUP_REFRESH=true
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
 
 networks:
   laravel-development:
@@ -182,3 +183,4 @@ networks:
 volumes:
   postgres-data-development:
   app-node-modules:
+  redis_dev_data:

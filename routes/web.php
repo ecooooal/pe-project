@@ -45,8 +45,8 @@ Route::group(['middleware' => ['can:view student']], function () {
 
 Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/', [StudentController::class, 'index'])->name('students.index');
-    Route::redirect('/exams', '/student#exam-div');
-
+    
+    Route::get('/exams', [StudentExamController::class, 'index']);
     Route::post('/exams', [StudentExamController::class, 'store'])->name('exams.student.store');
     Route::get('/exams/{exam}', [StudentExamController::class, 'show'])->name('exams.student.show');
     
@@ -151,6 +151,11 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/exams', [ExamController::class, 'index'])->name('exams.index');
     Route::get('/exams/create', [ExamController::class, 'create'])->name('exams.create');
     Route::post('/exams', [ExamController::class, 'store'])->name('exams.store');
+    Route::patch('/exams/{exam}/publishExam', [ExamController::class, 'publishExam'])
+        ->whereNumber('exam')
+        ->name('exams.publish');
+
+    
     Route::get('/exams/{exam}', [ExamController::class, 'show'])->name('exams.show');
     Route::get('/exams/{exam}/edit', [ExamController::class, 'edit'])->name('exams.edit');
     Route::patch('/exams/{exam}', [ExamController::class, 'update'])->name('exams.update');
@@ -160,7 +165,6 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::post('/exams/{exam}/builder/toggle-question',[ExamController::class, 'toggle_question'])->name('exam.toggleQuestion');
     Route::get('/exams/{exam}/builder/swap-algorithm',[ExamController::class, 'swap_partial_algorithm']);
     Route::get('/exams/{exam}/builder/build', [ExamController::class, 'build_exam']);
-    Route::patch('/exams/{exam}/publishExam', [ExamController::class, 'publishExam'])->name('exams.publish');
 
     Route::get('/exams/builder/tabs', [ExamController::class, 'swap_tabs']);
 
