@@ -71,10 +71,6 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::post('/email/reviewer', [StudentController::class, 'emailReviewer'])->name('student.email.reviewer');
     Route::post('/email/exam-record', [StudentController::class, 'emailExamRecord'])->name('student.email.exam.record');
 
-
-
-
-
     
     Route::get('/exams/exam.id/mcq-example', function () {
         return view('students/exams/mcq-example');
