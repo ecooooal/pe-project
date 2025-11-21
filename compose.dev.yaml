@@ -118,6 +118,46 @@ services:
     networks:
       - laravel-development
 
+  worker:
+    build:
+      args:
+        user: echo
+        uid: 1000
+      context: .
+      dockerfile: ./docker/php-cli/Dockerfile
+    env_file:
+      - .env
+    command: php artisan queue:work --sleep=3 --tries=3
+    restart: unless-stopped
+    volumes:
+      - ./app:/var/www/app
+      - ./bootstrap:/var/www/bootstrap
+      - ./routes:/var/www/routes
+      - ./config:/var/www/config
+      - ./resources:/var/www/resources
+      - ./public:/var/www/public
+      - ./database:/var/www/database
+      - ./compose.dev.yaml:/var/www/compose.dev.yaml
+      - ./compose.prod.yaml:/var/www/compose.prod.yaml
+      - ./docker:/var/www/docker
+      - ./composer.json:/var/www/composer.json
+      - ./composer.lock:/var/www/composer.lock
+      - ./package-lock.json:/var/www/package-lock.json
+      - ./package.json:/var/www/package.json
+      - ./vite.config.js:/var/www/vite.config.js
+      - ./.env.example:/var/www/.env.example
+      - ./.dockerignore:/var/www/.dockerignore
+      - ./.editorconfig:/var/www/.editorconfig
+      - ./artisan:/var/www/artisan
+      - ./vendor:/var/www/vendor
+      - app-node-modules:/var/www/node_modules
+      - ./storage:/var/www/storage
+    networks:
+      - laravel-development
+    depends_on:
+      redis:
+        condition: service_started
+
   postgres:
     image: postgres:16
     ports:
