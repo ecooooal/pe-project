@@ -28,13 +28,19 @@ class SubmitExpiredPaper implements ShouldQueue
      */
     public function handle(): void
     {
-        if ($this->studentPaper->isSubmitted()) 
+
+        if ($this->studentPaper->isSubmitted()) {
+            Log::info('paper is submitted');
             return;
+        }
 
         // Check expiration
         if ($this->studentPaper->isExpired()) {
+            Log::info('paper has expired');
             $this->studentPaper->status = "auto_completed";
             $this->examTakingService->submitPaper($this->studentPaper, $this->user); 
+            return;
         }
+
     }
 }

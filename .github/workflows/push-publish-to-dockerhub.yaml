@@ -50,7 +50,33 @@ jobs:
           echo "Current directory: $(pwd)"
           ls -R docker/common/php-fpm
 
-      - name: Build and push
+      - name: Build and push laravel php-cli image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ github.workspace }}
+          file: ${{ github.workspace }}/docker/php-cli/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+                coooal/pcu-dasma-pe-project-php-cli/:staging
+                ${{ github.ref == 'refs/heads/main' && 'coooal/pcu-dasma-pe-project-php-cli:latest' || '' }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push laravel web nginx image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ github.workspace }}
+          file: ${{ github.workspace }}/docker/production/nginx/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+                coooal/pcu-dasma-pe-project-web:staging
+                ${{ github.ref == 'refs/heads/main' && 'coooal/pcu-dasma-pe-project-web:latest' || '' }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push laravel php-fpm image
         uses: docker/build-push-action@v6
         with:
           context: ${{ github.workspace }}
