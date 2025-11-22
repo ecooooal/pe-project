@@ -39,9 +39,6 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Stage 2: Production environment
 FROM php:8.4-cli
 
-ARG user
-ARG uid
-
 # Install client libraries required for php extensions in runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
@@ -57,10 +54,6 @@ COPY --from=builder /usr/local/bin/docker-php-ext-* /usr/local/bin/
 # Use the default production configuration for PHP runtime arguments
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-RUN addgroup --gid $uid $user \
-    && adduser --disabled-password --gecos '' --uid $uid --ingroup $user $user \
-    && usermod -aG www-data $user
-
 # Copy the application code and dependencies from the build stage
 COPY --from=builder /var/www /var/www
 
@@ -68,10 +61,10 @@ COPY --from=builder /var/www /var/www
 WORKDIR /var/www
 
 # Ensure correct permissions
-RUN chown -R $user:$user /var/www
+RUN chown -R www-data:www-data /var/www
 
-# Switch to the non-privileged user to run the application
-USER $user
+# Switch to the non-privileged user www-data
+USER www-data
 
 # Default command: Provide a bash shell to allow running any command
 CMD ["bash"]
