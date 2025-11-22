@@ -119,12 +119,14 @@ services:
       - laravel-development
 
   worker:
+    image: laravel-workspace:dev
     build:
-      args:
-        user: echo
-        uid: 1000
       context: .
-      dockerfile: ./docker/php-cli/Dockerfile
+      dockerfile: ./docker/development/workspace/Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    pull_policy: never
     env_file:
       - .env
     command: php artisan queue:work --sleep=3 --tries=3

@@ -26,7 +26,11 @@ services:
 
   php-fpm:
     # For the php-fpm service, we will create a custom image to install the necessary PHP extensions and setup proper permissions.
-    image: coooal/pcu-dasma-pe-project-app:stage-true
+    image: coooal/pcu-dasma-pe-project-app:local-staging
+    build:
+      context: .
+      dockerfile: ./docker/common/php-fpm/Dockerfile
+      target: production # Use the 'production' stage in the Dockerfile
     restart: unless-stopped
     volumes:
       - laravel-public-assets:/var/www/public/build
@@ -52,25 +56,25 @@ services:
   # This is useful for running migrations, seeders, or any custom scripts.
   # It shares the same codebase and environment as the 'php-fpm' service.
   # -----------------------------------------------------------
-  php-cli:
-    build:
-      context: .
-      dockerfile: ./docker/php-cli/Dockerfile
-    tty: true # Enables an interactive terminal
-    stdin_open: true # Keeps standard input open for 'docker exec'
-    env_file:
-      - .env.staging
-    networks:
-      - laravel-staging
-    depends_on:
-      postgres:
-        condition: service_healthy
+  # php-cli:
+  #   build:
+  #     context: .
+  #     dockerfile: ./docker/php-cli/Dockerfile
+  #   tty: true # Enables an interactive terminal
+  #   stdin_open: true # Keeps standard input open for 'docker exec'
+  #   env_file:
+  #     - .env.staging
+  #   networks:
+  #     - laravel-staging
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
 
   worker:
+    image: coooal/pcu-dasma-pe-project-php-cli:staging
     build:
       context: .
       dockerfile: ./docker/php-cli/Dockerfile
-      image: worker-staging
     env_file:
       - .env.staging
     command: php artisan queue:work --sleep=3 --tries=3
