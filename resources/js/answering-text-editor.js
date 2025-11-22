@@ -20,7 +20,6 @@ import {indentWithTab} from "@codemirror/commands"
 
     function switchLanguage(language) {
         currentLanguage = language;
-        console.log(currentLanguage, language);
         if (!initial_solution_editor || !test_case_editor) return;
 
         let extension;
@@ -115,7 +114,6 @@ import {indentWithTab} from "@codemirror/commands"
         const initial_solution_div = document.getElementById("initial-solution-div");
         const test_case_div = document.getElementById("test-case-div");
         const select_form = document.getElementById("answer[programming_language]");
-        console.log('run initialize editors');
         if (!initial_solution_div || !test_case_div || !select_form) {
             console.warn("Editor elements not found. Skipping initialization.");
             return;
@@ -139,7 +137,6 @@ import {indentWithTab} from "@codemirror/commands"
 
         const select = document.getElementById('answer[programming_language]');
         if (!select || select.dataset.initialized === "true") return;
-        console.log('this is window.question_supported_languages', window.question_supported_languages)
         loadSupportedLanguages(window.question_supported_languages);
 
         switchLanguageFromEvent({ target: { value: select.value } });
@@ -163,14 +160,11 @@ import {indentWithTab} from "@codemirror/commands"
     }
 
     document.body.addEventListener("htmx:configRequest", function (e) {
-        console.log('htmx:configRequest is run');
         const container = e.detail.target.querySelector("#coding-question");
         if (!container) return;
         try {
             const editor = initial_solution_editor;
             const textarea = document.getElementById("answer-input");
-            console.log(editor.state.doc.toString());
-
 
             if (editor && textarea) {
                 textarea.value = editor.state.doc.toString();
@@ -184,7 +178,6 @@ import {indentWithTab} from "@codemirror/commands"
     });
 
     document.body.addEventListener("htmx:afterSwap", function (e) {
-        console.log('htmx:afterSwap is run');
         const container = e.detail.elt.querySelector("#coding-question");
         if (!container) return;
 
@@ -192,7 +185,6 @@ import {indentWithTab} from "@codemirror/commands"
 
             const instruction = JSON.parse(container.dataset.instruction || '{}');
             const languageCodes = JSON.parse(container.dataset.languageCodes || '{}');
-            console.log('This are the coding question type data',instruction, languageCodes);
             window.instruction = instruction;
             window.question_supported_languages = languageCodes;
 
