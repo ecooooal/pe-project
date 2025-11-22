@@ -57,7 +57,7 @@ jobs:
           file: ${{ github.workspace }}/docker/php-cli/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-                coooal/pcu-dasma-pe-project-php-cli/:staging
+                coooal/pcu-dasma-pe-project-php-cli:staging
                 ${{ github.ref == 'refs/heads/main' && 'coooal/pcu-dasma-pe-project-php-cli:latest' || '' }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
