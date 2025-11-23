@@ -10,7 +10,6 @@ use App\Models\StudentAnswer;
 use App\Models\StudentPaper;
 use App\Services\ExamTakingService;
 use App\Services\QuestionService;
-use App\Events\ExamSubmitted;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
@@ -21,6 +20,12 @@ use Str;
 
 class ExamRecordController extends Controller
 {
+    protected $examTakingService;
+
+    public function __construct(ExamTakingService $examTakingService)
+    {
+        $this->examTakingService = $examTakingService;
+    }
     public function index(Exam $exam)
     {
         $user = auth()->user();
@@ -36,89 +41,8 @@ class ExamRecordController extends Controller
     public function store(StudentPaper $student_paper)
     {
         $user = auth()->user();
-        // validate that the student_paper's author is the authenticated user
-        $student_paper->update(['submitted_at' => now()]);
-
-        $exam_id = $student_paper->exam->id;
-        $exam = Exam::find($exam_id);
-
-        $attempt_count = session()->pull('current_attempt', 1);
-
-        // AGGREGATE student points by subjects, get subject id, subject name, sum of student points for that subject, sum of obtainable points for subject
-        $subject_table = DB::table('student_answers')
-            ->join('questions', 'student_answers.question_id', '=', 'questions.id')
-            ->join('topics', 'questions.topic_id', '=', 'topics.id')
-            ->join('subjects', 'topics.subject_id', '=', 'subjects.id')
-            ->where('student_answers.student_paper_id', $student_paper->id)
-            ->groupBy('subjects.id', 'subjects.name')
-            ->select(
-                'subjects.id as id',    
-                'subjects.name as subject_name',
-                DB::raw('SUM(student_answers.points) as subject_score_obtained'),
-                DB::raw('SUM(questions.total_points) as subject_score'))
-            ->get()
-            ->keyBy('id');
-
-        $total_score = $subject_table->sum('subject_score_obtained');
-        $date_taken = $student_paper->created_at;
-        
-        $time_taken = round($student_paper->created_at->diffInMinutes($student_paper->submitted_at));
-
-        $exam_record = $student_paper->examRecord()->updateOrCreate(
-        ['student_paper_id' => $student_paper->id],
-            [
-                    'attempt' => $attempt_count,
-                    'total_score' => $total_score,
-                    'date_taken' => $date_taken,
-                    'time_taken' => $time_taken,
-            ]);
-
-        $transformed_subject_table = $subject_table->map(function ($item) use ($exam_record) {
-            return [
-                'exam_record_id'   => $exam_record->id,
-                'subject_id'       => $item->id,
-                'subject_name'     => $item->subject_name,
-                'score_obtained'   => (int) $item->subject_score_obtained,
-                'score'            => (int) $item->subject_score,
-                'created_at'       => now(),
-                'updated_at'       => now(),
-            ];
-        })->values()->toArray();
-
-        DB::table('exam_records_subjects')->upsert(
-        $transformed_subject_table,
-        ['exam_record_id', 'subject_id'],
-        ['score_obtained', 'score', 'updated_at']
-        );
-        
-        $coding_question_answers_pattern = "user:{$user->id}:paper:{$student_paper->id}:language:*:answer:*:code";
-
-        $keys = Redis::keys($coding_question_answers_pattern);
-
-        if (!empty($keys)) {
-            Self::storeCodeToJSON($user->id, $student_paper->id);
-        } else {
-            $score = $exam_record->total_score;
-
-            if ($score == $exam->max_score) {
-                $status = 'perfect_score';
-            } elseif ($score >= $exam->max_score * ($exam->passing_score / 100)) {
-                $status = 'pass';
-            } else {
-                $status = 'more_review';
-            }
-
-            $exam_record->update(['status' => $status]);
-            $student_paper->update(['status'  => 'completed']);
-        }
-
-        
-        // Dispatch ExamSubmitted after commit so listeners see consistent DB state
-        DB::afterCommit(function () use ($user, $exam) {
-            event(new ExamSubmitted($user, $exam));
-        });
-
-        return response('', 204)->header('HX-Redirect', route('exam_records.show', ['exam' => $exam, 'exam_record' => $exam_record]));
+        $exam_result = $this->examTakingService->submitPaper($student_paper, $user);
+        return response('', 204)->header('HX-Redirect', route('exam_records.show', ['exam' => $exam_result['exam'], 'exam_record' => $exam_result['exam_record']]));
     }
 
     public function show(Exam $exam, ExamRecord $examRecord)

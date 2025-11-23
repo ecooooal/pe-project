@@ -133,7 +133,7 @@ class ReportController extends Controller
 
     public function store(Exam $exam){
         $response = Http::timeout(30)
-            ->get("http://fastapi:80/api/reports/create-store/{$exam->id}");
+            ->get("http://fastapi:8080/api/reports/create-store/{$exam->id}");
 
         if (!$response->successful()) {
 

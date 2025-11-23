@@ -40,13 +40,10 @@ Route::post('/login', [SessionController::class, 'authenticate']);
 Route::post('/logout', [SessionController::class, 'logout'])->middleware(['auth']);
 Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution'])->name('validate.coding.question');
 
-Route::group(['middleware' => ['can:view student']], function () { 
-});
-
 Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/', [StudentController::class, 'index'])->name('students.index');
-    Route::redirect('/exams', '/student#exam-div');
-
+    
+    Route::get('/exams', [StudentExamController::class, 'index']);
     Route::post('/exams', [StudentExamController::class, 'store'])->name('exams.student.store');
     Route::get('/exams/{exam}', [StudentExamController::class, 'show'])->name('exams.student.show');
     
@@ -54,6 +51,7 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
         Route::get('/exams/{exam}/show-overview', [StudentExamController::class, 'showExamOverview'])->name('exams.student.overview');
         Route::get('/exams/{exam}/records', [ExamRecordController::class, 'index'])->name('exam_records.index');
         Route::get('/exams/{exam}/question-links/{student_paper}', [StudentPaperController::class, 'loadQuestionLinks'])->name('exam_papers.questions');
+        Route::get('/expired_student_paper_redirect/{student_paper}', [StudentPaperController::class, 'pollToAutoCompletedExamRecord'])->name('exam_papers.auto_completed_redirect');
         Route::get('/get-coding-results/{coding_answer}', [ExamRecordController::class, 'showCodingResult'])->name('exam_records.coding_answer_result');
         Route::get('/get-updated-score/{exam_record}', [ExamRecordController::class, 'showUpdatedScore'])->name('exam_records.show_updated_score');
     });
@@ -64,48 +62,6 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/exams/{exam}/take', [StudentPaperController::class, 'takeExam'])->name('exam_papers.take');
     Route::get('/student_papers/{student_paper}/question', [StudentPaperController::class, 'show'])->name('exam_papers.show');
     Route::patch('/student_papers/{student_paper}/{question}', [StudentAnswerController::class, 'update'])->name('student_answer.update');
-
-
-
-
-
-
-
-    
-    Route::get('/exams/exam.id/mcq-example', function () {
-        return view('students/exams/mcq-example');
-    });
-    Route::get('/exams/exam.id/torf-example', function () {
-        return view('students/exams/TorF-example');
-    });
-    Route::get('/exams/exam.id/iden-example', function () {
-        return view('students/exams/iden-example');
-    });
-    Route::get('/exams/exam.id/rank-example', function () {
-        $items = [
-            0 => 'Code writing',
-            1 => 'Syntax checking',
-            2 => 'Compiling',
-            3 => 'Execution'
-        ];
-
-        return view('students/exams/rank-example',['items' => $items]);
-    });
-    Route::get('/exams/exam.id/match-example', function () {
-        return view('students/exams/match-example');
-    });
-    Route::get('/exams/exam.id/coding-example', function () {
-        $programming_languages = [
-            'c++' => "C++",
-            'java' => "Java",
-            'sql' => "SQL",
-            'python' => "Python",
-        ];
-        return view('students/exams/coding-example', ['programming_languages' => $programming_languages]);
-    });
-    Route::get('/exams/exam.id/result', function () {
-        return view('students/exams/result-example');
-    });
 });
 
 
@@ -124,23 +80,38 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
         Route::post('/admins/roles', [AccessControlController::class, 'storeRole']);
         Route::patch('/admins/roles/{role}', [AccessControlController::class, 'updateRole']);
         Route::delete('/admins/roles/{role}', [AccessControlController::class, 'destroyRole']);
-    
-        Route::get('/admins/permissions', function () {
-            return view('admins/permissions');
+        
+        Route::get('/admins/academic-year', [AccessControlController::class, 'indexAcademicYear'])->name('admin.academic-year.index');
+        Route::get('/admins/academic-year/create', [AccessControlController::class, 'createAcademicYear'])->name('admin.academic-year.create');
+        Route::post('/admins/academic-year', [AccessControlController::class, 'storeAcademicYear'])->name('admin.academic-year.store');
+        
+        Route::patch('/admins/academic-year/{academic_year}', [AccessControlController::class, 'updateAcademicYear'])->name('admin.academic-year.update');
+        Route::delete('/admins/academic-year/{academic_year}', [AccessControlController::class, 'destroyAcademicYear'])->name('admin.academic-year.destroy');
+
+        Route::middleware('htmx.request:admin.redirect')->group(function () {
+            Route::get('/admins/users/create', [RegisteredUserController::class, 'create']);    
+            Route::get('/admins/users/{user}/edit', [RegisteredUserController::class, 'edit'])->name('admin.users.edit');
+            Route::get('/admins/users/{user}', [RegisteredUserController::class, 'show'])->name('admin.users.show');
+
+            Route::post('/admins/roles/load-role-checkbox', [AccessControlController::class, 'loadRoleCheckbox']);
+            Route::get('/admins/roles/create', [AccessControlController::class, 'createRole']);
+            Route::get('/admins/roles/{role}', [AccessControlController::class, 'showRole'])->name('admin.roles.show');
+            Route::get('/admins/roles/{role}/edit', [AccessControlController::class, 'editRole']);
+            
+            Route::get('/admins/academic-year/{academic_year}/edit', [AccessControlController::class, 'editAcademicYear'])->name('admin.academic-year.edit');
+            Route::get('/admins/academic-year/{academic_year}/destroy', [AccessControlController::class, 'destroyFormAcademicYear'])->name('admin.academic-year.destroy-form');
         });
-        Route::get('/admins/load-permissions', [AccessControlController::class, 'viewPermissions']);
-        Route::get('/admins/permissions/create', [AccessControlController::class, 'createPermission']);
-        Route::post('/admins/permissions', [AccessControlController::class, 'storePermission']);
-        Route::get('/admins/permissions/{permission}', [AccessControlController::class, 'showPermission'])->name('admin.permissions.show');
-        Route::get('/admins/permissions/{permission}/edit', [AccessControlController::class, 'editPermission']);
-        Route::patch('/admins/permissions/{permission}', [AccessControlController::class, 'updatePermission']);
-        Route::delete('/admins/permissions/{permission}', [AccessControlController::class, 'destroyPermission']);
-    
+
     });
 
     Route::get('/exams', [ExamController::class, 'index'])->name('exams.index');
     Route::get('/exams/create', [ExamController::class, 'create'])->name('exams.create');
     Route::post('/exams', [ExamController::class, 'store'])->name('exams.store');
+    Route::patch('/exams/{exam}/publishExam', [ExamController::class, 'publishExam'])
+        ->whereNumber('exam')
+        ->name('exams.publish');
+
+    
     Route::get('/exams/{exam}', [ExamController::class, 'show'])->name('exams.show');
     Route::get('/exams/{exam}/edit', [ExamController::class, 'edit'])->name('exams.edit');
     Route::patch('/exams/{exam}', [ExamController::class, 'update'])->name('exams.update');
@@ -150,7 +121,6 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::post('/exams/{exam}/builder/toggle-question',[ExamController::class, 'toggle_question'])->name('exam.toggleQuestion');
     Route::get('/exams/{exam}/builder/swap-algorithm',[ExamController::class, 'swap_partial_algorithm']);
     Route::get('/exams/{exam}/builder/build', [ExamController::class, 'build_exam']);
-    Route::patch('/exams/{exam}/publishExam', [ExamController::class, 'publishExam'])->name('exams.publish');
 
     Route::get('/exams/builder/tabs', [ExamController::class, 'swap_tabs']);
 

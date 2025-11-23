@@ -259,22 +259,7 @@
                 </div> 
                 {% if exam_record.status != 'in_progress' %}
                 <div class="flex flex-col gap-y-2 w-full">
-                    <a href="{{ route('student.download.exam.record', { exam_record: exam_record.id }) }}" class="flex p-2 max-h-fit w-full bg-orange-900 rounded-lg font-medium text-white hover:bg-orange-700 hover:text-gray-50 cursor-pointer justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                        <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625Z" />
-                        <path d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
-                        </svg>
-                        Download this record
-                    </a>
-                    <button 
-                        onclick="emailExamRecordDirect({{ exam_record.id }}, event)"
-                        class="flex p-2 max-h-fit w-full bg-green-900 rounded-lg font-medium text-white hover:bg-green-700 hover:text-gray-50 cursor-pointer justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 mr-1">
-                        <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
-                        <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z" />
-                        </svg>
-                        Email me this record
-                    </button>
+
                 </div>
                 {% endif %}
             </div>
@@ -341,86 +326,4 @@
 </script>
 {% endif %}
 
-<script>
-  document.body.addEventListener('htmx:beforeSwap', function(event) {
-    if (event.detail.xhr.status === 212) {
-      event.preventDefault();
-    }
-  });
-
-  function emailReviewerDirect(reviewerId, reviewerPath, event) {
-    const button = event.target.closest('button');
-    const originalText = button.innerHTML;
-    button.innerHTML = '<span class="animate-spin">⏳</span> Queuing...';
-    button.disabled = true;
-
-    const formData = new FormData();
-    formData.append('reviewer_id', reviewerId);
-    formData.append('reviewer_path', reviewerPath);
-    formData.append('student_email', 'auto');
-
-    fetch('{{ route('student.email.reviewer') }}', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      button.innerHTML = originalText;
-      button.disabled = false;
-      
-      if (data.success) {
-        alert('Email queued! You will receive the reviewer shortly.');
-      } else {
-        alert('Failed to queue email. Please try again.');
-      }
-    })
-    .catch(error => {
-      button.innerHTML = originalText;
-      button.disabled = false;
-      
-      console.error('Error:', error);
-      alert('An error occurred. Please try again.');
-    });
-  }
-
-  function emailExamRecordDirect(examRecordId, event) {
-    const button = event.target.closest('button');
-    const originalText = button.innerHTML;
-    button.innerHTML = '<span class="animate-spin">⏳</span> Queuing...';
-    button.disabled = true;
-
-    const formData = new FormData();
-    formData.append('exam_record_id', examRecordId);
-    formData.append('student_email', 'auto');
-
-    fetch('{{ route('student.email.exam.record') }}', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      button.innerHTML = originalText;
-      button.disabled = false;
-
-      if (data.success) {
-        alert('Email queued! You will receive the exam record shortly.');
-      } else {
-        alert('Failed to queue email. Please try again.');
-      }
-    })
-    .catch(error => {
-      button.innerHTML = originalText;
-      button.disabled = false;
-      
-      console.error('Error:', error);
-      alert('An error occurred. Please try again.');
-    });
-  }
-</script>
 {% endblock %}

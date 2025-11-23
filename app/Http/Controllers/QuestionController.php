@@ -101,9 +101,7 @@ class QuestionController extends Controller
     public function createCodingQuestion(){
         $courses = $this->userService->getCoursesForUser(auth()->user())->pluck('name', 'id');
         $programming_languages = [
-            'java' => "Java",
-            'c++' => "C++",
-            'python' => "Python",
+            'java' => "Java"
         ];
 
         $markdown = Str::of('- *Laravel*')->markdown();
