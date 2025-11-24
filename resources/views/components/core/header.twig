@@ -1,18 +1,18 @@
 {% from 'components/core/show-header' import show_header %}
 {% from '/components/core/header-item' import header_item %}
-
 {% import 'components/core/forms' as forms %}
 
 <div class="bg-blue-900 px-4 flex items-center h-20 justify-between">
     <div class="flex items-center gap-x-3 group">        
-        <a href="/" class="mx-auto  ">
+        <a href="/" class="mx-auto">
             <img class="object-cover w-12 h-12 mx-1" src="{{ asset('images/PCU_logo.png') }}">
         </a>
         <h1 class="text-white text-2xl font-semibold hover:text-blue-400 group-hover:text-blue-400 delay-100 duration-300">
             PCU Proficiency Examination Application
         </h1>
+        {{ csrf_field()}}
         {% if auth_user() %}
-            <p class="{{ current_academic_year ? 'text-gray-300' : 'text-red-300' }}  text-xs font-semibold mt-2">(Dasmarinas) {{ current_academic_year ? 'S.Y' : '' }} {{ current_academic_year ?? 'MAINTENANCE' }}</p>
+            <p class="{{ current_academic_year ? 'text-gray-300' : 'text-red-300' }} text-xs font-semibold mt-2">(Dasmarinas) {{ current_academic_year ? 'S.Y' : '' }} {{ current_academic_year ?? 'MAINTENANCE' }}</p>
         {% endif %}
     </div> 
 
@@ -23,37 +23,22 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-10 w-10 text-white hover:text-blue-400 delay-100 duration-300">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
                 </svg>
-                
             </a>
             <a href="/profiles/show" class="inline-block rounded-2xl">                
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-10 w-10 text-white hover:text-blue-400 delay-100 duration-300">
-                <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
+                    <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
                 </svg>
             </a>
-            
             {% elseif auth_user().can('view student') %}
                 {{ header_item('/student', 
-                        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                        <path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" />
-                        <path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" />
-                        </svg>',
-                        'Home',
-                        false)}} 
-
-            {{ header_item('/student/notifications', 
-                    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' class='size-6'>
-                    <path d='M5.25 8.25a6.75 6.75 0 1 1 13.5 0v5.378l1.106 2.211A.75.75 0 0 1 19.25 17H4.75a.75.75 0 0 1-.606-1.161l1.106-2.211V8.25Z' />
-                    <path d='M8.625 17.25a3.375 3.375 0 0 0 6.75 0h-6.75Z' />
-                    </svg>",
-                    'Notifications',
-                    false) }}    
-
+                    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6"><path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" /><path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" /></svg>',
+                    'Home', false)}} 
+                {{ header_item('/student/notifications', 
+                    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' class='size-6'><path d='M5.25 8.25a6.75 6.75 0 1 1 13.5 0v5.378l1.106 2.211A.75.75 0 0 1 19.25 17H4.75a.75.75 0 0 1-.606-1.161l1.106-2.211V8.25Z' /><path d='M8.625 17.25a3.375 3.375 0 0 0 6.75 0h-6.75Z' /></svg>",
+                    'Notifications', false) }}    
                 {{ header_item('/student/profile', 
-                        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                        <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
-                        </svg>',
-                        'Profile',
-                        false)}} 
+                    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" /></svg>',
+                    'Profile', false)}} 
             {% endif %}
             <form method="POST" action="/logout">
                 {{ csrf_field() }}
@@ -61,76 +46,41 @@
             </form>          
         {% endif %}
         {% if auth_guest() %}
-            <button popovertarget="login-popover" 
-                    class="text-white font-medium cursor-pointer">
-                    Login
+            <button popovertarget="login-popover" class="text-white font-medium cursor-pointer">
+                Login
             </button>
         {% endif %}
-
     </div>
 </div>
 
 {% if auth_guest() %}
     <div popover="manual" class="backdrop:bg-gray-900/15 backdrop:backdrop-blur-[1px] m-auto p-16 rounded-xl" id="login-popover">
         <div class="flex flex-col gap-y-4">
-            {{ show_header('Login') }}
-            <div class="flex">
-                <a href="/faculty" class="mx-auto border-green-500 border-5 p-2 rounded-4xl ">        
-                    google sign in 
-                </a>
+            {{ show_header('Login with PCU Account') }}
+            
+            <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline" id="error-text"></span>
             </div>
-            <div class="flex flex-1 flex-col">
-                <form action="/login" method="POST" class="flex flex-col gap-y-4">
-                    {{ csrf_field() }}
-                            <div class="flex gap-x-32 justify-between w-full">
-                                <div class="flex flex-col gap-y-4 w-full">
-                                    {{ forms.form_field(
-                                        label:forms.label(
-                                            id:'email', 
-                                            content:'Faculty Email', 
-                                            attributes:{
-                                                'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
-                                        ),
-                                        input:forms.email(
-                                            name:'email', 
-                                            value: old('email'),
-                                            attributes:{
-                                                'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                                'required':true,}
-                                        ),
-                                        isColumn:true 
-                                    )}}
-                                    {{ forms.form_field(
-                                        label:forms.label(
-                                            id:'password', 
-                                            content:'Password', 
-                                            attributes:{
-                                                'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
-                                                ),
-                                        input:forms.password(
-                                            name:'password', 
-                                            values:values, 
-                                            attributes:{
-                                                'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                                'placeholder':'*********',
-                                                'required':true}
-                                        ),
-                                        isColumn:true 
-                                    )}}
-                                </div>
-                            </div>
+            
+            <div id="loading-message" class="hidden text-center py-4">
+                <p class="text-gray-600">Signing in...</p>
+            </div>
 
-                    {% if errors is not empty %}
-                        <div class="flex gap-x-2">
-                            {% for error in errors.get('email') %}
-                                <p class="text-red-500 font-medium text-sm mx-auto">{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    <div class="flex gap-x-2">
-                        <button type="submit" class="mx-auto px-32 cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg py-2 font-semibold text-sm">Login</button>
-                    </div>
-                </form>
+            <div class="flex flex-col gap-y-4">
+                <button id="google-signin-btn" 
+                        class="mx-auto px-8 py-3 bg-white hover:bg-gray-100 text-gray-800 font-semibold rounded-lg border border-gray-300 shadow-sm transition duration-300 flex items-center gap-3">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Sign in with Google
+                </button>
+                
+                <p class="text-center text-sm text-gray-600">
+                    Please use your @pcu.edu.ph email
+                </p>
             </div>
         </div>
         
@@ -140,6 +90,84 @@
             </svg>          
         </button>
     </div>
-{% endif %}
 
-  
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        // Firebase configuration - Replace with your actual config
+        const firebaseConfig = {
+            apiKey: "{{ firebase_config.api_key }}",
+            authDomain: "{{ firebase_config.project_id }}.firebaseapp.com",
+            projectId: "{{ firebase_config.project_id }}",
+            storageBucket: "{{ firebase_config.project_id }}.firebasestorage.app",
+            messagingSenderId: "{{ firebase_config.messaging_sender_id }}",
+            appId: "{{ firebase_config.app_id }}"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({
+            hd: 'pcu.edu.ph' // Restrict to PCU domain
+        });
+
+        const signInBtn = document.getElementById('google-signin-btn');
+        const errorDiv = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        const loadingDiv = document.getElementById('loading-message');
+
+        function showError(message) {
+            errorText.textContent = message;
+            errorDiv.classList.remove('hidden');
+            loadingDiv.classList.add('hidden');
+        }
+
+        function showLoading() {
+            errorDiv.classList.add('hidden');
+            loadingDiv.classList.remove('hidden');
+        }
+
+        signInBtn.addEventListener('click', async () => {
+            showLoading();
+            
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                
+                // Check if email is from PCU domain
+                if (!user.email.endsWith('@pcu.edu.ph')) {
+                    showError('Please use your @pcu.edu.ph email address');
+                    await auth.signOut();
+                    return;
+                }
+
+                // Get ID token
+                const idToken = await user.getIdToken();
+
+                // Send to Laravel backend
+                const response = await fetch('/auth/firebase/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                    },
+                    body: JSON.stringify({ idToken })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Redirect based on role
+                    window.location.href = data.redirect || '/';
+                } else {
+                    showError(data.error || 'Authentication failed');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError(error.message || 'An error occurred during sign in');
+            }
+        });
+    </script>
+{% endif %}

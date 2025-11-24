@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\Auth\FirebaseController;
 use App\Http\Controllers\AccessControlController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ExamController;
@@ -17,7 +17,6 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\Student\ExamController as StudentExamController;
 use App\Http\Controllers\Student\StudentController;
-use App\Http\Controllers\GoogleAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -36,7 +35,8 @@ Route::get('/', function () {
 Route::get('auth/google', [GoogleAuthController::class, 'redirectToGoogle']);
 Route::get('auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 
-Route::post('/login', [SessionController::class, 'authenticate']);
+#Route::post('/login', [SessionController::class, 'authenticate']);
+Route::post('/auth/firebase/login', [FirebaseController::class, 'login'])->name('firebase.login');
 Route::post('/logout', [SessionController::class, 'logout'])->middleware(['auth']);
 Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution'])->name('validate.coding.question');
 
