@@ -27,12 +27,14 @@ class ExamController extends Controller
     }
 
     public function index(){
-        $courseIds = $this->userService->getCoursesForUser(auth()->user())->pluck('id');
+        $courses = $this->userService->getCoursesForUser(auth()->user());
+        $courseIds = $courses->pluck('id');
         $exams = Exam::with(['courses', 'questions'])
             ->whereHas('courses', function ($query) use ($courseIds) {
                 $query->whereIn('courses.id', $courseIds);
             })
             ->paginate(10);
+            
         $header = ['Name', 'Questions', 'Status', 'is Published', 'Examination Date'];
         $rows = $exams->map(function ($exam) {
             return [

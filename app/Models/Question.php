@@ -107,5 +107,20 @@ class Question extends Model
         };
     }
     
+    public function scopeSubject($query, $value)
+    {
+        $query->whereHas('topic.subject', function ($q) use ($value) {
+            $q->where('subjects.id', $value);
+        });
+    }
+
+    public function scopeTopic($query, $value)
+    {
+        $query->whereHas('topic', function ($q) use ($value) {
+            $q->where('topics.name', 'ILIKE', "%{$value}%");
+        });
+    }
+
+
 
 }
