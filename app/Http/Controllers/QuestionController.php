@@ -31,15 +31,16 @@ class QuestionController extends Controller
     public function index(){
         $questions = $this->userService->getQuestionsForUser(auth()->user())->paginate(10);
         $questions->load('author'); 
-        $header = ['Name', 'Subject', 'Topic', 'Type', 'Author'];
+        $header = ['Name', 'Subject', 'Topic', 'Type', 'Level'];
         $rows = $questions->map(function ($question) {
+            $question_level = $question->bloomTagLabel();
             return [
                 'id' => $question->id,
                 'name' => $question->name,
                 'subject' => $question->topic->subject->code,
                 'topic' => $question->topic->name,
                 'type' => $question->question_type->name,
-                'author' => $question->author->getFullName() ?? "No Author"
+                'level' => $question_level
             ];
         });
 
