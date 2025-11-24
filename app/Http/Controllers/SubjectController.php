@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\SubjectCoursesFilter;
 use App\Models\Course;
 use App\Models\Question;
 use App\Models\Subject;
@@ -11,6 +12,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Validator;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class SubjectController extends Controller
 {
@@ -22,10 +25,19 @@ class SubjectController extends Controller
         $this->userService = $userService;
     }
     public function index(){
-        $subject_courses = $this->userService->getSubjectsForUser(auth()->user())->paginate(10);
-        $subject_courses->load('courses');
+        $courses = $this->userService->getCoursesForUser(auth()->user());
+        $subject_courses = $this->userService->getSubjectsForUser(auth()->user());
+
+        $query = QueryBuilder::for($subject_courses)
+            ->with('courses')
+            ->allowedFilters(['name', 'code',
+                AllowedFilter::custom('course', new SubjectCoursesFilter()),
+            ])
+            ->paginate(10)
+            ->appends(request()->query());
+
         $header = ['Courses', 'Code', 'Name', 'Year Level'];
-        $rows = $subject_courses->map(function ($subject) {
+        $rows =  $query->map(function ($subject) {
             $courses_abbreviations = $subject->courses->map(function ($course){
                 return $course->abbreviation;
             });
@@ -39,9 +51,10 @@ class SubjectController extends Controller
         });
 
         $data = [
+            'courses' => $courses,
             'headers' => $header,
             'rows' => $rows,
-            'models' => $subject_courses,
+            'models' => $query,
             'url' => 'subjects'
         ];
 
