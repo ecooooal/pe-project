@@ -1,4 +1,4 @@
-{% macro breadcrumb(type = null, name = null) %}
+{% macro breadcrumb(first_model = null, second_model = null) %}
     {% set path = app.request.pathInfo %}
     {% set breadcrumbs = [] %}
     {% set path_parts = path | split('/') | slice(1, path|length) %}
@@ -8,7 +8,6 @@
             {% set current_url = current_url ~ '/' ~ part %}
             {% set breadcrumbs = breadcrumbs|merge([{'label': part|capitalize, 'url': current_url }]) %}            
     {% endfor %}
-
     <div>
         <nav aria-label="breadcrumb" class="w-max">
             <ol class="flex w-full flex-wrap items-center rounded-md bg-transparent px-6 py-2 m-2">
@@ -27,13 +26,22 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 mx-2">
                             <path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 0 1 1.06-1.06l7.5 7.5Z" clip-rule="evenodd" />
                         </svg>
-                        <span >{{ breadcrumb.label }}</span>
+
+                        {% if breadcrumb.label  matches '/^\\d+$/'  %}
+                            <span>{{ second_model == null ? first_model|length > 50 ? first_model|slice(0,50) ~ "..." : first_model : second_model}}</span>
+                        {% else %}
+                            <span >{{ breadcrumb.label }}</span>
+                        {% endif %}
                     {% else %}
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 mx-2">
                             <path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 0 1 1.06-1.06l7.5 7.5Z" clip-rule="evenodd" />
                         </svg>
-                      
-                        <a href="{{ breadcrumb.url }}">{{ breadcrumb.label }}</a>
+
+                        {% if breadcrumb.label  matches '/^\\d+$/'  %}
+                            <a href="{{ breadcrumb.url }}">{{ first_model|length > 50 ? first_model|slice(0,50) ~ "..." : first_model}}</a>
+                        {% else %}
+                            <a href="{{ breadcrumb.url }}">{{ breadcrumb.label }}</a>
+                        {% endif %}
                     {% endif %}
                 </li>
             {% endfor %}    
