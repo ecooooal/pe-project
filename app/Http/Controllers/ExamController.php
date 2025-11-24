@@ -13,6 +13,8 @@ use App\Events\ExamResultsPublished;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 use Str;
 
 class ExamController extends Controller
@@ -32,11 +34,20 @@ class ExamController extends Controller
         $exams = Exam::with(['courses', 'questions'])
             ->whereHas('courses', function ($query) use ($courseIds) {
                 $query->whereIn('courses.id', $courseIds);
-            })
-            ->paginate(10);
-            
+            });
+
+        $query = QueryBuilder::for($exams)
+            ->allowedFilters(['name',
+            AllowedFilter::callback('is_published', function ($query, $value) {
+                $query->where('exams.is_published', (bool) $value);
+            }),
+            AllowedFilter::scope('course'),
+            ])
+            ->paginate(10)
+            ->appends(request()->query());
+
         $header = ['Name', 'Questions', 'Status', 'is Published', 'Examination Date'];
-        $rows = $exams->map(function ($exam) {
+        $rows = $query->map(function ($exam) {
             return [
                 'id' => $exam->id,
                 'name' => $exam->name,
@@ -48,6 +59,8 @@ class ExamController extends Controller
         });
 
         $data = [
+            'query' => $query,
+            'courses' => $courses,
             'headers' => $header,
             'rows' => $rows,
             'models' => $exams,

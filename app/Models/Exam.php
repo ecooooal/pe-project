@@ -87,4 +87,11 @@ class Exam extends Model
     public function updatedBy(){
         return $this->belongsTo(User::class, 'updated_by');
     }
+
+    public function scopeCourse($query, $value)
+    {
+        $query->whereHas('courses', function ($q) use ($value) {
+            $q->where('courses.id', $value);
+        });
+    }
 }
