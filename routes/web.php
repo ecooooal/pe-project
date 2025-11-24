@@ -45,21 +45,21 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
     
     Route::get('/exams', [StudentExamController::class, 'index']);
     Route::post('/exams', [StudentExamController::class, 'store'])->name('exams.student.store');
-    Route::get('/exams/{exam}', [StudentExamController::class, 'show'])->name('exams.student.show');
+    Route::get('/exams/{exam:uuid}', [StudentExamController::class, 'show'])->name('exams.student.show');
     
     Route::middleware('htmx.request:students.index')->group(function () {
-        Route::get('/exams/{exam}/show-overview', [StudentExamController::class, 'showExamOverview'])->name('exams.student.overview');
-        Route::get('/exams/{exam}/records', [ExamRecordController::class, 'index'])->name('exam_records.index');
-        Route::get('/exams/{exam}/question-links/{student_paper}', [StudentPaperController::class, 'loadQuestionLinks'])->name('exam_papers.questions');
+        Route::get('/exams/{exam:uuid}/show-overview', [StudentExamController::class, 'showExamOverview'])->name('exams.student.overview');
+        Route::get('/exams/{exam:uuid}/records', [ExamRecordController::class, 'index'])->name('exam_records.index');
+        Route::get('/exams/{exam:uuid}/question-links/{student_paper}', [StudentPaperController::class, 'loadQuestionLinks'])->name('exam_papers.questions');
         Route::get('/expired_student_paper_redirect/{student_paper}', [StudentPaperController::class, 'pollToAutoCompletedExamRecord'])->name('exam_papers.auto_completed_redirect');
         Route::get('/get-coding-results/{coding_answer}', [ExamRecordController::class, 'showCodingResult'])->name('exam_records.coding_answer_result');
         Route::get('/get-updated-score/{exam_record}', [ExamRecordController::class, 'showUpdatedScore'])->name('exam_records.show_updated_score');
     });
 
-    Route::get('/exams/{exam}/records/{exam_record}', [ExamRecordController::class, 'show'])->name('exam_records.show');
+    Route::get('/exams/{exam:uuid}/records/{exam_record:uuid}', [ExamRecordController::class, 'show'])->name('exam_records.show');
     Route::patch('/exams/{student_paper}/evaluate', [ExamRecordController::class, 'store'])->name('exam_records.store');
 
-    Route::get('/exams/{exam}/take', [StudentPaperController::class, 'takeExam'])->name('exam_papers.take');
+    Route::get('/exams/{exam:uuid}/take', [StudentPaperController::class, 'takeExam'])->name('exam_papers.take');
     Route::get('/student_papers/{student_paper}/question', [StudentPaperController::class, 'show'])->name('exam_papers.show');
     Route::patch('/student_papers/{student_paper}/{question}', [StudentAnswerController::class, 'update'])->name('student_answer.update');
 });

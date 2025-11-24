@@ -466,7 +466,6 @@
                 </div>
                 <form   method="POST" 
                         hx-delete="{{ route('reports.destroy', { 'exam':exam, 'report':report } ) }}"
-                        hx-trigger="click[#delete-report-button]"
                         id="delete-form">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
