@@ -31,20 +31,22 @@ class ExamController extends Controller
     public function index(){
         $courses = $this->userService->getCoursesForUser(auth()->user());
         $courseIds = $courses->pluck('id');
-        $exams = Exam::with(['courses', 'questions'])
+
+        $query = QueryBuilder::for(Exam::class)
+            ->with(['courses', 'questions'])
             ->whereHas('courses', function ($query) use ($courseIds) {
                 $query->whereIn('courses.id', $courseIds);
-            });
-
-        $query = QueryBuilder::for($exams)
-            ->allowedFilters(['name',
-            AllowedFilter::callback('is_published', function ($query, $value) {
-                $query->where('exams.is_published', (bool) $value);
-            }),
-            AllowedFilter::scope('course'),
+            })
+            ->allowedFilters([
+                'name',
+                AllowedFilter::callback('is_published', function ($query, $value) {
+                    $query->where('is_published', (bool) $value);
+                }),
+                AllowedFilter::scope('course'),
             ])
             ->paginate(10)
             ->appends(request()->query());
+
 
         $header = ['Name', 'Questions', 'Status', 'is Published', 'Examination Date'];
         $rows = $query->map(function ($exam) {
@@ -59,11 +61,10 @@ class ExamController extends Controller
         });
 
         $data = [
-            'query' => $query,
             'courses' => $courses,
             'headers' => $header,
             'rows' => $rows,
-            'models' => $exams,
+            'models' => $query,
             'url' => 'exams'
         ];
 
