@@ -15,6 +15,9 @@
 <div class="flex flex-1 flex-col mx-64">
     <form action="/reviewers" method="POST" enctype="multipart/form-data" class="flex flex-col gap-y-4">
         {{ csrf_field() }}
+        <input type="hidden" name="reviewer_id" value="{{ reviewer_id is defined ? reviewer_id : '' }}">
+
+        <!-- ✅ Existing styled fields using Twig macros -->
         <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
             <div class="flex flex-col p-4 flex-1">
                 {{ show_header('Details') }}

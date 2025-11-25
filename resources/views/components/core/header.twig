@@ -83,6 +83,60 @@
                 </p>
             </div>
         </div>
+
+        <div class="flex flex-1 flex-col">
+                <form action="/login" method="POST" class="flex flex-col gap-y-4">
+                    {{ csrf_field() }}
+                            <div class="flex gap-x-32 justify-between w-full">
+                                <div class="flex flex-col gap-y-4 w-full">
+                                    {{ forms.form_field(
+                                        label:forms.label(
+                                            id:'email', 
+                                            content:'Faculty Email', 
+                                            attributes:{
+                                                'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
+                                        ),
+                                        input:forms.email(
+                                            name:'email', 
+                                            value: old('email'),
+                                            attributes:{
+                                                'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                                'required':true,}
+                                        ),
+                                        isColumn:true 
+                                    )}}
+                                    {{ forms.form_field(
+                                        label:forms.label(
+                                            id:'password', 
+                                            content:'Password', 
+                                            attributes:{
+                                                'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
+                                                ),
+                                        input:forms.password(
+                                            name:'password', 
+                                            values:values, 
+                                            attributes:{
+                                                'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                                'placeholder':'*********',
+                                                'required':true}
+                                        ),
+                                        isColumn:true 
+                                    )}}
+                                </div>
+                            </div>
+
+                    {% if errors is not empty %}
+                        <div class="flex gap-x-2">
+                            {% for error in errors.get('email') %}
+                                <p class="text-red-500 font-medium text-sm mx-auto">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="flex gap-x-2">
+                        <button type="submit" class="mx-auto px-32 cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg py-2 font-semibold text-sm">Login</button>
+                    </div>
+                </form>
+            </div>
         
         <button popovertarget="login-popover" popovertargetaction="hide" class="absolute right-0 top-0 pt-4 pr-4">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">

@@ -15,9 +15,13 @@ use App\Http\Controllers\Student\StudentPaperController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
+use App\Http\Controllers\MailController;
+use App\Http\Controllers\ReviewerController; // ✅ ADD THIS
+
 use App\Http\Controllers\Student\ExamController as StudentExamController;
 use App\Http\Controllers\Student\StudentController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -32,15 +36,16 @@ Route::get('/', function () {
     return view('landing-page');
 });
 
-Route::get('auth/google', [GoogleAuthController::class, 'redirectToGoogle']);
-Route::get('auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+# Route::get('auth/google', [GoogleAuthController::class, 'redirectToGoogle']);
+# Route::get('auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 
 #Route::post('/login', [SessionController::class, 'authenticate']);
 Route::post('/auth/firebase/login', [FirebaseController::class, 'login'])->name('firebase.login');
 Route::post('/logout', [SessionController::class, 'logout'])->middleware(['auth']);
 Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution'])->name('validate.coding.question');
 
-Route::group(['middleware' => ['can:view student']], function () { 
+Route::group(['middleware' => ['can:view student']], function () {
+    //
 });
 
 Route::prefix('student')->middleware(['can:view student'])->group(function() {
@@ -88,12 +93,9 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
             2 => 'Compiling',
             3 => 'Execution'
         ];
-
-        return view('students/exams/rank-example',['items' => $items]);
+        return view('students/exams/rank-example', ['items' => $items]);
     });
-    Route::get('/exams/exam.id/match-example', function () {
-        return view('students/exams/match-example');
-    });
+    Route::get('/exams/exam.id/match-example', fn () => view('students/exams/match-example'));
     Route::get('/exams/exam.id/coding-example', function () {
         $programming_languages = [
             'c++' => "C++",
@@ -103,11 +105,8 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
         ];
         return view('students/exams/coding-example', ['programming_languages' => $programming_languages]);
     });
-    Route::get('/exams/exam.id/result', function () {
-        return view('students/exams/result-example');
-    });
+    Route::get('/exams/exam.id/result', fn () => view('students/exams/result-example'));
 });
-
 
 Route::prefix('')->middleware(['can:view faculty'])->group(function () { 
     Route::get('/faculty', [LandingPageController::class, 'facultyShow'])->name('faculty.index');
@@ -174,6 +173,32 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::post('/questions', [QuestionController::class, 'store'])->name('questions.store');
     Route::get('/question_type_show/{question}', [QuestionController::class, 'question_type_show'])->name('question_type.show');
     Route::get('/questions/{question}', [QuestionController::class, 'show'])->name('questions.show');
+    Route::get('/questions/{question}/edit', [QuestionController::class, 'edit']);
+    Route::patch('/questions/{question}', [QuestionController::class, 'update']);
+    Route::delete('/questions/{question}', [QuestionController::class, 'destroy']);
+
+    Route::get('/questions/create/question-type', function (Request $request) {
+        $item_count = (int) $request->input('item_count', 4);
+        $type = $request->query('type');
+        switch ($type) {
+            case 'multiple_choice':
+                return view('questions-types/multiple-choice');
+            case 'true_or_false':
+                return view('questions-types/true-false');
+            case 'identification':
+                return view('questions-types/identification');
+            case 'ranking':
+                return view('questions-types/rank-order-process', compact('item_count'));
+            case 'matching':
+                return view('questions-types/matching-items');
+            case 'coding':
+                return view('questions-types/coding');
+            default:
+                return '';
+        }
+    })->name('question.types');
+
+    Route::get('/questions/{question}', [QuestionController::class, 'show'])->name('questions.show');
     Route::get('/questions/{question}/edit', [QuestionController::class, 'edit'])->name('questions.edit');
     Route::patch('/questions/{question}', [QuestionController::class, 'update'])->name('questions.update');
     Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
@@ -183,7 +208,6 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
         $is_matching = request('is_matching', false);
         $item_count = session('counter', $counter);
         $item_count++;
-
         session()->flash('counter', $item_count);
 
         return view('questions-types/new-text-item', ['counter' => $item_count, 'is_matching' => $is_matching]);
@@ -259,3 +283,5 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
         return view('profiles/courses');
     });
 });
+
+Route::get('send-mail', [MailController::class, 'index'])->name('send-mail');

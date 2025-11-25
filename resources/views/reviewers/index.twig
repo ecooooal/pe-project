@@ -1,5 +1,6 @@
-{% from 'components/core/breadcrumbs' import breadcrumb %}
 {% from 'components/core/index-table' import table %}
+{% from 'components/core/breadcrumbs' import breadcrumb %}
+
 {% extends 'components/core/faculty-layout' %}
 
 {% set headers = ['ID', 'Subject', 'Topic', 'Path', 'Date Created', 'Actions'] %}
@@ -20,6 +21,7 @@
 {% block content %}
 
 {{ breadcrumb() }}
+
 <div class="flex justify-between items-center mx-4 pr-4">
     <div class="flex items-center justify-start gap-x-2 mx-4 text-gray-800">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-9">
