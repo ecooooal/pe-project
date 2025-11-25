@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Exam;
+use App\Models\ExamRecord;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -9,6 +11,17 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        then: function () {
+            Route::bind('exam:uuid', function ($value) {
+                return Str::isUuid($value)
+                    ?? Exam::where('uuid', $value)->firstOrFail();
+            });
+            Route::bind('exam_record', function ($value) {
+                return Str::isUuid($value)
+                    ? ExamRecord::where('uuid', $value)->firstOrFail()
+                    : ExamRecord::findOrFail($value);
+            });
+        }
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([

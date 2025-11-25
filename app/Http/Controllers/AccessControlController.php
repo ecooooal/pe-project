@@ -11,15 +11,21 @@ use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class AccessControlController extends Controller
 {
 
     public function indexUsers(){
         $currentUser = request()->user();
-        $users = User::paginate(10);
+
+        $query = QueryBuilder::for(User::class)
+            ->allowedFilters(['first_name', 'last_name'])
+            ->paginate(10)
+            ->appends(request()->query());
         $header = ['ID', 'Name', 'email', 'Date Created'];
-        $rows = $users->map(function ($user) {
+        $rows = $query->map(function ($user) {
             return [
                 'id' => $user->id,
                 'name' => $user->getFullName(),
@@ -29,7 +35,7 @@ class AccessControlController extends Controller
         });
 
         $data = [
-            'models' => $users, 
+            'models' => $query, 
             'currentUser' => $currentUser,
             'header' => $header,
             'rows' => $rows,

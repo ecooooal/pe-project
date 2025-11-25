@@ -9,6 +9,8 @@ use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ReportController extends Controller
 {
@@ -26,10 +28,17 @@ class ReportController extends Controller
         $exams = Exam::with(['courses', 'questions'])
             ->whereHas('courses', function ($query) use ($courseIds) {
                 $query->whereIn('courses.id', $courseIds);
-            })->get();
+            });
+
+        $query = QueryBuilder::for($exams)
+            ->allowedFilters([
+                'name'
+            ])
+            ->paginate(10)
+            ->appends(request()->query());
 
         $data = [
-            'exams' => $exams
+            'exams' => $query
         ];
         return view('reports/index', $data);
 
@@ -133,7 +142,7 @@ class ReportController extends Controller
 
     public function store(Exam $exam){
         $response = Http::timeout(30)
-            ->get("http://fastapi:80/api/reports/create-store/{$exam->id}");
+            ->get("http://fastapi:8080/api/reports/create-store/{$exam->id}");
 
         if (!$response->successful()) {
 

@@ -29,8 +29,24 @@ class ExamController extends Controller
         $this->examService = $examService;
         $this->examTakingService = $examTakingService;
     }
-
+    public function index(){
+        return redirect()->route('students.index');
+    }
     public function show(Exam $exam){
+        $user = auth()->user();
+        $isEnrolled = $user->exams()->where('exam_id', $exam->id)->exists();
+
+        if (!$isEnrolled){
+
+            session()->flash('toast', json_encode([
+                'status' => 'Access Denied',
+                'message' => 'Not Enrolled in this exam.',
+                'type' => 'warning'
+            ]));
+
+            return redirect()->route('students.index');
+        }
+
         return view( 'students/exams/show', ['exam'=> $exam]);
     }
     

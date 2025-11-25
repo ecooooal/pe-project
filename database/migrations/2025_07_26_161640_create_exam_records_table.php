@@ -14,6 +14,7 @@ return new class extends Migration
     {
         Schema::create('exam_records', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->foreignIdFor(StudentPaper::class, 'student_paper_id')->constrained()->cascadeOnDelete();
             $table->unsignedTinyInteger('attempt');
             $table->unsignedSmallInteger('total_score');

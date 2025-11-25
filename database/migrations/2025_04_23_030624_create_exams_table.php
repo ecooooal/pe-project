@@ -16,6 +16,7 @@ return new class extends Migration
     {
         Schema::create('exams', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->foreignIdFor(AcademicYear::class, 'academic_year_id')->constrained();
             $table->string('name');
             $table->integer('max_score');

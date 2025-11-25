@@ -9,13 +9,17 @@ use App\Models\Subject;
 use App\Models\Topic;
 use App\Services\QuestionService;
 use App\Services\UserService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Spatie\QueryBuilder\QueryBuilder;
 use Str;
 use Validator;
-
+use Spatie\QueryBuilder\AllowedFilter;
+use App\Filters\QuestionCourseFilter;
+use App\Filters\QuestionLevelFilter;
 class QuestionController extends Controller
 {
     protected $userService;
@@ -29,24 +33,78 @@ class QuestionController extends Controller
     }
 
     public function index(){
-        $questions = $this->userService->getQuestionsForUser(auth()->user())->paginate(10);
-        $questions->load('author'); 
-        $header = ['Name', 'Subject', 'Topic', 'Type', 'Author'];
-        $rows = $questions->map(function ($question) {
+        $questions = $this->userService->getQuestionsForUser(auth()->user());
+        $courses = $this->userService->getCoursesForUser(auth()->user());
+        $subjects =  $this->userService->getSubjectsForUser(auth()->user())->get();
+        $topics =  $this->userService->getTopicsForUser(auth()->user());
+        $question_types = $questions->get()->pluck('question_type')->unique()->values();
+        
+        $order = ['Remember', 'Understand', 'Apply', 'Analyze', 'Evaluate', 'Create'];
+        $emojiMap = [
+            'Remember' => '🧠',
+            'Understand' => '📖',
+            'Apply' => '🛠️',
+            'Analyze' => '🧩',
+            'Evaluate' => '📝',
+            'Create' => '🎨',
+        ];
+        $tags = DB::table('tags')
+            ->join('taggables', 'tags.id', '=', 'taggables.tag_id')
+            ->where('taggables.type', 'required')
+            ->select('tags.*')
+            ->distinct()
+            ->get();
+        $question_levels = $tags->map(function ($tag) use ($emojiMap) {
+            $name = Str::ucfirst($tag->name);
+            $emoji = isset($emojiMap[$name]) ? $emojiMap[$name] : '❓';
+
+            return [
+                'id' => $tag->id,
+                'name' => $name,
+                'label' => $emoji . ' ' . $name,
+            ];
+        });
+        $question_levels = $question_levels->sortBy(function ($tag) use ($order) {
+            return array_search($tag['name'], $order);
+        })->values();
+
+
+        $query = QueryBuilder::for($questions)
+            ->allowedFilters(['name', 'question_type',
+            AllowedFilter::custom('course', new QuestionCourseFilter),
+            AllowedFilter::custom('question_level', new QuestionLevelFilter),
+            AllowedFilter::scope('subject'),
+            AllowedFilter::scope('topic'),
+            ])
+            ->with('questionLevel')
+            ->paginate(10)
+            ->appends(request()->query());
+            
+        $header = ['Name', 'Subject', 'Topic', 'Type', 'Level'];
+        $rows = $query->map(function ($question)   {
+            $question_level = $question->bloomTagLabel();
+            
             return [
                 'id' => $question->id,
                 'name' => $question->name,
                 'subject' => $question->topic->subject->code,
                 'topic' => $question->topic->name,
                 'type' => $question->question_type->name,
-                'author' => $question->author->getFullName() ?? "No Author"
+                'level' => $question_level
             ];
         });
 
+
+
         $data = [
+            'courses' => $courses,
+            'subjects' => $subjects,
+            'topics' => $topics,
+            'types'=> $question_types,
+            'levels' => $question_levels,
             'headers' => $header,
             'rows' => $rows,
-            'models' => $questions,
+            'models' => $query,
             'url' => 'questions'
         ];
 
@@ -101,9 +159,7 @@ class QuestionController extends Controller
     public function createCodingQuestion(){
         $courses = $this->userService->getCoursesForUser(auth()->user())->pluck('name', 'id');
         $programming_languages = [
-            'java' => "Java",
-            'c++' => "C++",
-            'python' => "Python",
+            'java' => "Java"
         ];
 
         $markdown = Str::of('- *Laravel*')->markdown();

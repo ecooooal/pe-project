@@ -41,6 +41,25 @@ class StudentPaper extends Model
         return $this->hasMany(StudentAnswer::class);
     }
 
+    public function getRemainingDuration(){
+        if ($this->expired_at != null){
+            return now()->diffInSeconds($this->expired_at, false);
+        } else {
+            return null;
+        }
+    }
+
+    public function isExpired(){
+        if ($this->expired_at != null){
+            return now() > $this->expired_at;
+        } else {
+            return false;
+        }
+    }
+    public function isSubmitted(){
+        return $this->submitted_at != null;
+    }
+
     protected static function booted()
     {
         self::updated(static function (StudentPaper $studentPaper) {
