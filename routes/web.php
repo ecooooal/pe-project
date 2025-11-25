@@ -45,23 +45,65 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
     
     Route::get('/exams', [StudentExamController::class, 'index']);
     Route::post('/exams', [StudentExamController::class, 'store'])->name('exams.student.store');
-    Route::get('/exams/{exam}', [StudentExamController::class, 'show'])->name('exams.student.show');
+    Route::get('/exams/{exam:uuid}', [StudentExamController::class, 'show'])->name('exams.student.show');
     
     Route::middleware('htmx.request:students.index')->group(function () {
-        Route::get('/exams/{exam}/show-overview', [StudentExamController::class, 'showExamOverview'])->name('exams.student.overview');
-        Route::get('/exams/{exam}/records', [ExamRecordController::class, 'index'])->name('exam_records.index');
-        Route::get('/exams/{exam}/question-links/{student_paper}', [StudentPaperController::class, 'loadQuestionLinks'])->name('exam_papers.questions');
+        Route::get('/exams/{exam:uuid}/show-overview', [StudentExamController::class, 'showExamOverview'])->name('exams.student.overview');
+        Route::get('/exams/{exam:uuid}/records', [ExamRecordController::class, 'index'])->name('exam_records.index');
+        Route::get('/exams/{exam:uuid}/question-links/{student_paper}', [StudentPaperController::class, 'loadQuestionLinks'])->name('exam_papers.questions');
         Route::get('/expired_student_paper_redirect/{student_paper}', [StudentPaperController::class, 'pollToAutoCompletedExamRecord'])->name('exam_papers.auto_completed_redirect');
         Route::get('/get-coding-results/{coding_answer}', [ExamRecordController::class, 'showCodingResult'])->name('exam_records.coding_answer_result');
         Route::get('/get-updated-score/{exam_record}', [ExamRecordController::class, 'showUpdatedScore'])->name('exam_records.show_updated_score');
     });
 
-    Route::get('/exams/{exam}/records/{exam_record}', [ExamRecordController::class, 'show'])->name('exam_records.show');
+    Route::get('/exams/{exam:uuid}/records/{exam_record:uuid}', [ExamRecordController::class, 'show'])->name('exam_records.show');
     Route::patch('/exams/{student_paper}/evaluate', [ExamRecordController::class, 'store'])->name('exam_records.store');
 
-    Route::get('/exams/{exam}/take', [StudentPaperController::class, 'takeExam'])->name('exam_papers.take');
+    Route::get('/exams/{exam:uuid}/take', [StudentPaperController::class, 'takeExam'])->name('exam_papers.take');
     Route::get('/student_papers/{student_paper}/question', [StudentPaperController::class, 'show'])->name('exam_papers.show');
     Route::patch('/student_papers/{student_paper}/{question}', [StudentAnswerController::class, 'update'])->name('student_answer.update');
+
+// Add these routes inside the student middleware group (after line where you have Route::patch('/student_papers/{student_paper}/{question}', ...))
+
+    Route::post('/download/exam-record/{exam_record}', [ExamRecordController::class, 'downloadExamRecord'])->name('student.download.exam.record');
+    Route::post('/email/reviewer', [StudentController::class, 'emailReviewer'])->name('student.email.reviewer');
+    Route::post('/email/exam-record', [StudentController::class, 'emailExamRecord'])->name('student.email.exam.record');
+
+    
+    Route::get('/exams/exam.id/mcq-example', function () {
+        return view('students/exams/mcq-example');
+    });
+    Route::get('/exams/exam.id/torf-example', function () {
+        return view('students/exams/TorF-example');
+    });
+    Route::get('/exams/exam.id/iden-example', function () {
+        return view('students/exams/iden-example');
+    });
+    Route::get('/exams/exam.id/rank-example', function () {
+        $items = [
+            0 => 'Code writing',
+            1 => 'Syntax checking',
+            2 => 'Compiling',
+            3 => 'Execution'
+        ];
+
+        return view('students/exams/rank-example',['items' => $items]);
+    });
+    Route::get('/exams/exam.id/match-example', function () {
+        return view('students/exams/match-example');
+    });
+    Route::get('/exams/exam.id/coding-example', function () {
+        $programming_languages = [
+            'c++' => "C++",
+            'java' => "Java",
+            'sql' => "SQL",
+            'python' => "Python",
+        ];
+        return view('students/exams/coding-example', ['programming_languages' => $programming_languages]);
+    });
+    Route::get('/exams/exam.id/result', function () {
+        return view('students/exams/result-example');
+    });
 });
 
 

@@ -36,23 +36,23 @@
     </div>
 
     <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
-        <table class="w-full">
+        <table class="table-auto min-w-max w-full text-left bg-white border-t border-gray-300 rounded-t-2xl">
             <thead class="bg-gray-100 border-b">
                 <tr>
                     {% for header in headers %}
-                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">{{ header }}</th>
+                        <th class="px-4 py-2 font-bold border-b border-gray-300 text-sm bg-gray-100 text-blue-900">{{ header }}</th>
                     {% endfor %}
                 </tr>
             </thead>
             <tbody id="reviewerTableBody">
                 {% for row in rows %}
-                    <tr id="reviewer-row-{{ row[6] }}" class="border-b hover:bg-gray-50">
-                        <td class="px-6 py-3">{{ row[0] }}</td>
-                        <td class="px-6 py-3">{{ row[1] }}</td>
-                        <td class="px-6 py-3">{{ row[2] }}</td>
-                        <td class="px-6 py-3">{{ row[3] }}</td>
-                        <td class="px-6 py-3">{{ row[4] }}</td>
-                        <td class="px-6 py-3">
+                    <tr id="reviewer-row-{{ row[6] }}" class="hover:bg-gray-100 transition duration-150 text-sm text-gray-900">
+                        <td class="p-4 border-b border-gray-300">{{ row[0] }}</td>
+                        <td class="p-4 border-b border-gray-300">{{ row[1] }}</td>
+                        <td class="p-4 border-b border-gray-300">{{ row[2] }}</td>
+                        <td class="p-4 border-b border-gray-300">{{ row[3] }}</td>
+                        <td class="p-4 border-b border-gray-300">{{ row[4] }}</td>
+                        <td class="p-4 border-b border-gray-300">
                             <div class="flex items-center justify-center gap-2">
                                 {# View Button #}
                                 <a href="/storage/reviewers/{{ row[5] }}" 

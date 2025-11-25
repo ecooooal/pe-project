@@ -10,6 +10,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class TopicController extends Controller
 {
@@ -22,10 +24,20 @@ class TopicController extends Controller
 
 
     public function index(){
-        $topics = $this->userService->gettopicsForUser(auth()->user())->paginate(10);
-        $topics->load('subject', 'questions');
+        $subjects =  $this->userService->getSubjectsForUser(auth()->user())->get();
+        $subjectIds = $subjects->pluck('id');
+
+        $query = QueryBuilder::for(Topic::class)
+            ->with(['subject', 'questions'])
+            ->whereIn('subject_id', $subjectIds)
+            ->allowedFilters(['name',
+                AllowedFilter::belongsTo('subject'),
+            ])
+            ->paginate(10)
+            ->appends(request()->query());
+
         $header = ['Subject', 'Name', 'Question Count'];
-        $rows = $topics->map(function ($topic) {
+        $rows = $query->map(function ($topic) {
             return [
                 'id' => $topic->id,
                 'subject' => $topic->subject->code,
@@ -35,9 +47,10 @@ class TopicController extends Controller
         });
 
         $data = [
+            'subjects' => $subjects,
             'headers' => $header,
             'rows' => $rows,
-            'models' => $topics,
+            'models' => $query,
             'url' => 'topics'
         ];
 

@@ -13,6 +13,8 @@ use App\Events\ExamResultsPublished;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 use Str;
 
 class ExamController extends Controller
@@ -27,14 +29,27 @@ class ExamController extends Controller
     }
 
     public function index(){
-        $courseIds = $this->userService->getCoursesForUser(auth()->user())->pluck('id');
-        $exams = Exam::with(['courses', 'questions'])
+        $courses = $this->userService->getCoursesForUser(auth()->user());
+        $courseIds = $courses->pluck('id');
+
+        $query = QueryBuilder::for(Exam::class)
+            ->with(['courses', 'questions'])
             ->whereHas('courses', function ($query) use ($courseIds) {
                 $query->whereIn('courses.id', $courseIds);
             })
-            ->paginate(10);
+            ->allowedFilters([
+                'name',
+                AllowedFilter::callback('is_published', function ($query, $value) {
+                    $query->where('is_published', (bool) $value);
+                }),
+                AllowedFilter::scope('course'),
+            ])
+            ->paginate(10)
+            ->appends(request()->query());
+
+
         $header = ['Name', 'Questions', 'Status', 'is Published', 'Examination Date'];
-        $rows = $exams->map(function ($exam) {
+        $rows = $query->map(function ($exam) {
             return [
                 'id' => $exam->id,
                 'name' => $exam->name,
@@ -46,9 +61,10 @@ class ExamController extends Controller
         });
 
         $data = [
+            'courses' => $courses,
             'headers' => $header,
             'rows' => $rows,
-            'models' => $exams,
+            'models' => $query,
             'url' => 'exams'
         ];
 

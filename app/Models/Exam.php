@@ -3,15 +3,18 @@
 namespace App\Models;
 
 use App\TracksUserActivity;
+use App\Traits\Uuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Str;
 
 class Exam extends Model
 {
-    use HasFactory, Notifiable, TracksUserActivity;
+    use HasFactory, Notifiable, TracksUserActivity, Uuid;
 
     protected $fillable = [
+        'uuid',
         'name',
         'academic_year_id',
         'course_id',
@@ -77,13 +80,18 @@ class Exam extends Model
         ->distinct()->get();
     }
 
-
-
     public function createdBy(){
         return $this->belongsTo(User::class, 'created_by');
         }
     
     public function updatedBy(){
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function scopeCourse($query, $value)
+    {
+        $query->whereHas('courses', function ($q) use ($value) {
+            $q->where('courses.id', $value);
+        });
     }
 }
