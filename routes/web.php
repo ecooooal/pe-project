@@ -35,10 +35,10 @@ Route::get('/', function () {
     return view('landing-page');
 });
 
-# Route::get('auth/google', [GoogleAuthController::class, 'redirectToGoogle']);
-# Route::get('auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+Route::get('auth/google', [GoogleAuthController::class, 'redirectToGoogle']);
+Route::get('auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 
-#Route::post('/login', [SessionController::class, 'authenticate']);
+Route::post('/login', [SessionController::class, 'authenticate']);
 Route::post('/auth/firebase/login', [FirebaseController::class, 'login'])->name('firebase.login');
 Route::post('/logout', [SessionController::class, 'logout'])->middleware(['auth']);
 Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution'])->name('validate.coding.question');

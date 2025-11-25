@@ -15,6 +15,7 @@ class FirebaseController extends Controller
 {
 	public function login(Request $request)
 	{
+		
 		$request->validate([
 			'idToken' => 'required|string',
 		]);
