@@ -21,7 +21,7 @@ class StudentController extends Controller
         $user = auth()->user();
         $enrolled_exams = $user->exams ?? [];
         $exam_records = $user->examRecords()
-            ->with(['studentPaper:id,exam_id,id', 'studentPaper.exam:id,name,max_score,id']) // adjust fields
+            ->with(['studentPaper:id,exam_id,id', 'studentPaper.exam:id,uuid,name,max_score,id']) // adjust fields
             ->orderByDesc('updated_at')
             ->limit(4)
             ->get();

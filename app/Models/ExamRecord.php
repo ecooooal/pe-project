@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\Uuid;
 use Illuminate\Database\Eloquent\Model;
 
 class ExamRecord extends Model
 {
+        use Uuid;
     protected $fillable = [
+        'uuid',
         'student_paper_id',
         'attempt',
         'subjects',
