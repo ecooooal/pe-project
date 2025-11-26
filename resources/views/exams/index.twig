@@ -54,7 +54,7 @@
                                     value="{{ course.id }}" 
                                     {% if course.id in app.request.get('filter')['course']|default([]) %}checked{% endif %}
                                     class="hidden peer">
-                                <span class="inline-block px-3 py-1 rounded-full border border-gray-300 text-sm font-medium text-white 
+                                <span class="inline-block px-3 py-1 rounded-full rounded-full border border-gray-300 text-sm font-medium text-gray-800  
                                             peer-checked:bg-blue-900 peer-checked:text-white peer-checked:border-blue-900
                                             hover:bg-gray-50 transition-colors duration-200">
                                     {{ course.abbreviation }}
@@ -88,7 +88,7 @@
                                     'class': 'opacity-0  -ml-[1rem]'
                                 },
                                 label_attributes: {
-                                    'class': 'inline-block px-4 py-2 rounded-full border border-gray-300 text-sm font-medium text-white hover:bg-gray-50 rounded-full cursor-pointer has-checked:bg-blue-900 has-checked:text-gray-50 has-checked:font-semibold transition-colors duration-200'
+                                    'class': 'inline-block px-4 py-2 rounded-full rounded-full border border-gray-300 text-sm font-medium text-gray-800  hover:bg-gray-50 rounded-full cursor-pointer has-checked:bg-blue-900 has-checked:text-gray-50 has-checked:font-semibold transition-colors duration-200'
                                 }))
                         }}
                     </div>
