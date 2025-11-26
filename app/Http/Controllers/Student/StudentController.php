@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Student;
 
+use App\Models\Course;
 use App\Models\ExamRecord;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class StudentController extends Controller
 {
@@ -19,6 +21,11 @@ class StudentController extends Controller
 
     public function index(){
         $user = auth()->user();
+
+        if (!$user->courses()->exists()){
+            return redirect()->route('students.assignCourseCreate');
+        }
+
         $enrolled_exams = $user->exams ?? [];
         $exam_records = $user->examRecords()
             ->with(['studentPaper:id,exam_id,id', 'studentPaper.exam:id,uuid,name,max_score,id']) // adjust fields
@@ -36,6 +43,33 @@ class StudentController extends Controller
         return view('students/student-home', $data);
     }
 
+    public function assignCourse(){
+        $courses = Course::pluck('abbreviation', 'id');
+
+        $data = [
+            'courses' => $courses
+        ];
+
+        return view('students/student-assign-course', $data);
+    }
+
+    public function updateCourse(){
+        $validator = Validator::make(request()->all(), [
+            'course' => ['required', 'exists:courses,id']
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('students.assignCourseCreate')
+                ->withErrors($validator);
+        }
+        $data = $validator->validated();
+
+        $user = auth()->user();
+
+        $user->courses()->sync($data['course']);
+
+        return redirect()->route('students.index');
+    }
     public function emailReviewer(Request $request)
     {
         $request->validate([

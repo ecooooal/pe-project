@@ -82,7 +82,7 @@ class ExamRecordController extends Controller
                             break;
 
                         case 'true_or_false':
-                            $yourAnswer = ($question_type_answer?->answer) ? 'True' : 'False';
+                            $yourAnswer = ($question_type_answer?->answer);
                             break;
 
                         case 'ranking':
@@ -165,7 +165,7 @@ class ExamRecordController extends Controller
 
             return view('students/records/get-coding-result', ['data' => $data]);
         } else {
-            return response('', 212);
+            return response('', 204);
         }
     }
 
@@ -180,7 +180,7 @@ class ExamRecordController extends Controller
 
             return view('students/records/get-updated-score', ['exam_record' => $examRecord]);
         } else {
-            return response('', 212);
+            return response('', 204); 
         }
     }
 

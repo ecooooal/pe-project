@@ -1,0 +1,40 @@
+{% from 'components/core/link-card' import link %}
+{% from 'components/core/show-header' import show_header %}
+{% import 'components/core/forms' as forms %}
+
+{% extends 'components/core/student-layout' %}
+
+{% block content %}
+<div class="flex flex-col max-w-full m-8 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
+    <div class="flex justify-between p-2 border-b-1 border-spacing-2 border-gray-200">
+        <div class="flex text-3xl font-semibold text-blue-900">
+            Assign My Course
+        </div>
+    </div>
+        <form action="{{ route('students.assignCourseUpdate')}}" method="POST" class="flex flex-col gap-y-2">
+            {{ csrf_field() }}
+            {{ method_field('PATCH') }}
+            {{ forms.form_field(
+                label:forms.label(
+                    id:'course', 
+                    content:'Course', 
+                    attributes:{
+                        'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
+                        ),
+                input:forms.select(
+                    name:'course', 
+                    values:courses, 
+                    attributes:{
+                        'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 capitalize',
+                        'required':true
+                    }
+                ),
+                errors: errors.get('courses'),
+                isColumn: true
+            )}}
+            <div class="flex">
+                <button type="submit" class="cursor-pointer ml-auto bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold text-sm">Assign My Course</button>
+            </div>
+        </form>
+</div>
+{% endblock %}
