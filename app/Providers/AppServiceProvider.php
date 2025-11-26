@@ -32,6 +32,10 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
+        // Share Firebase config with all views (including Twig templates)
+        View::share('firebase_config', config('firebase.client'));
+
+        // Existing view composer
         View::composer(['components/core/header', 'exams/index', 'faculty-home'], function($view){
             $current_academic_year = AcademicYear::current()->academic_year_interval ?? null;
             $view->with('current_academic_year', $current_academic_year);

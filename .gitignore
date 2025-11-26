@@ -7,7 +7,7 @@
 /private/codingAnswers
 /private/codingQuestions
 /storage/*.key
-/storage/pail
+/storage/pailgit 
 /storage/logs/laravel.log
 /storage/logs/*.log
 /vendor
@@ -27,3 +27,4 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+firebase-admin.json

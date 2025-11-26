@@ -1,4 +1,4 @@
-<?php
+
 
 namespace App\Http\Middleware;
 
@@ -15,11 +15,6 @@ class HtmxRequestOnly
      */
     public function handle(Request $request, Closure $next, $redirectRoute = null): Response
     {
-        // Bypass for superadmin dummy account
-        if (auth()->check() && auth()->user()->email === 'superAdmin@email.com') {
-            return $next($request);
-        }
-
         if ($request->header('HX-Request') === 'true') {
             return $next($request);
         }

@@ -18,7 +18,7 @@ class Report extends Model
     ];
     protected $casts = [
         'report_data' => 'array',
-        'raw_report_data' => 'array',
+        'raw_report_data' => 'array'
     ];
 
     public function exam(){

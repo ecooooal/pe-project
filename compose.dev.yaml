@@ -71,6 +71,8 @@ services:
       - ./vendor:/var/www/vendor
       - app-node-modules:/var/www/node_modules
       - ./storage:/var/www/storage
+    secrets:
+      - firebase_secret
     networks:
       - laravel-development
     depends_on:
@@ -204,8 +206,6 @@ services:
 
   fastapi:
     image: coooal/pcu-dasma-pe-project-fastapi:main
-    command: sh -c "ln -sf /code /code/app 2>/dev/null || true && uvicorn main:app --host 0.0.0.0 --port 80"
-    working_dir: /code
     ports:
       - "8082:8080"
     depends_on:
@@ -223,6 +223,10 @@ services:
 
 networks:
   laravel-development:
+
+secrets:
+  firebase_secret:
+    file: ./firebase-admin.json
 
 volumes:
   postgres-data-development:
