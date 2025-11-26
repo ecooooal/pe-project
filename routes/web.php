@@ -58,6 +58,7 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
         Route::get('/exams/{exam:uuid}/show-overview', [StudentExamController::class, 'showExamOverview'])->name('exams.student.overview');
         Route::get('/exams/{exam:uuid}/records', [ExamRecordController::class, 'index'])->name('exam_records.index');
         Route::get('/exams/{exam:uuid}/question-links/{student_paper}', [StudentPaperController::class, 'loadQuestionLinks'])->name('exam_papers.questions');
+        Route::get('/expired_student_paper_redirect/{student_paper}', [StudentPaperController::class, 'pollToAutoCompletedExamRecord'])->name('exam_papers.auto_completed_redirect');
         Route::get('/get-coding-results/{coding_answer}', [ExamRecordController::class, 'showCodingResult'])->name('exam_records.coding_answer_result');
         Route::get('/get-updated-score/{exam_record}', [ExamRecordController::class, 'showUpdatedScore'])->name('exam_records.show_updated_score');
     });

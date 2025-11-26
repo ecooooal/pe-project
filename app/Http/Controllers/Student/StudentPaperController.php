@@ -89,8 +89,8 @@ class StudentPaperController extends Controller
         
         return response('', 204)
             ->header('HX-Redirect', route('exam_records.show', [
-                'exam' => $exam->id,
-                'exam_record' => $record->id,
+                'exam' => $exam->uuid,
+                'exam_record' => $record->uuid,
             ]));
     }
 }
