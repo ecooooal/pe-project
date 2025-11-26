@@ -142,3 +142,9 @@
         @apply border-r-4 border-dotted border-blue-900 pr-2;
     }
   }
+
+@inline("peer-checked:bg-blue-{900} peer-checked:text-{white} peer-checked:border-blue-{900}");
+
+@layer base {
+  .peer-checked\:bg-blue-900 { background-color: #1e3a8a; }
+}
