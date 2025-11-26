@@ -10,6 +10,8 @@ class SessionController extends Controller
 {
     public function authenticate(Request $request): RedirectResponse
     {
+
+
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],

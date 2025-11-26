@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class ReviewerFile extends Model
+{
+    use HasFactory;
+
+    protected $table = 'reviewer_files'; // dapat match sa table name mo
+
+    protected $fillable = [
+        'reviewer_id',
+        'file_path',
+        'original_name', // optional: to store uploaded file name
+    ];
+
+    // Belongs to one reviewer
+    public function reviewer()
+    {
+        return $this->belongsTo(Reviewer::class);
+    }
+}
