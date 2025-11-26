@@ -247,6 +247,11 @@
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" class="w-32 "><path fill="none" stroke="#2a4365" stroke-width="20" stroke-linecap="round" stroke-dasharray="300 385" stroke-dashoffset="0" d="M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z"><animate attributeName="stroke-dashoffset" calcMode="spline" dur="2.2" values="685;-685" keySplines="0 0 1 1" repeatCount="indefinite"></animate></path></svg>
                         </div>
                     {% else %}
+                    {% if exam_record.status == "pass" %}
+                        <img class="object-cover w-48 h-48 mx-1" src="{{ asset('images/passing_score_badge.svg') }}"> 
+                    {% elseif exam_record.status == "perfect_score" %}
+                        <img class="object-cover w-48 h-48 mx-1" src="{{ asset('images/perfect_score_badge.svg') }}">  
+                    {% endif %}
                         <div id="student-score-donut-graph" 
                             class="h-[200px] w-[200px]"
                             data-student-score-status="{{ exam_record.status }}" 
@@ -323,6 +328,7 @@
         render_score_graph();
     }   
     document.body.addEventListener('htmx:afterSwap', render_score_graph);
+
 </script>
 {% endif %}
 

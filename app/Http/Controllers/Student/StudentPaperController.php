@@ -70,6 +70,7 @@ class StudentPaperController extends Controller
         $data = $this->examTakingService->getCurrentQuestion($student_paper);
         $data['student_paper'] = $student_paper;
         $data['is_expired'] = $student_paper->isExpired();
+
         return view( 'students/papers/show', $data);
     }
 
