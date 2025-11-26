@@ -10,7 +10,7 @@
         <h1 class="text-white text-2xl font-semibold hover:text-blue-400 group-hover:text-blue-400 delay-100 duration-300">
             PCU Proficiency Examination Application
         </h1>
-        {{ csrf_field()}}
+        {{ csrf_field() }}
         {% if auth_user() %}
             <p class="{{ current_academic_year ? 'text-gray-300' : 'text-red-300' }} text-xs font-semibold mt-2">(Dasmarinas) {{ current_academic_year ? 'S.Y' : '' }} {{ current_academic_year ?? 'MAINTENANCE' }}</p>
         {% endif %}
@@ -46,7 +46,7 @@
             </form>          
         {% endif %}
         {% if auth_guest() %}
-            <button popovertarget="login-popover" class="text-white font-medium cursor-pointer">
+            <button id="login-btn" type="button" class="text-white font-medium cursor-pointer">
                 Login
             </button>
         {% endif %}
@@ -54,6 +54,44 @@
 </div>
 
 {% if auth_guest() %}
+    {# Consent popover shown BEFORE login-popover #}
+    <div popover="manual"
+         id="consent-popover"
+         class="backdrop:bg-gray-900/40 backdrop:backdrop-blur-md m-auto max-w-xl p-8 rounded-xl bg-white shadow-xl space-y-4 relative">
+        <h2 class="text-lg font-semibold text-gray-900">
+            Data Privacy &amp; Consent
+        </h2>
+
+        <p class="text-sm text-gray-700">
+            By continuing, you agree that PCU may collect and process your school data
+            for the purpose of managing the Proficiency Examination application, in accordance with our Data Privacy Policy.
+            Rest assure that your grades won't be affected by this examination.
+        </p>
+
+        <div class="flex justify-end gap-3 pt-4">
+            <button id="consent-decline"
+                    type="button"
+                    class="px-4 py-2 text-sm rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50">
+                Cancel
+            </button>
+            <button id="consent-accept"
+                    type="button"
+                    class="px-4 py-2 text-sm rounded-md bg-blue-900 text-white hover:bg-blue-700">
+                I Agree
+            </button>
+        </div>
+
+        <button popovertarget="consent-popover"
+                popovertargetaction="hide"
+                type="button"
+                class="absolute right-3 top-3 text-gray-400 hover:text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+
     <div popover="manual" class="backdrop:bg-gray-900/15 backdrop:backdrop-blur-[1px] m-auto p-16 rounded-xl" id="login-popover">
         <div class="flex flex-col gap-y-4">
             {{ show_header('Login with PCU Account') }}
@@ -65,8 +103,6 @@
             <div id="loading-message" class="hidden text-center py-4">
                 <p class="text-gray-600">Signing in...</p>
             </div>
-
-            
 
             <div class="flex flex-col gap-y-4">
                 <button id="google-signin-btn" 
@@ -87,58 +123,58 @@
         </div>
 
         <div class="flex flex-1 flex-col">
-                <form action="/login" method="POST" class="flex flex-col gap-y-4">
-                    {{ csrf_field() }}
-                            <div class="flex gap-x-32 justify-between w-full">
-                                <div class="flex flex-col gap-y-4 w-full">
-                                    {{ forms.form_field(
-                                        label:forms.label(
-                                            id:'email', 
-                                            content:'Faculty Email', 
-                                            attributes:{
-                                                'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
-                                        ),
-                                        input:forms.email(
-                                            name:'email', 
-                                            value: old('email'),
-                                            attributes:{
-                                                'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                                'required':true,}
-                                        ),
-                                        isColumn:true 
-                                    )}}
-                                    {{ forms.form_field(
-                                        label:forms.label(
-                                            id:'password', 
-                                            content:'Password', 
-                                            attributes:{
-                                                'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'}
-                                                ),
-                                        input:forms.password(
-                                            name:'password', 
-                                            values:values, 
-                                            attributes:{
-                                                'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
-                                                'placeholder':'*********',
-                                                'required':true}
-                                        ),
-                                        isColumn:true 
-                                    )}}
-                                </div>
-                            </div>
-
-                    {% if errors is not empty %}
-                        <div class="flex gap-x-2">
-                            {% for error in errors.get('email') %}
-                                <p class="text-red-500 font-medium text-sm mx-auto">{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    <div class="flex gap-x-2">
-                        <button type="submit" class="mx-auto px-32 cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg py-2 font-semibold text-sm">Login</button>
+            <form action="/login" method="POST" class="flex flex-col gap-y-4">
+                {{ csrf_field() }}
+                <div class="flex gap-x-32 justify-between w-full">
+                    <div class="flex flex-col gap-y-4 w-full">
+                        {{ forms.form_field(
+                            label:forms.label(
+                                id:'email', 
+                                content:'Faculty Email', 
+                                attributes:{
+                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content_[\'\*\']'}
+                            ),
+                            input:forms.email(
+                                name:'email', 
+                                value: old('email'),
+                                attributes:{
+                                    'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                    'required':true,}
+                            ),
+                            isColumn:true 
+                        ) }}
+                        {{ forms.form_field(
+                            label:forms.label(
+                                id:'password', 
+                                content:'Password', 
+                                attributes:{
+                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content_[\'\*\']'}
+                                    ),
+                            input:forms.password(
+                                name:'password', 
+                                values:values, 
+                                attributes:{
+                                    'class':'flex-1 cursor-pointer block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                    'placeholder':'*******',
+                                    'required':true}
+                            ),
+                            isColumn:true 
+                        ) }}
                     </div>
-                </form>
-            </div>
+                </div>
+
+                {% if errors is not empty %}
+                    <div class="flex gap-x-2">
+                        {% for error in errors.get('email') %}
+                            <p class="text-red-500 font-medium text-sm mx-auto">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="flex gap-x-2">
+                    <button type="submit" class="mx-auto px-32 cursor-pointer bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg py-2 font-semibold text-sm">Login</button>
+                </div>
+            </form>
+        </div>
 
         {# Admin Login Form (Hidden by default) #}
         <div id="admin-login-section" class="hidden flex flex-col gap-y-4">
@@ -240,5 +276,77 @@
                 showError(error.message || 'An error occurred during sign in');
             }
         });
+    </script>
+
+    <script>
+        (function () {
+            const loginBtn        = document.getElementById('login-btn');
+            const consentPopover  = document.getElementById('consent-popover');
+            const loginPopover    = document.getElementById('login-popover');
+            const consentAccept   = document.getElementById('consent-accept');
+            const consentDecline  = document.getElementById('consent-decline');
+
+            if (!loginBtn || !consentPopover || !loginPopover) return;
+
+            const CONSENT_KEY = 'pcu-data-consent-v1';
+
+            function hasConsent() {
+                try {
+                    return localStorage.getItem(CONSENT_KEY) === 'true';
+                } catch (e) {
+                    // If localStorage is blocked, just fall back to showing consent every time
+                    return false;
+                }
+            }
+
+            function setConsent(value) {
+                try {
+                    localStorage.setItem(CONSENT_KEY, value ? 'true' : 'false');
+                } catch (e) {
+                    // ignore
+                }
+            }
+
+            function openLoginPopover() {
+                if (typeof loginPopover.showPopover === 'function') {
+                    loginPopover.showPopover();
+                }
+            }
+
+            function openConsentPopover() {
+                if (typeof consentPopover.showPopover === 'function') {
+                    consentPopover.showPopover();
+                }
+            }
+
+            // When the user clicks "Login"
+            loginBtn.addEventListener('click', function () {
+                if (hasConsent()) {
+                    // User already agreed before → go straight to login popover
+                    openLoginPopover();
+                } else {
+                    // First time or no stored consent → show consent first
+                    openConsentPopover();
+                }
+            });
+
+            // User agrees to data usage
+            consentAccept.addEventListener('click', function () {
+                setConsent(true);
+                if (typeof consentPopover.hidePopover === 'function') {
+                    consentPopover.hidePopover();
+                }
+                openLoginPopover();
+            });
+
+            // User cancels / declines
+            consentDecline.addEventListener('click', function () {
+                setConsent(false);
+                if (typeof consentPopover.hidePopover === 'function') {
+                    consentPopover.hidePopover();
+                }
+                // Do NOT open login popover
+            });
+        })();
     </script>
 {% endif %}
