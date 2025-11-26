@@ -46,6 +46,9 @@ Route::group(['middleware' => ['can:view student']], function () {
 
 Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::get('/', [StudentController::class, 'index'])->name('students.index');
+    Route::get('/student-course-assign', [StudentController::class, 'assignCourse'])->name('students.assignCourseCreate');
+    Route::patch('/student-course-assign', [StudentController::class, 'updateCourse'])->name('students.assignCourseUpdate');
+
     Route::redirect('/exams', '/student#exam-div');
 
     Route::post('/exams', [StudentExamController::class, 'store'])->name('exams.student.store');
