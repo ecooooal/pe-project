@@ -143,8 +143,11 @@
     }
   }
 
-@inline("peer-checked:bg-blue-{900} peer-checked:text-{white} peer-checked:border-blue-{900}");
+@inline("peer-checked:bg-blue-900 peer-checked:text-white peer-checked:border-blue-900");
 
 @layer base {
   .peer-checked\:bg-blue-900 { background-color: #1e3a8a; }
+  .peer-checked\:text-white { color: white; }
+  .peer-checked\:border-blue-900 { border-color: #1e3a8a; }
 }
+
