@@ -49,7 +49,6 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
     Route::redirect('/exams', '/student#exam-div');
 
     Route::post('/exams', [StudentExamController::class, 'store'])->name('exams.student.store');
-    Route::get('/exams/{exam}', [StudentExamController::class, 'show'])->name('exams.student.show');
     Route::get('/exams/{exam:uuid}', [StudentExamController::class, 'show'])->name('exams.student.show');
 
     Route::middleware('htmx.request:students.index')->group(function () {
