@@ -43,7 +43,7 @@
                                     value="{{ course.id }}" 
                                     {% if course.id in app.request.get('filter')['course']|default([]) %}checked{% endif %}
                                     class="hidden peer">
-                                <span class="inline-block px-3 py-1 rounded-full border border-gray-300 text-sm font-medium text-gray-700 
+                                <span class="inline-block px-3 py-1 rounded-full rounded-full border border-gray-300 text-sm font-medium text-gray-800  
                                             peer-checked:bg-blue-900 peer-checked:text-white peer-checked:border-blue-900
                                             hover:bg-gray-50 transition-colors duration-200">
                                     {{ course.abbreviation }}
@@ -68,7 +68,7 @@
                                     value="{{ subject.id }}" 
                                     {% if subject.id in app.request.get('filter')['subject']|default([]) %}checked{% endif %}
                                     class="hidden peer">
-                                <span class="inline-block px-3 py-1 rounded-full border border-gray-300 text-sm font-medium text-gray-700 
+                                <span class="inline-block px-3 py-1 rounded-full rounded-full border border-gray-300 text-sm font-medium text-gray-800  
                                             peer-checked:bg-blue-900 peer-checked:text-white peer-checked:border-blue-900
                                             hover:bg-gray-50 transition-colors duration-200">
                                     {{ subject.code }}
@@ -111,7 +111,7 @@
                                     value="{{ question_type.value }}" 
                                     {% if question_type.value in app.request.get('filter')['question_type']|default([]) %}checked{% endif %}
                                     class="hidden peer">
-                                <span class="inline-block px-3 py-1 rounded-full border border-gray-300 text-sm font-medium text-gray-700 
+                                <span class="inline-block px-3 py-1 rounded-full rounded-full border border-gray-300 text-sm font-medium text-gray-800  
                                             peer-checked:bg-blue-900 peer-checked:text-white peer-checked:border-blue-900
                                             hover:bg-gray-50 transition-colors duration-200">
                                     {{ question_type.name }}
@@ -131,7 +131,7 @@
                                     value="{{ question_level.id }}" 
                                     {% if question_level.id in app.request.get('filter')['question_level']|default([]) %}checked{% endif %}
                                     class="hidden peer">
-                                <span class="inline-block px-3 py-1 rounded-full border border-gray-300 text-sm font-medium text-gray-700 
+                                <span class="inline-block px-3 py-1 rounded-full rounded-full border border-gray-300 text-sm font-medium text-gray-800  
                                             peer-checked:bg-blue-900 peer-checked:text-white peer-checked:border-blue-900
                                             hover:bg-gray-50 transition-colors duration-200">
                                     {{ question_level.label }}
