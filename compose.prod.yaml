@@ -32,9 +32,10 @@ services:
       - laravel-public-assets-production:/var/www/public/build
       - laravel-storage-production:/var/www/storage # Mount the storage volume
     env_file:
-      - .env.staging
+      - .env.production
     networks:
       - laravel-production
+    command: ["php-fpm", "-F"]
     healthcheck:
       test: ["CMD-SHELL", "php-fpm-healthcheck || exit 1"]
       interval: 10s
@@ -59,17 +60,21 @@ services:
     tty: true # Enables an interactive terminal
     stdin_open: true # Keeps standard input open for 'docker exec'
     env_file:
-      - .env.staging
+      - .env.production
     networks:
       - laravel-production
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+      php-fpm:
+        condition: service_healthy
 
   worker:
     image: coooal/pcu-dasma-pe-project-php-cli:latest
     env_file:
-      - .env.staging
+      - .env.production
     command: php artisan queue:work --sleep=3 --tries=3
     restart: unless-stopped
     volumes:
@@ -81,11 +86,15 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      php-fpm:
+        condition: service_healthy
 
   postgres:
     image: postgres:16
     restart: unless-stopped
     user: postgres
+    env_file:
+      - .env.production
     ports:
       - "${DB_PORT}:5432"
     environment:
@@ -111,6 +120,8 @@ services:
   redis:
     image: redis:alpine
     restart: unless-stopped # Automatically restart unless the service is explicitly stopped
+    env_file:
+      - .env.production
     networks:
       - laravel-production
     volumes:
@@ -129,7 +140,7 @@ services:
   java-api:
     image: coooal/pcu-dasma-pe-project-java-api:main
     ports:
-      - "${JAVA_API_PORT}:8090"
+      - "8085:8090"
     networks:
       - laravel-production
     cap_drop: 
@@ -146,11 +157,17 @@ services:
 
   fastapi:
     image: coooal/pcu-dasma-pe-project-fastapi:main
+    env_file:
+      - .env.production
     ports:
       - "${FASTAPI_PORT}:8080"
     depends_on:
-      - redis
-      - postgres
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      php-fpm:
+        condition: service_healthy
     networks:
       - laravel-production
     environment:

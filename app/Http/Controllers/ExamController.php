@@ -78,9 +78,32 @@ class ExamController extends Controller
     }
 
     public function show(Exam $exam){
-        $exam->load(['questions','courses']);
+        $exam->load(['questions','courses', 'users.courses']);
+        $users = $this->examService->getEnrolledStudentsData($exam);
+        $header = ['Course', 'Access Code', 'Name', 'Email', 'Attempts Count', 'Enrolled Date'];
+        $rows = $users->map(function ($user) {
+            $courses_abbreviations = $user->courses->map(function ($course){
+                return $course->abbreviation;
+            });
+            return [
+                'id' => $user->id,
+                'courses' => $courses_abbreviations,
+                'access_code' => $user->pivot->access_code,
+                'name' => $user->getFullName(),
+                'email' => $user->email,
+                'attempts_count' => $user->attempts_count,
+                'enrolled_date' => Carbon::parse($user->pivot->created_at)->format('m/d/Y')
+            ];
+        });
 
-        return view('exams/show', ['exam' => $exam]);
+        $data = [
+            'exam' => $exam, 
+            'users' => $users,
+            'headers' => $header,
+            'rows' => $rows
+        ];
+
+        return view('exams/show', $data);
     }
 
     public function create(){
