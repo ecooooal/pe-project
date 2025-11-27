@@ -69,6 +69,9 @@ class ProcessStudentPerformanceJob implements ShouldQueue
                 'subject_id' => $subject->id,
                 'topic_id' => $topic->id,
                 'question_id' => $question->id,
+
+                'student_name' => $student->getFullName(),
+                'student_email' => $student->email,
                 'course_abbreviation' => $student_course->abbreviation,
                 'subject_name' => $subject->name,
                 'topic_name' => $topic->name,

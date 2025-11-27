@@ -82,6 +82,10 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
 
 Route::prefix('')->middleware(['can:view faculty'])->group(function () { 
     Route::get('/faculty', [LandingPageController::class, 'facultyShow'])->name('faculty.index');
+    
+    Route::get('/settings', function(){
+        return view('settings');
+    });
 
     Route::group(['middleware' => ['can:view access control']], function () { 
         Route::get('/admins', [AccessControlController::class, 'redirect'])->name('admin.redirect');
@@ -218,9 +222,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
 
     Route::get('/notifications', [NotificationController::class, 'index']);
 
-    Route::get('/settings', function(){
-        return view('settings');
-    });
+
 
     Route::get('/profiles/show', function(){
         return view('profiles/show');
