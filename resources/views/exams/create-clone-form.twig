@@ -1,0 +1,66 @@
+{% from 'components/core/show-header' import show_header %}
+{% from 'components/core/index-table' import table %}
+{% import 'components/core/forms' as forms %}
+
+<div id="clone_exam_form" class="htmx-animate flex flex-col gap-y-2 items-center max-w-full rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
+    {{ forms.form_field(
+        label:forms.label(
+            id:'clone_exam', 
+            content:'Exam To Clone', 
+            attributes:{
+                'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
+        ),
+        input:forms.select(
+            name:'clone_exam', 
+            values: can_clone_exams,
+            attributes:{
+                'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                'required':true,
+                'hx-get': route('exams.create.clone-exam-questions'),
+                'hx-trigger' : 'load, change',
+                'hx-swap' : 'outerHTML',
+                'hx-target':'#clone-exam-questions'
+            }
+        ),
+        errors:errors.get('clone_exam'),
+        isColumn:true 
+    )}}
+    <div class="flex w-full items-center gap-x-2 p-1">
+        <button
+            type="button" popovertarget="clone-exam-questions-popover" 
+            class="cursor-pointer flex gap-x-1 items-center text-sm text-blue-800 font-bold hover:underline hover:text-blue-900">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-6">
+            <path fill-rule="evenodd" d="M6 4.75A.75.75 0 0 1 6.75 4h10.5a.75.75 0 0 1 0 1.5H6.75A.75.75 0 0 1 6 4.75ZM6 10a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H6.75A.75.75 0 0 1 6 10Zm0 5.25a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H6.75a.75.75 0 0 1-.75-.75ZM1.99 4.75a1 1 0 0 1 1-1H3a1 1 0 0 1 1 1v.01a1 1 0 0 1-1 1h-.01a1 1 0 0 1-1-1v-.01ZM1.99 15.25a1 1 0 0 1 1-1H3a1 1 0 0 1 1 1v.01a1 1 0 0 1-1 1h-.01a1 1 0 0 1-1-1v-.01ZM1.99 10a1 1 0 0 1 1-1H3a1 1 0 0 1 1 1v.01a1 1 0 0 1-1 1h-.01a1 1 0 0 1-1-1V10Z" clip-rule="evenodd" />
+            </svg>
+            <span>
+                See Exam Questions
+            </span>
+        </button>
+    </div>
+    <div popover
+        class="backdrop:bg-gray-900/25 m-auto w-fit rounded-2xl"
+        id="clone-exam-questions-popover"
+    >
+        <div class="flex flex-col max-w-full bg-white border-2 border-gray-300 rounded-2xl">
+            <!-- header -->
+
+            <div class="flex items-center w-full p-4 bg-white">
+                <h1 class="text-gray-900 font-bold text-3xl">Exam Questions</h1>
+                <div class="ml-auto p-2">
+                    <button type="button" popovertarget="clone-exam-questions-popover" class="cursor-pointer bg-white border-1 border-gray-600 text-gray-900 hover:bg-red-500 hover:border-white hover:text-white duration-300 rounded-lg p-2 font-semibold">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                        <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="clone-exam-questions" class="p-4">
+
+            </div>
+
+            <div class="flex justify-end items-center w-full h-16 p-4 bg-white">
+            </div>
+        </div>
+    </div>
+</div>

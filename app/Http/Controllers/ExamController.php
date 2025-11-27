@@ -12,6 +12,7 @@ use App\Services\UserService;
 use App\Events\ExamResultsPublished;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -100,7 +101,8 @@ class ExamController extends Controller
             'exam' => $exam, 
             'users' => $users,
             'headers' => $header,
-            'rows' => $rows
+            'rows' => $rows,
+            'questions'=> $exam->questions
         ];
 
         return view('exams/show', $data);
@@ -136,6 +138,7 @@ class ExamController extends Controller
             'examination_date' => 'nullable|date|after_or_equal:today',
             'passing_score' => 'required|integer|gte:1|max:100',
             'expiration_date' => 'nullable|date|after:now|after_or_equal:examination_date',
+            'clone_exam' => 'nullable|integer|gte:1|exists:exams,id'
         ], [
             'courses' => 'The course field is required.',
             'courses.*' => 'Invalid Course',
@@ -160,6 +163,17 @@ class ExamController extends Controller
 
         $access_code = $this->examService->generateAccessCode();
         $this->examService->saveAccessCode($exam, $access_code);
+
+        if ($validated['clone_exam'] ?? false){
+            Log::info('cloning an exam with exam id' . $validated['clone_exam']);
+            $clone_exam = Exam::where('id', $validated['clone_exam'])
+                                ->with('questions')
+                                ->first();
+           $question_ids = $clone_exam->questions->pluck('id')->toArray();
+            Log::info('Questions found are :' .  implode(', ', $question_ids));
+
+           $exam->questions()->sync($question_ids);
+        }
 
         session()->flash('toast', json_encode([
             'status' => 'Created!',
@@ -190,6 +204,7 @@ class ExamController extends Controller
             'examination_date' => 'nullable|date|after_or_equal:today',
             'passing_score' => 'required|integer|gte:1|max:100',
             'expiration_date' => 'nullable|date|after:now|after_or_equal:examination_date',
+            'clone_exam' => 'nullable|integer|gte:1|exists:exams,id'
         ], [
             'courses' => 'The course field is required.',
             'courses.*' => 'Invalid Course',
@@ -210,6 +225,16 @@ class ExamController extends Controller
         ]);
 
         $exam->courses()->sync($validated['courses']);
+        if ($validated['clone_exam'] ?? false){
+            Log::info('cloning an exam with exam id' . $validated['clone_exam']);
+            $clone_exam = Exam::where('id', $validated['clone_exam'])
+                                ->with('questions')
+                                ->first();
+           $question_ids = $clone_exam->questions->pluck('id')->toArray();
+            Log::info('Questions found are :' .  implode(', ', $question_ids));
+
+           $exam->questions()->sync($question_ids);
+        }
 
         session()->flash('toast', json_encode([
             'status' => 'Updated!',
@@ -399,5 +424,42 @@ class ExamController extends Controller
     public function swap_tabs(){
 
         return view('exams/partials-tabs-algorithm');
+    }
+
+    public function createCloneExam(){
+        $isEditing = request()->input('isEditing');
+        if($isEditing ?? false){
+            $exams = $this->userService->getExamsForUser(auth()->user())
+            ->where('id', '!=', $isEditing)
+            ->pluck('name', 'id');
+        } else {
+            $exams = $this->userService->getExamsForUser(auth()->user())->pluck('name', 'id');
+        }
+        return view('exams/create-clone-form', ['can_clone_exams' => $exams]);
+    }
+    public function getCloneExamQuestions(Request $request){
+        $exam = Exam::where('id', $request->clone_exam)
+                    ->with('questions.topic.subject')
+                    ->first();
+        $header = ['Name', 'Subject', 'Topic', 'Type', 'Level'];
+        $rows = $exam->questions->map(function ($question)   {
+            $question_level = $question->bloomTagLabel();
+            
+            return [
+                'id' => $question->id,
+                'name' => $question->name,
+                'subject' => $question->topic->subject->code,
+                'topic' => $question->topic->name,
+                'type' => $question->question_type->name,
+                'level' => $question_level
+            ];
+        });
+
+        $data = [
+            'headers' => $header,
+            'rows' => $rows
+        ];
+
+        return view('exams/create-clone-questions', $data);
     }
 }

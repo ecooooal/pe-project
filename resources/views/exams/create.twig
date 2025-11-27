@@ -13,7 +13,9 @@
 <div class="flex flex-1 flex-col mx-16">
     <form id="exam-form" action="{{ route('exams.store') }}" method="POST" class="flex flex-col gap-y-4">
         {{ csrf_field() }}
+        <div id="clone-exam-form"></div>
         <div class="flex max-w-full rounded-xl bg-white px-2 shadow-sm ring-1 ring-gray-950/5">
+
             <div class="flex flex-col p-4 flex-1">
                 {{ show_header('Details') }}
                 <div class="flex gap-x-32 justify-between w-full">
@@ -35,6 +37,27 @@
                             errors:errors.get('name'),
                             isColumn:true 
                         )}}
+                        <div id="clone-exam-button-div" class="flex items-center gap-x-2">
+                            <button 
+                                type="button"
+                                hx-get="{{ route('exams.create.clone-exam')}}"
+                                hx-trigger="click"
+                                hx-target="#clone-exam-form"
+                                hx-swap="outerHTML" 
+                                id="double_click_clone_exam"
+                                class="cursor-pointer flex gap-x-1 items-center text-xs text-blue-800 font-bold hover:underline hover:text-blue-900">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                                <path d="M7 3.5A1.5 1.5 0 0 1 8.5 2h3.879a1.5 1.5 0 0 1 1.06.44l3.122 3.12A1.5 1.5 0 0 1 17 6.622V12.5a1.5 1.5 0 0 1-1.5 1.5h-1v-3.379a3 3 0 0 0-.879-2.121L10.5 5.379A3 3 0 0 0 8.379 4.5H7v-1Z" />
+                                <path d="M4.5 6A1.5 1.5 0 0 0 3 7.5v9A1.5 1.5 0 0 0 4.5 18h7a1.5 1.5 0 0 0 1.5-1.5v-5.879a1.5 1.5 0 0 0-.44-1.06L9.44 6.439A1.5 1.5 0 0 0 8.378 6H4.5Z" />
+                                </svg>
+                                <span>
+                                    Clone an Exam
+                                </span>
+                            </button>
+                            <small id="double_click_msg" class="text-gray-500 text-xs italic opacity-0 transition-opacity duration-300 pointer-event-none select-none">
+                                Double click to proceed
+                            </small>
+                        </div>
                         <div class="flex gap-1">
                             <div class="relative inline-block shrink-0">
                                 <button 
@@ -317,5 +340,30 @@
             form.appendChild(input); 
         });
     } 
+
+const link = document.getElementById('double_click_clone_exam');
+const msg = document.getElementById('double_click_msg');
+
+link.addEventListener('click', function(e) {
+    if (!this.dataset.clickedOnce) {
+    e.preventDefault();
+    e.stopImmediatePropagation(); 
+    this.dataset.clickedOnce = 'true';
+    this.style.opacity = 0.6;
+    msg.style.opacity = 1; 
+
+    setTimeout(() => {
+        this.dataset.clickedOnce = '';
+        this.style.opacity = 1;
+        msg.style.opacity = 0; 
+    }, 1000);
+    return; // stop here
+    }
+    setTimeout(() => {
+        const parent = this.closest('#clone-exam-button-div');
+        if (parent) parent.remove();
+        else this.remove();
+    }, 10); // slight delay ensures HTMX captures the click first
+});
 </script>
 {% endblock %}
