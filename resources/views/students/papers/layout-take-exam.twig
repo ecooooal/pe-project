@@ -8,8 +8,16 @@
 
 {% block content %}
 {{ vite('resources/js/answering-text-editor.js')|raw }}
-<div class="flex flex-1 gap-x-4 m-4">
-    <div class="flex flex-1 flex-col max-w-[75vw]">
+<div hx-on::after-request="
+            htmx.ajax(
+                'GET',
+                '{{ route('exam_papers.questions', { exam: exam, student_paper: student_paper }) }}',
+                { target: '#question-links', swap: 'innerHTML' }
+            );
+        "
+    class="flex flex-1 gap-x-4 m-4">
+    <div class="flex flex-1 flex-col max-w-[75vw]"
+        >
         <div    id="exam-content" 
                 class="flex flex-1 flex-col max-w-full max-h-fit gap-y-8 bg-white rounded-xl p-4 shadow-sm ring-1 ring-gray-950/5"
                 hx-get="{{ route('exam_papers.show', {student_paper:student_paper}) }}"
@@ -21,7 +29,6 @@
     <div class="flex flex-col shrink-0 md:w-1/5 ml-auto max-h-fit max-w-full gap-y-2 text-wrap rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5">
         {{ show_item('Exam', exam.name|title)}}
         {{ show_header('') }}
-        {{ show_item('Duration', exam.duration ?: 'No Timer')}}
         <div class="flex gap-x-2 text-pretty break-keep">
             <span class="font-medium shrink-0 text-gray-900">
                 Duration : 
@@ -32,14 +39,17 @@
         {{ show_item('Total Questions', student_paper.question_count )}}
         {{ show_header('') }}
         {% if duration > 0 or duration == null %}
-            <div id="exam-paper-questions" class="flex flex-1 flex-col">
-                <ul hx-get="{{ route('exam_papers.questions', { exam:exam, student_paper:student_paper} ) }}"
-                    hx-target="this"
-                    hx-swap="innerHTML"
-                    hx-trigger="load"
+            <div  
+                hx-get="{{ route('exam_papers.questions', { exam:exam, student_paper:student_paper} ) }}"
+                hx-target="#question-links"
+                hx-swap="innerHTML"
+                hx-trigger="load"
+                id="exam-paper-questions" 
+                class="flex flex-1 flex-col">
+                <ol
                     id="question-links"
-                    class="max-h-64 overflow-y-auto w-full space-y-1">
-                </ul>
+                    class="max-h-64 overflow-y-auto w-full font-mono list-decimal list-inside space-y-1">
+                </ol>
             </div>
         {% endif %}
     </div>  
@@ -47,7 +57,7 @@
 <script>
 history.pushState(null, null, location.href);
 window.onpopstate = function () {
-history.go(1); // Prevent back navigation
+history.go(1);
 };
 
 document.addEventListener('copy', function(event) {
@@ -70,35 +80,32 @@ function deleteQuestionLinks() {
     }
 }
 function displayTime(seconds) {
-    // Calculate minutes and remaining seconds
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
 
-    // Format the time to always show two digits (e.g., 05 instead of 5)
     const formattedMinutes = String(minutes).padStart(2, '0');
     const formattedSeconds = String(remainingSeconds).padStart(2, '0');
 
-    // Update the text content of the display element
     duration_field.textContent = `${formattedMinutes}:${formattedSeconds}`;
 }
 
 expired_date = "{{expired_date}}";
 duration_field = document.getElementById("student_paper_duration");
 if (expired_date == ""){
-    duration_field.innerHTML = "∞";
+    duration_field.innerHTML = "Unlimited";
 } else {
     expired_date = new Date(expired_date).getTime();;
     function updateTimer() {
         const now = Date.now();
-        const diff = Math.max(0, expired_date - now); // milliseconds remaining
-        displayTime(Math.floor(diff / 1000)); // convert to seconds
+        const diff = Math.max(0, expired_date - now);
+        displayTime(Math.floor(diff / 1000));
 
         if(diff <= 0){
             deleteQuestionLinks(); 
             clearInterval(timerInterval);
         }
     }
-    const timerInterval = setInterval(updateTimer, 500); // update more frequently
+    const timerInterval = setInterval(updateTimer, 500); 
 }
 
 </script>

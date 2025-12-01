@@ -104,7 +104,7 @@
                         {{ forms.form_field(
                             label:forms.label(
                                 id:'name', 
-                                content:'Name', 
+                                content:'Question', 
                                 attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
                             ),
@@ -317,7 +317,7 @@
                     <div class="flex flex-col gap-2">
                         <div class="flex gap-2">
                             <span class="whitespace-nowrap text-sm/6 font-medium text-gray-900 after:text-red-500 after:content-[\'\*\']'">
-                                Enable Compile Student Codes?
+                                Enable Student ability to compile their codes during this coding question?
                             </span>
                             <label class="relative block w-10 h-5 cursor-pointer select-none">
                                 <input id="syntax-only-checkbox" name="enable_student_compile" type="checkbox" class="peer" value="1" {{ isEdit ? question_type_data.enable_compilation ? 'checked' : ''}} />

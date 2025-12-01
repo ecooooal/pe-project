@@ -80,13 +80,13 @@ class QuestionController extends Controller
             ->paginate(10)
             ->appends(request()->query());
             
-        $header = ['Name', 'Subject', 'Topic', 'Type', 'Level'];
+        $header = ['Question', 'Subject', 'Topic', 'Type', 'Level'];
         $rows = $query->map(function ($question)   {
             $question_level = $question->bloomTagLabel();
             
             return [
                 'id' => $question->id,
-                'name' => $question->name,
+                'question' => $question->name,
                 'subject' => $question->topic->subject->code,
                 'topic' => $question->topic->name,
                 'type' => $question->question_type->name,

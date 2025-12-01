@@ -34,7 +34,6 @@
                             errors:errors.get('items.' ~ (i) ~ '.solution'),
                         isReverse:true
                     )}}
-                    <button type="button" ondblclick="this.parentElement.remove()" class="flex text-xl font-bold text-red-700 hover:text-red-500 transition-colors cursor-pointer items-center mt-2">X</button>
                     <div class="flex md:w-1/5">
                             {{ forms.form_field(
                             label:forms.label(
@@ -55,6 +54,7 @@
                             errors:errors.get('items.' ~ (i) ~ '.points')
                         )}}
                     </div>
+                    <button type="button" ondblclick="this.parentElement.remove()" class="flex text-xl font-bold text-red-700 hover:text-red-500 transition-colors cursor-pointer items-center mt-2">X</button>
                 </div>
                 {% endfor %}
                 <span id="swap"></span>
@@ -74,7 +74,7 @@
                 hx-trigger="click throttle:1s"
                 hx-indicator="#loader"
                 >
-                Add more Items
+                Add more Item
             </button>
             <img id="loader" class="htmx-indicator mx-auto transition-opacity duration-500 pointer-events-none" width="20" src="{{ asset('images/bars-scale.svg') }}"/>
 

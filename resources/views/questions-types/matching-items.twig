@@ -30,7 +30,7 @@
                         {{ forms.form_field(
                             label:forms.label(
                                 id: 'items[' ~ (i) ~ '][right]', 
-                                content:'Solution Item ' ~ (i), 
+                                content:'Correct Answer ' ~ (i), 
                                 attributes:{
                                     'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
                                 ),
@@ -44,7 +44,6 @@
                             errors:errors.get('items.' ~ (i) ~ '.right'),
                             isColumn: true
                         )}}
-                        <button type="button" ondblclick="this.parentElement.remove()" class="flex text-xl font-bold text-red-700 hover:text-red-500 transition-colors cursor-pointer items-center mt-8">X</button>
                         <div class="flex md:w-1/5">
                             {{ forms.form_field(
                             label:forms.label(
@@ -66,6 +65,8 @@
                             isColumn:true
                         )}}
                         </div>
+                        <button type="button" ondblclick="this.parentElement.remove()" class="flex text-xl font-bold text-red-700 hover:text-red-500 transition-colors cursor-pointer items-center mt-8">X</button>
+
                     </div>   
                 {% endfor %}
                 <span id="swap" class="slide-it"></span>
@@ -87,7 +88,7 @@
                     hx-trigger="click throttle:1s"
                     hx-indicator="#loader"
                     >
-                    Add more Items
+                    Add more Matching Item
                 </button>
             </div>
         </div>

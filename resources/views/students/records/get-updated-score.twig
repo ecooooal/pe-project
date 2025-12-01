@@ -42,7 +42,13 @@
         if (student_data_div) {
         student_score = student_data_div.dataset.studentScore;
         exam_max_score = student_data_div.dataset.examMaxScore;
-         student_score_status = student_data_div.dataset.studentScoreStatus;
+
+        let percentage = 0;
+        if (parseFloat(exam_max_score) > 0) {
+            percentage = Math.round(parseFloat(student_score) / parseFloat(exam_max_score) * 100);
+        }
+
+        student_score_status = student_data_div.dataset.studentScoreStatus;
         student_score_status_message = student_score_status == 'perfect_score' ? 'Perfect' : student_score_status == 'pass' ? 'Pass' : 'Review';
         const remaining = exam_max_score - student_score;
         const marker_color = student_score_status == 'perfect_score' ? '#FFD700' : student_score_status == 'pass' ? 'rgb(44, 160, 44)' : 'rgb(255, 127, 14)';
@@ -52,7 +58,7 @@
             values: [student_score, remaining],
             labels: [`${student_score} pts`, ''],            
             hole: 0.6,
-            text: [`${student_score} pts`, ''],   
+            text: [`${student_score} pts`, `${remaining} pts`],   
             textinfo: 'text',                        
             hoverinfo: 'none',      
             direction: 'counterclockwise',
@@ -75,7 +81,7 @@
                         size: 18
                     },
                     showarrow: false,
-                    text: `${student_score_status_message}`,
+                    text: `${student_score_status_message}<br>${percentage}%`,
                     x: 0.5,
                     y: 0.5
                 }

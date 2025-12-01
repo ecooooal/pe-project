@@ -172,6 +172,12 @@ class MailController extends Controller
                 return redirect('/reviewers/create')->with('success', $successMessage . ' You can add another.');
             }
 
+            session()->flash('toast', json_encode([
+                'status' => 'Created!',
+                'message' => $successMessage,
+                'type' => 'info'
+            ]));
+
             return redirect('/reviewers')->with('success', $successMessage);
 
         } catch (\Exception $e) {
