@@ -10,14 +10,14 @@
             {{ forms.form_field(
                 label:forms.label(
                     id:'solution', 
-                    content:'Solution', 
+                    content:'Correct Answer', 
                     attributes:{
                         'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900',}
                     ),
                 input:forms.select(
                     name:'solution', 
                     value: isEdit ? question_type_data.solution : old('solution'),
-                    values:{'':'Select a Solution', 'true':'True', 'false':'False'}, 
+                    values:{'':'Select the Correct Answer', 'true':'True', 'false':'False'}, 
                     attributes:{
                         'class':'flex-1 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
                         'required':true}),
