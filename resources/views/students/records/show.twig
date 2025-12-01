@@ -279,6 +279,12 @@
         if (!student_data_div) return;
         student_score = student_data_div.dataset.studentScore;
         exam_max_score = student_data_div.dataset.examMaxScore;
+
+        let percentage = 0;
+        if (parseFloat(exam_max_score) > 0) {
+            percentage = Math.round(parseFloat(student_score) / parseFloat(exam_max_score) * 100);
+        }
+
         student_score_status = student_data_div.dataset.studentScoreStatus;
         student_score_status_message = student_score_status == 'perfect_score' ? 'Perfect' : student_score_status == 'pass' ? 'Pass' : 'Review';
         const remaining = exam_max_score - student_score;
@@ -312,7 +318,7 @@
                         size: 18
                     },
                     showarrow: false,
-                    text: `${student_score_status_message}`,
+                    text: `${student_score_status_message}<br>${percentage}%`,
                     x: 0.5,
                     y: 0.5
                 }

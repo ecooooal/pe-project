@@ -48,8 +48,18 @@ class ExamRecordController extends Controller
     public function show(Exam $exam, ExamRecord $examRecord)
     {
         $examRecord->load('subjects');
-        $student_paper = StudentPaper::with('studentAnswers.question')
-            ->find($examRecord->student_paper_id);
+        $student_paper = StudentPaper::with(['studentAnswers' => function ($query) use ($examRecord) {
+            $paper = StudentPaper::find($examRecord->student_paper_id);
+            $questions_order = json_decode($paper->questions_order, true);
+            
+            if (!empty($questions_order) && is_array($questions_order)) {
+                $questionIds = implode(',', $questions_order);
+                $query->orderByRaw("array_position(ARRAY[$questionIds]::bigint[], question_id)");
+            }
+
+            $query->with('question');
+        }])->find($examRecord->student_paper_id);
+
 
         $rows = [];
         foreach ($student_paper->studentAnswers as $i => $answer) {

@@ -41,6 +41,12 @@ class StudentPaper extends Model
         return $this->hasMany(StudentAnswer::class);
     }
 
+    public function getAnsweredStudentAnswers(){
+        return $this->studentAnswers()
+            ->where('is_answered', true)
+            ->get();
+    }
+
     public function getRemainingDuration(){
         if ($this->expired_at != null){
             return now()->diffInSeconds($this->expired_at, false);

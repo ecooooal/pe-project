@@ -75,8 +75,11 @@ class StudentPaperController extends Controller
     }
 
     public function loadQuestionLinks(Exam $exam, StudentPaper $student_paper){
-        $questions = $this->examTakingService->orderedQuestions($student_paper, $exam);
-        return view('students/papers/question-links', ['questions_in_array' => $questions, 'student_paper' => $student_paper]);
+        $data['questions_in_array'] = $this->examTakingService->orderedQuestions($student_paper, $exam);
+        $data['answered_questions'] = $student_paper->getAnsweredStudentAnswers()->pluck('question_id')->toArray();
+        $data['current_position'] = (string) $data['questions_in_array'][$student_paper->current_position]->id;
+        $data['student_paper'] = $student_paper;
+        return view('students/papers/question-links', $data);
     }
     public function pollToAutoCompletedExamRecord(StudentPaper $student_paper){
         $exam_result = $this->examTakingService->getExamRecordFromStudentPaper($student_paper);

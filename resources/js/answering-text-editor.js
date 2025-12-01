@@ -200,7 +200,7 @@ import {indentWithTab} from "@codemirror/commands"
     });
 
     document.body.addEventListener('htmx:configRequest', function(evt) {
-        document.querySelectorAll('.question-button').forEach(b => {
+        document.querySelectorAll('button').forEach(b => {
             b.disabled = true;
             b.classList.add('opacity-50', 'pointer-events-none');
         });
@@ -210,19 +210,10 @@ import {indentWithTab} from "@codemirror/commands"
         const btn = document.getElementById('test-code-button');
         if (btn) btn.disabled = false;
 
-        const clickedBtn = evt.detail.elt;
-
-        // Enable and reset all buttons first
-        document.querySelectorAll('.question-button').forEach(b => {
+        document.querySelectorAll('button').forEach(b => {
             b.disabled = false;
-            b.classList.remove('text-blue-900', 'font-bold', 'pointer-events-none', 'opacity-50');
+            b.classList.remove('opacity-50', 'pointer-events-none');
         });
-
-        // Then disable and style the clicked button only
-        if (clickedBtn && clickedBtn.classList.contains('question-button')) {
-            clickedBtn.classList.add('text-blue-900', 'font-bold', 'pointer-events-none');
-            clickedBtn.disabled = true;
-        }
     });
 
 

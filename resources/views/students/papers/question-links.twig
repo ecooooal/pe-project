@@ -1,17 +1,32 @@
 {% from 'components/core/show-item' import show_item %}
-
 {% for question in questions_in_array %}
-<li class="flex justify-between p-1 group">
-<button hx-patch="{{ route('student_answer.update', {student_paper : student_paper, question:question} ) }}"
+<li class="flex justify-between p-1 ">
+<button 
+        {% if question.id != current_position %}
+        hx-patch="{{ route('student_answer.update', {student_paper : student_paper, question:question} ) }}"
         hx-target="#exam-content"
         hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
         hx-include="#answer-form"
         hx-swap="innerHTML"
         hx-trigger="click throttle:1000ms"
         hx-vals='{ "action": "jump", "index": {{ question.order_index }} }'
+        {% endif %}
         type="button" 
-        class="question-button text-gray-700">
-        {{ show_item(loop.index, question.question_type.value|replace({'_': ' '})|lower|capitalize, label_attributes:'group-hover:text-blue-900 duration-150', value_attributes:'group-hover:text-blue-900 duration-150 group-active:underline cursor-pointer')}}
+        class="question-button text-gray-700 group {{ question.id != current_position ? 'cursor-pointer' : 'pointer-events-none' }}">
+        <span class="flex gap-2 text-center">
+            <p class="font-medium duration-150 w-6 h-6 items-center justify-center rounded-full flex {{ question.id == current_position ? 'bg-blue-900 text-gray-50' : 'group-hover:bg-blue-900 group-hover:text-gray-50 '}}">{{ loop.index }}</p> 
+            <span>:</span>
+            <p class="group-hover:text-blue-900 duration-150 align-middle text-center group-active:underline {{ question.id in answered_questions ? 'text-green-500' : 'text-gray-500' }}">
+                {{ question.id in answered_questions 
+                    ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-6">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" />
+                    </svg>' 
+                    : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-6">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd" />
+                    </svg>' 
+                }}
+            </p>
+        </span>
     </button>
 </li>
 {% endfor %}
