@@ -186,14 +186,15 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, signInWithPopup, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
-        // Firebase configuration - Replace with your actual config
+        // Firebase configuration (production)
         const firebaseConfig = {
-            apiKey: "{{ firebase_config.api_key }}",
-            authDomain: "{{ firebase_config.project_id }}.firebaseapp.com",
-            projectId: "{{ firebase_config.project_id }}",
-            storageBucket: "{{ firebase_config.project_id }}.firebasestorage.app",
-            messagingSenderId: "{{ firebase_config.messaging_sender_id }}",
-            appId: "{{ firebase_config.app_id }}"
+            apiKey: "AIzaSyCoU2CNJ_dZNOtoslf5Lt8lAXwhfaZuBvY",
+            authDomain: "pe-project-831e1.firebaseapp.com",
+            projectId: "pe-project-831e1",
+            storageBucket: "pe-project-831e1.firebasestorage.app",
+            messagingSenderId: "17747378201",
+            appId: "1:17747378201:web:ee3dbbee143f0781fe2a88",
+            measurementId: "G-WDT4XLHRKD"
         };
 
         const app = initializeApp(firebaseConfig);
