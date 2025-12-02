@@ -1,0 +1,59 @@
+{
+  "name": "Information Assurance and Security 1",
+  "code": "IAS1",
+  "year_level": 2,
+  "topics": [
+    {
+      "name": "Security Principles",
+      "questions": [
+        {
+          "name": "Define the principle of confidentiality.",
+          "type": "identification",
+          "points": 1,
+          "solution": "Ensuring information is accessible only to authorized individuals.",
+          "question_level": "remember"
+        },
+        {
+          "name": "Explain how integrity can be compromised in a system.",
+          "type": "identification",
+          "points": 2,
+          "solution": "Through unauthorized modification of data.",
+          "question_level": "analyze"
+        },
+        {
+          "name": "Propose a security measure to maintain availability.",
+          "type": "identification",
+          "points": 2,
+          "solution": "Implement redundancy and failover systems.",
+          "question_level": "create"
+        }
+      ]
+    },
+    {
+      "name": "Threats and Vulnerabilities",
+      "questions": [
+        {
+          "name": "What is malware?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Malicious software designed to harm systems.",
+          "question_level": "remember"
+        },
+        {
+          "name": "Analyze why social engineering is effective.",
+          "type": "identification",
+          "points": 2,
+          "solution": "It exploits human psychology rather than technical flaws.",
+          "question_level": "analyze"
+        },
+        {
+          "name": "Evaluate if antivirus alone is sufficient protection.",
+          "type": "identification",
+          "points": 2,
+          "solution": "No, layered security is required.",
+          "question_level": "evaluate"
+        }
+      ]
+    }
+  ]
+}
