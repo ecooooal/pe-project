@@ -1,0 +1,32 @@
+{
+  "name": "Systems Integration and Architecture 2",
+  "code": "SIA2",
+  "course": [2],
+  "year_level": 3,
+  "topics": [
+    {
+      "name": "Enterprise Architecture",
+      "questions": [
+        {
+          "name": "What is enterprise architecture?",
+          "type": "identification",
+          "points": 1,
+          "solution": "A framework for aligning IT strategy with business goals",
+          "question_level": "understand"
+        }
+      ]
+    },
+    {
+      "name": "System Deployment",
+      "questions": [
+        {
+          "name": "What is the purpose of system testing before deployment?",
+          "type": "identification",
+          "points": 1,
+          "solution": "To identify defects and ensure system reliability",
+          "question_level": "apply"
+        }
+      ]
+    }
+  ]
+}

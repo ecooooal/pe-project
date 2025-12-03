@@ -34,4 +34,9 @@ class Reviewer extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function topicDetail() // Use this name in allowedIncludes() and the URL
+    {
+        return $this->belongsTo(Topic::class, 'topic'); 
+    }
 }

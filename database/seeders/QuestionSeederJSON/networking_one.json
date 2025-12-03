@@ -1,0 +1,32 @@
+{
+  "name": "Networking 1",
+  "code": "NET1",
+  "course": [2],
+  "year_level": 2,
+  "topics": [
+    {
+      "name": "Networking Basics",
+      "questions": [
+        {
+          "name": "What does LAN stand for?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Local Area Network",
+          "question_level": "remember"
+        }
+      ]
+    },
+    {
+      "name": "OSI Model",
+      "questions": [
+        {
+          "name": "How many layers does the OSI model have?",
+          "type": "identification",
+          "points": 1,
+          "solution": "7",
+          "question_level": "remember"
+        }
+      ]
+    }
+  ]
+}

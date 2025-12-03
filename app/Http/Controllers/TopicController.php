@@ -24,7 +24,7 @@ class TopicController extends Controller
 
 
     public function index(){
-        $subjects =  $this->userService->getSubjectsForUser(auth()->user())->get();
+        $subjects =  $this->userService->getSubjectsForUser(auth()->user())->get()->sort();
         $subjectIds = $subjects->pluck('id');
 
         $query = QueryBuilder::for(Topic::class)

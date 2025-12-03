@@ -1,0 +1,107 @@
+{
+  "name": "Platform Technologies",
+  "code": "INFT2107",
+  "course": [2],
+  "year_level": 2,
+  "topics": [
+    {
+      "name": "Computer Architecture and Components",
+      "questions": [
+        {
+          "name": "What component is primarily responsible for executing instructions in a computer?",
+          "type": "identification",
+          "points": 1,
+          "solution": "CPU",
+          "question_level": "remember"
+        },
+        {
+          "name": "Which type of memory is non-volatile?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": ["RAM", "Cache", "ROM", "Registers"],
+          "solution": "c",
+          "question_level": "understand"
+        }
+      ]
+    },
+    {
+      "name": "Operating Systems Fundamentals",
+      "questions": [
+        {
+          "name": "True or False: The operating system manages both hardware and software resources.",
+          "type": "true_or_false",
+          "points": 1,
+          "solution": "true",
+          "question_level": "remember"
+        },
+        {
+          "name": "What is the core part of the operating system that manages processes and memory?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Kernel",
+          "question_level": "remember"
+        }
+      ]
+    },
+    {
+      "name": "System Virtualization",
+      "questions": [
+        {
+          "name": "Which technology allows multiple operating systems to run on one physical machine?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": ["Dual-boot", "Virtualization", "Containerization", "RAID"],
+          "solution": "b",
+          "question_level": "understand"
+        },
+        {
+          "name": "What do you call a virtualized machine instance?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Virtual Machine",
+          "question_level": "remember"
+        }
+      ]
+    },
+    {
+      "name": "Cloud Platforms and Web Services",
+      "questions": [
+        {
+          "name": "Which of the following is a cloud service model?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": ["HTTP", "IaaS", "FTP", "SQL"],
+          "solution": "b",
+          "question_level": "remember"
+        },
+        {
+          "name": "True or False: Cloud computing allows on-demand resource scalability.",
+          "type": "true_or_false",
+          "points": 1,
+          "solution": "true",
+          "question_level": "understand"
+        }
+      ]
+    },
+    {
+      "name": "Deployment and System Integration",
+      "questions": [
+        {
+          "name": "What tool is commonly used for automated system deployment?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": ["Docker", "Notepad", "Paint", "Excel"],
+          "solution": "a",
+          "question_level": "apply"
+        },
+        {
+          "name": "Define continuous integration.",
+          "type": "identification",
+          "points": 1,
+          "solution": "A practice where code changes are automatically tested and merged frequently.",
+          "question_level": "understand"
+        }
+      ]
+    }
+  ]
+}

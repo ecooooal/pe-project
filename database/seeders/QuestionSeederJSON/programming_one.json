@@ -1,0 +1,53 @@
+{
+  "name": "Programming 1",
+  "code": "PROG1",
+  "course": [2],
+  "year_level": 1,
+  "topics": [
+    {
+      "name": "Basics and Syntax",
+      "questions": [
+        { "name": "What symbol ends a statement in C-like languages?", "type": "identification", "points": 1, "solution": ";", "question_level": "remember" },
+        { "name": "Which data type stores whole numbers?", "type": "multiple_choice", "points": 1, "items": ["int", "float", "char", "string"], "solution": "a", "question_level": "remember" },
+        { "name": "True or False: `char` can store multiple characters.", "type": "true_or_false", "points": 1, "solution": "false", "question_level": "understand" },
+        { "name": "What is the default value of an uninitialized integer in Java?", "type": "identification", "points": 1, "solution": "0", "question_level": "remember" },
+        { "name": "Explain briefly what a compiler does.", "type": "identification", "points": 2, "solution": "It translates source code into machine code.", "question_level": "understand" },
+        { "name": "Identify the error: `int 1value = 10;`", "type": "identification", "points": 2, "solution": "Variable names cannot start with numbers.", "question_level": "apply" },
+        { "name": "Match the following keywords:", "type": "matching", "items": { "1": { "left": "int", "right": "whole number", "points": 1 }, "2": { "left": "double", "right": "decimal number", "points": 1 }, "3": { "left": "char", "right": "single character", "points": 1 } }, "question_level": "understand" },
+        { "name": "Arrange the following program steps:", "type": "ranking", "items": { "1": { "solution": "Write code", "points": 1 }, "2": { "solution": "Compile code", "points": 1 }, "3": { "solution": "Run program", "points": 1 }, "4": { "solution": "Fix errors", "points": 1 } }, "question_level": "apply" },
+        { "name": "Predict the output: `int x=5; x=x+3; print(x);`", "type": "identification", "points": 1, "solution": "8", "question_level": "apply" },
+        { "name": "Explain why variables must have data types.", "type": "identification", "points": 3, "solution": "They define memory size and type of data stored.", "question_level": "analyze" }
+      ]
+    },
+    {
+      "name": "Conditionals",
+      "questions": [
+        { "name": "What keyword begins a conditional statement?", "type": "identification", "points": 1, "solution": "if", "question_level": "remember" },
+        { "name": "Which operator checks equality?", "type": "multiple_choice", "points": 1, "items": ["=", "==", "!=", ">"], "solution": "b", "question_level": "remember" },
+        { "name": "True or False: `else if` always requires an `if` first.", "type": "true_or_false", "points": 1, "solution": "true", "question_level": "understand" },
+        { "name": "Write a condition that checks if x is greater than 10.", "type": "identification", "points": 1, "solution": "x > 10", "question_level": "apply" },
+        { "name": "Explain the difference between `=` and `==`.", "type": "identification", "points": 2, "solution": "`=` assigns values; `==` compares values.", "question_level": "understand" },
+        { "name": "Predict: if x=5, what does `if(x>10)` do?", "type": "identification", "points": 1, "solution": "Condition is false; block does not execute.", "question_level": "apply" },
+        { "name": "Match the condition operators:", "type": "matching", "items": { "1": { "left": ">", "right": "greater than", "points": 1 }, "2": { "left": "<", "right": "less than", "points": 1 }, "3": { "left": "!=", "right": "not equal", "points": 1 } }, "question_level": "understand" },
+        { "name": "Rank these from simplest to most complex conditional structure:", "type": "ranking", "items": { "1": { "solution": "if", "points": 1 }, "2": { "solution": "if-else", "points": 1 }, "3": { "solution": "if-else-if", "points": 1 }, "4": { "solution": "nested if", "points": 1 } }, "question_level": "analyze" },
+        { "name": "Why is code indentation important?", "type": "identification", "points": 2, "solution": "It improves readability and reduces logic errors.", "question_level": "analyze" },
+        { "name": "Write a conditional that checks if a number is even.", "type": "identification", "points": 2, "solution": "if(x % 2 == 0)", "question_level": "apply" }
+      ]
+    },
+    {
+      "name": "Loops",
+      "questions": [
+        { "name": "Which loop runs at least once?", "type": "multiple_choice", "points": 1, "items": ["for", "while", "do-while", "foreach"], "solution": "c", "question_level": "remember" },
+        { "name": "True or False: Loops can be infinite.", "type": "true_or_false", "points": 1, "solution": "true", "question_level": "understand" },
+        { "name": "Identify the loop: `for(i=0; i<5; i++)`", "type": "identification", "points": 1, "solution": "for loop", "question_level": "remember" },
+        { "name": "Write a loop that prints numbers 1 to 5.", "type": "identification", "points": 2, "solution": "for(int i=1;i<=5;i++) print(i);", "question_level": "apply" },
+        { "name": "Explain the purpose of loop counters.", "type": "identification", "points": 2, "solution": "They keep track of iterations.", "question_level": "understand" },
+        { "name": "Predict the output: `for(i=0;i<3;i++) print(i);`", "type": "identification", "points": 1, "solution": "0 1 2", "question_level": "apply" },
+        { "name": "Match loop types:", "type": "matching", "items": { "1": { "left": "for", "right": "known iteration count", "points": 1 }, "2": { "left": "while", "right": "condition controlled", "points": 1 }, "3": { "left": "do-while", "right": "runs at least once", "points": 1 } }, "question_level": "understand" },
+        { "name": "Rank the following by control complexity:", "type": "ranking", "items": { "1": { "solution": "while", "points": 1 }, "2": { "solution": "for", "points": 1 }, "3": { "solution": "nested loops", "points": 1 }, "4": { "solution": "infinite loop", "points": 1 } }, "question_level": "analyze" },
+        { "name": "What happens if a loop’s condition never becomes false?", "type": "identification", "points": 1, "solution": "It becomes infinite.", "question_level": "understand" },
+        { "name": "Explain why loops are essential in programming.", "type": "identification", "points": 3, "solution": "They automate repetition and reduce redundant code.", "question_level": "analyze" }
+      ]
+    }
+  ]
+}

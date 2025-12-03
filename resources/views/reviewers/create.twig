@@ -71,7 +71,7 @@
                                 file:'reviewerFile',
                                 attributes:{
                                     'multiple':true,
-                                    'accept':'application/pdf',
+                                    'accept':'.pdf',
                                     'class':'w-full text-sm text-slate-500 bg-white rounded-md outline-1 -outline-offset-1 outline-gray-300 
                                         file:cursor-pointer file:border-0 file:py-2 file:px-4 file:mr-4 
                                         file:rounded-md file:bg-gray-100 hover:file:bg-gray-200 file:text-slate-600',
@@ -106,6 +106,15 @@
 </div>
 
 <script>
+const uploadField = document.getElementById("reviewerFile[]");
+
+uploadField.onchange = function() {
+    if(this.files[0].size > 6291456) {
+       alert("File is too big!");
+       this.value = "";
+    }
+};
+
 // Populate subjects and topics for dependent dropdowns
 document.addEventListener('DOMContentLoaded', function () {
     const subjects = {{ subjects is defined ? subjects|raw : '[]' }};

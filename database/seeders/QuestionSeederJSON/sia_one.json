@@ -1,0 +1,32 @@
+{
+  "name": "Systems Integration and Architecture 1",
+  "code": "SIA1",
+  "course": [2],
+  "year_level": 2,
+  "topics": [
+    {
+      "name": "System Components",
+      "questions": [
+        {
+          "name": "What is system integration?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Combining hardware and software components into one system",
+          "question_level": "understand"
+        }
+      ]
+    },
+    {
+      "name": "System Architecture",
+      "questions": [
+        {
+          "name": "Which architecture divides systems into presentation, logic, and data layers?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Three-tier architecture",
+          "question_level": "remember"
+        }
+      ]
+    }
+  ]
+}

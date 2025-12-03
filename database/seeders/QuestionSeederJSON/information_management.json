@@ -1,0 +1,60 @@
+{
+  "name": "Information Management",
+  "code": "IM1",
+  "course": [2],
+  "year_level": 2,
+  "topics": [
+    {
+      "name": "Database Concepts",
+      "questions": [
+        {
+          "name": "What is a primary key in a database?",
+          "type": "identification",
+          "points": 1,
+          "solution": "A unique identifier for table records",
+          "question_level": "remember"
+        },
+        {
+          "name": "Explain why normalization is important.",
+          "type": "identification",
+          "points": 2,
+          "solution": "It reduces redundancy and improves data integrity.",
+          "question_level": "analyze"
+        },
+        {
+          "name": "Suggest a scenario requiring a composite key.",
+          "type": "identification",
+          "points": 2,
+          "solution": "When multiple fields together uniquely identify a record.",
+          "question_level": "create"
+        }
+      ]
+    },
+    {
+      "name": "ERD Modeling",
+      "questions": [
+        {
+          "name": "What does crow's foot notation represent?",
+          "type": "identification",
+          "points": 1,
+          "solution": "A one-to-many relationship",
+          "question_level": "understand"
+        },
+        {
+          "name": "Which component of an ERD defines attributes?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Entities",
+          "question_level": "apply"
+        },
+        {
+          "name": "Evaluate if a many-to-many relationship should be resolved.",
+          "type": "identification",
+          "points": 2,
+          "solution": "Yes, by creating a junction table.",
+          "question_level": "evaluate"
+        }
+      ]
+    }
+  ]
+}

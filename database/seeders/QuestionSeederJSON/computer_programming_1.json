@@ -1,6 +1,7 @@
 {
 "name": "Computer Programming 1",
 "code": "COMPROG1",
+"course": [1],
 "year_level": 1,
 "topics": [
     {

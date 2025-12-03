@@ -18,16 +18,8 @@ class CourseSeeder extends Seeder
             'abbreviation' => 'BSCS'
         ]);
         Course::create([
-            'name' => 'Bachelor of Science in Computer Engineering',
-            'abbreviation' => 'BSCPE'
-        ]);        
-        Course::create([
             'name' => 'Bachelor of Science in Information Technology',
             'abbreviation' => 'BSIT'
-        ]);        
-        Course::create([
-            'name' => 'Bachelor of Multimedia Arts',
-            'abbreviation' => 'BMMA'
-        ]);
+        ]);     
     }
 }

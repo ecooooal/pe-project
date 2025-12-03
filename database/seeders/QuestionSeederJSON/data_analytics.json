@@ -1,0 +1,33 @@
+{
+  "name": "Data Analytics",
+  "code": "DA1",
+  "course": [1],
+  "year_level": 3,
+  "topics": [
+    {
+      "name": "Data Processing",
+      "questions": [
+        {
+          "name": "What is data cleaning?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Removing errors and inconsistencies from data",
+          "question_level": "understand"
+        }
+      ]
+    },
+    {
+      "name": "Data Visualization",
+      "questions": [
+        {
+          "name": "Which chart is best for showing proportions?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": ["Line graph", "Bar chart", "Pie chart", "Histogram"],
+          "solution": "c",
+          "question_level": "understand"
+        }
+      ]
+    }
+  ]
+}

@@ -196,7 +196,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/reviewers/create', [MailController::class, 'create'])->name('reviewers.create');
     Route::post('/reviewers', [MailController::class, 'index'])->name('reviewers.store');
     Route::delete('/reviewers/{id}', [MailController::class, 'destroy'])->name('reviewers.destroy');
-    // Route::get('/reviewers/{reviewer}/download', [MailController::class, 'downloadFacultyReviewer'])->name('reviewers.download');
+    Route::get('/reviewers/{id}/download', [MailController::class, 'downloadReviewer'])->name('reviewers.download');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/{exam}', [ReportController::class, 'index_exam'])->name('reports.index_exam');
