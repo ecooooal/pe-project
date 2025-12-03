@@ -14,7 +14,12 @@
         <h1 class="font-bold text-4xl">Topic Management</h1>
     </div>
     {% if can('create topics') %}
-    <button type="button" popovertarget="create-topic-popover"  class="flex items-center gap-1 bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold">
+    <button type="button"
+            hx-get="{{ route('topics.create') }}"
+            hx-trigger="click"
+            hx-target="#topics-create-form"
+            hx-swap="outerHTML"
+            popovertarget="create-topic-popover"  class="flex items-center gap-1 bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
         <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clip-rule="evenodd" />
         </svg>   
@@ -102,11 +107,7 @@
         class="backdrop:bg-gray-900/25 m-auto rounded-xl w-96" 
         id="create-topic-popover"
         >
-        <form   hx-get="{{ route('topics.create') }}"
-                hx-trigger="revealed"
-                hx-target="this"
-                hx-swap="outerHTML">  
-        </form>
+        <form id="topics-create-form"></form>
     </div>
 {% endif %}
 {% endblock %}

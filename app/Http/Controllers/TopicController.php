@@ -149,19 +149,25 @@ class TopicController extends Controller
     public function update(Request $request, Topic $topic){
         $this->authorize('update', $topic);
 
-
-        $request->validate([
+        $validated = $request->validate([
                 'name' => [
                     'required',
                     Rule::unique('topics')->where(function ($query) use ($request) {
                         return $query->where('subject_id', $request->subject);
                     })->ignore($topic->id),
                 ],
-                'subject' => ['required', 'integer', 'exists:subjects,id'],
+                'subject' => ['nullable', 'integer', 'exists:subjects,id'],
             ]);
 
+        $data = [
+            'name' => $validated['name'],
+        ];
 
-        $topic->update($request->all());
+        if (isset($validated['subject'])) {
+            $data['subject_id'] = $validated['subject'];
+        }
+
+        $topic->update($data);
     
         session()->flash('toast', json_encode([
             'status' => 'Updated!',

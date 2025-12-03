@@ -69,23 +69,6 @@
                                     'placeholder':'Default ratio of subject to topic is 60:40'}),
                             isColumn:true
                         )}}
-                        {{ forms.form_field(
-                            label:forms.label(
-                                id:'criteria', 
-                                content:'Criteria for Picking : ', 
-                                attributes:{
-                                    'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900'}
-                                ),
-                            input:forms.radio(
-                                name:'criteria',
-                                values: values,
-                                value:'density',
-                                attributes:{
-                                    'class':'',
-                                    })
-                        )}}
-                        <span class="text-gray-500 italic font-semibold text-xs">*Default criteria is density.</span>
-
                     </div>
 
                     <div class="flex flex-col justify-center">

@@ -1,7 +1,7 @@
 {% from 'components/core/breadcrumbs' import breadcrumb %}
 {% from 'components/core/show-header' import show_header %}
 {% import 'components/core/forms' as forms %}
-<form hx-post="{{ route('topics.store') }}" class="flex flex-col gap-y-2 p-4 mb-2">
+<form hx-post="{{ route('topics.store') }}" hx-swap="outerHTML" class="flex flex-col gap-y-2 p-4 mb-2">
     {{ csrf_field() }}
     <div class="flex max-w-full p-4 rounded-xl bg-white">
         <div class="flex flex-col flex-1">
