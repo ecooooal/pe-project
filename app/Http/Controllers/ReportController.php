@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
+use Str;
 
 class ReportController extends Controller
 {
@@ -69,9 +70,9 @@ class ReportController extends Controller
         $report_data = $report->report_data;
         $overview_data = $report_data['exam_overview_data'];
 
+
         $exam_name = $exam->name;
         $created_date = $report->created_at;
-
         $courses =  $overview_data['courses'];
         $subject_count = $overview_data['subject_count'];
         $topic_count = $overview_data['topic_count'];
@@ -95,6 +96,47 @@ class ReportController extends Controller
         $normalized_exam_scores_by_topics = $report_data['normalized_exam_scores_by_topics'];
         $exam_by_types_with_levels = $report_data['exam_by_types_with_levels'];
         $exam_question_heatstrip = $report_data['exam_question_heatstrip'];
+
+        $individual_question_stats = collect($report_data['individual_question_stats']);
+        $individual_question_stats_headers = ['Question Name', 'Type', 'Level', 'Topic' ,'Subject', 'Points', 'Average Points Obtained', 'Student Answers Count', 'Difficulty Index', 'Discrimination Index', 'Lower Group Percent Correct', 'Uppper Group Percent Correct'];
+        $individual_question_stats_rows = $individual_question_stats->map(function ($question){
+            return [
+                'id' => $question['question_id'],
+                'name' => $question['question_name'],
+                'type' => $question['question_type'],
+                'level' => Str::ucfirst($question['question_level']),
+                'topic' => $question['topic_name'],
+                'subject' => $question['subject_name'],
+                'points' => $question['question_points'],
+                'avg_points' => $question['avg_points_obtained'],
+                'student_answers_count' => $question['answered_count'],
+                'difficulty_index' => $question['difficulty_index'],
+                'discrimination_index' => $question['discrimination_index'],
+                'lower_group_percent' => $question['lower_group_percent_correct'],
+                'upper_group_percent' => $question['upper_group_percent_correct']
+            ];
+        });
+        $individual_student_performance = collect($report_data['individual_student_performance']);
+        $individual_student_performance_headers = ['Name', 'Email', 'Course', 'Attempt Count', 'Total Score', 'No. of Answered Correct', 'Exam Accuracy', 'Remember Accuracy', 'Understand Accuracy', 'Apply Accuracy', 'Analyze Accuracy', 'Evaluate Accuracy', 'Create Accuracy'];
+        $individual_student_performance_rows = $individual_student_performance->map(function ($student){
+            return [
+                'id' => $student['user_id'],
+                'name' => $student['student_name'],
+                'email' => $student['student_email'],
+                'course' => $student['course_abbreviation'],
+                'attempt' => $student['attempt'],
+                'total_score' => $student['total_score'],
+                'no_answered_correct' => $student['correct_count'],
+                'exam_accuracy' => $student['exam_accuracy'],
+                'remember_accuracy' => $student['remember_accuracy'] ?? "Null",
+                'understand_accuracy' => $student['understand_accuracy'] ?? "Null",
+                'apply_accuracy' => $student['apply_accuracy'] ?? "Null",
+                'analyze_accuracy' => $student['analyze_accuracy'] ?? "Null",
+                'evaluate_accuracy' => $student['evaluate_accuracy'] ?? "Null",
+                'create_accuracy' => $student['create_accuracy'] ?? "Null"
+            ];
+        });
+        
         $data = [
             'exam' => $exam->id,
             'report' => $report->id,
@@ -129,9 +171,13 @@ class ReportController extends Controller
             'normalized_exam_scores_by_subjects_data' => $normalized_exam_scores_by_subjects,
             'normalized_exam_scores_by_topics_data' => $normalized_exam_scores_by_topics,
             'exam_question_heatstrip_data' => $exam_question_heatstrip,
-            'exam_compare_types_and_blooms_data' =>$exam_by_types_with_levels
+            'exam_compare_types_and_blooms_data' =>$exam_by_types_with_levels,
+            // Individual performance analysis
+            'individual_question_stats_headers' => $individual_question_stats_headers,
+            'individual_question_stats_rows' => $individual_question_stats_rows,
+            'individual_student_performance_headers' => $individual_student_performance_headers,
+            'individual_student_performance_rows' => $individual_student_performance_rows
         ];
-
         return view('reports/show', $data);
     }
 

@@ -3,6 +3,7 @@ use App\Http\Controllers\Auth\FirebaseController;
 use App\Http\Controllers\AccessControlController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\QuestionController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\Student\ExamController as StudentExamController;
 use App\Http\Controllers\Student\StudentController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,8 +34,8 @@ Route::get('/', function () {
     return view('landing-page');
 });
 
-Route::get('auth/google', [GoogleAuthController::class, 'redirectToGoogle']);
-Route::get('auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+//Route::get('auth/google', [GoogleAuthController::class, 'redirectToGoogle']);
+//Route::get('auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 
 #Route::post('/login', [SessionController::class, 'authenticate']);
 Route::post('/auth/firebase/login', [FirebaseController::class, 'login'])->name('firebase.login');
@@ -82,6 +84,10 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
 
 Route::prefix('')->middleware(['can:view faculty'])->group(function () { 
     Route::get('/faculty', [LandingPageController::class, 'facultyShow'])->name('faculty.index');
+    
+    Route::get('/settings', function(){
+        return view('settings');
+    });
 
     Route::group(['middleware' => ['can:view access control']], function () { 
         Route::get('/admins', [AccessControlController::class, 'redirect'])->name('admin.redirect');
@@ -126,6 +132,8 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/exams/{exam}/edit', [ExamController::class, 'edit'])->name('exams.edit');
     Route::patch('/exams/{exam}', [ExamController::class, 'update'])->name('exams.update');
     Route::delete('/exams/{exam}', [ExamController::class, 'destroy'])->name('exams.destroy');
+    Route::get('/exams/create/get-clone-exam-form', [ExamController::class, 'createCloneExam'])->name('exams.create.clone-exam');
+    Route::get('/exams/create/get-clone-exam-questions', [ExamController::class, 'getCloneExamQuestions'])->name('exams.create.clone-exam-questions');
 
     Route::get('/exams/{exam}/builder', [ExamController::class, 'exam_builder_show']);
     Route::post('/exams/{exam}/builder/toggle-question',[ExamController::class, 'toggle_question'])->name('exam.toggleQuestion');
@@ -190,6 +198,9 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/reviewers/create', [MailController::class, 'create'])->name('reviewers.create');
     Route::post('/reviewers', [MailController::class, 'index'])->name('reviewers.store');
     Route::delete('/reviewers/{id}', [MailController::class, 'destroy'])->name('reviewers.destroy');
+    Route::get('/reviewers/{id}/download', [MailController::class, 'downloadReviewer'])->name('reviewers.download');
+
+
     // Route::get('/reviewers/{reviewer}/download', [MailController::class, 'downloadFacultyReviewer'])->name('reviewers.download');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
@@ -216,9 +227,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
 
     Route::get('/notifications', [NotificationController::class, 'index']);
 
-    Route::get('/settings', function(){
-        return view('settings');
-    });
+
 
     Route::get('/profiles/show', function(){
         return view('profiles/show');

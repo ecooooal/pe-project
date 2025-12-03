@@ -203,28 +203,30 @@
                     {% if reviewers is defined and reviewers|length > 0 %}
                         {% for reviewer in reviewers %}
                         <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800">{{ reviewer.subject_name }}</h3>
-                            <p class="text-sm text-gray-600 mb-3">{{ reviewer.topic_name }}</p>
-                            <a href="/storage/reviewers/{{ reviewer.path }}" 
-                               download
-                               class="inline-flex items-center text-sm font-medium text-orange-900 hover:underline">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                                <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625Z" />
-                                <path d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
-                                </svg>
-                                Download this reviewer (PDF)
-                            </a>
-                            <p class="inline-flex font-bold text-gray-300 text-3xl mx-4"> | </p>
-                            <button
-                                onclick="emailReviewerDirect('{{ reviewer.id }}', '{{ reviewer.path }}', event)"
-                                class="inline-flex items-center text-sm font-medium text-green-900 hover:underline gap-x-1 cursor-pointer">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                                <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
-                                <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z" />
-                                </svg>
-                                Email me this reviewer (PDF)
-                            </button>
-                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800">{{ reviewer.subject_name }}</h3>
+                        <p class="text-sm text-gray-600 mb-3">{{ reviewer.topic_name }}</p>
+                        <a href="{{ route('reviewers.download', reviewer.id) }}"
+                            class="inline-flex items-center text-sm font-medium text-orange-900 hover:underline">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                            <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625Z" />
+                            <path d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
+                        </svg>
+                        Download this reviewer (PDF)
+                    </a>
+
+                <p class="inline-flex font-bold text-gray-300 text-3xl mx-4"> | </p>
+
+            <button
+                onclick="emailReviewerDirect('{{ reviewer.id }}', event)"
+                class="inline-flex items-center text-sm font-medium text-green-900 hover:underline gap-x-1 cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
+                <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z" />
+            </svg>
+            Email me this reviewer (PDF)
+            </button>
+            </div>
+
                         {% endfor %}
                     {% else %}
                         <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-md">
