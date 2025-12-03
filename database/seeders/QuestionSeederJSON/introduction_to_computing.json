@@ -1,0 +1,105 @@
+{
+  "name": "Introduction to Computing",
+  "code": "INFT1101",
+  "year_level": 1,
+  "topics": [
+    {
+      "name": "History and Evolution of Computing",
+      "questions": [
+        {
+          "name": "Who is known as the father of computing?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Charles Babbage",
+          "question_level": "remember"
+        },
+        {
+          "name": "True or False: ENIAC was one of the earliest electronic computers.",
+          "type": "true_or_false",
+          "points": 1,
+          "solution": "true",
+          "question_level": "remember"
+        }
+      ]
+    },
+    {
+      "name": "Computer Hardware and Software",
+      "questions": [
+        {
+          "name": "What component is considered the brain of the computer?",
+          "type": "identification",
+          "points": 1,
+          "solution": "CPU",
+          "question_level": "remember"
+        },
+        {
+          "name": "Which of the following is system software?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": ["MS Word", "Photoshop", "Linux Kernel", "Chrome"],
+          "solution": "c",
+          "question_level": "understand"
+        }
+      ]
+    },
+    {
+      "name": "Information Systems and IT Careers",
+      "questions": [
+        {
+          "name": "True or False: A systems analyst designs solutions to business problems.",
+          "type": "true_or_false",
+          "points": 1,
+          "solution": "true",
+          "question_level": "understand"
+        },
+        {
+          "name": "Which type of information system supports daily business operations?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": ["TPS", "DSS", "ESS", "GIS"],
+          "solution": "a",
+          "question_level": "remember"
+        }
+      ]
+    },
+    {
+      "name": "Basic Number Systems and Data Representation",
+      "questions": [
+        {
+          "name": "Convert decimal 12 into binary.",
+          "type": "identification",
+          "points": 1,
+          "solution": "1100",
+          "question_level": "apply"
+        },
+        {
+          "name": "Which number system uses base 8?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": ["Binary", "Octal", "Hexadecimal", "Decimal"],
+          "solution": "b",
+          "question_level": "remember"
+        }
+      ]
+    },
+    {
+      "name": "Internet, Networks, and Emerging Technologies",
+      "questions": [
+        {
+          "name": "What does HTTP stand for?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Hypertext Transfer Protocol",
+          "question_level": "remember"
+        },
+        {
+          "name": "True or False: 5G technology is generally faster than 4G.",
+          "type": "true_or_false",
+          "points": 1,
+          "solution": "true",
+          "question_level": "remember"
+        }
+      ]
+    }
+  ]
+}

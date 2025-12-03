@@ -45,7 +45,7 @@
                     {{ show_item('Current No. of Subjects', subject_count  )}}
                 </div>
                 <div class="flex flex-col mr-16 gap-y-4">
-                    {{ show_item('Author', course.createdBy.getFullName() )}}
+                    {{ show_item('Author', course.createdBy.getFullName() ?? 'System' )}}
                 </div>
             </div>
         </div>  

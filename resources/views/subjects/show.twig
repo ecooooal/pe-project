@@ -53,7 +53,7 @@
                     {{ show_item('Current No. of Topics', subject.topics.count() )}}
                 </div>
                 <div class="flex flex-col mr-16 gap-y-4">
-                    {{ show_item('Author', subject.createdBy.getFullName() )}}
+                    {{ show_item('Author', subject.createdBy.getFullName()  ?? 'System' )}}
                 </div>
             </div>
         </div>  

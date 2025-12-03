@@ -35,7 +35,7 @@ class QuestionController extends Controller
     public function index(){
         $questions = $this->userService->getQuestionsForUser(auth()->user());
         $courses = $this->userService->getCoursesForUser(auth()->user());
-        $subjects =  $this->userService->getSubjectsForUser(auth()->user())->get();
+        $subjects =  $this->userService->getSubjectsForUser(auth()->user())->get()->sort();
         $topics =  $this->userService->getTopicsForUser(auth()->user());
         $question_types = $questions->get()->pluck('question_type')->unique()->values();
         

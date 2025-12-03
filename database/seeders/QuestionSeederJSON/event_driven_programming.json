@@ -1,0 +1,60 @@
+{
+  "name": "Event Driven Programming",
+  "code": "EDP1",
+  "year_level": 2,
+  "topics": [
+    {
+      "name": "Event Handling",
+      "questions": [
+        {
+          "name": "What is an event listener?",
+          "type": "identification",
+          "points": 1,
+          "solution": "A function that waits for an event trigger",
+          "question_level": "remember"
+        },
+        {
+          "name": "Describe how a click event is processed.",
+          "type": "identification",
+          "points": 2,
+          "solution": "The listener responds to the event and runs assigned logic.",
+          "question_level": "understand"
+        },
+        {
+          "name": "Design a simple event-driven workflow for submitting a form.",
+          "type": "identification",
+          "points": 2,
+          "solution": "OnSubmit event validates data and sends it to the server.",
+          "question_level": "create"
+        }
+      ]
+    },
+    {
+      "name": "GUI Components",
+      "questions": [
+        {
+          "name": "Which component allows selecting from a list?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": ["Textbox", "Label", "ComboBox", "Button"],
+          "solution": "c",
+          "question_level": "remember"
+        },
+        {
+          "name": "Explain the purpose of layout managers.",
+          "type": "identification",
+          "points": 2,
+          "solution": "They control arrangement and alignment of GUI components.",
+          "question_level": "analyze"
+        },
+        {
+          "name": "Evaluate if a button should trigger synchronous or asynchronous actions.",
+          "type": "identification",
+          "points": 2,
+          "solution": "Async is preferred for long processes to avoid blocking UI.",
+          "question_level": "evaluate"
+        }
+      ]
+    }
+  ]
+}

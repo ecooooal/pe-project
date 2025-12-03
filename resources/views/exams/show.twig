@@ -64,7 +64,7 @@
                                     popovertarget="access-code-popover" 
                                     value="View Access Codes">
                         </div>
-                        {{ show_item('Author', exam.createdBy.getFullName()) }}
+                        {{ show_item('Author', exam.createdBy.getFullName())  ?? 'System' }}
                         {{ show_item('Updated By', exam.updatedBy.getFullName()) }}
                     </div>
                 </div>

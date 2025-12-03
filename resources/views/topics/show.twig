@@ -57,7 +57,7 @@
                 <div class="flex flex-col gap-y-4">
                     {{ show_item('Name', topic.name)}}
                     {{ show_item('Current No. of Questions', topic.questions.count() )}}
-                    {{ show_item('Author', topic.createdBy.getFullName())}}
+                    {{ show_item('Author', topic.createdBy.getFullName()  ?? 'System' )}}
                 </div>
             </div>
         </div>  
