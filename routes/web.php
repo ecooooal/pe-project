@@ -82,6 +82,10 @@ Route::prefix('student')->middleware(['can:view student'])->group(function() {
 
 Route::prefix('')->middleware(['can:view faculty'])->group(function () { 
     Route::get('/faculty', [LandingPageController::class, 'facultyShow'])->name('faculty.index');
+    
+    Route::get('/settings', function(){
+        return view('settings');
+    });
 
     Route::group(['middleware' => ['can:view access control']], function () { 
         Route::get('/admins', [AccessControlController::class, 'redirect'])->name('admin.redirect');
@@ -126,6 +130,8 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/exams/{exam}/edit', [ExamController::class, 'edit'])->name('exams.edit');
     Route::patch('/exams/{exam}', [ExamController::class, 'update'])->name('exams.update');
     Route::delete('/exams/{exam}', [ExamController::class, 'destroy'])->name('exams.destroy');
+    Route::get('/exams/create/get-clone-exam-form', [ExamController::class, 'createCloneExam'])->name('exams.create.clone-exam');
+    Route::get('/exams/create/get-clone-exam-questions', [ExamController::class, 'getCloneExamQuestions'])->name('exams.create.clone-exam-questions');
 
     Route::get('/exams/{exam}/builder', [ExamController::class, 'exam_builder_show']);
     Route::post('/exams/{exam}/builder/toggle-question',[ExamController::class, 'toggle_question'])->name('exam.toggleQuestion');
@@ -216,9 +222,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
 
     Route::get('/notifications', [NotificationController::class, 'index']);
 
-    Route::get('/settings', function(){
-        return view('settings');
-    });
+
 
     Route::get('/profiles/show', function(){
         return view('profiles/show');

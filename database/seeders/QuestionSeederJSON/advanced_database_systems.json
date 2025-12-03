@@ -1,0 +1,60 @@
+{
+  "name": "Advanced Database Systems",
+  "code": "ADS1",
+  "year_level": 3,
+  "topics": [
+    {
+      "name": "Advanced SQL",
+      "questions": [
+        {
+          "name": "Which SQL function returns the number of rows?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": ["COUNT()", "SUM()", "ROWNUM()", "NUMBER()"],
+          "solution": "a",
+          "question_level": "remember"
+        },
+        {
+          "name": "Analyze the purpose of JOIN operations.",
+          "type": "identification",
+          "points": 2,
+          "solution": "They combine data from multiple tables based on related fields.",
+          "question_level": "analyze"
+        },
+        {
+          "name": "Create a SQL query using GROUP BY and HAVING.",
+          "type": "identification",
+          "points": 2,
+          "solution": "SELECT dept, COUNT(*) FROM emp GROUP BY dept HAVING COUNT(*)>5;",
+          "question_level": "create"
+        }
+      ]
+    },
+    {
+      "name": "Transactions and Concurrency",
+      "questions": [
+        {
+          "name": "What does ACID stand for?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Atomicity, Consistency, Isolation, Durability",
+          "question_level": "remember"
+        },
+        {
+          "name": "Explain why isolation levels matter.",
+          "type": "identification",
+          "points": 2,
+          "solution": "They determine how concurrent transactions affect each other.",
+          "question_level": "understand"
+        },
+        {
+          "name": "Evaluate if READ UNCOMMITTED is safe for financial systems.",
+          "type": "identification",
+          "points": 2,
+          "solution": "No, it risks dirty reads and inconsistent data.",
+          "question_level": "evaluate"
+        }
+      ]
+    }
+  ]
+}

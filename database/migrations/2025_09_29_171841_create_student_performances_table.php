@@ -23,13 +23,15 @@ return new class extends Migration
             $table->foreignIdFor(Exam::class, 'exam_id')->constrained();
             $table->foreignIdFor(StudentPaper::class, 'student_paper_id')->constrained();
             $table->unsignedTinyInteger('attempt');
-            $table->foreignIdFor(User::class, 'user_id')->constrained();
+            $table->foreignIdFor(User::class, column: 'user_id')->constrained();
 
             $table->foreignIdFor(Course::class, 'course_id')->constrained();
             $table->foreignIdFor(Subject::class, 'subject_id')->constrained();
             $table->foreignIdFor(Topic::class, 'topic_id')->constrained();
             $table->foreignIdFor(Question::class, 'question_id')->constrained();
 
+            $table->string('student_name');
+            $table->string('student_email');
             $table->string('course_abbreviation');
             $table->string('subject_name');
             $table->string('topic_name');

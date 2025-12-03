@@ -1,0 +1,104 @@
+{
+  "name": "Human Computer Interaction 1",
+  "code": "INFT1202L",
+  "year_level": 1,
+  "topics": [
+    {
+      "name": "Foundations of HCI",
+      "questions": [
+        {
+          "name": "What does HCI stand for?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Human Computer Interaction",
+          "question_level": "remember"
+        },
+        {
+          "name": "True or False: HCI focuses on improving the interaction between humans and computers.",
+          "type": "true_or_false",
+          "points": 1,
+          "solution": "true",
+          "question_level": "understand"
+        }
+      ]
+    },
+    {
+      "name": "Human Cognitive Models",
+      "questions": [
+        {
+          "name": "Which cognitive model describes how users process and retain information?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": ["GOMS", "KLM", "Memory Model", "Fitts' Law"],
+          "solution": "c",
+          "question_level": "understand"
+        },
+        {
+          "name": "What cognitive factor influences how users interpret interface elements?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Perception",
+          "question_level": "understand"
+        }
+      ]
+    },
+    {
+      "name": "User Interface Principles and Guidelines",
+      "questions": [
+        {
+          "name": "Which design principle refers to maintaining similar behavior across the system?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Consistency",
+          "question_level": "understand"
+        },
+        {
+          "name": "True or False: Feedback helps users understand the results of their actions.",
+          "type": "true_or_false",
+          "points": 1,
+          "solution": "true",
+          "question_level": "understand"
+        }
+      ]
+    },
+    {
+      "name": "Usability and User Experience",
+      "questions": [
+        {
+          "name": "What is the measure of how effectively a user can complete tasks?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Usability",
+          "question_level": "remember"
+        },
+        {
+          "name": "Which factor is NOT part of user experience?",
+          "type": "multiple_choice",
+          "points": 1,
+          "items": ["Emotion", "Efficiency", "Aesthetics", "CPU clock speed"],
+          "solution": "d",
+          "question_level": "understand"
+        }
+      ]
+    },
+    {
+      "name": "Prototyping and User Testing",
+      "questions": [
+        {
+          "name": "What type of prototype is low-fidelity and often hand-drawn?",
+          "type": "identification",
+          "points": 1,
+          "solution": "Paper prototype",
+          "question_level": "remember"
+        },
+        {
+          "name": "True or False: User testing helps identify usability issues before full development.",
+          "type": "true_or_false",
+          "points": 1,
+          "solution": "true",
+          "question_level": "understand"
+        }
+      ]
+    }
+  ]
+}

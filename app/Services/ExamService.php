@@ -397,5 +397,27 @@ class ExamService
             $publishing_status['status'] = true;
             return $publishing_status;
     }
+
+    public function getEnrolledStudentsData(Exam $exam)
+    {
+        $retakes = $exam->retakes ?? 99;
+
+        $users = $exam->users()
+            ->withCount([
+                'studentPapers as attempts_count' => function ($q) use ($exam) {
+                    $q->where('exam_id', $exam->id);
+                }
+            ])
+            ->with(['courses'])
+            ->paginate(10);
+
+        $users->getCollection()->transform(function ($user) use ($retakes) {
+            $user->attempts_left = max(0, $retakes - $user->attempts_count);
+            return $user;
+        });
+
+        return $users;
+    }
+
 }
 

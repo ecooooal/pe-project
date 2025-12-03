@@ -2,6 +2,7 @@
 {% from 'components/core/breadcrumbs' import breadcrumb %}
 {% from 'components/core/show-header' import show_header %}
 {% from 'components/core/show-item' import show_item %}
+{% from 'components/core/index-table' import table %}
 
 {% extends 'components/core/faculty-layout' %}
 
@@ -401,6 +402,36 @@
                     </div>
                 </div>
             </div>
+             <div  class="flex flex-col w-full">
+                <p class="text-3xl font-bold text-gray-800">Individual Student Performance</p>
+                <div class="flex flex-col gap-2 p-1">
+                    <div class="mx-4 p-4">
+                        <div class="flex items-center w-full p-4 bg-white border-x border-t border-gray-300 rounded-t-2xl">
+                        </div>
+                        <div class="max-h-96 overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
+                            {{ table(headers:individual_student_performance_headers, rows:individual_student_performance_rows, actions:false) }}
+                        </div>
+                        <div class="flex justify-end items-center w-full h-4 p-4 bg-white border-x border-b border-gray-300 rounded-b-2xl">
+                    
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div  class="flex flex-col w-full">
+                <p class="text-3xl font-bold text-gray-800">Individual Question Performance</p>
+                <div class="flex flex-col gap-2 p-1">
+                    <div class="mx-4 p-4">
+                        <div class="flex items-center w-full p-4 bg-white border-x border-t border-gray-300 rounded-t-2xl">
+                        </div>
+                        <div class="max-h-96 overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
+                            {{ table(headers:individual_question_stats_headers, rows:individual_question_stats_rows, actions:false) }}
+                        </div>
+                        <div class="flex justify-end items-center w-full h-4 p-4 bg-white border-x border-b border-gray-300 rounded-b-2xl">
+                    
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="reports_courses_data" data-courses="{{ courses|json_encode() }}" class="hidden"></div>
         <div id="reports_questions_data" data-questions="{{ questions_count }}" class="hidden"></div>
@@ -412,6 +443,8 @@
         <div id="reports_normalized_exam_scores_by_topics_data" data-topic-scores="{{ normalized_exam_scores_by_topics_data|json_encode() }}" class="hidden"></div>        
         <div id="reports_exam_question_heatstrip_data" data-level-scores="{{ exam_question_heatstrip_data|json_encode() }}" class="hidden"></div>
         <div id="reports_type_with_level_scores_data" data-type-scores="{{ exam_compare_types_and_blooms_data|json_encode() }}" class="hidden"></div>
+
+
 </div>
 <div popover ="manual"
     class="backdrop:bg-gray-900/15 backdrop:backdrop-blur-[1px] m-auto p-8 rounded-xl w-fit" 

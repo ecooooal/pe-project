@@ -1,0 +1,7 @@
+{% from 'components/core/show-header' import show_header %}
+{% from 'components/core/index-table' import table %}
+{% import 'components/core/forms' as forms %}
+
+<div id="clone-exam-questions"   class="overflow-auto max-h-96 max-w-full scroll-smooth border-x border-t border-gray-300">
+    {{ table(headers:headers, rows:rows, actions:false) }}
+</div>

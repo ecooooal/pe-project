@@ -533,7 +533,7 @@ function renderHeatStripQuestions(data){
         let qData = grouped_by_levels[level].sort((a, b) => a.accuracy_percentage - b.accuracy_percentage);
         return {
             y: Array(qData.length).fill(level),
-            x: Array(data.length).fill(1),
+            x: Array(qData.length).fill(1),
             type: 'bar',
             orientation: 'h',
             marker: {
@@ -581,7 +581,7 @@ function renderHeatStripQuestions(data){
         let qData = grouped_by_levels[level].sort((a, b) => a.average_time_to_answer - b.average_time_to_answer);
         return {
             y: Array(qData.length).fill(level),
-            x: Array(data.length).fill(1),
+            x: Array(qData.length).fill(1),
             type: 'bar',
             orientation: 'h',
             marker: {
@@ -609,15 +609,13 @@ function renderHeatStripQuestions(data){
                     ticksuffix: 's' 
                 }
             },
-            customdata: qData.map(q => [q.question_name, q.question_type, q.average_score, q.accuracy_percentage, q.maximum_points_attainable, q.topic_name, q.subject_name]),
+            customdata: qData.map(q => [q.question_name, q.question_type, q.average_time_to_answer, q.topic_name, q.subject_name]),
             hovertemplate:
                 "Question text: %{customdata[0]}<br>" +
                 "Question type: %{customdata[1]}<br>" +
-                "Average score: %{customdata[2]}<br>" +
-                "Average score in Percent: %{customdata[3]}%<br>" +
-                "Max Score Attainable: %{customdata[4]}<br>"  +
-                "Question topic: %{customdata[5]}<br>" +
-                "Question subject: %{customdata[6]}<extra></extra>",
+                "Average time to answer: %{customdata[2]} seconds<br>" +
+                "Question topic: %{customdata[3]}<br>" +
+                "Question subject: %{customdata[4]}<extra></extra>",
             hoverlabel: {
                 font: { color: 'white' }      // hover text color
             },

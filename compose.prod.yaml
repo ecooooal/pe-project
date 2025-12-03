@@ -1,8 +1,6 @@
 services:
   web:
-    build:
-      context: .
-      dockerfile: ./docker/production/nginx/Dockerfile
+    image: coooal/pcu-dasma-pe-project-web:latest
     restart: unless-stopped # Automatically restart unless the service is explicitly stopped
     volumes:
       # Mount the 'laravel-storage' volume to '/var/www/storage' inside the container.
@@ -12,6 +10,7 @@ services:
       # The 'php-fpm' service mounts the same volume without ':ro' to allow write operations.
       # -----------------------------------------------------------
       - laravel-storage-production:/var/www/storage:ro
+      - laravel-public-assets-production:/var/www/public/build:ro
     networks:
       - laravel-production
     ports:
@@ -27,17 +26,16 @@ services:
 
   php-fpm:
     # For the php-fpm service, we will create a custom image to install the necessary PHP extensions and setup proper permissions.
-    build:
-      context: .
-      dockerfile: ./docker/common/php-fpm/Dockerfile
-      target: production # Use the 'production' stage in the Dockerfile
+    image: coooal/pcu-dasma-pe-project-app:1.0.0
     restart: unless-stopped
     volumes:
+      - laravel-public-assets-production:/var/www/public/build
       - laravel-storage-production:/var/www/storage # Mount the storage volume
     env_file:
-      - .env
+      - .env.production
     networks:
       - laravel-production
+    command: ["php-fpm", "-F"]
     healthcheck:
       test: ["CMD-SHELL", "php-fpm-healthcheck || exit 1"]
       interval: 10s
@@ -46,6 +44,8 @@ services:
     # The 'depends_on' attribute with 'condition: service_healthy' ensures that
     # this service will not start until the 'postgres' service passes its health check.
     # This prevents the application from trying to connect to the database before it's ready.
+    secrets:
+      - firebase_secret
     depends_on:
       postgres:
         condition: service_healthy
@@ -55,21 +55,46 @@ services:
   # This is useful for running migrations, seeders, or any custom scripts.
   # It shares the same codebase and environment as the 'php-fpm' service.
   # -----------------------------------------------------------
-  # php-cli:
-  #   build:
-  #     context: .
-  #     dockerfile: ./docker/php-cli/Dockerfile
-  #   tty: true # Enables an interactive terminal
-  #   stdin_open: true # Keeps standard input open for 'docker exec'
-  #   env_file:
-  #     - .env
-  #   networks:
-  #     - laravel
+  php-cli:
+    image: coooal/pcu-dasma-pe-project-php-cli:latest
+    tty: true # Enables an interactive terminal
+    stdin_open: true # Keeps standard input open for 'docker exec'
+    env_file:
+      - .env.production
+    networks:
+      - laravel-production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      php-fpm:
+        condition: service_healthy
+
+  worker:
+    image: coooal/pcu-dasma-pe-project-php-cli:latest
+    env_file:
+      - .env.production
+    command: php artisan queue:work --sleep=3 --tries=3
+    restart: unless-stopped
+    volumes:
+      - laravel-storage-production:/var/www/storage
+    networks:
+      - laravel-production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      php-fpm:
+        condition: service_healthy
 
   postgres:
     image: postgres:16
     restart: unless-stopped
     user: postgres
+    env_file:
+      - .env.production
     ports:
       - "${DB_PORT}:5432"
     environment:
@@ -95,8 +120,12 @@ services:
   redis:
     image: redis:alpine
     restart: unless-stopped # Automatically restart unless the service is explicitly stopped
+    env_file:
+      - .env.production
     networks:
       - laravel-production
+    volumes:
+      - redis_production_data:/data
     # Health check for Redis
     # -----------------------------------------------------------
     # Checks if Redis is responding to the 'PING' command.
@@ -108,6 +137,47 @@ services:
       timeout: 5s
       retries: 3
 
+  java-api:
+    image: coooal/pcu-dasma-pe-project-java-api:main
+    ports:
+      - "8085:8090"
+    networks:
+      - laravel-production
+    cap_drop: 
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: '0.50'
+    stop_grace_period: 15s 
+    stop_signal: SIGKILL 
+
+  fastapi:
+    image: coooal/pcu-dasma-pe-project-fastapi:main
+    env_file:
+      - .env.production
+    ports:
+      - "${FASTAPI_PORT}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      php-fpm:
+        condition: service_healthy
+    networks:
+      - laravel-production
+    environment:
+      - REDIS_HOST=redis
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+
 networks:
   # Attach the service to the 'laravel-production' network.
   # -----------------------------------------------------------
@@ -116,6 +186,12 @@ networks:
   # -----------------------------------------------------------
   laravel-production:
 
+secrets:
+  firebase_secret:
+    file: ./firebase-admin.json
+
 volumes:
   postgres-data-production:
   laravel-storage-production:
+  redis_production_data:
+  laravel-public-assets-production:

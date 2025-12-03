@@ -25,7 +25,11 @@ class UserService
 
     public function getExamsForUser(User $user)
     {
-        return Exam::whereIn('course_id', $user->getCourseIds());
+        $courseIds = $user->courses()->pluck('courses.id');
+
+        return Exam::whereHas('courses', function ($q) use ($courseIds) {
+            $q->whereIn('courses.id', $courseIds);
+        });
     }
 
     public function getSubjectsForUser(User $user)
