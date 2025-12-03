@@ -145,7 +145,6 @@ class ExamRecordController extends Controller
             WHERE reviewers.topic IN ('.implode(',', array_fill(0, count($topics), '?')).')
         ', $topics);
 
-
         $data = [
             'exam_record' => $examRecord,
             'student_paper' => $student_paper,
