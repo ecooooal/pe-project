@@ -50,17 +50,18 @@
             </div>
         </div>  
     </div>
-    <div id="pagination-div" class="mx-4 p-4">
-        <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-t border-gray-300 rounded-t-2xl">
-            <h1>Filter here</h1>
-        </div>
-        <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
-            {{ table(headers:headers,rows:rows, url:url) }}
+    <div class="mx-4 p-4">
+        <div class="flex justify-start items-center w-full h-16 p-6 bg-white border-x border-t border-gray-300 rounded-t-2xl">
+            <span class="text-2xl font-semibold text-gray-900">Subjects in this Course</span>
 
         </div>
-        <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300 rounded-b-2xl">
-            {{ models.onEachSide(3).links() }}
+        <div id="pagination-div" class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
+            {{ table(headers:headers,rows:rows, url:url) }}
+            <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300 rounded-b-2xl">
+                {{ models.onEachSide(3).links() }}
+            </div>
         </div>
+
     </div>
 </div>
 

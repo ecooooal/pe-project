@@ -1,89 +1,129 @@
 {% from 'components/core/breadcrumbs' import breadcrumb %}
-{% from 'components/core/index-table' import table %}
+{% from 'components/core/index-table' import reviewers_table %}
 {% extends 'components/core/faculty-layout' %}
 
-{% set headers = ['ID', 'Subject', 'Topic', 'Path', 'Date Created', 'Actions'] %}
-
-{% set rows = [] %}
-{% for reviewer in reviewers %}
-    {% set rows = rows|merge([[
-        reviewer.id,
-        reviewer.name,
-        reviewer.topic_name,
-        reviewer.path,
-        reviewer.created_at|date("m-d-Y"),
-        reviewer.path,
-        reviewer.id
-    ]]) %}
-{% endfor %}
+{% set headers = headers ?? ['ID', 'Subject', 'Topic', 'File Name', 'Date Created', 'Actions'] %}
 
 {% block content %}
 
 {{ breadcrumb() }}
 <div class="flex justify-between items-center mx-4 pr-4">
     <div class="flex items-center justify-start gap-x-2 mx-4 text-gray-800">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-9">
-            <path d="M11.25 4.533A9.707 9.707 0 0 0 6 3a9.735 9.735 0 0 0-3.25.555.75.75 0 0 0-.5.707v14.25a.75.75 0 0 0 1 .707A8.237 8.237 0 0 1 6 18.75c1.995 0 3.823.707 5.25 1.886V4.533ZM12.75 20.636A8.214 8.214 0 0 1 18 18.75c.966 0 1.89.166 2.75.47a.75.75 0 0 0 1-.708V4.262a.75.75 0 0 0-.5-.707A9.735 9.735 0 0 0 18 3a9.707 9.707 0 0 0-5.25 1.533v16.103Z" />
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-10">
+            <path d="M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z" />
+            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z" clip-rule="evenodd" />
         </svg>
         <h1 class="font-bold text-4xl">Reviewer Management</h1>
     </div>
-    <a href="/reviewers/create" class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold">Add Reviewer</a>
-</div>
-
-<div class="mx-4 p-4">
-    <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-t border-gray-300 rounded-t-2xl">
-        <h1>Filter here</h1>
+        <a href="/reviewers/create" class="flex items-center gap-1 bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clip-rule="evenodd" />
+            </svg>  
+            Reviewer
+        </a>
     </div>
 
-    <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
-        <table class="w-full">
-            <thead class="bg-gray-100 border-b">
-                <tr>
-                    {% for header in headers %}
-                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">{{ header }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody id="reviewerTableBody">
-                {% for row in rows %}
-                    <tr id="reviewer-row-{{ row[6] }}" class="border-b hover:bg-gray-50">
-                        <td class="px-6 py-3">{{ row[0] }}</td>
-                        <td class="px-6 py-3">{{ row[1] }}</td>
-                        <td class="px-6 py-3">{{ row[2] }}</td>
-                        <td class="px-6 py-3">{{ row[3] }}</td>
-                        <td class="px-6 py-3">{{ row[4] }}</td>
-                        <td class="px-6 py-3">
-                            <div class="flex items-center justify-center gap-2">
-                                {# View Button #}
-                                <a href="/storage/reviewers/{{ row[5] }}" 
-                                   target="_blank" 
-                                   class="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-2 rounded transition-colors duration-200"
-                                   title="View file">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                                        <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path>
-                                        <path fill-rule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.121.755 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z" clip-rule="evenodd"></path>
+    <div class="mx-4 p-4">
+        <div class="flex items-center w-full p-4 bg-white border-x border-t border-gray-300 rounded-t-2xl ">
+            <form method="GET" class="w-full flex flex-1 flex-col justify-between gap-2">
+                <div class="flex flex-1 gap-2">
+                    <div class="flex flex-col w-full gap-2 bg-green-100 p-4 rounded-xl">
+                        <span class="flex align-middle text-gray-900 gap-1 whitespace-nowrap text-sm/6 font-medium text-gray-900">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
+                                <path d="M11.25 4.533A9.707 9.707 0 0 0 6 3a9.735 9.735 0 0 0-3.25.555.75.75 0 0 0-.5.707v14.25a.75.75 0 0 0 1 .707A8.237 8.237 0 0 1 6 18.75c1.995 0 3.823.707 5.25 1.886V4.533ZM12.75 20.636A8.214 8.214 0 0 1 18 18.75c.966 0 1.89.166 2.75.47a.75.75 0 0 0 1-.708V4.262a.75.75 0 0 0-.5-.707A9.735 9.735 0 0 0 18 3a9.707 9.707 0 0 0-5.25 1.533v16.103Z" />
+                            </svg>
+                            Subjects :
+                        </span>
+                        <div class="flex flex-wrap gap-2">
+                            {% for subject in subjects %}
+                                <label class="cursor-pointer">
+                                    <input 
+                                        type="checkbox" 
+                                        name="filter[name][]" 
+                                        value="{{ subject }}" 
+                                        {% if subject in app.request.get('filter')['name']|default([]) %}checked{% endif %}
+                                        class="hidden peer">
+                                    <span class="inline-block px-3 py-1 rounded-full border border-gray-300 text-sm font-medium text-gray-800  
+                                                peer-checked:bg-blue-900 peer-checked:text-white peer-checked:border-blue-900
+                                                hover:bg-gray-50 transition-colors duration-200">
+                                        {{ subject }}
+                                    </span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="flex flex-col w-full bg-orange-100 p-4 rounded-xl">
+                            <span class="flex align-middle gap-1 whitespace-nowrap text-sm/6 font-medium text-gray-900">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
+                                        <path d="M19.906 9c.382 0 .749.057 1.094.162V9a3 3 0 0 0-3-3h-3.879a.75.75 0 0 1-.53-.22L11.47 3.66A2.25 2.25 0 0 0 9.879 3H6a3 3 0 0 0-3 3v3.162A3.756 3.756 0 0 1 4.094 9h15.812ZM4.094 10.5a2.25 2.25 0 0 0-2.227 2.568l.857 6A2.25 2.25 0 0 0 4.951 21H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-2.227-2.568H4.094Z" />
                                     </svg>
-                                </a>
-                                
-                                {# Delete Button #}
-                                <button type="button"
-                                        onclick="deleteReviewer({{ row[6] }}, '{{ row[2] }}')"
-                                        class="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded transition-colors duration-200"
-                                        title="Delete reviewer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                                        <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                                Topics :
+                            </span>
+                        <div class="flex w-full gap-1 align-middle text-gray-900  p-2 rounded-xl">
+                            {% for topic_id, topic_name in topics %}
+                                <label class="cursor-pointer">
+                                    <input 
+                                        type="checkbox" 
+                                        name="filter[topic][]" 
+                                        value="{{ topic_id }}"  
+                                        {% if topic_id in app.request.get('filter')['topic']|default([]) %}checked{% endif %}
+                                        class="hidden peer">
+                                    <span class="inline-block px-3 py-1 rounded-full border border-gray-300 text-sm font-medium text-gray-800  
+                                                peer-checked:bg-blue-900 peer-checked:text-white peer-checked:border-blue-900
+                                                hover:bg-gray-50 transition-colors duration-200">
+                                        {{ topic_name }}
+                                    </span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                    {{ forms.form_field(
+                        label:forms.label(
+                            id:'filter[name]', 
+                            content:'Exam', 
+                            attributes:{
+                                'class':'whitespace-nowrap text-sm/6 font-medium text-gray-900  after:text-red-500 after:content-[\'\*\']'}
+                        ),
+                        input:forms.text(
+                            name:'filter[name]', 
+                            attributes:{
+                                'class':'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+                                'placeholder':'Search Exam name...'
+                            }
+                        ),
+                        isColumn:true 
+                    )}}
+                    <div class="flex gap-1">
+                        <div class="flex flex-1/2">
+                            <button type="submit" class="flex w-full cursor-pointer justify-center gap-1 bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white active:bg-blue-900 duration-300 rounded-lg p-2 font-semibold">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                <path fill-rule="evenodd" d="M3.792 2.938A49.069 49.069 0 0 1 12 2.25c2.797 0 5.54.236 8.209.688a1.857 1.857 0 0 1 1.541 1.836v1.044a3 3 0 0 1-.879 2.121l-6.182 6.182a1.5 1.5 0 0 0-.439 1.061v2.927a3 3 0 0 1-1.658 2.684l-1.757.878A.75.75 0 0 1 9.75 21v-5.818a1.5 1.5 0 0 0-.44-1.06L3.13 7.938a3 3 0 0 1-.879-2.121V4.774c0-.897.64-1.683 1.542-1.836Z" clip-rule="evenodd" />
+                                </svg>
 
-    <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300 rounded-b-2xl">
-        <h1>Pagination</h1>
+                                Filter
+                            </button>
+                        </div>
+                        <div class="flex flex-1 justify-between align-middle text-gray-900">
+                            <a href="{{ route('reviewers.index') }}" 
+                            class="flex w-full justify-center gap-1 p-2 rounded-lg bg-gray-100 hover:bg-gray-200 duration-300 text-sm font-medium">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
+                            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
+                            </svg>
+
+                            Clear Filters
+                            </a>             
+                        </div>
+                    </div>
+            </form>
+        </div>
+        <div id="pagination-div" class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300 rounded-b-2xl">
+            {{ reviewers_table(headers, rows)}}
+        <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300">
+                {{ models.onEachSide(3).links() }}
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -94,20 +134,18 @@
 
 <script>
 async function deleteReviewer(reviewerId, reviewerName) {
-    // Confirmation dialog
     if (!confirm(`Are you sure you want to delete "${reviewerName}"?\n\nThis will permanently delete the file from storage and database.`)) {
         return;
     }
-    
+
     const row = document.getElementById(`reviewer-row-${reviewerId}`);
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || 
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ||
                       document.querySelector('input[name="_token"]')?.value;
-    
+    console.log(row);
     try {
-        // Show loading state
         row.style.opacity = '0.5';
         row.style.pointerEvents = 'none';
-        
+
         const response = await fetch(`/reviewers/${reviewerId}`, {
             method: 'DELETE',
             headers: {
@@ -116,25 +154,22 @@ async function deleteReviewer(reviewerId, reviewerName) {
                 'Accept': 'application/json'
             }
         });
-        
+
         const data = await response.json();
-        
+
         if (response.ok && data.success) {
-            // Animate row removal
             row.style.transition = 'all 0.3s ease';
             row.style.transform = 'translateX(100%)';
             row.style.opacity = '0';
-            
+
             setTimeout(() => {
                 row.remove();
-                
-                // Check if table is empty
                 const tbody = document.getElementById('reviewerTableBody');
                 if (tbody.children.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">No reviewers found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-5 py-6 text-center text-gray-500">No reviewers found</td></tr>';
                 }
             }, 300);
-            
+
             showToast('Reviewer deleted successfully!', 'success');
         } else {
             throw new Error(data.message || 'Failed to delete reviewer');
@@ -150,14 +185,14 @@ async function deleteReviewer(reviewerId, reviewerName) {
 function showToast(message, type) {
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toastMessage');
-    
-    toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 ${
+
+    toast.className = `fixed top-1/2 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 ${
         type === 'success' ? 'bg-green-500' : 'bg-red-500'
     }`;
-    
+
     toastMessage.textContent = message;
     toast.classList.remove('hidden');
-    
+
     setTimeout(() => {
         toast.style.opacity = '0';
         setTimeout(() => {
