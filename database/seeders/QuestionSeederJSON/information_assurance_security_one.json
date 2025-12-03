@@ -1,6 +1,7 @@
 {
   "name": "Information Assurance and Security 1",
   "code": "IAS1",
+  "course": [1],
   "year_level": 2,
   "topics": [
     {

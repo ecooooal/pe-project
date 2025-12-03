@@ -1,6 +1,7 @@
 {
   "name": "Data Analytics",
   "code": "DA1",
+  "course": [1],
   "year_level": 3,
   "topics": [
     {

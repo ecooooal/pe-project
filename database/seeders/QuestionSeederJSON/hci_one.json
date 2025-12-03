@@ -1,6 +1,7 @@
 {
   "name": "Human Computer Interaction 1",
   "code": "INFT1202L",
+  "course": [1,2],
   "year_level": 1,
   "topics": [
     {

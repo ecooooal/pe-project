@@ -1,6 +1,7 @@
 {
   "name": "Introduction to Computing",
   "code": "INFT1101",
+  "course": [1,2],
   "year_level": 1,
   "topics": [
     {

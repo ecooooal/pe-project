@@ -1,6 +1,7 @@
 {
     "name": "Data Structures",
     "code": "DS",
+    "course": [1],
     "year_level": 2,
     "topics": [
         {

@@ -1,6 +1,7 @@
 {
   "name": "Systems Integration and Architecture 1",
   "code": "SIA1",
+  "course": [2],
   "year_level": 2,
   "topics": [
     {

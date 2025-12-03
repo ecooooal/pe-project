@@ -1,6 +1,7 @@
 {
   "name": "Information Management",
   "code": "IM1",
+  "course": [2],
   "year_level": 2,
   "topics": [
     {

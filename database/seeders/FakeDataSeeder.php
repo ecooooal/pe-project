@@ -49,7 +49,7 @@ class FakeDataSeeder extends Seeder
                 'year_level' => $subject_data['year_level'],
                 'created_at' => Carbon::now()
             ]);
-            $subject->courses()->attach([1, 2]);
+            $subject->courses()->attach($subject_data['course']);
             
             foreach ($subject_data['topics'] as $topic_data) {
                 $topic = Topic::firstOrCreate([

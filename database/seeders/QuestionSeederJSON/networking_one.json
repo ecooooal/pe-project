@@ -1,6 +1,7 @@
 {
   "name": "Networking 1",
   "code": "NET1",
+  "course": [2],
   "year_level": 2,
   "topics": [
     {

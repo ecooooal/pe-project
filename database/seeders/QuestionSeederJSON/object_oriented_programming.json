@@ -1,6 +1,7 @@
 {
   "name": "Object Oriented Programming",
   "code": "OOP",
+  "course": [1],
   "year_level": 2,
   "topics": [
     {

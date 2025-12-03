@@ -1,6 +1,7 @@
 {
   "name": "Programming 1",
   "code": "PROG1",
+  "course": [2],
   "year_level": 1,
   "topics": [
     {

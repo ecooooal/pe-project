@@ -1,6 +1,7 @@
 {
   "name": "Advanced Database Systems",
   "code": "ADS1",
+  "course": [1],
   "year_level": 3,
   "topics": [
     {

@@ -1,6 +1,7 @@
 {
   "name": "Event Driven Programming",
   "code": "EDP1",
+  "course": [1,2],
   "year_level": 2,
   "topics": [
     {
