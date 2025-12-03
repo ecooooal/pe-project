@@ -33,6 +33,7 @@
 **/secrets.dev.yaml
 **/values.dev.yaml
 **/vendor
+!resources/views/vendor
 **/.DS_Store
 *.log
 .editorconfig
