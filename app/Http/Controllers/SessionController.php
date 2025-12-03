@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class SessionController extends Controller
 {
@@ -16,7 +17,7 @@ class SessionController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
- 
+        
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
  

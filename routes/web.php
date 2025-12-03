@@ -3,6 +3,7 @@ use App\Http\Controllers\Auth\FirebaseController;
 use App\Http\Controllers\AccessControlController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\QuestionController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\Student\ExamController as StudentExamController;
 use App\Http\Controllers\Student\StudentController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,8 +34,8 @@ Route::get('/', function () {
     return view('landing-page');
 });
 
-Route::get('auth/google', [GoogleAuthController::class, 'redirectToGoogle']);
-Route::get('auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+//Route::get('auth/google', [GoogleAuthController::class, 'redirectToGoogle']);
+//Route::get('auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 
 #Route::post('/login', [SessionController::class, 'authenticate']);
 Route::post('/auth/firebase/login', [FirebaseController::class, 'login'])->name('firebase.login');
@@ -196,6 +198,9 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/reviewers/create', [MailController::class, 'create'])->name('reviewers.create');
     Route::post('/reviewers', [MailController::class, 'index'])->name('reviewers.store');
     Route::delete('/reviewers/{id}', [MailController::class, 'destroy'])->name('reviewers.destroy');
+    Route::get('/reviewers/{id}/download', [MailController::class, 'downloadReviewer'])->name('reviewers.download');
+
+
     // Route::get('/reviewers/{reviewer}/download', [MailController::class, 'downloadFacultyReviewer'])->name('reviewers.download');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

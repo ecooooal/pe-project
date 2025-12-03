@@ -2,88 +2,88 @@
 {% from 'components/core/index-table' import table %}
 {% extends 'components/core/faculty-layout' %}
 
-{% set headers = ['ID', 'Subject', 'Topic', 'Path', 'Date Created', 'Actions'] %}
-
-{% set rows = [] %}
-{% for reviewer in reviewers %}
-    {% set rows = rows|merge([[
-        reviewer.id,
-        reviewer.name,
-        reviewer.topic_name,
-        reviewer.path,
-        reviewer.created_at|date("m-d-Y"),
-        reviewer.path,
-        reviewer.id
-    ]]) %}
-{% endfor %}
+{% set headers = headers ?? ['ID', 'Subject', 'File Name', 'Date Created', 'Actions'] %}
 
 {% block content %}
 
 {{ breadcrumb() }}
-<div class="flex justify-between items-center mx-4 pr-4">
-    <div class="flex items-center justify-start gap-x-2 mx-4 text-gray-800">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-9">
-            <path d="M11.25 4.533A9.707 9.707 0 0 0 6 3a9.735 9.735 0 0 0-3.25.555.75.75 0 0 0-.5.707v14.25a.75.75 0 0 0 1 .707A8.237 8.237 0 0 1 6 18.75c1.995 0 3.823.707 5.25 1.886V4.533ZM12.75 20.636A8.214 8.214 0 0 1 18 18.75c.966 0 1.89.166 2.75.47a.75.75 0 0 0 1-.708V4.262a.75.75 0 0 0-.5-.707A9.735 9.735 0 0 0 18 3a9.707 9.707 0 0 0-5.25 1.533v16.103Z" />
-        </svg>
-        <h1 class="font-bold text-4xl">Reviewer Management</h1>
-    </div>
-    <a href="/reviewers/create" class="bg-blue-900 text-gray-200 hover:bg-blue-600 hover:text-white duration-300 rounded-lg p-2 font-semibold">Add Reviewer</a>
-</div>
 
-<div class="mx-4 p-4">
-    <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-t border-gray-300 rounded-t-2xl">
-        <h1>Filter here</h1>
+<div class="mx-4 pr-4 space-y-4">
+    <div class="flex justify-between items-center">
+        <div class="flex items-center gap-3 text-gray-800">
+            <div class="p-3 rounded-full bg-indigo-100 text-indigo-700 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7">
+                    <path d="M11.25 4.533A9.707 9.707 0 0 0 6 3a9.735 9.735 0 0 0-3.25.555.75.75 0 0 0-.5.707v14.25a.75.75 0 0 0 1 .707A8.237 8.237 0 0 1 6 18.75c1.995 0 3.823.707 5.25 1.886V4.533ZM12.75 20.636A8.214 8.214 0 0 1 18 18.75c.966 0 1.89.166 2.75.47a.75.75 0 0 0 1-.708V4.262a.75.75 0 0 0-.5-.707A9.735 9.735 0 0 0 18 3a9.707 9.707 0 0 0-5.25 1.533v16.103Z" />
+                </svg>
+            </div>
+            <div>
+                <p class="text-xs uppercase tracking-[0.12em] text-indigo-500 font-semibold">Library</p>
+                <h1 class="font-black text-3xl text-gray-900 leading-tight">Reviewer Management</h1>
+            </div>
+        </div>
+        <a href="/reviewers/create"
+           class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-full shadow-md transition-all duration-200">
+            <span class="text-sm font-semibold">Add Reviewer</span>
+        </a>
     </div>
 
-    <div class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300">
-        <table class="w-full">
-            <thead class="bg-gray-100 border-b">
-                <tr>
-                    {% for header in headers %}
-                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">{{ header }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody id="reviewerTableBody">
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-md overflow-hidden">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+            <div class="flex items-center gap-2 text-gray-700 font-semibold">
+                <span class="text-xs uppercase tracking-wide text-gray-500">Manage</span>
+                <span class="text-sm text-gray-800">All reviewer files</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <input type="text" placeholder="Search file name..."
+                       class="w-48 md:w-64 rounded-lg border border-gray-200 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                <button class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">Filter</button>
+            </div>
+        </div>
+
+        <div class="overflow-auto">
+            <table class="w-full text-sm text-gray-800">
+                <thead class="bg-gray-100 border-b border-gray-200 text-xs uppercase tracking-wide text-gray-600">
+                    <tr>
+                        {% for header in headers %}
+                            <th class="px-5 py-3 text-left font-semibold">{{ header }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody id="reviewerTableBody" class="divide-y divide-gray-100">
                 {% for row in rows %}
-                    <tr id="reviewer-row-{{ row[6] }}" class="border-b hover:bg-gray-50">
-                        <td class="px-6 py-3">{{ row[0] }}</td>
-                        <td class="px-6 py-3">{{ row[1] }}</td>
-                        <td class="px-6 py-3">{{ row[2] }}</td>
-                        <td class="px-6 py-3">{{ row[3] }}</td>
-                        <td class="px-6 py-3">{{ row[4] }}</td>
-                        <td class="px-6 py-3">
-                            <div class="flex items-center justify-center gap-2">
-                                {# View Button #}
-                                <a href="/storage/reviewers/{{ row[5] }}" 
-                                   target="_blank" 
-                                   class="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-2 rounded transition-colors duration-200"
-                                   title="View file">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                                        <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path>
-                                        <path fill-rule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.121.755 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z" clip-rule="evenodd"></path>
-                                    </svg>
+                    <tr id="reviewer-row-{{ row[0] }}" class="odd:bg-white even:bg-gray-50 hover:bg-indigo-50/60 transition-colors">
+                        <td class="px-5 py-3 font-semibold text-gray-900">{{ row[0] }}</td>
+                        <td class="px-5 py-3">{{ row[1] }}</td>
+                        <td class="px-5 py-3">{{ row[2] }}</td>
+                        <td class="px-5 py-3 text-gray-600 text-xs">{{ row[3] }}</td>
+                        <td class="px-5 py-3">
+                            <div class="flex items-center gap-3 text-sm">
+                                <a href="/reviewers/{{ row[0] }}/download"
+                                   class="inline-flex items-center gap-1 text-teal-600 hover:text-teal-700 hover:underline">
+                                    <span>Download</span>
                                 </a>
-                                
-                                {# Delete Button #}
-                                <button type="button"
-                                        onclick="deleteReviewer({{ row[6] }}, '{{ row[2] }}')"
-                                        class="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded transition-colors duration-200"
-                                        title="Delete reviewer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                                        <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd" />
-                                    </svg>
+                                <button onclick="deleteReviewer({{ row[0] }}, '{{ row[2] }}')"
+                                        class="inline-flex items-center gap-1 text-red-600 hover:text-red-700 hover:underline">
+                                    <span>Delete</span>
                                 </button>
                             </div>
                         </td>
                     </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="px-5 py-6 text-center text-gray-500">
+                            No reviewers yet. <a href="/reviewers/create" class="text-indigo-600 hover:text-indigo-700 font-semibold">Add one now</a>.
+                        </td>
+                    </tr>
                 {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                </tbody>
+            </table>
+        </div>
 
-    <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300 rounded-b-2xl">
-        <h1>Pagination</h1>
+        <div class="flex justify-between items-center px-5 py-4 bg-gray-50 text-sm text-gray-600">
+            <span>Showing {{ rows|length }} item(s)</span>
+            <span class="text-gray-400">Pagination</span>
+        </div>
     </div>
 </div>
 
@@ -94,20 +94,18 @@
 
 <script>
 async function deleteReviewer(reviewerId, reviewerName) {
-    // Confirmation dialog
     if (!confirm(`Are you sure you want to delete "${reviewerName}"?\n\nThis will permanently delete the file from storage and database.`)) {
         return;
     }
-    
+
     const row = document.getElementById(`reviewer-row-${reviewerId}`);
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || 
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ||
                       document.querySelector('input[name="_token"]')?.value;
-    
+
     try {
-        // Show loading state
         row.style.opacity = '0.5';
         row.style.pointerEvents = 'none';
-        
+
         const response = await fetch(`/reviewers/${reviewerId}`, {
             method: 'DELETE',
             headers: {
@@ -116,25 +114,22 @@ async function deleteReviewer(reviewerId, reviewerName) {
                 'Accept': 'application/json'
             }
         });
-        
+
         const data = await response.json();
-        
+
         if (response.ok && data.success) {
-            // Animate row removal
             row.style.transition = 'all 0.3s ease';
             row.style.transform = 'translateX(100%)';
             row.style.opacity = '0';
-            
+
             setTimeout(() => {
                 row.remove();
-                
-                // Check if table is empty
                 const tbody = document.getElementById('reviewerTableBody');
                 if (tbody.children.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">No reviewers found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-5 py-6 text-center text-gray-500">No reviewers found</td></tr>';
                 }
             }, 300);
-            
+
             showToast('Reviewer deleted successfully!', 'success');
         } else {
             throw new Error(data.message || 'Failed to delete reviewer');
@@ -150,14 +145,14 @@ async function deleteReviewer(reviewerId, reviewerName) {
 function showToast(message, type) {
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toastMessage');
-    
-    toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 ${
+
+    toast.className = `fixed top-1/2 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 ${
         type === 'success' ? 'bg-green-500' : 'bg-red-500'
     }`;
-    
+
     toastMessage.textContent = message;
     toast.classList.remove('hidden');
-    
+
     setTimeout(() => {
         toast.style.opacity = '0';
         setTimeout(() => {
