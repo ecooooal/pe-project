@@ -145,12 +145,21 @@ class ExamRecordController extends Controller
             WHERE reviewers.topic IN ('.implode(',', array_fill(0, count($topics), '?')).')
         ', $topics);
 
+        foreach ($reviewers as $file) {
+            $fileName = basename($file->path);
+            $displayName = preg_replace('/^\w+_/', '', $fileName); 
+            $file->display_name = $displayName;
+            $file->formatted_date = Carbon::parse($file->created_at)->format('d-m-Y');
+        }
+
+        $clean_reviewers = collect($reviewers)->toArray();
+
         $data = [
             'exam_record' => $examRecord,
             'student_paper' => $student_paper,
             'exam' => $exam,
             'rows' => $rows,
-            'reviewers' => $reviewers
+            'reviewers' => $clean_reviewers
         ];
 
         return view('students/records/show', $data);

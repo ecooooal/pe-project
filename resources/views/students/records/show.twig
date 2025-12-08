@@ -203,8 +203,8 @@
                     {% if reviewers is defined and reviewers|length > 0 %}
                         {% for reviewer in reviewers %}
                         <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800">{{ reviewer.subject_name }}</h3>
-                            <p class="text-sm text-gray-600 mb-3">{{ reviewer.topic_name }}</p>
+                            <h3 class="text-lg font-semibold text-gray-800">{{ 'Subject: ' ~ reviewer.subject_name }} | {{ reviewer.display_name }}</h3>
+                            <p class="text-sm text-gray-600 mb-3">{{ 'Topic: ' ~ reviewer.topic_name }}</p>
                             <a href="{{ route('reviewers.download', {id:reviewer.id})}}" 
                                download
                                class="inline-flex items-center text-sm font-medium text-orange-900 hover:underline">
