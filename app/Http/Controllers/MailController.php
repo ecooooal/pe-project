@@ -339,7 +339,7 @@ class MailController extends Controller
             }
 
             // Add permission check for faculty access
-            if (!$user->can('view faculty')) {
+            if (!$user->can('view faculty') && !$user->can('view student')) {
                 abort(403, 'You do not have permission to download reviewer files.');
             }
 
