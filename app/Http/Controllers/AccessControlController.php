@@ -201,7 +201,7 @@ class AccessControlController extends Controller
                 'max:9',
                 Rule::unique('academic_years', 'year_label'),
             ],
-            'start_date' => 'required|date|after_or_equal:today',
+            'start_date' => 'required|date',
             'end_date' => [
                 'required',
                 'date',

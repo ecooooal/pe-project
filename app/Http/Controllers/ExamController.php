@@ -190,7 +190,8 @@ class ExamController extends Controller
         }
         $exam->load('courses');
         $courses =  $this->userService->getCoursesForUser(auth()->user()); 
-        return view('exams/edit', ['exam' => $exam, 'available_courses' => $courses]);
+        $hasStudentPapers = $this->examService->hasStudentPapers($exam);
+        return view('exams/edit', ['exam' => $exam, 'available_courses' => $courses, 'has_student_papers' => $hasStudentPapers]);
     }
 
     public function update(Exam $exam){
@@ -251,6 +252,10 @@ class ExamController extends Controller
 
         if ($exam->is_published) {
             return back()->with('error', 'You cannot delete an exam that is currently published.');
+        }
+
+        if ($this->examService->hasStudentPapers($exam)) {
+            return back()->with('error', 'This exam has student records and cannot be deleted.');
         }
 
         session()->flash('toast', json_encode([
