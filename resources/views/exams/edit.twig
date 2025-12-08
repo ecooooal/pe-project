@@ -404,13 +404,13 @@ link.addEventListener('click', function(e) {
         this.style.opacity = 1;
         msg.style.opacity = 0; 
     }, 1000);
-    return; // stop here
+    return; 
     }
     setTimeout(() => {
         const parent = this.closest('#clone-exam-button-div');
         if (parent) parent.remove();
         else this.remove();
-    }, 10); // slight delay ensures HTMX captures the click first
+    }, 10);
 });
 </script>
 {% endblock %}

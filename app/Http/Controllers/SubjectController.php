@@ -139,8 +139,8 @@ class SubjectController extends Controller
     }
 
     public function edit(Subject $subject){
-        $courses = Course::all()->pluck('name', 'id');
-
+        $subject->load('courses');
+        $courses =  $this->userService->getCoursesForUser(auth()->user()); 
         $data = [
             'subject' => $subject, 
             'courses' => $courses
@@ -150,18 +150,25 @@ class SubjectController extends Controller
     }
 
     public function update(Subject $subject){
-        request()->validate([
+        $validated = request()->validate([
             'name'    => ['required', Rule::unique('subjects', 'name')->ignore($subject->id)],
             'code'    => ['required', Rule::unique('subjects', 'code')->ignore($subject->id)],
-            'year_level' => ['required', 'integer', 'min:1', 'max:4']
-        ]); 
+            'year_level' => ['required', 'integer', 'min:1', 'max:4'],            
+            'courses' => 'required|array|min:1',
+            'courses.*' => 'exists:courses,id|required|string|distinct',
+        ], [
+            'courses' => 'The course field is required.',
+            'courses.*' => 'Invalid Course'
+        ]);
+
         $subject->update([
             'name' => request('name'),
             'code' => request('code'),
             'year_level' => request('year_level'),
         ]);
 
-        
+        $subject->courses()->sync($validated['courses']);
+
         session()->flash('toast', json_encode([
             'status' => 'Updated!',
             'message' => 'Subject: ' . $subject->name,
