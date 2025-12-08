@@ -40,6 +40,7 @@ Route::post('/auth/firebase/login', [FirebaseController::class, 'login'])->name(
 Route::post('/login', [SessionController::class, 'authenticate']);
 Route::post('/logout', [SessionController::class, 'logout'])->middleware(['auth']);
 Route::post('/questions/create/validate-complete-solution', [QuestionController::class, 'validateCompleteSolution'])->name('validate.coding.question');
+Route::get('/reviewers/{id}/download', [MailController::class, 'downloadReviewer'])->name('reviewers.download');
 
 Route::group(['middleware' => ['can:view student']], function () { 
 });
@@ -196,7 +197,6 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/reviewers/create', [MailController::class, 'create'])->name('reviewers.create');
     Route::post('/reviewers', [MailController::class, 'index'])->name('reviewers.store');
     Route::delete('/reviewers/{id}', [MailController::class, 'destroy'])->name('reviewers.destroy');
-    Route::get('/reviewers/{id}/download', [MailController::class, 'downloadReviewer'])->name('reviewers.download');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/{exam}', [ReportController::class, 'index_exam'])->name('reports.index_exam');

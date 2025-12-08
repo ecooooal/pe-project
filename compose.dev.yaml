@@ -71,6 +71,7 @@ services:
       - ./vendor:/var/www/vendor
       - app-node-modules:/var/www/node_modules
       - ./storage:/var/www/storage
+      - ./php_custom.ini:/usr/local/etc/php/conf.d/custom.ini
     secrets:
       - firebase_secret
     networks:

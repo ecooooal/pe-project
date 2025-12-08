@@ -33,6 +33,8 @@ services:
       - laravel-storage-production:/var/www/storage # Mount the storage volume
     env_file:
       - .env.production
+    volume:
+      - ./php_custom.ini:/usr/local/etc/php/conf.d/custom.ini
     networks:
       - laravel-production
     command: ["php-fpm", "-F"]
