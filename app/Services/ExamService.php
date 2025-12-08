@@ -419,5 +419,9 @@ class ExamService
         return $users;
     }
 
+    public function hasStudentPapers(Exam $exam){
+        return $exam->studentPapers()->exists();
+    }
+
 }
 
