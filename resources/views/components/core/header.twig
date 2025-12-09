@@ -23,10 +23,65 @@
                     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6"><path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" /><path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" /></svg>',
                     'Home', false)}} 
             {% endif %}
-            <form method="POST" action="/logout">
-                {{ csrf_field() }}
-                <button type="submit" class="text-white font-medium cursor-pointer">Logout</button>
-            </form>          
+            <div class="relative">
+            <button 
+                id="logout_dropdown_button"
+                class="flex items-center text-white font-medium cursor-pointer p-2 rounded-md hover:bg-blue-800 transition duration-300 focus:outline-none"
+                aria-expanded="false"
+                aria-controls="logout_menu"
+            >
+                <span class="mr-2">{{ auth_user().first_name ~ ' ' ~ auth_user().last_name }}</span> 
+                <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+
+            <div 
+                id="logout_menu"
+                class="hidden absolute right-0 mt-2 w-24 rounded-md shadow-lg bg-white ring-2 ring-gray-800 ring-opacity-5 z-50 origin-top-right" 
+                role="menu" 
+                aria-orientation="vertical"
+            >
+                <div class="py-1" role="none">
+                    <form method="POST" action="/logout" class="block w-full text-left" role="none">
+                        {{ csrf_field() }}
+                        <button type="submit" class="flex items-center justify-center text-center w-full px-4 py-2 text-sm font-bold text-orange-900 hover:bg-gray-100 hover:text-orange-700 transition duration-300" role="menuitem">
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-7">
+                                <path fill-rule="evenodd" d="M16.5 3.75a1.5 1.5 0 0 1 1.5 1.5v13.5a1.5 1.5 0 0 1-1.5 1.5h-6a1.5 1.5 0 0 1-1.5-1.5V15a.75.75 0 0 0-1.5 0v3.75a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V5.25a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3V9A.75.75 0 1 0 9 9V5.25a1.5 1.5 0 0 1 1.5-1.5h6ZM5.78 8.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 0 0 0 1.06l3 3a.75.75 0 0 0 1.06-1.06l-1.72-1.72H15a.75.75 0 0 0 0-1.5H4.06l1.72-1.72a.75.75 0 0 0 0-1.06Z" clip-rule="evenodd" />
+                                </svg>  
+                            </span>
+                        
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script>
+            const logout_dropdown = document.getElementById('logout_dropdown_button');
+            const logout_menu = document.getElementById('logout_menu');
+            console.log(logout_dropdown, logout_menu);
+
+            if (logout_dropdown && logout_menu) {
+                function toggleDropdown() {
+                    logout_menu.classList.toggle('hidden');
+                    const isExpanded = logout_menu.classList.contains('hidden') ? 'false' : 'true';
+                    logout_dropdown.setAttribute('aria-expanded', isExpanded);
+                }
+
+                logout_dropdown.addEventListener('click', function(event) {
+                    event.stopPropagation(); 
+                    toggleDropdown();
+                });
+
+                document.addEventListener('click', function(event) {
+                    if (!logout_dropdown.contains(event.target) && !logout_menu.classList.contains('hidden')) {
+                        toggleDropdown();
+                    }
+                });
+            }
+        </script>
         {% endif %}
         {% if auth_guest() %}
             <button id="login-btn" type="button" class="text-white font-medium cursor-pointer">
@@ -105,8 +160,15 @@
             </div>
         </div>
 
+        <div class="flex flex-1 flex-col my-2">
+            <button id="show_faculty_login_form" class="px-6 py-2 bg-blue-900 text-white rounded-md font-semibold hover:bg-blue-700 transition duration-300">
+                Faculty Login
+            </button>
+        </div>
+
         <div class="flex flex-1 flex-col">
-            <form action="/login" method="POST" class="flex flex-col gap-y-4">
+
+            <form id="faculty_login_form" action="/login" method="POST" class="flex flex-col gap-y-4 hidden">
                 {{ csrf_field() }}
                 <div class="flex gap-x-32 justify-between w-full">
                     <div class="flex flex-col gap-y-4 w-full">
@@ -331,5 +393,27 @@
                 // Do NOT open login popover
             });
         })();
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const show_faculty_login_button = document.getElementById('show_faculty_login_form');
+            const faculty_login_form = document.getElementById('faculty_login_form');
+
+            if (show_faculty_login_button && faculty_login_form) {
+                show_faculty_login_button.addEventListener('click', function() {
+                    faculty_login_form.classList.toggle('hidden');
+
+                    if (faculty_login_form.classList.contains('hidden')) {
+                        show_faculty_login_button.textContent = 'Faculty Login';
+                        show_faculty_login_button.classList.remove('bg-orange-900', 'hover:bg-orange-700')
+                        show_faculty_login_button.classList.add('bg-blue-900', 'hover:bg-blue-700')
+                    } else {
+                        show_faculty_login_button.textContent = 'Hide Faculty Login';
+                        show_faculty_login_button.classList.remove('bg-blue-900', 'hover:bg-blue-700')
+                        show_faculty_login_button.classList.add('bg-orange-900', 'hover:bg-orange-700')
+                    }
+                });
+            }
+        });
     </script>
 {% endif %}
