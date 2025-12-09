@@ -62,13 +62,13 @@ class Question extends Model
         $level = $this->questionLevel()->first()->name ?? 'none';
 
         $mapping = [
-            'remember' => '🧠 Remember',
-            'understand' => '📖 Understand',
-            'apply' => '🛠️ Apply',
-            'analyze' => '🧩 Analyze',
-            'evaluate' => '📝 Evaluate',
-            'create' => '🎨 Create',
-            'none' => '❌ No Level'
+            'remember' => 'Remember',
+            'understand' => 'Understand',
+            'apply' => 'Apply',
+            'analyze' => 'Analyze',
+            'evaluate' => 'Evaluate',
+            'create' => 'Create',
+            'none' => 'No Level'
         ];
 
         return $mapping[strtolower($level)] ?? ucfirst($level);

@@ -204,7 +204,7 @@ Route::prefix('')->middleware(['can:view faculty'])->group(function () {
     Route::get('/reports/{exam}/create', [ReportController::class, 'create'])->name('reports.create');
     Route::get('/reports/{exam}/{report}', [ReportController::class, 'show'])->name('reports.show');
     Route::delete('/reports/{exam}/{report}', [ReportController::class, 'destroy'])->name('reports.destroy');
-    Route::get('/reports/{exam}/{report}/export', [ReportController::class, 'exportReport'])->name('reports.export');
+    Route::get('/reports/{exam}/{report}/export/{report_type}', [ReportController::class, 'exportReport'])->name('reports.export');
 
     Route::middleware('htmx.request:faculty.index')->group(function () {
         Route::get('/homepage/report/exam', [LandingPageController::class, 'examReportShow'])->name('graphs.homepage.exam');
