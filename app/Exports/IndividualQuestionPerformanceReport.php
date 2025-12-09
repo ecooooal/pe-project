@@ -7,9 +7,10 @@ use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings; 
 use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 use Str;
 
-class IndividualQuestionPerformanceReport implements FromCollection, WithHeadings
+class IndividualQuestionPerformanceReport implements FromCollection, WithHeadings, WithStrictNullComparison
 {
     use Exportable;
     protected $report_id;
@@ -54,6 +55,6 @@ class IndividualQuestionPerformanceReport implements FromCollection, WithHeading
             return [];
         }
 
-        return ['Question ID', 'Question Name', 'Type', 'Level', 'Topic' ,'Subject', 'Attainable Points', 'Average Points Obtained', 'Student Answers Count', 'Difficulty Index', 'Discrimination Index', 'Lower Group Percent Correct', 'Uppper Group Percent Correct'];
+        return ['Question ID', 'Question Name', 'Type', 'Level', 'Topic' ,'Subject', 'Attainable Points', 'Average Points Obtained', 'Student Answers Count', 'Difficulty Index', 'Discrimination Index', 'Lower Group Percent Correct', 'Upper Group Percent Correct'];
     }
 }
