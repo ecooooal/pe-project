@@ -20,6 +20,35 @@ class RawReportExport implements FromCollection, WithHeadings, WithMapping, With
         'points_obtained' => 'integer',
     ];
 
+    protected $columnOrder = [
+        'id',       
+        'exam_id',
+        'course_id',
+        'subject_id',
+        'topic_id',
+        'question_id',
+        'subject_name',
+        'topic_name',
+        'question_name',
+        'question_type',
+        'question_level',
+        'question_points',
+        'user_id',
+        'student_paper_id',
+        'attempt',
+        'student_name',
+        'student_email',
+        'course_abbreviation',
+        'is_answered',
+        'is_correct',
+        'points_obtained',
+        'first_viewed_at',
+        'first_answered_at',
+        'last_answered_at',
+        'created_at',
+        'updated_at' 
+    ];
+
     public function __construct(int $report_id)
     {
         $this->reportId = $report_id;
@@ -47,7 +76,12 @@ class RawReportExport implements FromCollection, WithHeadings, WithMapping, With
             }
         }
 
-        return $row;
+        $orderedRow = [];
+            foreach ($this->columnOrder as $key) {
+                $orderedRow[$key] = $row[$key] ?? null; 
+            }
+
+        return $orderedRow;
     }
 
     public function headings(): array
@@ -58,12 +92,6 @@ class RawReportExport implements FromCollection, WithHeadings, WithMapping, With
             return [];
         }
 
-        $firstRow = $report->raw_report_data[0];
-
-        if (is_array($firstRow)) {
-            return array_keys($firstRow);
-        }
-        
-        return [];
+        return $this->columnOrder;
     }
 }
