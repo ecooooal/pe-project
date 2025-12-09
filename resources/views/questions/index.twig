@@ -134,7 +134,7 @@
                                 <span class="inline-block px-3 py-1 rounded-full rounded-full border border-gray-300 text-sm font-medium text-gray-800  
                                             peer-checked:bg-blue-900 peer-checked:text-white peer-checked:border-blue-900
                                             hover:bg-gray-50 transition-colors duration-200">
-                                    {{ question_level.label }}
+                                    {{ question_level.name }}
                                 </span>
                             </label>
                         {% endfor %}
@@ -180,9 +180,12 @@
                 </div>
         </form>
     </div>
-    <div id="pagination-div"  class="overflow-auto max-w-full scroll-smooth border-x border-t border-gray-300 rounded-b-2xl">
+    <div id="pagination-div"  class="border-x border-t border-gray-300 rounded-b-2xl">
 
-        {{ table(headers:headers, rows:rows, url:url) }}
+        <div class="overflow-auto max-w-full scroll-smooth ">
+            {{ table(headers:headers, rows:rows, url:url) }}            
+        </div>
+
         <div class="flex justify-end items-center w-full h-16 p-8 bg-white border-x border-b border-gray-300 rounded-b-2xl">
             {{ models.onEachSide(3).links() }}
         </div>

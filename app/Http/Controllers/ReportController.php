@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\IndividualQuestionPerformanceReport;
+use App\Exports\IndividualStudentPerformanceReportExport;
+use App\Exports\RawReportExport;
 use App\Models\Exam;
 use App\Models\Report;
 use App\Services\ExamService;
@@ -10,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Str;
@@ -67,6 +71,15 @@ class ReportController extends Controller
     }
 
     public function show(Exam $exam, Report $report){
+        if ($report->exam_id != $exam->id){
+            session()->flash('toast', json_encode([
+                'status' => 'Error!',
+                'message' => 'Mismatch exam and report.',
+                'type' => 'warning'
+            ]));
+            return redirect()->route('reports.index');
+        }
+
         $report_data = $report->report_data;
         $overview_data = $report_data['exam_overview_data'];
 
@@ -98,12 +111,12 @@ class ReportController extends Controller
         $exam_question_heatstrip = $report_data['exam_question_heatstrip'];
 
         $individual_question_stats = collect($report_data['individual_question_stats']);
-        $individual_question_stats_headers = ['Question Name', 'Type', 'Level', 'Topic' ,'Subject', 'Points', 'Average Points Obtained', 'Student Answers Count', 'Difficulty Index', 'Discrimination Index', 'Lower Group Percent Correct', 'Uppper Group Percent Correct'];
+        $individual_question_stats_headers = ['Question Name', 'Type', 'Level', 'Topic' ,'Subject', 'Attainable Points', 'Average Points Obtained', 'Student Answers Count', 'Difficulty Index', 'Discrimination Index', 'Lower Group Percent Correct', 'Uppper Group Percent Correct'];
         $individual_question_stats_rows = $individual_question_stats->map(function ($question){
             return [
                 'id' => $question['question_id'],
                 'name' => $question['question_name'],
-                'type' => $question['question_type'],
+                'type' => Str::title(str_replace('_', ' ', $question['question_type'])),
                 'level' => Str::ucfirst($question['question_level']),
                 'topic' => $question['topic_name'],
                 'subject' => $question['subject_name'],
@@ -257,27 +270,46 @@ class ReportController extends Controller
         return response('', 200)->header('HX-Redirect', route('reports.index_exam', ['exam' => $exam]));
     }
 
-    public function exportReport(Exam $exam, Report $report){
+    public function exportReport(Exam $exam, Report $report, $report_type){
         if ($report->deleted_at != null){
-            return response()->json(['error' => "This report has been archived"], 401);
+            session()->flash('toast', json_encode([
+                'status' => 'Error!',
+                'message' => 'This report has been archived.',
+                'type' => 'warning'
+            ]));
+            return redirect()->route('reports.index');
         }
     
         if ($report->exam_id != $exam->id){
-            return response()->json(['error' => "Mismatch exam and report"], 401);
+            session()->flash('toast', json_encode([
+                'status' => 'Error!',
+                'message' => 'Mismatch exam and report.',
+                'type' => 'warning'
+            ]));
+            return redirect()->route('reports.show', ['exam' => $exam, 'report' => $report]);
         }
+        $exam_name_formatted = Str::title(str_replace(' ', '_',   $exam->name));
+        switch ($report_type) {
+            case "raw":
+                $filename = $exam_name_formatted . '_' . 'Raw_Data_' . $report->created_at->format('Y-m-d') . '.xlsx';
+                return (new RawReportExport($report->id))->download($filename);
+                
+            case "indiviual_student_performance":
+                $filename = $exam_name_formatted . '_' . 'Student_Performance_' . $report->created_at->format('Y-m-d') . '.xlsx';
+                return (new IndividualStudentPerformanceReportExport($report->id))->download($filename);
 
-        $filename = $exam->name. '_' . $report->created_at->format('Y-m-d') . '.json';
-
-        // Fetch all reports, get only raw_json_data
-        $reports = DB::table('reports')->where('id', '=', $report->id)->Value('raw_report_data');
-        return response($reports,
-        200,
-        [
-            'Content-Type' => 'application/json',
-            'Content-Disposition' => "attachment; filename=\"$filename\"",
-        ]
-    );
-
+            case "indiviual_question_performance":
+                $filename = $exam_name_formatted . '_' . 'Question_Performance_' . $report->created_at->format('Y-m-d') . '.xlsx';
+                return (new IndividualQuestionPerformanceReport($report->id))->download($filename);
+            
+            default:
+                session()->flash('toast', json_encode([
+                    'status' => 'Export Report Error!',
+                    'message' => 'Invalid report type.',
+                    'type' => 'warning'
+                ]));
+        }
+        return redirect()->route('reports.show', ['exam' => $exam, 'report' => $report]);
     }
     
 }
