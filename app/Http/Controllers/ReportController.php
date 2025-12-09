@@ -111,7 +111,7 @@ class ReportController extends Controller
         $exam_question_heatstrip = $report_data['exam_question_heatstrip'];
 
         $individual_question_stats = collect($report_data['individual_question_stats']);
-        $individual_question_stats_headers = ['Question Name', 'Type', 'Level', 'Topic' ,'Subject', 'Attainable Points', 'Average Points Obtained', 'Student Answers Count', 'Difficulty Index', 'Discrimination Index', 'Lower Group Percent Correct', 'Uppper Group Percent Correct'];
+        $individual_question_stats_headers = ['Question Name', 'Type', 'Level', 'Topic' ,'Subject', 'Attainable Points', 'Average Points Obtained', 'Student Answers Count', 'Difficulty Index', 'Discrimination Index', 'Lower Group Percent Correct', 'Upper Group Percent Correct'];
         $individual_question_stats_rows = $individual_question_stats->map(function ($question){
             return [
                 'id' => $question['question_id'],

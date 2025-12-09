@@ -31,10 +31,9 @@ services:
     volumes:
       - laravel-public-assets:/var/www/public/build
       - laravel-storage-staging:/var/www/storage # Mount the storage volume
+      - ./php_custom.ini:/usr/local/etc/php/conf.d/custom.ini
     env_file:
       - .env.staging
-    volume:
-      - ./php_custom.ini:/usr/local/etc/php/conf.d/custom.ini
     networks:
       - laravel-staging
     healthcheck:
