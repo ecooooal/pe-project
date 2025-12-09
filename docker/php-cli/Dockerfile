@@ -48,6 +48,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     libicu-dev \
     libzip-dev \
+    libgd-dev \
+    libxml2-dev \
+    libfcgi-bin \
+    procps \
     && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Copy PHP extensions and libraries from the builder stage
